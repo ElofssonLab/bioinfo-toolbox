@@ -2,20 +2,26 @@ import sys
 import string
 import csv
 
-import parse_dom_assign_hmmer3_repeat
-import dict_pfam_pdb as pfam_pdb
+#import parse_dom_assign_hmmer3_repeat
+import parse_hmmer3_domtblout
+#import dict_pfam_pdb as pfam_pdb
 #import dict_pfam_pdb_clan as pfam_pdb
-import dict_pfam_numseq as pfam_numseq
+#import dict_pfam_numseq as pfam_numseq
 #import dict_pfam_numseq_clan as pfam_numseq
 
 def create_dom_dict(domfile, pfam_clan, clan_name, pfameval, extraeval, pdb_res_dict):
 
     ## parse hmmscan result file into two dictionaries
-    scan_result = parse_dom_assign_hmmer3_repeat.main(domfile, pfam_clan, clan_name, pfameval, extraeval)
+    #scan_result = parse_dom_assign_hmmer3_repeat.main(domfile, pfam_clan, clan_name, pfameval, extraeval)
+    repeat_flag = True
+    scan_result = parse_hmmer3_domtblout.main(domfile, pfameval, extraeval, repeat_flag, pfam_clan, clan_name)
+    domkey_name_dict = scan_result[0]
+    dom_prot_dict = scan_result[1]
+    prot_dom_dict = scan_result[2]
     domfile.close()
 
-    prot_dom_dict = scan_result[0]
-    domkey_name_dict = scan_result[1]
+    #prot_dom_dict = scan_result[0]
+    #domkey_name_dict = scan_result[1]
     
     ## get domain statistics
     dom_dict = {}  # [len, avg E-val, avg Bit-score, max Bit-score, avg #rep, min #rep, max #rep, #seq, best PDB, longest PDB, name]
@@ -46,8 +52,9 @@ def create_dom_dict(domfile, pfam_clan, clan_name, pfameval, extraeval, pdb_res_
                     dom_pos = dom[0]
                     #dom_eval = dom[1] # not used here
                     dom_key = dom[2]
-                    dom_len = dom[3]
-                    dom_score = dom[4]
+                    #dom_len = dom[3]
+                    dom_len = dom_pos[1] - dom_pos[0]
+                    dom_score = dom[3]
                     dom_count = dom_counts_dict[dom_key]
                     dom_res = pdb_res_dict[dom_pdb[0:4]]
                     

@@ -23,9 +23,9 @@ import matplotlib.cbook as cbook
 import parse_contacts
 #import parse_psipred
 import parse_fasta
-import parse_jones
-import parse_hmm
-import dotter
+#import parse_jones
+#import parse_hmm
+#import dotter
 
 
 # scale value x from [min_x, max_x] to [0,1]
@@ -318,7 +318,8 @@ def plot_map(contact_filename, psipred_filename, pdb_filename, rep_len, sep=',')
     #alidist = squareform(pdist(alinum.T, 'euclidean'))
     #alidistlog = np.log(alidist)
 
-    #dot_matrix = dotter.calc_dot_matrix(seq)
+    """
+    dot_matrix = dotter.calc_dot_matrix(seq)
     profile = parse_hmm.read_hmm(open('%s.hmm' % '.'.join(contact_filename.split('.')[:-1])))
     dot_matrix = dotter.calc_dot_matrix_profile(seq, profile)
     tmp_dot_matrix = dot_matrix
@@ -340,7 +341,7 @@ def plot_map(contact_filename, psipred_filename, pdb_filename, rep_len, sep=',')
                 similarities_y.append(j)
                 similarities_sc.append(score)
     dot_matrix = tmp_dot_matrix
-
+    """
 
 
     fig = plt.figure()
@@ -355,15 +356,17 @@ def plot_map(contact_filename, psipred_filename, pdb_filename, rep_len, sep=',')
         if ss[i] == 'C':
             plt.plot(i, i, 'D', c='#999999', mec='#999999', markersize=3)
     """
-    ax.imshow(dot_matrix, origin='lower', cmap=cm.binary)
+    #ax.imshow(dot_matrix, origin='lower', cmap=cm.binary)
     ax.scatter(ref_contacts_x, ref_contacts_y, marker='o', c='#CCCCCC', lw=0, edgecolor='#CCCCCC')
     ax.scatter(ref_contacts_y, ref_contacts_x, marker='o', c='#CCCCCC', lw=0, edgecolor='#CCCCCC')
     #sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c=scores[::-1], s=8, alpha=0.75, cmap=cm.jet, linewidths=0.5)
-    sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c='#0080AD', edgecolor='#0080AD', s=7, linewidths=0.5)
+    ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c='#', s=6, linewidths=0)
+    ax.scatter(contacts2_x[::-1], contacts2_y[::-1], marker='o', c='#', s=6, linewidths=0)
+    #sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c='#0080AD', edgecolor='#0080AD', s=7, linewidths=0.5)
     #sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c='#8B0043', edgecolor='#8B0043', s=7, linewidths=0.5)
     #sc = ax.scatter(contacts_y[::-1], contacts_x[::-1], marker='o', c='#0080AD', edgecolor='#0080AD', s=7, linewidths=0.5)
     #sc = ax.scatter(similarities_y[::-1], similarities_x[::-1], marker='x', edgecolor=similarities_sc[::-1], s=7, cmap=cm.binary, linewidths=0.5)
-    sc = ax.scatter(similarities_y[::-1], similarities_x[::-1], marker='x', edgecolor='#8B0043', s=7, linewidths=0.5)
+    #sc = ax.scatter(similarities_y[::-1], similarities_x[::-1], marker='x', edgecolor='#8B0043', s=7, linewidths=0.5)
     fig.suptitle(contact_filename)
     print ref_len
 
@@ -375,10 +378,11 @@ def plot_map(contact_filename, psipred_filename, pdb_filename, rep_len, sep=',')
     pp.savefig(fig)
     pp.close()
 
+    """
     outfile = open('%s.contacts' % '.'.join(contact_filename.split('.')[0:-1]),'w')
     for i in range(len(scores)):
         outfile.write('%s,%s,%s\n' % (int(contacts_x[i] + 1), int(contacts_y[i] + 1), scores[i]))
-
+    """
     """
     #pylab.matshow(numpy.transpose(contact_map), cmap=pylab.cm.binary, extent=(0, 143, 143, 0))
     #pylab.colorbar()in_same_helix(1,3,ss)

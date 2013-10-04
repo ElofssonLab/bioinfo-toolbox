@@ -46,7 +46,7 @@ def create_dom_dict(domfile, pfam_clan, clan_name, pfameval, extraeval, pdb_res_
     repeat_flag = True
     t0 = clock()
     #scan_result = parse_dom_assign_hmmer3_repeat.main(domfile, pfam_clan, clan_name, pfameval, extraeval)
-    #scan_result = parse_hmmer3_domtblout.main(domfile, pfameval, extraeval, repeat_flag, pfam_clan, clan_name)
+    scan_result = parse_hmmer3_domtblout.main(domfile, pfameval, extraeval, repeat_flag, pfam_clan, clan_name)
     #scan_result = parse_hmmer3_domtblout.main(domfile, pfameval, extraeval, repeat_flag)
     t1 = clock()
     print 'Parsing complete in %ds' % (t1 - t0)

@@ -1,4 +1,8 @@
+import sys
 import string, copy
+
+import dict_pfam_clan as pcl
+
 
 ## parses 'Pfam-A.full'
 ## output: dictionary {pfam_acc: number_of_sequences}
@@ -55,3 +59,9 @@ def main_clan(afile, pfam_clan):
 
     return pfam_numseq_dict
 
+
+
+if __name__ == '__main__':
+
+    pfam_numseq_dict = main_clan(open(sys.argv[1], 'r'), pcl.pfam_clan_dict)
+    print pfam_numseq_dict
