@@ -1,13 +1,18 @@
+#!/usr/bin/env python
+
 import string, copy
 import sys
 
-## parses any fasta, a2m, a3m file, sequence or alignment
-## ensures: key of a given query ID only contains its ID, not the full header
-## output: {header: [sequence_1, sequence_2, ...]}
 def read_fasta(afile, query_id=''):
 
-    seq_dict = {}
+    """Parses any fasta, a2m, a3m file, sequence or alignment file.
+    @param  afile       input file
+    @param  query_id    ID of query sequence (default='')
+    Ensures: key of a given query ID only contains its ID, not the full header
+    @return {header: [sequence_1, sequence_2, ...]} 
+    """
 
+    seq_dict = {}
     header = ''
     seq = ''
 
@@ -44,13 +49,16 @@ def read_fasta(afile, query_id=''):
     return seq_dict
 
 
-## parses any fasta, a2m, a3m file, sequence or alignmen
-## ensures: key = PDB accession
-## output: {PDB-acc: [sequence_1, sequence_2, ...]}
 def read_fasta_pdb(afile, query_id=''):
 
-    seq_dict = {}
+    """Parses any fasta, a2m, a3m file, sequence or alignment file.
+    @param  afile       input file
+    @param  query_id    ID of query sequence (default='')
+    Ensures: key = PDB accession
+    @return {PDB-acc: [sequence_1, sequence_2, ...]}
+    """
 
+    seq_dict = {}
     header = ''
     seq = ''
 
@@ -97,7 +105,4 @@ if __name__ == "__main__":
         query_id = ''
     seq_dict = read_fasta(afile, query_id)
     afile.close()
-
-    print seq_dict
-    #print seq_dict['>sp|P20749|BCL3_HUMAN B-cell lymphoma 3 protein OS=Homo sapiens GN=BCL3 PE=1 SV=2']
-    #print len(seq_dict)
+    print 'There are %d entries with unique headers in your file.' % len(seq_dict)

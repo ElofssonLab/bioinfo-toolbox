@@ -359,9 +359,7 @@ def plot_map(contact_filename, psipred_filename, pdb_filename, rep_len, sep=',')
     #ax.imshow(dot_matrix, origin='lower', cmap=cm.binary)
     ax.scatter(ref_contacts_x, ref_contacts_y, marker='o', c='#CCCCCC', lw=0, edgecolor='#CCCCCC')
     ax.scatter(ref_contacts_y, ref_contacts_x, marker='o', c='#CCCCCC', lw=0, edgecolor='#CCCCCC')
-    #sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c=scores[::-1], s=8, alpha=0.75, cmap=cm.jet, linewidths=0.5)
-    ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c='#', s=6, linewidths=0)
-    ax.scatter(contacts2_x[::-1], contacts2_y[::-1], marker='o', c='#', s=6, linewidths=0)
+    sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c=scores[::-1], s=8, alpha=0.75, cmap=cm.jet, linewidths=0.5)
     #sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c='#0080AD', edgecolor='#0080AD', s=7, linewidths=0.5)
     #sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c='#8B0043', edgecolor='#8B0043', s=7, linewidths=0.5)
     #sc = ax.scatter(contacts_y[::-1], contacts_x[::-1], marker='o', c='#0080AD', edgecolor='#0080AD', s=7, linewidths=0.5)
@@ -372,17 +370,16 @@ def plot_map(contact_filename, psipred_filename, pdb_filename, rep_len, sep=',')
 
     plt.gca().set_xlim([0,ref_len])
     plt.gca().set_ylim([0,ref_len])
-    #plt.colorbar(sc)
+    plt.colorbar(sc)
 
     pp = PdfPages('%s_ContactMap.pdf' % contact_filename)
     pp.savefig(fig)
     pp.close()
 
-    """
     outfile = open('%s.contacts' % '.'.join(contact_filename.split('.')[0:-1]),'w')
     for i in range(len(scores)):
         outfile.write('%s,%s,%s\n' % (int(contacts_x[i] + 1), int(contacts_y[i] + 1), scores[i]))
-    """
+
     """
     #pylab.matshow(numpy.transpose(contact_map), cmap=pylab.cm.binary, extent=(0, 143, 143, 0))
     #pylab.colorbar()in_same_helix(1,3,ss)

@@ -3,13 +3,15 @@ import sys
 # command line input
 seqfile_name = sys.argv[1]
 infile_name = sys.argv[2]
-min_dist = int(sys.argv[3])
+#min_dist = int(sys.argv[3])
+min_dist = 5
 
 # set length of a single repeat unit:
 rep_len = 33
 
 # use L * factor highest scoring constraints
-factor = 1
+factor = float(sys.argv[3])
+score = sys.argv[4]
 
 # scale value x from [min_x, max_x] to [0,1]
 # NOT USED
@@ -64,17 +66,21 @@ for constr in old_constraints:
         if seq[res2 - 1] == 'G':
             atm2 = 'CA'
         #score = scale(float(constr[2]), min_score, max_score)
-        score = float(constr[-1])
-        score = score * -20.0
-        rosetta_lines.append('AtomPair %s %d %s %d FADE -10 19 10 %.2f' % (atm1, res1, atm2, res2, round(score, 2)))
+        #score = float(constr[-1])
+        #score = score * -2.0
+        #score = -1.0 * score
+        #score = -15.0
+        rosetta_lines.append('AtomPair %s %d %s %d FADE -10 19 10 %.2f' % (atm1, res1, atm2, res2, round((float(score) * -1.0) , 2)))
+        #rosetta_lines.append('AtomPair %s %d %s %d BOUNDED 1.5 8 1 0.5 PREDICTED' % (atm1, res1, atm2, res2))
         count += 1
     if count > (seq_len * factor):
         break
-#print max_score
-#print min_score
+
 
 # write rosetta readable constraint file
-outfile_name = '.'.join(infile_name.split('.')[0:-1]) + '.constraints'
+outfile_name = '.'.join(infile_name.split('.')[0:-1]) + '-' + str(factor) + '.constraints'
+#outfile_name = '.'.join(infile_name.split('.')[0:-1]) + '-s' + score + '.constraints'
+#outfile_name = '.'.join(infile_name.split('.')[0:-1]) + '-BOUNDED.constraints'
 outfile = open(outfile_name, 'w')
 for line in rosetta_lines:
     outfile.write('%s\n' % line)
