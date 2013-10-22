@@ -21,7 +21,54 @@ def parse_atm_record(line):
     
     return record
 
+
+def read(pdbfile):
+
+    header = ''
+    res_lst = []
+    atm_lst = []
+    tail = ''
+
+    seen_atoms = False
+    curr_resi = 0
+    prev_resi = 0
     
+    for line in pdbfile:
+        if not line.startswith('ATOM') and not seen_atoms:
+            header += line
+        elif not line.startswith('ATOM') and seen_atoms:
+            tail += line
+        else:
+            atm_record = parse_atm_record(line)
+            if not seen_atoms:
+                curr_resi = atm_record['res_no']
+                prev_resi = curr_resi
+            seen_atoms = True
+            curr_resi = atm_record['res_no']
+            if curr_resi == prev_resi:
+                atm_lst.append(line)
+            else:
+                #atm_lst.append(line)
+                res_lst.append(atm_lst)
+                atm_lst = [line]
+            prev_resi = curr_resi
+    res_lst.append(atm_lst)
+     
+    pdbfile.close()
+    pdb_lst = [header, res_lst, tail]
+    return pdb_lst
+
+
+def write(pdb_lst, outfile):
+
+    outfile.write(pdb_lst[0])
+
+    for res in pdb_lst[1]:
+        for atm in res:
+            outfile.write(atm)
+            
+    outfile.write(pdb_lst[2])
+    outfile.close()
 
 
 def get_coordinates(pdbfile, chain):
@@ -174,6 +221,7 @@ def get_atom_seq(pdbfile, chain):
     three_to_one = {'ARG':'R', 'HIS':'H', 'LYS':'K', 'ASP':'D', 'GLU':'E', 'SER':'S', 'THR':'T', 'ASN':'N', 'GLN':'Q', 'CYS':'C', 'GLY':'G', 'PRO':'P', 'ALA':'A', 'ILE':'I', 'LEU':'L', 'MET':'M', 'PHE':'F', 'TRP':'W', 'TYR':'Y', 'VAL':'V', 'UNK': 'X'}
     res_dict = {}
     
+    res_name = ''
     for line in pdbfile:
         if not line.startswith('ATOM'):
             continue
@@ -182,28 +230,15 @@ def get_atom_seq(pdbfile, chain):
             continue
 
         res_i = atm_record['res_no']
-        res_name = three_to_one[atm_record['res_name']]
+        #print atm_record['res_name']
+        if atm_record['res_name'] in three_to_one:
+            #res_name = three_to_one[atm_record['res_name']]
+            #print res_name
+            res_name = three_to_one[atm_record['res_name']]
+        #else:
+            #res_name = ''
+            #continue
 
-        """
-        line_arr = line.split()
-
-        if len(line_arr[2]) > 4:
-            if line_arr[3] != chain:
-                continue
-            res_name = three_to_one[line_arr[2][-3:]]
-            try:
-                res_i = int(line_arr[4])
-            except ValueError as exc:
-                continue
-        else:
-            if line_arr[4] != chain:
-                continue
-            res_name = three_to_one[line_arr[3][-3:]]
-            try:
-                res_i = int(line_arr[5])
-            except ValueError as exc:
-                continue
-        """
         res_dict[res_i] = res_name
 
     res_lst = sorted(res_dict.iteritems(), key=operator.itemgetter(0))
@@ -214,6 +249,19 @@ def get_atom_seq(pdbfile, chain):
 
     pdbfile.close()
     return atom_seq
+
+
+def get_first_chain(pdbfile):
+
+    for line in pdbfile:
+        if not line.startswith('ATOM'):
+            continue
+        atm_record = parse_atm_record(line)
+        break
+
+    pdbfile.close
+    return atm_record['chain']
+ 
 
 
 

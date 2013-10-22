@@ -121,9 +121,106 @@ def get_dom_seq(acc, ref_len, query_file):
         return dom_seq, dom_lst
 
 
+def get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, dom_lst, ref_len, factor):
+
+    PPVs = []
+    inter_PPVs = []
+    intra_PPVs = []
+    TPs = []
+    inter_TPs = []
+    intra_TPs = []
+    FPs = []
+    inter_FPs = []
+    intra_FPs = []
+
+    for num_c in range(min(len(contacts_x), ref_len * factor))[1:]:
+        TP = 0.0
+        intra_TP = 0.0
+        inter_TP = 0.0
+        FP = 0.0
+        intra_FP = 0.0
+        inter_FP = 0.0
+        for i in range(num_c):
+            c_x = contacts_x[i]
+            c_y = contacts_y[i]
+            if atom_seq_ali[c_x] == '-':
+                continue
+            if atom_seq_ali[c_y] == '-':
+                continue
+            c_x_dom = in_dom(c_x, dom_lst)
+            c_y_dom = in_dom(c_y, dom_lst)
+            #print c_x_dom
+            #print c_y_dom
+            if ref_contact_map[c_x, c_y] > 0:
+                TP += 1.0
+                if c_x_dom != c_y_dom and c_x_dom != 0 and c_y_dom != 0:
+                    inter_TP += 1.0
+                if c_x_dom == c_y_dom and c_x_dom != 0 and c_y_dom != 0:
+                    intra_TP += 1.0
+            else:
+                FP += 1.0
+                if c_x_dom != c_y_dom and c_x_dom != 0 and c_y_dom != 0:
+                    inter_FP += 1.0
+                if c_x_dom == c_y_dom and c_x_dom != 0 and c_y_dom != 0:
+                    intra_FP += 1.0
+
+        #print '%s, %s, %s, %s, %s, %s' % (TP, FP, inter_TP, inter_FP, intra_TP, intra_FP)
+        if TP > 0 and FP > 0:
+            PPVs.append(TP / (TP + FP))
+            if inter_TP > 0 or inter_FP > 0:
+                inter_PPVs.append(inter_TP / (inter_TP + inter_FP))
+            if intra_TP > 0 or intra_FP > 0:
+                intra_PPVs.append(intra_TP / (intra_TP + intra_FP))
+            TPs.append(TP / ref_len)
+            FPs.append(FP / ref_len)
+
+    #print len(PPVs)
+    if len(PPVs) == 0:
+        PPVs.append(0.0)
+    """
+    if len(inter_PPVs) > 0:
+        #print inter_PPVs[-1]
+    else:
+        inter_PPVs.append(0.0)
+        #print inter_PPVs[-1]
+    
+    if len(intra_PPVs) > 0:
+        #print intra_PPVs[-1]
+    else:
+        intra_PPVs.append(0.0)
+        #print intra_PPVs
+    """
+    #print TPs[-1]
+    #print FPs[-1]
+    return PPVs
+
+
+def get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali):
+
+    tp_colors = []
+
+    for i in range(len(contacts_x)):
+        c_x = contacts_x[i]
+        c_y = contacts_y[i]
+        if atom_seq_ali[c_x] == '-':
+            #tp_colors.append('green')
+            tp_colors.append('red')
+            continue
+        if atom_seq_ali[c_y] == '-':
+            #tp_colors.append('green')
+            tp_colors.append('red')
+            continue
+        if ref_contact_map[c_x, c_y] > 0:
+            tp_colors.append('blue')
+        else:
+            tp_colors.append('red')
+
+    return tp_colors
+ 
+
 def plot_map(fasta_filename, contact_filename, psipred_filename, pdb_filename, chain, factor, sep=','):  
     
-    rep_len = 1000
+    #rep_len = 1000
     #psipred_filename = '%s.horiz' % '.'.join(fasta_filename.split('.')[:-1])
     ss = parse_psipred.horizontal(open(psipred_filename, 'r'))
     seq = parse_fasta.read_fasta(open(fasta_filename, 'r')).values()[0][0]
@@ -277,77 +374,9 @@ def plot_map(fasta_filename, contact_filename, psipred_filename, pdb_filename, c
         if count >= ref_len * 1.0:
             break
     """
-
-    PPVs = []
-    inter_PPVs = []
-    intra_PPVs = []
-    TPs = []
-    inter_TPs = []
-    intra_TPs = []
-    FPs = []
-    inter_FPs = []
-    intra_FPs = []
-
-    for num_c in range(min(len(contacts_x), ref_len * factor))[1:]:
-        TP = 0.0
-        intra_TP = 0.0
-        inter_TP = 0.0
-        FP = 0.0
-        intra_FP = 0.0
-        inter_FP = 0.0
-        for i in range(num_c):
-            c_x = contacts_x[i]
-            c_y = contacts_y[i]
-            if atom_seq_ali[c_x] == '-':
-                continue
-            if atom_seq_ali[c_y] == '-':
-                continue
-            c_x_dom = in_dom(c_x, dom_lst)
-            c_y_dom = in_dom(c_y, dom_lst)
-            #print c_x_dom
-            #print c_y_dom
-            if ref_contact_map[c_x, c_y] > 0:
-                TP += 1.0
-                if c_x_dom != c_y_dom and c_x_dom != 0 and c_y_dom != 0:
-                    inter_TP += 1.0
-                if c_x_dom == c_y_dom and c_x_dom != 0 and c_y_dom != 0:
-                    intra_TP += 1.0
-            else:
-                FP += 1.0
-                if c_x_dom != c_y_dom and c_x_dom != 0 and c_y_dom != 0:
-                    inter_FP += 1.0
-                if c_x_dom == c_y_dom and c_x_dom != 0 and c_y_dom != 0:
-                    intra_FP += 1.0
-
-        #print '%s, %s, %s, %s, %s, %s' % (TP, FP, inter_TP, inter_FP, intra_TP, intra_FP)
-        if TP > 0 and FP > 0:
-            PPVs.append(TP / (TP + FP))
-            if inter_TP > 0 or inter_FP > 0:
-                inter_PPVs.append(inter_TP / (inter_TP + inter_FP))
-            if intra_TP > 0 or intra_FP > 0:
-                intra_PPVs.append(intra_TP / (intra_TP + intra_FP))
-            TPs.append(TP / ref_len)
-            FPs.append(FP / ref_len)
-
-    #print len(PPVs)
-    if len(PPVs) == 0:
-        PPVs.append(0.0)
-    """
-    if len(inter_PPVs) > 0:
-        #print inter_PPVs[-1]
-    else:
-        inter_PPVs.append(0.0)
-        #print inter_PPVs[-1]
-    
-    if len(intra_PPVs) > 0:
-        #print intra_PPVs[-1]
-    else:
-        intra_PPVs.append(0.0)
-        #print intra_PPVs
-    """
-    #print TPs[-1]
-    #print FPs[-1]
-    
+    PPVs = get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, dom_lst, ref_len, factor)
+    tp_colors = get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali)
+   
     acc = contact_filename.split('.')[0]
 
     #print '%s\t%s' % (acc, '\t'.join(map(str, PPVs)))
@@ -415,7 +444,8 @@ inter_PPV_file = open('/bubo/home/h9/mircomic/glob/2013-05-29_human_repeats/pcon
     #ax.scatter(range(ref_len), range(ref_len), marker='d', c=dom_seq_lst, lw=0, edgecolor=dom_seq_lst, cmap=cm.spectral_r)
     #plt.plot(ref_contacts_x, ref_contacts_y, 'o', c='#CCCCCC', mec='#CCCCCC')
     
-    sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c=scores[::-1], s=4, alpha=0.75, cmap=cm.jet, linewidths=0.5)
+    #sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c=scores[::-1], s=4, alpha=0.75, cmap=cm.jet, linewidths=0.5)
+    sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c=tp_colors[::-1], s=6, alpha=0.75, linewidths=0.0)
     
     #sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c='#004F9D', edgecolor='#004F9D', s=4, linewidths=0.5)
     #sc = ax.scatter(contacts2_y[::-1], contacts2_x[::-1], marker='o', c='#D70909', edgecolor='#D70909', s=4, linewidths=0.5)
@@ -426,7 +456,7 @@ inter_PPV_file = open('/bubo/home/h9/mircomic/glob/2013-05-29_human_repeats/pcon
 
     plt.gca().set_xlim([0,ref_len])
     plt.gca().set_ylim([0,ref_len])
-    plt.colorbar(sc)
+    #plt.colorbar(sc)
     #cbar = plt.colorbar(ax, ticks=[min(scores), max(scores)])
     #cbar.ax.set_yticklabels(['Low', 'High'])
     #cbar.set_label(r'Contact Score')
@@ -469,6 +499,6 @@ if __name__ == "__main__":
 
     pdb_filename = sys.argv[4]
     chain = sys.argv[5]
-    factor = sys.argv[6]
+    factor = float(sys.argv[6])
     plot_map(fasta_filename, contact_filename, psipred_filename, pdb_filename, chain, factor, sep)
 

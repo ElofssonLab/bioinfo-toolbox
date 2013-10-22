@@ -1,6 +1,8 @@
+#!/bin/python
 import sys
-import parse_vall
-import parse_cath_clf
+sys.path.append('/home/mircomic/toolbox')
+from parsing import parse_vall
+from parsing import parse_cath_clf
 from time import clock
 
 
