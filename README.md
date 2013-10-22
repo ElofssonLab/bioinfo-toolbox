@@ -1,6 +1,7 @@
 <h3>Bioinfo Toolbox</h3><br>
 Some scripts I thought might be useful to the whole group.<br>
-Most of it is still quite messy and/or rather quick'n'dirty.. so please go ahead and feel free to add/improve/document as much as you like!!
+Most of it is still quite messy and/or rather quick'n'dirty.. so please go ahead and feel free to add/improve/document as much as you like!!<br>
+The only <strong>restriction</strong> here is: if you want to adjust the input/output of a function, either use optional arguments or create a new definition of the function. Otherwise existing workflows might get disrupted.<br>
 <br><br>
 The following folders contain different python modules:<br>
 <ul>
