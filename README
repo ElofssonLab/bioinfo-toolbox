@@ -1,8 +1,0 @@
-Mirco's toolbox of utterly useful scripts.
-
-It contains the following folders:
-
-alignment - parsing and working on multiple sequence alignments
-contacts - parsing contact map files, reformatting contacts to rosetta constraints, plotting
-hmmscan - parsing domtblout files, parsing pfam/pdb-index files, repeat/multidomain analysis
-rosetta - fragment filtering, parse fragment/vall/cath_clf files
