@@ -229,7 +229,11 @@ def get_atom_seq(pdbfile, chain):
 
     three_to_one = {'ARG':'R', 'HIS':'H', 'LYS':'K', 'ASP':'D', 'GLU':'E', 'SER':'S', 'THR':'T', 'ASN':'N', 'GLN':'Q', 'CYS':'C', 'GLY':'G', 'PRO':'P', 'ALA':'A', 'ILE':'I', 'LEU':'L', 'MET':'M', 'PHE':'F', 'TRP':'W', 'TYR':'Y', 'VAL':'V', 'UNK': 'X'}
     res_dict = {}
-    
+ 
+    if not chain:
+        chain = get_first_chain(pdbfile)
+        pdbfile.seek(0)
+
     res_name = ''
     for line in pdbfile:
         if not line.startswith('ATOM'):
