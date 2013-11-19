@@ -75,6 +75,10 @@ def get_coordinates(pdbfile, chain):
 
     res_dict = defaultdict(list)
 
+    if not chain:
+        chain = get_first_chain(pdbfile)
+        pdbfile.seek(0)
+
     for line in pdbfile:
         if not line.startswith('ATOM'):
             continue
@@ -127,10 +131,15 @@ def get_cb_coordinates(pdbfile, chain):
     cb_lst = []
     res_dict = defaultdict(list)
 
+    if not chain:
+        chain = get_first_chain(pdbfile)
+        pdbfile.seek(0)
+
     for line in pdbfile:
         if not line.startswith('ATOM'):
             continue
         atm_record = parse_atm_record(line)
+
         if atm_record['chain'] != ' ' and atm_record['chain'] != chain:
             continue
 
@@ -220,7 +229,11 @@ def get_atom_seq(pdbfile, chain):
 
     three_to_one = {'ARG':'R', 'HIS':'H', 'LYS':'K', 'ASP':'D', 'GLU':'E', 'SER':'S', 'THR':'T', 'ASN':'N', 'GLN':'Q', 'CYS':'C', 'GLY':'G', 'PRO':'P', 'ALA':'A', 'ILE':'I', 'LEU':'L', 'MET':'M', 'PHE':'F', 'TRP':'W', 'TYR':'Y', 'VAL':'V', 'UNK': 'X'}
     res_dict = {}
-    
+ 
+    if not chain:
+        chain = get_first_chain(pdbfile)
+        pdbfile.seek(0)
+
     res_name = ''
     for line in pdbfile:
         if not line.startswith('ATOM'):
@@ -259,7 +272,6 @@ def get_first_chain(pdbfile):
         atm_record = parse_atm_record(line)
         break
 
-    pdbfile.close
     return atm_record['chain']
  
 
