@@ -17,7 +17,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
-sys.path.append('%s/toolbox' % home)
+sys.path.append('%s/bioinfo-toolbox' % home)
 from parsing import parse_contacts
 from parsing import parse_psipred
 from parsing import parse_fasta
