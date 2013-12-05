@@ -25,6 +25,7 @@ def get_scores(f):
         if not line and in_hit:
             in_hit = False
             ID = ''
+            continue
 
         # parse hit list
         if in_hit:
@@ -38,11 +39,13 @@ def get_scores(f):
             score = float(line_arr[-5])
             len = int(line_arr[-3])
             # the only thing missing is ident (default: -1)
-            result_dict[ID] = (eval, ident, score, len)
+            if not ID in result_dict:
+                result_dict[ID] = (eval, ident, score, len)
+            continue
 
         # parse verbose result list to get the identities
         if line.startswith('>'):
-            if ID:
+            if ID and result_dict[ID][1] == -1:
                 score_lis = list(result_dict[ID])
                 score_lis[1] = ident
                 result_dict[ID] = tuple(score_lis)
