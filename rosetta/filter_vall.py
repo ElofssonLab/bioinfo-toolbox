@@ -1,6 +1,9 @@
 #!/bin/python
 import sys
-sys.path.append('/home/mircomic/toolbox')
+import os
+import cPickle as pickle
+
+sys.path.append('/home/x_mirmi/bioinfo-toolbox')
 from parsing import parse_vall
 from parsing import parse_cath_clf
 from time import clock
@@ -35,7 +38,12 @@ def main(vallfile_name, clf_name, pdb_id):
     
     print 'Parsing started...'
     t0 = clock()
-    vallfile_list = parse_vall.read(open(vallfile_name, 'r'))
+    if not os.path.exists('%s.pickle' % vallfile_name):
+        vallfile_list = parse_vall.read(open(vallfile_name, 'r'))
+        pickle.dump(vallfile_list, open('%s.pickle' % vallfile_name, 'w'))
+    else:
+        vallfile_list = pickle.load(open('%s.pickle' % vallfile_name, 'r'))
+
     t1 = clock()
     print 'Parsing ended in %ds.\n' % (t1 - t0)
 
@@ -58,7 +66,7 @@ if __name__ == '__main__':
 
     print 'Writing started...'
     t0 = clock()
-    parse_vall.write(new_vallfile_list, open('%s' % sys.argv[1], 'w'))
+    parse_vall.write(new_vallfile_list, open('%s' % sys.argv[4], 'w'))
     t1 = clock()
     print 'Writing ended in %ds.\n' % (t1 - t0)
 
