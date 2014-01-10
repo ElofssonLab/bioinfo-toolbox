@@ -1,14 +1,16 @@
 import sys
 
 sys.path.append('/bubo/sw/apps/bioinfo/biopython/1.59/tintin/lib/python')
+sys.path.append('/home/x_mirmi/glob/biopython')
 from Bio import pairwise2
 
 sys.path.append('/home/mircomic/toolbox')
+sys.path.append('/home/x_mirmi/toolbox')
 from parsing import parse_pdb
 
 
 
-def fix(pdb1_filename, pdb2_filename):
+def fix(pdb1_filename, pdb2_filename, out_filename):
 
     pdb1 = parse_pdb.read(open(pdb1_filename, 'r'))
     chain1 = parse_pdb.get_first_chain(open(pdb1_filename, 'r'))
@@ -43,7 +45,6 @@ def fix(pdb1_filename, pdb2_filename):
             pdb2_idx.append(idx)
         #else:
 
-
     pdb2_new = ['', [], pdb2[2]]
     i = 0
     prev_idx = -1
@@ -55,7 +56,8 @@ def fix(pdb1_filename, pdb2_filename):
             i = i+1
             continue
         elif new_idx == prev_idx:
-            break
+            i = i+1
+            continue
         else:
             for atm in res:
                 new_idx_str = str(pdb2_idx[i])
@@ -75,7 +77,10 @@ def fix(pdb1_filename, pdb2_filename):
     #print len(pdb2_idx)
     #print align[-1]
     #print len(align[-1][1])
-    pdb2_outfile = open('.'.join(pdb2_filename.split('.')[:-1]) + '.aligned.pdb', 'w')
+    if out_filename:
+        pdb2_outfile = open(out_filename, 'w')
+    else:
+        pdb2_outfile = open('.'.join(pdb2_filename.split('.')[:-1]) + '.aligned.pdb', 'w')
     parse_pdb.write(pdb2_new, pdb2_outfile)
     
 

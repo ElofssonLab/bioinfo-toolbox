@@ -13,6 +13,7 @@ def parse_atm_record(line):
     record['res_name'] = line[17:20].strip()
     record['chain'] = line[21]
     record['res_no'] = int(line[22:26])
+    record['insert'] = line[26].strip()
     record['x'] = float(line[30:38])
     record['y'] = float(line[38:46])
     record['z'] = float(line[46:54])
@@ -243,6 +244,10 @@ def get_atom_seq(pdbfile, chain):
             continue
 
         res_i = atm_record['res_no']
+        
+        if atm_record['insert'] == 'X':
+            res_i = res_i * 0.001
+         
         #print atm_record['res_name']
         if atm_record['res_name'] in three_to_one:
             #res_name = three_to_one[atm_record['res_name']]
@@ -283,6 +288,6 @@ if __name__ == '__main__':
     chain = sys.argv[2]
     #print get_atom_seq(pdbfile, chain)
     pdbfile.close()
-    pdbfile = open(sys.argv[1], 'r')
+    #pdbfile = open(sys.argv[1], 'r')
     #print get_coordinates(pdbfile)
-    pdbfile.close()
+    #pdbfile.close()
