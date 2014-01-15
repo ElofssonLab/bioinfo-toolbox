@@ -1,11 +1,7 @@
 import sys
 import argparse
 from math import *
-from os.path import expanduser
-home = expanduser("~")
 
-# on UPPMAX only
-#sys.path.append('/bubo/sw/apps/bioinfo/biopython/1.59/tintin/lib/python')
 import Bio.PDB
 from Bio import pairwise2
 
@@ -17,7 +13,6 @@ from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
-sys.path.append('%s/bioinfo-toolbox' % home)
 from parsing import parse_contacts
 from parsing import parse_psipred
 from parsing import parse_fasta
@@ -127,7 +122,7 @@ def get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali):
     return tp_colors
  
 
-def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_filename='', pdb_filename='', is_heavy=False, chain='', sep=','):  
+def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_filename='', pdb_filename='', is_heavy=False, chain='', sep=',', outfilename=''):  
    
     acc = c_filename.split('.')[0]
 
@@ -281,9 +276,19 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_filenam
     plt.gca().set_xlim([0,ref_len])
     plt.gca().set_ylim([0,ref_len])
 
-    pp = PdfPages('%s_ContactMap.pdf' % c_filename)
-    pp.savefig(fig)
-    pp.close()
+    if outfilename:
+        if outfilename.endswith('.pdf'):
+            pp = PdfPages(outfilename)
+            pp.savefig(fig)
+            pp.close()
+        else:
+            pp = PdfPages('%s.pdf' % outfilename)
+            pp.savefig(fig)
+            pp.close()
+    else:
+        pp = PdfPages('%s_ContactMap.pdf' % c_filename)
+        pp.savefig(fig)
+        pp.close()
 
 
     
@@ -292,6 +297,7 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(description='Plot protein residue contact maps.')
     p.add_argument('fasta_file')#, required=True)
     p.add_argument('contact_file')#, required=True)
+    p.add_argument('-o', '--outfile', default='')
     p.add_argument('-f', '--factor', default=2.0, type=float)
     p.add_argument('--c2', default='')
     p.add_argument('--psipred_horiz', default='')
@@ -314,5 +320,5 @@ if __name__ == "__main__":
     else:
         sep = '\t'
     
-    plot_map(args['fasta_file'], args['contact_file'], args['factor'], c2_filename=args['c2'], psipred_filename=args['psipred_horiz'], pdb_filename=args['pdb'], is_heavy=args['heavy'], chain=args['chain'], sep=sep)
+    plot_map(args['fasta_file'], args['contact_file'], args['factor'], c2_filename=args['c2'], psipred_filename=args['psipred_horiz'], pdb_filename=args['pdb'], is_heavy=args['heavy'], chain=args['chain'], sep=sep, outfilename=args['outfile'])
 
