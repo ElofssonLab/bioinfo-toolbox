@@ -13,6 +13,9 @@ from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
+sys.path.append('/home/x_mirmi/bioinfo-toolbox')
+sys.path.append('/home/mircomic/bioinfo-toolbox')
+
 from parsing import parse_contacts
 from parsing import parse_psipred
 from parsing import parse_fasta
@@ -218,7 +221,7 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_filenam
    
         print '%s\t%s' % (acc, PPVs[-1])
       
-        ax.scatter(ref_contacts_x, ref_contacts_y, marker='o', c='#CCCCCC', lw=0)
+        ax.scatter(ref_contacts_x, ref_contacts_y, marker='o', c='#CCCCCC', lw=0, edgecolor='#CCCCCC')
 
 
     ### plot predicted contacts from second contact map if given
