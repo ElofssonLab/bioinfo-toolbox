@@ -12,13 +12,13 @@ def plot(filename):
     L = 0
     for line in alifile:
         N += 1
-        tmp.write('>seq:%s\n' % N)
-        tmp.write(line)
+        #tmp.write('>seq:%s\n' % N)
+        #tmp.write(line)
         if L == 0:
             for chr in line:
                 L += 1
     alifile.close()
-    tmp.close()
+    #tmp.close()
     aliarr = np.zeros((N, L))
     alifile = open(filename, 'r')
     i = 0
