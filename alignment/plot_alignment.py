@@ -7,7 +7,7 @@ import matplotlib.cm as cm
 
 def plot(filename):
     alifile = open(filename, 'r')
-    tmp = open('.'.join(filename.split('.')[:-1]) + '.fas', 'w')
+    #tmp = open('.'.join(filename.split('.')[:-1]) + '.fas', 'w')
     N = 0
     L = 0
     for line in alifile:
