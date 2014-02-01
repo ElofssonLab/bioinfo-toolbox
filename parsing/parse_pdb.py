@@ -147,96 +147,26 @@ def get_cb_coordinates(pdbfile, chain):
         res_i = atm_record['res_no']
         
         atm = [float('inf'), float('inf'), float('inf')]
-        # in case of glycine add CA
-        """
-        if 'GLY' in atm_record['res_name'] and atm_record['atm_name'] == 'CA':
-                atm = [atm_record['x'], atm_record['y'], atm_record['z']]
-                res_dict[res_i].append(np.array(atm))
-        """
-        # sometimes there are residues at the beginning or end without CB
-        # => add CA as well and later select the last added atom 
-        # (= CA if there is only one, CB otherwise)
-        """
-        if 'ARG' in atm_record['res_name'] and atm_record['atm_name'] == 'CA':
-                atm = [atm_record['x'], atm_record['y'], atm_record['z']]
-                res_dict[res_i].append(np.array(atm))
-        """
+
         if atm_record['atm_name'] == 'CA':
                 atm = [atm_record['x'], atm_record['y'], atm_record['z']]
                 res_dict[res_i].append(np.array(atm))    
         elif atm_record['atm_name'] == 'CB':
                 atm = [atm_record['x'], atm_record['y'], atm_record['z']]
-                res_dict[res_i].append(np.array(atm))    
+                res_dict[res_i].append(np.array(atm))  
         
-
-        """
-        line_arr = line.split()
-
-        if line_arr[4] != chain:
-            continue
-
-        if line_arr[2] == 'CA':
-            try:
-                res_i = int(line_arr[5])
-            except ValueError as exc:
-                continue
-            try:
-                atm = map(float, line_arr[6:9])
-            except ValueError as exc:
-                atm = [float('inf'), float('inf'), float('inf')]
-            res_dict[res_i].append(np.array(atm))
-        else:
-            if line_arr[2] != 'CB':
-                continue
-            try:
-                res_i = int(line_arr[5])
-            except ValueError as exc:
-                continue
-            if len(line_arr[3]) > 3 and line_arr[3].startswith('A'):
-                try:
-                    atm = map(float, line_arr[6:9])
-                except ValueError as exc:
-                    atm = [float('inf'), float('inf'), float('inf')]
-                atm_count += 1
-                cb_lst.append(np.array(atm))
-                res_dict[res_i].append(np.array(atm))
-            elif len(line_arr[3]) == 3:
-                try:
-                    atm = map(float, line_arr[6:9])
-                except ValueError as exc:
-                    atm = [float('inf'), float('inf'), float('inf')]
-                atm_count += 1
-                cb_lst.append(np.array(atm))
-                res_dict[res_i].append(np.array(atm))
-        #print line_arr[2]
-        
-        if line_arr[3] == 'GLY' or line_arr[3] == 'AGLY':
-            if line_arr[2] != 'CA':
-                continue
-            try:
-                res_i = int(line_arr[5])
-            except ValueError as exc:
-                continue
-            try:
-                atm = map(float, line_arr[6:9])
-            except ValueError as exc:
-                atm = [float('inf'), float('inf'), float('inf')]
-            #atm = map(float, line_arr[6:9])
-            atm_count += 1
-            cb_lst.append(np.array(atm))
-        """
- 
     cb_lst = []
-    for i in xrange(res_i):
-        if len(res_dict[i+1]) > 1:
-            #print res_dict[i+1]
-            cb_lst.append(res_dict[i+1][-1])
-        elif len(res_dict[i+1]) == 1:
-            #print res_dict[i+1]
-            cb_lst.append(res_dict[i+1][0])
+    num_res = len(res_dict)+2
+    tmp_i = 0
+    for i in res_dict.keys():
+        if len(res_dict[i]) > 1:
+            tmp_i += 1
+            cb_lst.append(res_dict[i][-1])
+        elif len(res_dict[i]) == 1:
+            tmp_i += 1
+            cb_lst.append(res_dict[i][0])
     #print atm_count 
     pdbfile.close()
-    #print cb_lst
     return cb_lst
 
 
