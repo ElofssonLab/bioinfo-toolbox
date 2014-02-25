@@ -2,11 +2,9 @@ import sys
 import argparse
 from math import *
 
-<<<<<<< HEAD
 # on UPPMAX only
 sys.path.append('/sw/apps/bioinfo/biopython/1.59/tintin/lib/python')
-=======
->>>>>>> d158d5c8c37c9c84d8c3fb2e292bc47227ec73d7
+
 import Bio.PDB
 from Bio import pairwise2
 
