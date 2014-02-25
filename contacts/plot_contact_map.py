@@ -5,7 +5,7 @@ from os.path import expanduser
 home = expanduser("~")
 
 # on UPPMAX only
-#sys.path.append('/bubo/sw/apps/bioinfo/biopython/1.59/tintin/lib/python')
+sys.path.append('/sw/apps/bioinfo/biopython/1.59/tintin/lib/python')
 import Bio.PDB
 from Bio import pairwise2
 
