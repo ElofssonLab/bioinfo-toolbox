@@ -127,7 +127,8 @@ def get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali):
 
 def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_filename='', pdb_filename='', is_heavy=False, chain='', sep=',', outfilename=''):  
    
-    acc = c_filename.split('.')[0]
+    #acc = c_filename.split('.')[0]
+    acc = fasta_filename.split('.')[0][:4]
 
     ### get sequence
     seq = parse_fasta.read_fasta(open(fasta_filename, 'r')).values()[0][0]
@@ -180,7 +181,7 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_filenam
         res_lst = parse_pdb.get_coordinates(open(pdb_filename, 'r'), chain)
         cb_lst = parse_pdb.get_cb_coordinates(open(pdb_filename, 'r'), chain)
         atom_seq = parse_pdb.get_atom_seq(open(pdb_filename, 'r'), chain)
-
+                
         align = pairwise2.align.globalms(atom_seq, seq, 2, -1, -0.5, -0.1)
 
         atom_seq_ali = align[-1][0]
