@@ -16,8 +16,9 @@ from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
-sys.path.append('/home/x_mirmi/bioinfo-toolbox')
-sys.path.append('/home/mircomic/bioinfo-toolbox')
+from os.path import expanduser
+home = expanduser("~")
+sys.path.append(home + '/bioinfo-toolbox')
 
 from parsing import parse_contacts
 from parsing import parse_psipred

@@ -25,3 +25,16 @@ def parse(afile, sep=' '):
 
     contacts.sort(key=lambda x: x[0], reverse=True)
     return contacts
+
+
+def write(contacts, outfile, sep=' '):
+
+    """Write contact file.
+    @param  contacts    contact list
+    @param  outfile     output contact file
+    @param  sep     separator of contact file (default=' ')
+    """
+
+    for c in contacts:
+        outfile.write('%d%s%d%s%f\n' % (c[1], sep, c[2], sep, c[0]))
+
