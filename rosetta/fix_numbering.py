@@ -1,6 +1,7 @@
 import sys
 
 sys.path.append('/bubo/sw/apps/bioinfo/biopython/1.59/tintin/lib/python')
+sys.path.append('/sw/apps/bioinfo/biopython/1.59/tintin/lib/python')
 sys.path.append('/home/x_mirmi/glob/biopython')
 from Bio import pairwise2
 
