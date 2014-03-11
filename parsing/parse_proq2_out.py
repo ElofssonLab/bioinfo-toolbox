@@ -6,7 +6,7 @@ def parse(f, prefix=""):
     for l in f:
         l = l.strip()
         l_lst = l.split()
-        map(float, l_lst[1:-1])
+        l_lst[1:-1] = map(float, l_lst[1:-1])
         new_tag = prefix + l_lst[-1]
         l_lst[-1] = new_tag
         result.append(l_lst[1:])
