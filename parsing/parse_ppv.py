@@ -5,7 +5,6 @@ def parse(f):
     f.readline()
     for l in f:
         l_lst = l.strip().split()
-        print l_lst
         ppv_dict[l_lst[0]] = float(l_lst[1])
     return ppv_dict
 
