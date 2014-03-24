@@ -23,7 +23,7 @@ def parse_atm_record(line):
     return record
 
 
-def read(pdbfile):
+def read(pdbfile, chain=''):
 
     header = ''
     res_lst = []
@@ -41,6 +41,8 @@ def read(pdbfile):
             tail += line
         else:
             atm_record = parse_atm_record(line)
+            if chain and not chain == atm_record['chain']:
+                continue
             if not seen_atoms:
                 curr_resi = atm_record['res_no']
                 prev_resi = curr_resi

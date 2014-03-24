@@ -11,14 +11,16 @@ from parsing import parse_pdb
 
 
 
-def fix(pdb1_filename, pdb2_filename, out_filename):
+def fix(pdb1_filename, pdb2_filename, out_filename, chain1='', chain2=''):
 
-    pdb1 = parse_pdb.read(open(pdb1_filename, 'r'))
-    chain1 = parse_pdb.get_first_chain(open(pdb1_filename, 'r'))
+    if not chain1:
+        chain1 = parse_pdb.get_first_chain(open(pdb1_filename, 'r'))
+    pdb1 = parse_pdb.read(open(pdb1_filename, 'r'), chain1)
     seq1 = parse_pdb.get_atom_seq(open(pdb1_filename, 'r'), chain1)
 
-    pdb2 = parse_pdb.read(open(pdb2_filename, 'r'))
-    chain2 = parse_pdb.get_first_chain(open(pdb2_filename, 'r'))
+    if not chain2:
+        chain2 = parse_pdb.get_first_chain(open(pdb2_filename, 'r'))
+    pdb2 = parse_pdb.read(open(pdb2_filename, 'r'), chain2)
     seq2 = parse_pdb.get_atom_seq(open(pdb2_filename, 'r'), chain2)
 
     align = pairwise2.align.globalms(seq1, seq2, 2, -1, -0.5, -0.1)
@@ -45,11 +47,11 @@ def fix(pdb1_filename, pdb2_filename, out_filename):
             idx = i+1 + offset
             pdb2_idx.append(idx)
         #else:
-
     pdb2_new = ['', [], pdb2[2]]
     i = 0
     prev_idx = -1
-
+    #print pdb2_idx
+    #print len(pdb2[1])
     for res in pdb2[1]:
         new_res = []
         new_idx = pdb2_idx[i]
