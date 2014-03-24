@@ -23,7 +23,7 @@ def parse_atm_record(line):
     return record
 
 
-def read(pdbfile, chain=''):
+def read(pdbfile, chain='', model=1):
 
     header = ''
     res_lst = []
@@ -31,27 +31,57 @@ def read(pdbfile, chain=''):
     tail = ''
 
     seen_atoms = False
+    in_atoms = False
+    in_model = False
     curr_resi = 0
     prev_resi = 0
     
     for line in pdbfile:
-        if not line.startswith('ATOM') and not seen_atoms:
+        if line.startswith('MODEL') and int(line.strip().split()[-1]) == model:
+            in_model = True
+            header += line
+        elif in_model and line.startswith('TER'):
+            atm_record = parse_atm_record(atm_lst[-1])
+            if chain and not chain == atm_record['chain']:
+                continue
+            seen_atoms = True
+            #print "seen_atoms model"
+            #print len(res_lst)
+            #in_atoms = False
+            tail += line
+        elif in_model and line.startswith('ENDMDL'):
+            in_model = False
+            tail += line
+        elif line.startswith('MODEL') and not int(line.strip().split()[-1]) == model:
+            continue
+        elif not in_model and line.startswith('TER'):
+            atm_record = parse_atm_record(atm_lst[-1])
+            if chain and not chain == atm_record['chain']:
+                continue
+            seen_atoms = True
+            #in_atoms = False
+            #print "seen atoms"
+            #print len(res_lst)
+            continue
+        elif not in_model and line.startswith('ENDMDL'):
+            continue
+        elif not line.startswith('ATOM') and not seen_atoms:
             header += line
         elif not line.startswith('ATOM') and seen_atoms:
             tail += line
-        else:
+        elif in_model or ((not seen_atoms) and (not in_model)):
             atm_record = parse_atm_record(line)
             if chain and not chain == atm_record['chain']:
+                atm_lst = [line]
                 continue
-            if not seen_atoms:
+            if not in_atoms:
                 curr_resi = atm_record['res_no']
                 prev_resi = curr_resi
-            seen_atoms = True
+            in_atoms = True
             curr_resi = atm_record['res_no']
             if curr_resi == prev_resi:
                 atm_lst.append(line)
             else:
-                #atm_lst.append(line)
                 res_lst.append(atm_lst)
                 atm_lst = [line]
             prev_resi = curr_resi
@@ -141,6 +171,7 @@ def get_cb_coordinates(pdbfile, chain):
     for line in pdbfile:
         if not line.startswith('ATOM'):
             continue
+
         atm_record = parse_atm_record(line)
 
         if atm_record['chain'] != ' ' and atm_record['chain'] != chain:
@@ -172,10 +203,12 @@ def get_cb_coordinates(pdbfile, chain):
     return cb_lst
 
 
-def get_atom_seq(pdbfile, chain=''):
+def get_atom_seq(pdbfile, chain='', model=1):
 
     three_to_one = {'ARG':'R', 'HIS':'H', 'LYS':'K', 'ASP':'D', 'GLU':'E', 'SER':'S', 'THR':'T', 'ASN':'N', 'GLN':'Q', 'CYS':'C', 'GLY':'G', 'PRO':'P', 'ALA':'A', 'ILE':'I', 'LEU':'L', 'MET':'M', 'PHE':'F', 'TRP':'W', 'TYR':'Y', 'VAL':'V', 'UNK': 'X'}
     res_dict = {}
+    
+    in_model = False
  
     if not chain:
         chain = get_first_chain(pdbfile)

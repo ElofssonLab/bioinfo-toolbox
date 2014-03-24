@@ -31,6 +31,7 @@ def fix(pdb1_filename, pdb2_filename, out_filename, chain1='', chain2=''):
     seq1_ali = align[-1][0]
     seq2_ali = align[-1][1]
 
+    #print pdb2
     pdb2_idx = []
     offset = 0
     for i in xrange(len(seq2_ali)):
@@ -84,6 +85,7 @@ def fix(pdb1_filename, pdb2_filename, out_filename, chain1='', chain2=''):
         pdb2_outfile = open(out_filename, 'w')
     else:
         pdb2_outfile = open('.'.join(pdb2_filename.split('.')[:-1]) + '.aligned.pdb', 'w')
+    #print pdb2_new
     parse_pdb.write(pdb2_new, pdb2_outfile)
     
 
