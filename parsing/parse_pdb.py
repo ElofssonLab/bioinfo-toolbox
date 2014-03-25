@@ -60,6 +60,46 @@ def read(pdbfile):
     return pdb_lst
 
 
+def read_chain(pdbfile, chain):
+
+    header = ''
+    res_lst = []
+    atm_lst = []
+    tail = ''
+
+    seen_atoms = False
+    curr_resi = 0
+    prev_resi = 0
+    
+    for line in pdbfile:
+        if not line.startswith('ATOM') and not seen_atoms:
+            header += line
+        elif not line.startswith('ATOM') and seen_atoms:
+            tail += line
+        else:
+            atm_record = parse_atm_record(line)
+            if not atm_record['chain'] == chain:
+                continue
+            if not seen_atoms:
+                curr_resi = atm_record['res_no']
+                prev_resi = curr_resi
+            seen_atoms = True
+            curr_resi = atm_record['res_no']
+            if curr_resi == prev_resi:
+                atm_lst.append(line)
+            else:
+                #atm_lst.append(line)
+                res_lst.append(atm_lst)
+                atm_lst = [line]
+            prev_resi = curr_resi
+    res_lst.append(atm_lst)
+     
+    pdbfile.close()
+    pdb_lst = [header, res_lst, tail]
+    return pdb_lst
+
+
+
 def write(pdb_lst, outfile):
 
     outfile.write(pdb_lst[0])

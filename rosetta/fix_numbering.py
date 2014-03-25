@@ -5,20 +5,20 @@ sys.path.append('/sw/apps/bioinfo/biopython/1.59/tintin/lib/python')
 sys.path.append('/home/x_mirmi/glob/biopython')
 from Bio import pairwise2
 
-sys.path.append('/home/mircomic/toolbox')
-sys.path.append('/home/x_mirmi/toolbox')
+sys.path.append('/home/mircomic/bioinfo-toolbox')
+sys.path.append('/home/x_mirmi/bioinfo-toolbox')
 from parsing import parse_pdb
 
 
 
 def fix(pdb1_filename, pdb2_filename, out_filename):
 
-    pdb1 = parse_pdb.read(open(pdb1_filename, 'r'))
     chain1 = parse_pdb.get_first_chain(open(pdb1_filename, 'r'))
+    pdb1 = parse_pdb.read_chain(open(pdb1_filename, 'r'), chain1)
     seq1 = parse_pdb.get_atom_seq(open(pdb1_filename, 'r'), chain1)
 
-    pdb2 = parse_pdb.read(open(pdb2_filename, 'r'))
     chain2 = parse_pdb.get_first_chain(open(pdb2_filename, 'r'))
+    pdb2 = parse_pdb.read_chain(open(pdb2_filename, 'r'), chain2)
     seq2 = parse_pdb.get_atom_seq(open(pdb2_filename, 'r'), chain2)
 
     align = pairwise2.align.globalms(seq1, seq2, 2, -1, -0.5, -0.1)
@@ -90,4 +90,6 @@ if __name__ == '__main__':
 
     pdb1_filename = sys.argv[1]
     pdb2_filename = sys.argv[2]
-    fix(pdb1_filename, pdb2_filename)
+    outfilename = sys.argv[3]
+
+    fix(pdb1_filename, pdb2_filename, outfilename)
