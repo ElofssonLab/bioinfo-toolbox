@@ -71,6 +71,7 @@ for constr in old_constraints:
         score = -15.0
         rosetta_lines.append('AtomPair %s %d %s %d FADE -10 19 10 %.2f 0' % (atm1, res1, atm2, res2, round(score, 2)))
         #rosetta_lines.append('AtomPair CA %d CA %d FADE -10 19 10 %.2f 0' % (res1, res2, round(score, 2)))
+        #rosetta_lines.append('AtomPair %s %d %s %d BOUNDED 1.5 8 1 0.5 PREDICTED' % (atm1, res1, atm2, res2))
         count += 1
     if count > (seq_len * factor):
         break
