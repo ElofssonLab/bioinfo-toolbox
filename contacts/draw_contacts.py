@@ -81,66 +81,101 @@ def read_fasta(afile, query_id=''):
     return seq_dict
 
 
-prot_name = sys.argv[1]
-seqfile = sys.argv[2]
-pdbfile = sys.argv[3]
-cfile = sys.argv[4]
-factor = float(sys.argv[5])
-
-seqlen = len(read_fasta(open(seqfile, 'r')).values()[0][0])
-contacts = parse_contacts(open(cfile, 'r'))
+def draw(prot_name, seqfile, pdbfile, cfile, factor):
+    seq = read_fasta(open(seqfile, 'r')).values()[0][0]
+    seqlen = len(seq)
+    contacts = parse_contacts(open(cfile, 'r'))
 
 
-cmd.load(pdbfile)
-cmd.set('dash_gap', 0.0)
-cmd.set('dash_radius', 0.1)
-cmd.bg_color('white')
-cmd.hide('everything')
-cmd.show('cartoon')
-cmd.color('gray', prot_name)
-cmd.set('ray_shadows', 0)
+    cmd.load(pdbfile)
+    cmd.set('dash_gap', 0.0)
+    cmd.set('dash_radius', 0.1)
+    cmd.bg_color('white')
+    cmd.hide('everything')
+    cmd.show('cartoon')
+    cmd.color('gray', prot_name)
+    
+    """
+    view = (\
+        -0.271442711,   -0.905138493,    0.327085078,\
+         0.034359235,   -0.348747194,   -0.936563492,\
+         0.961805284,   -0.242983535,    0.125761271,\
+         0.000000000,    0.000000000, -128.858474731,\
+        17.616867065,   -0.161788940,   -4.633638382,\
+       103.167495728,  154.549499512,  -20.000000000 )
 
-view = (\
-    -0.929645956,   -0.144559741,   -0.338900387,\
-     0.319600046,   -0.774050355,   -0.546532333,\
-    -0.183317721,   -0.616394758,    0.765792787,\
-     0.000000000,    0.000000000, -157.942276001,\
-    18.551437378,    6.361377716,   -4.695641994,\
-   131.235534668,  184.649002075,  -20.000000000 )
+    #PconsFold paper:
+        -0.087676540,   -0.441159278,   -0.893107057,\
+         0.482956320,    0.765313327,   -0.425448418,\
+         0.871214509,   -0.468636513,    0.145965248,\
+        -0.000171857,    0.001094781, -158.355941772,\
+        23.238109589,   -7.513275623,    6.870838165,\
+       131.660964966,  185.186004639,  -20.000000000 )
+    cmd.set_view(view)
+    """
 
-cmd.set_view(view)
+    count = 0
+    maxdist = 20.0
 
-count = 0
+    for contact in contacts:
+        if count > seqlen * factor:
+            break
+        if seq[contact[1]-1] == 'G':
+            atm1a = '/%s//A/%s/CA' % (prot_name, contact[1])
+            atm1b = atm1a
+        else:
+            atm1a = '/%s//A/%s/CA' % (prot_name, contact[1])
+            atm1b = '/%s//A/%s/CB' % (prot_name, contact[1])
+        if seq[contact[2]-1] == 'G':
+            atm2a = '/%s//A/%s/CA' % (prot_name, contact[2])
+            atm2b = atm2a
+        else:
+            atm2a = '/%s//A/%s/CA' % (prot_name, contact[2])
+            atm2b = '/%s//A/%s/CB' % (prot_name, contact[2])
+        cmd.select('a', atm1a)
+        cmd.select('b', atm2a)
+        d_name = 'd' + str(count)
+        dist = cmd.distance(d_name, atm1a, atm2a)
+        if dist == -1:
+            ## atom pair not in structure (xtal vs. seqres)
+            continue
+        cmd.hide('labels', d_name)
 
-for contact in contacts:
-    if count > seqlen * factor:
-        break
-    atm1 = '/%s//A/%s/CA' % (prot_name, contact[1])
-    atm2 = '/%s//A/%s/CA' % (prot_name, contact[2])
-    cmd.select('a', atm1)
-    cmd.select('b', atm2)
-    d_name = 'd' + str(count)
-    cmd.distance(d_name, atm1, atm2)
-    cmd.hide('labels', d_name)
+        col_name = 'own_color' + str(count)
+        score = contact[0]
+        dist = cmd.distance(d_name + 'b', atm1b, atm2b)
+        cmd.delete(d_name + 'b')
+        #if score > 0.5:
+        print '%s: %f => %f' % (d_name, dist, dist/(maxdist/2))
+        if dist < maxdist/2:
+            #cmd.hide('labels', d_name)
+            #cmd.set_color(col_name, [0.0 + score, 1.0 - score, 0.0])
+            cmd.set_color(col_name, [0.0 + (dist/(maxdist/2)-0.4), 1.0, 0.0])
+            cmd.color(col_name, d_name)
+            #cmd.color("forest", d_name)
+        #elif dist < 10:
+            #cmd.color("tv_orange", d_name)
+        elif dist > maxdist/2 and dist < maxdist:
+            #cmd.set_color(col_name, [0.0, 0.1 + score,1.0 - score])
+            cmd.set_color(col_name, [1.0, 1.0 - (dist/(maxdist/2)-1), 0.0])
+            cmd.color(col_name, d_name)
+        else:
+            cmd.color("red", d_name)
 
-    col_name = 'own_color' + str(count)
-    score = contact[0]
-    dist = cmd.distance(d_name, atm1, atm2)
-    #if score > 0.5:
-    if dist < 10:
-        #cmd.hide('labels', d_name)
-        #cmd.set_color(col_name, [0.0 + score, 1.0 - score, 0.0])
-        #cmd.color(col_name, d_name)
-        cmd.color("green", d_name)
-    elif dist < 12:
-        cmd.color("orange", d_name)
-    else:
-        #cmd.set_color(col_name, [0.0, 0.1 + score,1.0 - score])
-        #cmd.color(col_name, d_name)
-        cmd.color("red", d_name)
+        count = count +1
 
-    count = count +1
-
+    cmd.set('ray_shadows', 0)
+    cmd.set('antialias', 1)
+    cmd.ray(1635,1038)
+    cmd.png(prot_name + '.png')
 
 
+if __name__ == "__main__":
 
+    prot_name = sys.argv[1]
+    seqfile = sys.argv[2]
+    pdbfile = sys.argv[3]
+    cfile = sys.argv[4]
+    factor = float(sys.argv[5])
+
+    draw(prot_name, seqfile, pdbfile, cfile, factor)
