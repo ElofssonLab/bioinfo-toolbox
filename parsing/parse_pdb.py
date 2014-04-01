@@ -261,6 +261,8 @@ def get_atom_seq(pdbfile, chain='', model=1):
         atm_record = parse_atm_record(line)
         if atm_record['chain'] != ' ' and atm_record['chain'] != chain:
             continue
+        if atm_record['atm_name'] != 'CA':
+            continue
 
         res_i = atm_record['res_no']
         
