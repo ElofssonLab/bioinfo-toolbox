@@ -86,7 +86,7 @@ def get_ppv(fasta_filename, c_filename, pdb_filename, factor=1.0, chain='', sep=
         c_y = contacts[i][2] - 1
 
         pos_diff = abs(c_x - c_y)
-        too_close = pos_diff < 5
+        too_close = pos_diff < 20
 
         if not too_close:
             contacts_x.append(c_x)
