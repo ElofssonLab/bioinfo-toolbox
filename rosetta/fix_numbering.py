@@ -24,10 +24,10 @@ def fix(pdb1_filename, pdb2_filename, out_filename, chain1='', chain2=''):
     seq2 = parse_pdb.get_atom_seq(open(pdb2_filename, 'r'), chain2)
 
     align = pairwise2.align.globalms(seq1, seq2, 2, -1, -0.5, -0.1)
-    print seq1
-    print seq2
+    #print seq1
+    #print seq2
 
-    print align
+    #print align
     seq1_ali = align[-1][0]
     seq2_ali = align[-1][1]
 
