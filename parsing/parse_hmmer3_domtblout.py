@@ -230,7 +230,7 @@ if __name__ == "__main__":
     infile.close()
     #print domtblout[0]
     #print domtblout[1]
-    #print domtblout[2]
+    print domtblout[2]
     print 'DONE!'
     
 
