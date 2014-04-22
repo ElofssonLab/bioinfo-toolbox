@@ -80,7 +80,7 @@ def get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, fac
     TPs = []
     FPs = []
 
-    for num_c in range(min(len(contacts_x), ref_len * factor))[1:]:
+    for num_c in range(min(len(contacts_x), ceil(ref_len * factor)) + 1)[1:]:
         TP = 0.0
         FP = 0.0
         for i in range(num_c):
@@ -91,14 +91,14 @@ def get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, fac
             if atom_seq_ali[c_y] == '-':
                 continue
             if ref_contact_map[c_x, c_y] > 0:
-                TP += 1.0
+                TP += 1.0 / (ref_len*factor)
             else:
-                FP += 1.0
+                FP += 1.0 / (ref_len*factor)
 
         if TP > 0 and FP > 0:
             PPVs.append(TP / (TP + FP))
-            TPs.append(TP / ref_len)
-            FPs.append(FP / ref_len)
+            TPs.append(TP)
+            FPs.append(FP)
 
     if len(PPVs) == 0:
         PPVs.append(0.0)
