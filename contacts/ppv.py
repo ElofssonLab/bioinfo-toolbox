@@ -108,7 +108,6 @@ def get_ppv(fasta_filename, c_filename, pdb_filename, factor=1.0, chain='', sep=
         atom_seq = parse_pdb.get_atom_seq(open(pdb_filename, 'r'), chain)
                 
         align = pairwise2.align.globalms(atom_seq, seq, 2, -1, -0.5, -0.1)
-
         atom_seq_ali = align[-1][0]
         seq_ali = align[-1][1]
 
