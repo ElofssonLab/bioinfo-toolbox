@@ -102,8 +102,12 @@ def get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, fac
 
     if len(PPVs) == 0:
         PPVs.append(0.0)
+    if len(TPs) == 0:
+        TPs.append(0.0)
+    if len(FPs) == 0:
+        FPs.append(0.0)
 
-    return PPVs
+    return PPVs, TPs, FPs
 
 
 def get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali):
@@ -221,10 +225,10 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_filenam
         ref_contacts_x = ref_contacts[0]
         ref_contacts_y = ref_contacts[1]
        
-        PPVs = get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, factor)
+        PPVs, TPs, FPs = get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, factor)
         tp_colors = get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali)
    
-        print '%s\t%s' % (acc, PPVs[-1])
+        print '%s %s %s %s' % (pdb_filename, PPVs[-1], TPs[-1], FPs[-1])
       
         ax.scatter(ref_contacts_x, ref_contacts_y, marker='o', c='#CCCCCC', lw=0, edgecolor='#CCCCCC')
 
