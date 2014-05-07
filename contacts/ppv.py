@@ -51,15 +51,15 @@ def get_ppv_helper(contacts_x, contacts_y, ref_contact_map, ref_len, factor, ato
             if atom_seq_ali[c_y] == '-':
                 continue
         if ref_contact_map[c_x, c_y] > 0:
-            TP += 1.0
+            TP += 1.0 / (ref_len*factor)
         else:
-            FP += 1.0
+            FP += 1.0 / (ref_len*factor)
 
     if TP > 0 and FP > 0:
-        TP = TP / (ref_len*factor)
-        FP = FP / (ref_len*factor)
         PPV = TP / (TP + FP)
-
+    print ref_len
+    print ref_len * factor
+    print num_c
     return (PPV, TP, FP)
 
 
@@ -110,7 +110,8 @@ def get_ppv(fasta_filename, c_filename, pdb_filename, factor=1.0, chain='', sep=
         align = pairwise2.align.globalms(atom_seq, seq, 2, -1, -0.5, -0.1)
         atom_seq_ali = align[-1][0]
         seq_ali = align[-1][1]
-
+        print atom_seq_ali
+        print seq_ali
         j = 0
         gapped_cb_lst = []
 
