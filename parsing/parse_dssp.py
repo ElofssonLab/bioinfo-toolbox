@@ -59,6 +59,8 @@ class DSSPData:
         self.yca.append(    line[122:129].strip() )
         self.zca.append(    line[129:136].strip() )
 
+  def getNums(self):
+    return self.num
   def getResnums(self):
     return self.resnum
   def getChainType(self):
