@@ -55,11 +55,9 @@ def get_ppv_helper(contacts_x, contacts_y, ref_contact_map, ref_len, factor, ato
         else:
             FP += 1.0 / (ref_len*factor)
 
-    if TP > 0 and FP > 0:
+    if TP > 0:
         PPV = TP / (TP + FP)
-    print ref_len
-    print ref_len * factor
-    print num_c
+
     return (PPV, TP, FP)
 
 
@@ -86,7 +84,7 @@ def get_ppv(fasta_filename, c_filename, pdb_filename, factor=1.0, chain='', sep=
         c_y = contacts[i][2] - 1
 
         pos_diff = abs(c_x - c_y)
-        too_close = pos_diff < 20
+        too_close = pos_diff < 5
 
         if not too_close:
             contacts_x.append(c_x)
@@ -110,8 +108,8 @@ def get_ppv(fasta_filename, c_filename, pdb_filename, factor=1.0, chain='', sep=
         align = pairwise2.align.globalms(atom_seq, seq, 2, -1, -0.5, -0.1)
         atom_seq_ali = align[-1][0]
         seq_ali = align[-1][1]
-        print atom_seq_ali
-        print seq_ali
+        #print atom_seq_ali
+        #print seq_ali
         j = 0
         gapped_cb_lst = []
 
@@ -134,8 +132,59 @@ def get_ppv(fasta_filename, c_filename, pdb_filename, factor=1.0, chain='', sep=
     print '%s %s %s %s' % (pdb_filename, PPV, TP, FP)
     return (pdb_filename, PPV, TP, FP)
   
-
     
+def get_ppv_hbond(fasta_filename, c_filename, hbond_filename, factor=1.0, sep=' ', outfilename=''):  
+
+    acc = fasta_filename.split('.')[-2][-5:-1]
+
+    ### get sequence
+    seq = parse_fasta.read_fasta(open(fasta_filename, 'r')).values()[0][0]
+    ref_len = len(seq)
+ 
+    ### get top "factor" * "ref_len" predicted contacts
+    contacts = parse_contacts.parse(open(c_filename, 'r'), sep)
+
+    contacts_x = []
+    contacts_y = []
+    scores = []
+    contact_dict = {}
+
+    count = 0
+    for i in range(len(contacts)):
+        score = contacts[i][0]
+        c_x = contacts[i][1] - 1
+        c_y = contacts[i][2] - 1
+
+        pos_diff = abs(c_x - c_y)
+        too_close = pos_diff < 5
+
+        if not too_close:
+            contacts_x.append(c_x)
+            contacts_y.append(c_y)
+            scores.append(score)
+            count += 1
+           
+        if count >= ref_len * factor:
+            break
+   
+    ref_contact_map = np.zeros((ref_len, ref_len))
+
+    hbonds_raw = open(hbond_filename).readlines()
+    hbonds = [line.strip().split(' ') for line in hbonds_raw] #map(split(' '), map(strip, hbonds_raw))
+
+    for h in hbonds:
+        i = int(h[0]) - 1
+        j = int(h[1]) - 1
+        val = float(h[2])
+        ref_contact_map[i,j] = -val
+        ref_contact_map[j,i] = -val
+    
+    PPV, TP, FP = get_ppv_helper(contacts_x, contacts_y, ref_contact_map, ref_len, factor)
+
+    print '%s %s %s %s' % (hbond_filename, PPV, TP, FP)
+    return (hbond_filename, PPV, TP, FP)
+
+
 if __name__ == "__main__":
 
     p = argparse.ArgumentParser(description='Plot protein residue contact maps.')
@@ -161,5 +210,8 @@ if __name__ == "__main__":
     else:
         sep = '\t'
     
-    get_ppv(args['fasta_file'], args['contact_file'], args['pdb'], args['factor'], chain=args['chain'], sep=sep, outfilename=args['outfile'], noalign=args['noalign'])
+    if len(open(args['pdb']).readline().split(' ')) != 3:
+        get_ppv(args['fasta_file'], args['contact_file'], args['pdb'], args['factor'], chain=args['chain'], sep=sep, outfilename=args['outfile'], noalign=args['noalign'])
+    else:
+        get_ppv_hbond(args['fasta_file'], args['contact_file'], args['pdb'], args['factor'], sep=sep, outfilename=args['outfile'])
 
