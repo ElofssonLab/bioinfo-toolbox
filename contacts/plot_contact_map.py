@@ -95,10 +95,11 @@ def get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, fac
             else:
                 FP += 1.0 / (ref_len*factor)
 
-        if TP > 0 and FP > 0:
+        if TP > 0.0:
             PPVs.append(TP / (TP + FP))
             TPs.append(TP)
             FPs.append(FP)
+
 
     if len(PPVs) == 0:
         PPVs.append(0.0)
@@ -262,9 +263,9 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_filenam
 
         ### use TP/FP color coding if reference contacts given
         if pdb_filename:
-            PPVs2 = get_ppvs(contacts2_x, contacts2_y, ref_contact_map, atom_seq_ali, ref_len, factor)
+            PPVs2, TPs2, FPs2 = get_ppvs(contacts2_x, contacts2_y, ref_contact_map, atom_seq_ali, ref_len, factor)
             tp2_colors = get_tp_colors(contacts2_x, contacts2_y, ref_contact_map, atom_seq_ali)
-            print '%s\t%s' % (acc, PPVs2[-1])
+            print '%s %s %s %s' % (pdb_filename, PPVs2[-1], TPs2[-1], FPs2[-1])
             fig.suptitle('%s\nPPV (upper left) = %.2f | PPV (lower right) = %.2f' % (acc, PPVs[-1], PPVs2[-1]))
             sc = ax.scatter(contacts2_y[::-1], contacts2_x[::-1], marker='o', c=tp2_colors[::-1], s=6, alpha=0.75, linewidths=0.0)
             sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c=tp_colors[::-1], s=6, alpha=0.75, linewidths=0.0)

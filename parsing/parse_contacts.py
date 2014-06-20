@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-def parse(afile, sep=' '):
+def parse(afile, sep=' ', min_dist=4):
     
     """Parse contact file.
     @param  afile   contact file
@@ -19,7 +19,7 @@ def parse(afile, sep=' '):
             i = int(line_arr[0])
             j = int(line_arr[1])
             score = float(line_arr[-1])
-            if abs(i - j) > 4:
+            if abs(i - j) > min_dist:
                 contacts.append((score, i, j))
     afile.close()
 
