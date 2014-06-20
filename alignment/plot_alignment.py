@@ -40,7 +40,27 @@ def plot(filename):
     #plt.savefig('%s.pdf' % filename)
 
 
+def get_frac_gaps(filename):
+    alifile = open(filename, 'r')
+    N = 0.
+    for line in alifile:
+        if not line.startswith('>'):
+            N += 1.
+    alifile.close()
+    print N
+    alifile = open(filename, 'r')
+    frac_gaps = 0.
+    for line in alifile:
+        if not line.startswith('>'):
+            ngaps = line.count('-')
+            frac_gaps += ngaps/N
+    alifile.close()
+    return frac_gaps
+
 
 if __name__ == "__main__":
-
-    plot(sys.argv[1])
+    
+    if sys.argv[1].endswith('.jones'):
+        plot(sys.argv[1])
+    elif sys.argv[1].endswith('.a3m'):
+        print sys.argv[1] + ' ' + str(get_frac_gaps(sys.argv[1]))
