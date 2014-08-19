@@ -108,6 +108,8 @@ def get_ppv(fasta_filename, c_filename, pdb_filename, factor=1.0, chain='', sep=
         align = pairwise2.align.globalms(atom_seq, seq, 2, -1, -0.5, -0.1)
         atom_seq_ali = align[-1][0]
         seq_ali = align[-1][1]
+        #print seq
+        #print atom_seq
         #print atom_seq_ali
         #print seq_ali
         j = 0
@@ -129,7 +131,7 @@ def get_ppv(fasta_filename, c_filename, pdb_filename, factor=1.0, chain='', sep=
    
         PPV, TP, FP = get_ppv_helper(contacts_x, contacts_y, ref_contact_map, ref_len, factor, atom_seq_ali=atom_seq_ali)
 
-    print '%s %s %s %s' % (pdb_filename, PPV, TP, FP)
+    print '%s %s %s %s %s' % (fasta_filename, pdb_filename, PPV, TP, FP)
     return (pdb_filename, PPV, TP, FP)
   
     

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import numpy as np
 
 
 def parse(afile, sep=' ', min_dist=4):
@@ -25,6 +26,29 @@ def parse(afile, sep=' ', min_dist=4):
 
     contacts.sort(key=lambda x: x[0], reverse=True)
     return contacts
+
+
+def get_numpy_cmap(contacts, seq_len=-1, sep=' '):
+
+    """Convert contacts into numpy matrix.
+    @param  contacts    contact list as obtained from "parse"
+    @param  seq_len     sequence length
+    @param  sep         separator of contact file (default=' ')
+    @return np.array((seq_len, seq_len), score)
+    """
+
+    max_i = max(contacts, key=lambda(x):x[1])[1]
+    max_j = max(contacts, key=lambda(x):x[2])[2]
+    n = int(max(seq_len, max_i, max_j))
+    cmap = np.zeros((n,n))
+
+    for c in contacts:
+        i = c[1] - 1
+        j = c[2] - 1
+        cmap[i,j] = c[0]
+    
+    return cmap
+
 
 
 def write(contacts, outfile, sep=' '):

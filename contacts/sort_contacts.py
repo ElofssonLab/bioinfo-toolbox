@@ -1,5 +1,5 @@
 import sys
-sys.path.append("/home/mircomic/toolbox")
+sys.path.append("/home/mircomic/bioinfo-toolbox")
 from parsing import parse_contacts
 
 # command line input

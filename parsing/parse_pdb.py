@@ -219,6 +219,9 @@ def get_cb_coordinates(pdbfile, chain):
 
         res_i = atm_record['res_no']
         
+        if atm_record['insert'] == 'X':
+            res_i = res_i * 0.001
+
         atm = [float('inf'), float('inf'), float('inf')]
 
         if atm_record['atm_name'] == 'CA':

@@ -1,4 +1,24 @@
-import sys
+import sys, os
+
+from os.path import expanduser 
+home = expanduser("~")         
+sys.path.append(home + '/bioinfo-toolbox') 
+ 
+from parsing import parse_contacts          
+from parsing import parse_psipred           
+from parsing import parse_fasta  
+
+
+def is_beta(res_i, ss):
+    result = False
+    for offset in range(-1, 2):
+    #for offset in range(0):
+        try:
+            result = result or ss[res_i + offset] == 'E'
+        except IndexError:
+            # sequence out of bounds: okay, pass it
+            pass
+    return result
 
 # command line input
 seqfile_name = sys.argv[1]
@@ -10,6 +30,11 @@ min_dist = int(sys.argv[3])
 
 # use L * factor highest scoring constraints
 factor = float(sys.argv[4])
+
+if len(sys.argv) == 6:
+    psipred_filename = sys.argv[5]
+else:
+    psipred_filename = ''
 
 # scale value x from [min_x, max_x] to [0,1]
 # NOT USED
@@ -48,6 +73,11 @@ for line in infile:
         continue
     old_constraints.append(tuple(line.strip().split(sep)))
     
+if psipred_filename:
+    ss = parse_psipred.horizontal(open(psipred_filename, 'r'))
+else:
+    ss = ''
+
 
 # reformat to rosetta constraints
 old_constraints.sort(key=lambda x: float(x[-1]), reverse=True)
@@ -69,7 +99,11 @@ for constr in old_constraints:
         #score = float(constr[-1])
         #score = (score * -20.0)# - (1/factor)
         score = -15.0
-        rosetta_lines.append('AtomPair %s %d %s %d FADE -10 19 10 %.2f 0' % (atm1, res1, atm2, res2, round(score, 2)))
+        if is_beta(res1 - 1, ss) and is_beta(res2 - 1, ss):
+            print "Add beta-beta constraint at %s,%s" % (res1, res2)
+            rosetta_lines.append('AtomPair %s %d %s %d FADE -10 19 10 %.2f 0' % (atm1, res1, atm2, res2, round(score, 2)*3))
+        else:
+            rosetta_lines.append('AtomPair %s %d %s %d FADE -10 19 10 %.2f 0' % (atm1, res1, atm2, res2, round(score, 2)))
         #rosetta_lines.append('AtomPair CA %d CA %d FADE -10 19 10 %.2f 0' % (res1, res2, round(score, 2)))
         #rosetta_lines.append('AtomPair %s %d %s %d BOUNDED 1.5 8 1 0.5 PREDICTED' % (atm1, res1, atm2, res2))
         count += 1
