@@ -1,8 +1,9 @@
 #!/usr/bin/env python
+import sys
 import numpy as np
 
 
-def parse(afile, sep=' ', min_dist=4):
+def parse(afile, sep=' ', min_dist=5):
     
     """Parse contact file.
     @param  afile   contact file
@@ -20,7 +21,7 @@ def parse(afile, sep=' ', min_dist=4):
             i = int(line_arr[0])
             j = int(line_arr[1])
             score = float(line_arr[-1])
-            if abs(i - j) > min_dist:
+            if abs(i - j) >= min_dist:
                 contacts.append((score, i, j))
     afile.close()
 
@@ -61,4 +62,23 @@ def write(contacts, outfile, sep=' '):
 
     for c in contacts:
         outfile.write('%d%s%d%s%f\n' % (c[1], sep, c[2], sep, c[0]))
+
+
+if __name__ == "__main__":
+
+    c_filename = sys.argv[1]
+
+    # guessing separator of constraint file
+    line = open(c_filename,'r').readline()
+    if len(line.split(',')) != 1:
+        sep = ','
+    elif len(line.split(' ')) != 1:
+        sep = ' '
+    else:
+        sep = '\t'
+
+    cm = parse(open(c_filename), sep=sep)
+
+    for c in cm:
+        print c[1], c[2], c[0]
 
