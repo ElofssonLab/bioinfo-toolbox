@@ -199,7 +199,7 @@ def get_coordinates(pdbfile, chain):
     return sorted(res_dict.iteritems(), key=operator.itemgetter(0))
 
 
-def get_cb_coordinates(pdbfile, chain):
+def get_res_dict(pdbfile, chain):
 
     cb_lst = []
     res_dict = defaultdict(list)
@@ -219,6 +219,9 @@ def get_cb_coordinates(pdbfile, chain):
 
         res_i = atm_record['res_no']
         
+        if atm_record['insert'] == 'X':
+            res_i = res_i * 0.001
+
         atm = [float('inf'), float('inf'), float('inf')]
 
         if atm_record['atm_name'] == 'CA':
@@ -227,7 +230,26 @@ def get_cb_coordinates(pdbfile, chain):
         elif atm_record['atm_name'] == 'CB':
                 atm = [atm_record['x'], atm_record['y'], atm_record['z']]
                 res_dict[res_i].append(np.array(atm))  
-        
+    
+    return res_dict
+
+
+def get_ca_coordinates(pdbfile, chain):
+
+    res_dict = get_res_dict(pdbfile, chain)
+
+    ca_lst = []
+    num_res = len(res_dict)+2
+    for i in res_dict.keys():
+        ca_lst.append(res_dict[i][0])
+    pdbfile.close()
+    return ca_lst
+
+
+def get_cb_coordinates(pdbfile, chain):
+
+    res_dict = get_res_dict(pdbfile, chain)
+
     cb_lst = []
     num_res = len(res_dict)+2
     tmp_i = 0
