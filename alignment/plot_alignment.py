@@ -32,8 +32,8 @@ def plot(filename):
             j += 1
         i += 1
     alifile.close()
-    print aliarr.shape
-    print aliarr
+    #print aliarr.shape
+    #print aliarr
     plt.imshow(aliarr, cmap=cm.binary, aspect='auto')
     #plt.show()
     plt.savefig('%s.png' % filename, bbox_inches='tight', dpi=300)
@@ -41,26 +41,41 @@ def plot(filename):
 
 
 def get_frac_gaps(filename):
+    L = len(open(filename, 'r').readline().strip())
+    #print L
     alifile = open(filename, 'r')
     N = 0.
     for line in alifile:
-        if not line.startswith('>'):
-            N += 1.
+        N += 1.
     alifile.close()
-    print N
+    #print N
     alifile = open(filename, 'r')
     frac_gaps = 0.
     for line in alifile:
-        if not line.startswith('>'):
-            ngaps = line.count('-')
-            frac_gaps += ngaps/N
+        ngaps = line.count('-')
+        frac_gaps += ngaps/float(L)
     alifile.close()
-    return frac_gaps
+    return frac_gaps/N
+
+
+def get_numseq_coverage(filename, coverage=0.9):
+    L = len(open(filename, 'r').readline().strip())
+    #print L
+    Ncov = 0
+    alifile = open(filename, 'r')
+    for line in alifile:
+        frac_gaps = 0.
+        ngaps = line.count('-')
+        frac_gaps += ngaps/float(L)
+        #print L,ngaps,frac_gaps,1-coverage
+        if frac_gaps < 1-coverage:
+            Ncov += 1
+    alifile.close()
+    return Ncov
 
 
 if __name__ == "__main__":
     
-    if sys.argv[1].endswith('.jones'):
-        plot(sys.argv[1])
-    elif sys.argv[1].endswith('.a3m'):
-        print sys.argv[1] + ' ' + str(get_frac_gaps(sys.argv[1]))
+    #plot(sys.argv[1])
+    #print get_frac_gaps(sys.argv[1])
+    print get_numseq_coverage(sys.argv[1])
