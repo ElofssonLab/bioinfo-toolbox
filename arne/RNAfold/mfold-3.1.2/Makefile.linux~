@@ -1,0 +1,195 @@
+# Makefile for mfold version 3.1
+# Michael Zuker and Darrin Stewart
+# Copyright Washington University School of Medicine 1998-
+SHELL	= /bin/sh
+
+# tgd required for gif files by boxplot_ng, ct_boxplot_ng plt22gif
+# tgd has its own makefiles
+# see src/tgd1.2c/Makefile src/tgd1.2c/gd1.2/Makefile
+
+# Set optimization flags as high as possible. What you see below is
+# only a guide.
+# Must choose 1 definition for FFLAGS and CFLAGS or make up your own
+#FFLAGS	= -O3 -col120 -static -mips4 # SGI with mips4
+#FFLAGS	= -O3 -col120 -static -mips2 # SGI with mips2
+FFLAGS	= -O3 -C -fno-automatic -ffixed-line-length-none # gnu Fortran
+#FFLAGS	= -O3 -extend_source # Compaq Alpha 8400 (Tru64 Unix 4.0D)
+#FFLAGS	= -Bstatic -O3 -e # Sun/Solaris (no dynamic library links)
+#FFLAGS	= -O2 -e # Sun/Solaris
+#CFLAGS = -O 
+CFLAGS	= -O -Wno-deprecated -fomit-frame-pointer # -traditional -traditional-cpp # Solaris (Sparc and Intel), Alpha
+
+# Define compilers as appropriate
+#FTN	= f95
+FTN	= f77 
+#FTN	= g77
+CC	= gcc
+#C++	= cxx  # Compaq Alpha 8400 (Tru64 Unix 4.0D)
+C++	= g++
+#C++     = cpp
+#C++	= c++
+
+# Must choose 1 combination for INCL, INCL2 and BITS
+#INCL	= src/rna-default.inc # "iibset" and "iibits" available (SGI, Alpha)
+#INCL2	= src/rna2-default.inc
+#BITS	= src/bits.f # (as above)
+#INCL	= src/rna-sun.inc # Sparc/Solaris with "bis" and "bit" available
+#INCL2	= src/rna2-sun.inc
+#BITS	= src/bits-sun.f # (as above)
+INCL	= src/rna-gnu.inc # gnu version; will run anywhere
+INCL2	= src/rna2-gnu.inc
+BITS	= src/bits-gnu.f # (as above)
+
+BINDIR	= /usr/local/bin
+LIBDIR	= /usr/local/lib/mfold-3.1
+
+MAXN2	= 800
+#MAXN2	= 10600
+#MAXN2	= 16484
+MAXN	= 8000
+MAXN1	= 8000
+
+######################################################################
+# Nothing below here need be edited when installing. #
+######################################################################
+
+BINEXE	= bin/batgen bin/distance bin/ct2rnaml bin/ct_compare \
+	bin/ct_boxplot_ng bin/efn bin/efn2 bin/newtemp bin/scorer bin/auxgen \
+	bin/sav2plot bin/sav2p-num bin/h-num.exe bin/ss-count bin/add-dHdSTm \
+	bin/nafold bin/nafold2 bin/boxplot_ng bin/naview.exe bin/plt22ps \
+	bin/quikfold bin/plt22gif bin/genss bin/tgd bin/sav2plot2 \
+	bin/sav2p-num2 bin/add-dHdSTm2
+
+SCRIPTS	= bin/naview bin/mfold bin/auto_ct2ps bin/h-num bin/filter-sort
+
+DATA	= *.dg *.dh *.dgd *.dhd *.gif *.nav *.dat *.awk *.html *.col
+BINS	= $(BINEXE) $(SCRIPTS)
+
+all: $(BINEXE) 
+	strip $(BINEXE) ; chmod 755 $(BINS) 
+
+clean:
+	rm -f $(BINEXE) src/maxn*.inc src/main-nodot*.f src/rna.inc *.o *.u
+	rm -f src/tgd1.2c/*.o src/tgd1.2c/gd1.2/*.o src/tgd1.2c/gd1.2/libgd.a
+	rm -f c++/*.o
+
+install: $(BINEXE)
+	cp $(BINEXE) $(SCRIPTS) $(BINDIR)
+	@echo "Executables copied to $(BINDIR)"
+	cd dat ; cp $(DATA) $(LIBDIR) ; cd ../
+	@echo "Data files copied to $(LIBDIR)"
+	@echo "Everything is installed. You can do a 'make clean'"
+
+# batgen
+
+bin/batgen: src/batgen.f src/getseq.f
+	$(FTN) $(FFLAGS) -o bin/batgen src/batgen.f src/getseq.f
+
+# distance
+
+bin/distance: src/distance.f src/bpin.f src/bpsrch.f
+	$(FTN) $(FFLAGS) -o bin/distance src/distance.f src/bpin.f src/bpsrch.f
+
+# miscellaneous
+
+bin/ct2rnaml: src/ct2rnaml.c
+	$(CC) $(CFLAGS) -o bin/ct2rnaml src/ct2rnaml.c
+
+bin/ct_compare: src/ct_compare.f
+	$(FTN) $(FFLAGS) -o bin/ct_compare src/ct_compare.f
+
+bin/ct_boxplot_ng: src/ct_boxplot_ng.c src/ct_boxplot_read_ct.inc \
+	src/ct_boxplot_ps.inc src/ct_boxplot_gif.inc \
+	src/ct_boxplot_general.inc src/ct_boxplot_setcolor.inc \
+	src/ct_boxplot.h src/copyright_ps.inc src/copyright_gif.inc
+	$(CC) $(CFLAGS) -o bin/ct_boxplot_ng src/ct_boxplot_ng.c -lm
+
+bin/efn: src/efn.f src/efn.inc
+	$(FTN) $(FFLAGS) -o bin/efn src/efn.f
+
+bin/efn2: c++/efn2.cpp c++/algorithm.cpp c++/algorithm.h c++/platform.cpp
+	$(C++) $(CFLAGS) -o bin/efn2 c++/efn2.cpp -lm
+
+bin/h-num.exe: src/h-num.f
+	$(FTN) $(FFLAGS) -o bin/h-num.exe src/h-num.f
+
+bin/naview.exe: src/naview.c
+	$(CC) $(CFLAGS) -o bin/naview.exe src/naview.c -lm
+
+bin/newtemp: src/newtemp.f src/ion.f src/dc.f
+	$(FTN) $(FFLAGS) -o bin/newtemp src/ion.f src/dc.f src/newtemp.f
+
+bin/plt22ps: src/plt22ps.c src/plt22gif_or_ps.h
+	$(CC) $(CFLAGS) -o bin/plt22ps src/plt22ps.c -lm
+
+bin/plt22gif: src/plt22gif.c bin/tgd src/plt22gif_or_ps.h
+	$(CC) $(CFLAGS) -o bin/plt22gif src/plt22gif.c -lm
+
+bin/genss: src/genss.c 
+	$(CC) $(CFLAGS) -o bin/genss src/genss.c -lm
+
+bin/boxplot_ng: src/boxplot_ng.c src/boxplot_setcolor.inc \
+	src/boxplot_setcolor.inc
+	$(CC) $(CFLAGS) -o bin/boxplot_ng src/boxplot_ng.c -lm
+
+bin/tgd: src/tgd1.2c/tgd.c
+	cd src/tgd1.2c ; $(MAKE)
+
+bin/scorer: src/scorer.f
+	$(FTN) $(FFLAGS) -o bin/scorer src/scorer.f
+
+bin/auxgen: src/auxgen.f
+	$(FTN) $(FFLAGS) -o bin/auxgen src/auxgen.f
+
+bin/sav2plot: src/sav2plot.f src/maxn.inc
+	$(FTN) $(FFLAGS) -o bin/sav2plot src/sav2plot.f
+
+bin/sav2p-num: src/sav2p-num.f src/maxn.inc
+	$(FTN) $(FFLAGS) -o bin/sav2p-num src/sav2p-num.f
+
+bin/sav2plot2: src/sav2plot2.f src/maxn2.inc
+	$(FTN) $(FFLAGS) -o bin/sav2plot2 src/sav2plot2.f
+
+bin/sav2p-num2: src/sav2p-num2.f src/maxn2.inc
+	$(FTN) $(FFLAGS) -o bin/sav2p-num2 src/sav2p-num2.f
+
+bin/ss-count: src/ss-count.f
+	$(FTN) $(FFLAGS) -o bin/ss-count src/ss-count.f
+
+bin/add-dHdSTm: src/add-dHdSTm.f
+	$(FTN) $(FFLAGS) -o bin/add-dHdSTm src/add-dHdSTm.f
+
+bin/add-dHdSTm2: src/add-dHdSTm2.f
+	$(FTN) $(FFLAGS) -o bin/add-dHdSTm2 src/add-dHdSTm2.f
+
+# nafold, quikfold
+
+NASRC	= src/main-nodot.f src/rna.f src/misc.f src/efiles.f src/sort.f \
+	src/dc.f $(BITS) src/formid.f src/multid.f
+
+QUIK	= src/quik.f src/rna-quik.f src/misc-quik.f src/dc.f src/multid.f
+
+bin/nafold2: $(INCL2) src/maxn2.inc $(NASRC)
+	cp $(INCL2) src/rna.inc
+	cp $(INCL2) src/rna_or_efn.inc
+	$(FTN) $(FFLAGS) -o bin/nafold2 $(NASRC) 
+
+bin/nafold: $(INCL) src/maxn.inc $(NASRC)
+	cp $(INCL) src/rna.inc
+	cp $(INCL) src/rna_or_efn.inc
+	$(FTN) $(FFLAGS) -o bin/nafold $(NASRC) 
+
+bin/quikfold: src/maxn1.inc src/maxn2.inc $(QUIK)
+	$(FTN) $(FFLAGS) -o bin/quikfold $(QUIK) 
+
+src/main-nodot.f: src/main.f
+	cat src/main.f | sed 's/^cNODOT/ /' > src/main-nodot.f
+
+src/maxn.inc: Makefile
+	echo "      parameter (maxn=$(MAXN))" > src/maxn.inc
+
+src/maxn1.inc: Makefile
+	echo "      parameter (maxn=$(MAXN1))" > src/maxn1.inc
+
+src/maxn2.inc: Makefile
+	echo "      parameter (maxn=$(MAXN2))" > src/maxn2.inc

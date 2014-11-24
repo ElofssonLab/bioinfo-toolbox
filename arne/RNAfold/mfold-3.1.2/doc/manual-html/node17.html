@@ -1,0 +1,222 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Future plans</TITLE>
+<META NAME="description" CONTENT="Future plans">
+<META NAME="keywords" CONTENT="FEBS98-html">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="FEBS98-html.css">
+<LINK REL="next" HREF="node18.html">
+<LINK REL="previous" HREF="node13.html">
+<LINK REL="up" HREF="FEBS98-html.html">
+<LINK REL="next" HREF="node18.html">
+</HEAD>
+<BODY BGCOLOR=#FFDEAD TEXT=#202020 LINK=#800000 ALINK=#ffff00 VLINK=#353976>
+<!--Navigation Panel-->
+<A NAME="tex2html249"
+ HREF="node18.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="img/next_motif.gif"></A> 
+<A NAME="tex2html246"
+ HREF="FEBS98-html.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="img/up_motif.gif"></A> 
+<A NAME="tex2html240"
+ HREF="node16.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="img/previous_motif.gif"></A> 
+<A NAME="tex2html248"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="img/contents_motif.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html250"
+ HREF="node18.html">Acknowledgment</A>
+<B> Up:</B> <A NAME="tex2html247"
+ HREF="FEBS98-html.html">Algorithms and Thermodynamics for</A>
+<B> Previous:</B> <A NAME="tex2html241"
+ HREF="node16.html">EXAMPLE 3</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00090000000000000000">
+Future plans</A>
+</H1>
+
+<P>
+The Unix version of <I>mfold</I> will remain. The newest programs, such as
+<I>plt22ps</I> and <I>plt22gif</I> are written in command line
+mode. The older programs have shell scripts or Perl ``wrappers''
+around them to make them appear as single binaries that operate in
+command line mode. The trend will be to replace older code as
+necessary with non-interactive programs. This makes it easier to piece
+together different programs to create new forms of output.
+
+<P>
+When <I>mfold</I> was first created, the limitations of personal computers
+did not make a PC version practical. This has changed radically in the
+past 10 years, and an Intel/Windows PC is now a fine environment for
+running <I>mfold</I> . The basic Fortran and C programs have already been
+ported and will run under Widows, but a Unix-like shell is
+necessary. The <I>RNAstructure</I> program is now a faithful recreation
+of <I>mfold</I> in Windows, with a convenient user interface. The major
+problem with the existing setup is that the Unix and Windows versions
+are totally different and will have to be updated in parallel to keep
+them equivalent.
+
+<P>
+The <I>mfold</I> programs running on SGI/Irix, SPARC/Solaris and
+Intel/Solaris have been incorporated into a world wide web (WWW)
+server that allows users from around the world to submit sequences for
+folding. This server has some extra features not available in the
+<I>mfold</I> package, and goes well beyond the very simple HTML output of
+the current <I>mfold</I> software. However, this software offers nothing new
+in terms of predictions, and it will be described elsewhere. Rapid
+developments in web browsers and languages such as Java-script and Java
+may make an HTML (or similar) interface to <I>mfold</I> better than
+others. As things stand now, the <I>mfold</I> server can run on a (local)
+Unix computer and be accessed by web browsers running on personal
+computers. 
+
+<P>
+Additional parameters will be added to the command line version of
+<I>mfold</I> in the future. These will be described when the <I>mfold</I> command
+is given without parameters and the documentation will be altered
+accordingly. In the near future, a base labeling frequency will be
+added so that the user can specify the frequency of base
+enumeration. Other controls on secondary structure, such as zooming on
+images about specified coordinates, could be added, but 
+these are already available through the use of the <I>plt22ps</I> and
+<I>plt22gif</I> programs.
+
+<P>
+The ``energy'' parameters from the older, interactive versions of
+<I>mfold</I> could easily be introduced in command line form. This would
+make it unnecessary to run the <I>nafold</I> program directly to alter
+them. Table <A HREF="#EPARAMS">5</A> lists these parameters that are not defined
+in the  <SMALL>MISCLOOP</SMALL> file.
+
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="850">&#160;</A>
+<TABLE>
+<CAPTION><STRONG>Table 5:</STRONG>
+Additional command line variables that could
+be added to <I> mfold</I> .</CAPTION>
+<TR><TD><TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="LEFT"><B> Parameter</B></TD>
+<TD ALIGN="LEFT"><B> Description</B></TD>
+<TD ALIGN="CENTER"><B> Default value</B></TD>
+</TR>
+<TR><TD ALIGN="LEFT">ddSTACK</TD>
+<TD ALIGN="LEFT">extra 
+<!-- MATH: $\delta \delta G$ -->
+<IMG
+ WIDTH="31" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img27.gif"
+ ALT="$\delta \delta G$">
+per stack</TD>
+<TD ALIGN="CENTER">0</TD>
+</TR>
+<TR><TD ALIGN="LEFT">ddBULGE</TD>
+<TD ALIGN="LEFT">extra 
+<!-- MATH: $\delta \delta G$ -->
+<IMG
+ WIDTH="31" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img27.gif"
+ ALT="$\delta \delta G$">
+per bulge loop</TD>
+<TD ALIGN="CENTER">0</TD>
+</TR>
+<TR><TD ALIGN="LEFT">ddILOOP</TD>
+<TD ALIGN="LEFT">extra 
+<!-- MATH: $\delta \delta G$ -->
+<IMG
+ WIDTH="31" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img27.gif"
+ ALT="$\delta \delta G$">
+per interior loop</TD>
+<TD ALIGN="CENTER">0</TD>
+</TR>
+<TR><TD ALIGN="LEFT">ddHLOOP</TD>
+<TD ALIGN="LEFT">extra 
+<!-- MATH: $\delta \delta G$ -->
+<IMG
+ WIDTH="31" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img27.gif"
+ ALT="$\delta \delta G$">
+per hairpin loop</TD>
+<TD ALIGN="CENTER">0</TD>
+</TR>
+<TR><TD ALIGN="LEFT">MAXILOOP</TD>
+<TD ALIGN="LEFT">maximum size of an internal loop</TD>
+<TD ALIGN="CENTER">30</TD>
+</TR>
+<TR><TD ALIGN="LEFT">MAXLOP</TD>
+<TD ALIGN="LEFT">maximum asymmetry of an internal loop</TD>
+<TD ALIGN="CENTER">30</TD>
+</TR>
+</TABLE></TD></TR>
+</TABLE>
+</DIV>
+<BR>
+<P>
+Current plans call for the addition of coaxial stacking to the folding
+algorithm and possibly the creation of a special version that uses
+Jacobson-Stockmeyer theory to assign more realistic free energies to
+multi-branch loops, as in equation <A HREF="node5.html#DDGM2">7</A>. In addition, a
+practical approach to pseudoknots will be attempted, where pairs of
+mutually exclusive helices that create pseudoknots are identified in
+the <I>energy dot plot</I> . In these case, the bases involved in 1 or perhaps 2 of these
+pseudoknots can be constrained to be single stranded, and foldings
+predicted to fill in the rest of the secondary structure.
+
+<P>
+Another future development will be the introduction of a 2 molecule
+folding system. This immediately complicates the problem, since
+concentration now becomes important.  In addition, the folding of
+certain very simple bi-molecular systems is at least as hard as
+predicting pseudoknots in the folding of a single sequence.
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html249"
+ HREF="node18.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="img/next_motif.gif"></A> 
+<A NAME="tex2html246"
+ HREF="FEBS98-html.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="img/up_motif.gif"></A> 
+<A NAME="tex2html240"
+ HREF="node16.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="img/previous_motif.gif"></A> 
+<A NAME="tex2html248"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="img/contents_motif.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html250"
+ HREF="node18.html">Acknowledgment</A>
+<B> Up:</B> <A NAME="tex2html247"
+ HREF="FEBS98-html.html">Algorithms and Thermodynamics for</A>
+<B> Previous:</B> <A NAME="tex2html241"
+ HREF="node16.html">EXAMPLE 3</A>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<TABLE><TR><TD><IMG SRC=img/shield16.gif HSPACE=20></TD><TD><I>Michael Zuker <BR>Institute for Biomedical Computing<BR>
+Washington University in St. Louis<BR>
+1998-12-05</I></TD></TR></TABLE>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,57 @@
+
+
+             Version 2.1 was created in September 1992. 
+
+1. The route to a "hard copy" energy dot plot has been changed. The
+format of the ASCII plot file has been improved. This file can be
+produced by running lrna or crna and choosing the plot option from
+the popup menu in "dot plot" mode, or by running the new
+"sav2plot" program using an existing save file. This
+ASCII plot file is processed into a color Postscript file by the
+dot2ps shell script (which itself uses the dotps C program). Thus
+the "figdot" program and the need to use the GCG "figure" program
+have both been eliminated.
+
+
+2. Conversion to IRIX 4.0.5 created a problem with the interactive
+energy dot plot. The dolab2.c subroutine used to draw "fancy font"
+labelling in the dot plot refused to interface with the rest of the
+FORTRAN code. This subroutine was eliminated and replaced by a few
+simple lines of code within dotplot.f
+
+
+3. Programs "scorer" (by John Jaeger) and "ct_compare" (by M. Zuker) 
+have been added. These compare a given RNA secondary structure, from 
+an input ct file, with a group of other structures on the same 
+sequence fragment, taken from a second input ct file. Scorer is 
+"helix" based, while ct_compare counts both conserved helices and 
+base pairs.
+
+4. A manual describing use of the UNIX versions has been created and 
+placed in the doc directory as "manuscript.ps". This document is in 
+Postscript. The files figure-4.ps and figure-5.ps are part of the 
+manual.
+
+             Version 2.2 was created in December  1992.
+
+5.  The *.dat and *.dh files now reside in their own directory. The
+relative path is mfold-2.2/dat. The file 'path.inc' in mfold-2.2/src
+defines this path in a data statement. This should be edited before 
+program installation. Makefile should also be edited so the BINDIR 
+and LIBDIR are properly defined.
+
+This path is needed by the programs : crna,efn,lrna and newtemp.
+source code 'newtemp.f'. This is an absolute path; on my IRIS it is:
+
+'/usr/people/zuker/mfold-2.2/dat/'. In the export version this is:
+'/usr/local/lib/mfold/dat/'.
+
+This should be changed according to the wishes of your users. Note
+that lrna, crna and efn newtemp concatenate 'path' and the .dat file
+names. If the openfile fails, the programs look in the current
+working directory. The 'newtemp' program assumes that the .dat and 
+.dh files are in the 'path' directory. The new files for folding at 
+different temperatures are written into the current working 
+directory. Thus a user can create files for folding at (say) 45 
+degrees. He/she must then type in 'stack.045', 'loop.045' and so on 
+when prompted. 

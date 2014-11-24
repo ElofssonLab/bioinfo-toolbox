@@ -1,0 +1,73 @@
+# Makefile for quikfold and quikfold-tback version 3.1
+# Michael Zuker 
+# Rensselaer Polytechnic Institute
+SHELL	= /bin/sh
+
+# Set optimization flags as high as possible. What you see below is
+# only a guide.
+# Must choose 1 definition for FFLAGS and CFLAGS or make up your own
+#FFLAGS	= -O3 -col120 -static -mips4 # SGI with mips4
+#FFLAGS	= -O3 -col120 -static -mips2 # SGI with mips2
+FFLAGS	= -O3 -fno-automatic -ffixed-line-length-none # gnu Fortran
+#FFLAGS	= -O3 -extend_source # Compaq Alpha 8400 (Tru64 Unix 4.0D)
+#FFLAGS	= -Bstatic -O3 -e # Sun/Solaris (no dynamic library links)
+#FFLAGS	= -O2 -e # Sun/Solaris
+
+# Define compiler as appropriate
+FTN	= g77 
+#FTN	= f77 
+
+BINDIR	= /usr/local/bin
+LIBDIR	= /usr/local/lib/mfold
+
+MAXN1	= 9000
+MAXN2	= 800
+
+######################################################################
+# Nothing below here need be edited when installing. #
+######################################################################
+
+BINEXE	= bin/quikfold bin/quik-tback bin/quikfold-faster
+
+BINS	= $(BINEXE)
+
+all: $(BINEXE) 
+	strip $(BINEXE) ; chmod 755 $(BINS) 
+
+clean:
+	rm -f $(BINEXE) src/maxn*.inc 
+
+install: $(BINEXE)
+	cp $(BINEXE) $(BINDIR)
+	@echo "Executables copied to $(BINDIR)"
+	@echo "Everything is installed. You can do a 'make clean'"
+
+# quikfold
+
+QUIK	= src/quik.f src/rna-quik.f src/misc-quik.f src/dc.f src/multid.f
+
+bin/quikfold: src/maxn1.inc src/maxn2.inc $(QUIK)
+	$(FTN) $(FFLAGS) -o bin/quikfold $(QUIK) 
+
+# quik-tback
+
+QUIKT	= src/quik-tback.f src/rna-quik.f src/misc-quik-tback.f src/dc.f 
+
+bin/quik-tback: src/maxn1.inc $(QUIKT)
+	$(FTN) $(FFLAGS) -o bin/quik-tback $(QUIKT) 
+
+# quikfold-faster
+
+QUIKF	= src/quik-faster.f src/rna-quik.f src/misc-quik.f src/dc.f \
+	  src/multid.f
+
+bin/quikfold-faster: src/maxn1.inc src/maxn2.inc $(QUIKF)
+	$(FTN) $(FFLAGS) -o bin/quikfold-faster $(QUIKF) 
+
+src/maxn1.inc: Makefile
+	echo "      parameter (maxn=$(MAXN1))" > src/maxn1.inc
+
+src/maxn2.inc: Makefile
+	echo "      parameter (maxn=$(MAXN2))" > src/maxn2.inc
+
+

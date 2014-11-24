@@ -1,0 +1,7 @@
+
+The command:
+
+mfold SEQ=mdv1.seq ANN=p-num RUN_TYPE=html
+
+produced the output in the samples directory. the original file was
+only mdv1.seq

@@ -1,0 +1,11 @@
+PostScript file  # device string  (not used)
+21.6 28.0        # device dimensions in cm
+y                # display bases?
+n                # display loops numbers?
+0.7              # minimum permissible separation between bases (don't change)
+n                # change loop radii?
+0.3              # character size (0.3 default)
+y                # base pairs drawn as dots?  (answer yes or no)
+LAB_FR           # base labelling frequency (specify 0 for none)
+n                # draw a mosaic? (answer no)
+ROT_ANG          # figure rotation in degrees

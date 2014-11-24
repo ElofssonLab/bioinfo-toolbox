@@ -1,0 +1,46 @@
+# Makefile for mfold version 3.1
+# Michael Zuker and Darrin Stewart
+# Copyright Washington University School of Medicine 1998-
+SHELL	= /bin/sh
+
+# tgd required for gif files by boxplot_ng, ct_boxplot_ng plt22gif
+# tgd has its own makefiles
+# see src/tgd1.2c/Makefile src/tgd1.2c/gd1.2/Makefile
+
+# Set optimization flags as high as possible. What you see below is
+# only a guide.
+# Must choose 1 definition for FFLAGS and CFLAGS or make up your own
+#FFLAGS	= -O3 -col120 -static -mips4 # SGI with mips4
+#FFLAGS	= -O3 -col120 -static -mips2 # SGI with mips2
+FFLAGS	= -O3 -fno-automatic -ffixed-line-length-none # gnu Fortran
+#FFLAGS	= -O3 -extend_source # Compaq Alpha 8400 (Tru64 Unix 4.0D)
+#FFLAGS	= -Bstatic -O3 -e # Sun/Solaris (no dynamic library links)
+#FFLAGS	= -O2 -e # Sun/Solaris
+#CFLAGS	= -O3 # SGI 
+CFLAGS	= -O # Solaris (Sparc and Intel), Alpha
+
+# Define compilers as appropriate
+#FTN	= f95
+#FTN	= f77 
+FTN	= g77
+CC	= gcc
+#C++	= cxx  # Compaq Alpha 8400 (Tru64 Unix 4.0D)
+C++	= g++
+
+BINDIR	= /home/applications/zukerm/mfold/bin
+LIBDIR	= /home/applications/zukerm/mfold/lib
+
+######################################################################
+# Nothing below here need be edited when installing. #
+######################################################################
+
+BINEXE	= bin/ct2rnaml
+
+all: $(BINEXE) 
+	strip $(BINEXE) ; chmod 755 $(BINS) 
+
+# Old Fortran RNAML
+
+bin/ct2rnaml: src/ct2rnaml.f
+	$(FTN) $(FFLAGS) -o bin/ct2rnaml src/ct2rnaml.f
+

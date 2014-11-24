@@ -1,0 +1,106 @@
+1. 12/10/96
+
+Error: Used "-f" instead of "-s" in testing for files in the scripts
+'mfold' and 'mfold-html'. The former tests for file existence and
+rules out directories. The latter tests for non-empty files. Note also
+the 'REUSE' error.
+
+In mfold:  
+if [ ! -f $SEQ ]; then   
+  should be    
+if [ ! -s $SEQ ]; then
+
+if [ ! -f $FILE_PREFIX.sav ]; then  
+  should be 
+if [ ! -s $FILE_PREFIX.sav ]; then
+
+if [ ! -f $FILE_PREFIX.sav -o REUSE = NO ]; then
+  should be
+if [ ! -s $FILE_PREFIX.sav -o $REUSE = NO ]; then
+
+The same lines occur in pre-mfold and should be changed.
+
+2. 12/17/96
+
+In mfold, the first test for the existence of $SEQ.sav should be
+eliminated. This means striking out 2 lines:
+
+line 89 : if [ ! -s $SEQ.sav ]; then
+line 115: fi
+
+The same lines in pre-mfold-html must also be excised.
+
+3. 12/20/96
+
+In rna.f (and hence rna-nodot.f, rna-html.f), a new computed
+structure must contain more than 'window' base pairs that were not in
+previously computed foldings. 'window' is stored in cntrl(9). 'numbp'
+is the number of new base pairs in a structure. If the number of base
+pairs in the first folding is less than 'window', then no structure
+will be found. This is undesirable. Hence, the test will be dropped
+for the first structure, which will always be accepted.
+
+In rna.f, rna-nodot.f and rna-html.f:
+      if(numbp.le.cntrl(9)) then
+becomes
+      if(numbp.le.cntrl(9).and.rep.gt.1) then
+
+4. 9/22/97
+
+dot2ps.c and dot2ps.h are changed so that squares are plotted instead
+of circles. They base pairs are still called 'dots'. Difference files:
+
+dot2ps.c: (old vs. new)
+
+19c19,31
+< /dot  {rad  0.0  360.0  arc  fill} def\n\n";
+---
+> /dot {\n\
+>    newpath\n\
+>    moveto\n\
+>    0.5 s mul   0 rlineto\n\
+>    0   0.5 s mul rlineto\n\
+>   -1 s mul     0 rlineto\n\
+>    0    -1 s mul rlineto\n\
+>    1 s mul     0 rlineto\n\
+>    0   0.5 s mul rlineto\n\
+>    closepath\n\
+>    fill\n\
+>    stroke\n\
+> } def\n\n";
+20a33
+> 
+221c234
+<     float rad = RADIUS, big1;
+---
+>     float s = SIZE, big1;
+235c248
+<     rad *= size*size; 
+---
+>     s *= size*size; 
+252c265
+<                 fprintf (psf, "/rad %.3f scf div def\n", rad*big1);
+---
+>                 fprintf (psf, "/s %.3f scf div def\n", s*big1);
+254c267
+<                 fprintf (psf, "/rad %.3f scf div def\n", rad);
+---
+>                 fprintf (psf, "/s %.3f scf div def\n", s);
+
+dot2ps.h: (old vs. new)
+
+17c17
+< #define RADIUS     0.004       /* base radius measure for setting dot size */
+---
+> #define SIZE       0.0057      /* base size measure for setting dot size */
+
+5. 10/13/97  pre-auto_ct2ps altered to use more appropriate character
+   size for plotting larger sequences. Also, TEST was removed.
+
+< new                > old
+67a68
+>           TEST=`expr \( 600 / \( 88 \+ $LENGTH \) \)` 
+70c71
+<              CHAR_SIZE=0.0`echo $CHAR_SIZE | cut -c3-5`
+---
+>              CHAR_SIZE=0.1

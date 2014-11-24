@@ -1,0 +1,478 @@
+
+     List of errata and changes in version 2 of suboptimal 
+                        folding code.
+
+1. This small bug would give an energy of zero to a hairpin loop of 
+size 3 when the closing base pair is forced. This is OK for the 
+closed excision case, but not in general.
+
+************ new
+LIN.FOR;5
+  115         if ((size.eq.3).and.fce(i,j).and.seq(hstnum(i+1)).eq.' ') then
+  116   c        Closed excision
+****** old
+LIN.FOR;4
+  115         if ((size.eq.3).and.fce(i,j)) then
+  116   c        Closed excision
+************
+
+The same change should be made in CIRC.FOR .
+
+
+2. Jan. 15, 1990.
+A knot checking feature has been added to EFN.FOR . Very often, 
+phylogenetic or other CT files not produced by the folding program 
+can contain knots or conflicting base pairs. The program will now
+find and flag these.
+
+************  new
+File USR$DISK:[ZUKER.MFOLD]EFN.FOR;24
+   61   c     Check for knots
+   62   c
+   63         do i = 1,n
+   64            if (basepr(i).ne.0) then
+   65               j = max(i,basepr(i))
+   66               ip = min(i,basepr(i))
+   67               if (basepr(ip).ne.j.or.basepr(j).ne.ip) then
+   68                  write(6,1041) hstnum(ip),hstnum(j)
+   69                  stop
+   70               endif
+   71               do k = ip+1,j-1
+   72                  if (basepr(k).ne.0) then
+   73                     l = basepr(k)
+   74                     if (l.le.ip.or.l.ge.j) then
+   75                     write(6,1042) hstnum(ip),hstnum(j),hstnum(k),hstnum(l)
+   76                     stop
+   77                     endif
+   78                  endif
+   79               enddo
+   80            endif
+   81         enddo
+   82   1041  format(' Base pair ',i5,'.',i5,39H has 5' or 3' end in 
+             .another base pair.)
+   83   1042  format(' Base pair ',i5,'.',i5,' conflicts with ',i5,'.',i5)
+   84   c
+   85   c     Process sequence to find base types.
+****** old
+File USR$DISK:[ZUKER.MFOLD]EFN.FOR;20
+   61   c     Process sequence to find base types.
+************
+************
+File USR$DISK:[ZUKER.MFOLD]EFN.FOR;24
+  271               write (6,1010) hstnum(i),hstnum(k),hstnum(kp),hstnum(j)
+  272   1010        format(' Knot : ',i5,'.',i5,' conflicts with ',i5,'.',i5)
+  273               e = infinity
+******
+File USR$DISK:[ZUKER.MFOLD]EFN.FOR;20
+  247               write (6,*) 'ERROR - KNOT FOUND'
+  248               e = infinity
+************
+
+3. January 17, 1990.
+Lorne Reid (at Allelix) has graciously updated the FIGDOT program so 
+that it works with GCG version 6.
+************
+File USR$DISK:[ZUKER]FIGDOT.FOR;5
+    9   *
+   10         parameter (nmax=700)
+******
+File USR$DISK:[ZUKER.MFOLD]FIGDOT.FOR;13
+    9   *  1/15/90 - L. Reid, - add pen colour according to value of cell
+   10   *  1/15/90 - Change bottom & top of viewport so that it goes 0 -100
+   11   *            as per the UWGCG manual  (Rev 6.0 section 13-21)
+   12   *  1/17/90 - Zuker changes color option 
+   13         parameter (nmax=700)
+************
+************
+File USR$DISK:[ZUKER]FIGDOT.FOR;5
+  122         do j=n,1,-1
+  123           do i=1,j
+  124                   if (m(i,j).ne.0) then
+  125   * if we've found a point, see if we can draw a line...
+  126                           x=1
+  127                           do while (m(i+x,j-x).ne.0)
+  128                                   m(i+x,j-x)=0
+******
+File USR$DISK:[ZUKER.MFOLD]FIGDOT.FOR;13
+  125         k = 1
+  126         maxm = 1
+  127         do while (k.le.maxm)
+  128   * put out a pen colour associated with the value
+  129            write (15,1024) k
+  130            do j=n,1,-1
+  131               do i=1,j
+  132                   if (k.eq.1.and.m(i,j).gt.maxm) maxm = m(i,j)
+  133                   if (m(i,j).eq.k) then
+  134   * if we've found a point, see if we can draw a line...
+  135                           x=1
+  136                           do while (m(i+x,j-x).eq. k)
+  137                                   m(i+x,j-x)=0
+************
+************
+File USR$DISK:[ZUKER]FIGDOT.FOR;5
+  140           enddo
+  141         enddo
+******
+File USR$DISK:[ZUKER.MFOLD]FIGDOT.FOR;13
+  149              enddo
+  150            enddo
+  151            k = k + 1
+  152         enddo
+************
+************
+File USR$DISK:[ZUKER]FIGDOT.FOR;5
+  144         do j=n,1,-1
+  145           do i=1,j
+  146                   if (m(j,i).ne.0) then
+  147   * if we've found a point, see if we can draw a line...
+  148                           x=1
+  149                           do while (m(j-x,i+x).ne.0)
+  150                                   m(j-x,i+x)=0
+******
+File USR$DISK:[ZUKER.MFOLD]FIGDOT.FOR;13
+  155         k = 1
+  156         maxm = 1
+  157         do while (k.le.maxm)
+  158   * put out a pen colour associated with the value
+  159            write (15,1024) k
+  160            do j=n,1,-1
+  161              do i=1,j
+  162                   if (k.eq.1.and.m(i,j).gt.maxm) maxm = m(j,i)
+  163                   if (m(j,i).eq.k) then
+  164   * if we've found a point, see if we can draw a line...
+  165                           x=1
+  166                           do while (m(j-x,i+x) .eq. m(j,i))
+  167                                   m(j-x,i+x)=0
+************
+************
+File USR$DISK:[ZUKER]FIGDOT.FOR;5
+  162           enddo
+  163         enddo
+******
+File USR$DISK:[ZUKER.MFOLD]FIGDOT.FOR;13
+  179              enddo
+  180            enddo
+  181            k = k + 1
+  182         enddo
+************
+************
+File USR$DISK:[ZUKER]FIGDOT.FOR;5
+  175   14    format ('.vp 20.455 129.545 100.0 0.0',/,
+  176        1        '.wn ',4(f7.2,1x),/,
+******
+File USR$DISK:[ZUKER.MFOLD]FIGDOT.FOR;13
+  194   * Fix up the horizontal axis to run from 0 to 100 rather than reverse
+  195   14    format ('.vp 20.455 129.545 0.0 100.0',/,
+  196        1        '.wn ',4(f7.2,1x),/,
+************
+************
+File USR$DISK:[ZUKER]FIGDOT.FOR;5
+  187   * Point format
+******
+File USR$DISK:[ZUKER.MFOLD]FIGDOT.FOR;13
+  207   1024  format ('.nc ',i1)
+  208   * Point format
+************
+
+4. Jan. 24, 1990.
+Andrew Bettany pointed out a problem with the 'single force' option.
+The program gives a 'bonus energy' to each base designated 'double
+stranded' that actually is double stranded. However, in a base pair
+where both bases are marked 'double stranded', only a single bonus is
+given. This is an error and prejudices the program against letting
+two such designated bases pair with one another. The fix involves 3 
+extra lines of code in LIN.FOR and CIRC.FOR (both changes are 
+identical).
+************ new
+File USR$DISK:[ZUKER.MFOLD]LIN.FOR;7
+   37                erg = erg + eparam(9)
+   38                if (force(i).eq.2.and.force(j).eq.2) erg = erg + eparam(9)
+   39            endif
+   40         endif
+   41    
+******
+File USR$DISK:[ZUKER.MFOLD]LIN.FOR;5 old
+   37               erg = erg + eparam(9)
+   38            endif
+   39         endif
+   40    
+************
+************
+File USR$DISK:[ZUKER.MFOLD]LIN.FOR;7
+  594         if (force(i).eq.2.and.force(j).eq.2) nforce = nforce + 1
+  595   c     Perhaps I,J stacks over I+1,J-1?
+  596         if (i.ne.n.and.j.ne.n+1) then
+  597            if (e.eq.erg(2,i,j,i+1,j-1)
+******
+File USR$DISK:[ZUKER.MFOLD]LIN.FOR;5
+  593   c     Perhaps I,J stacks over I+1,J-1?
+  594         if (i.ne.n.and.j.ne.n+1) then
+  595            if (e.eq.erg(2,i,j,i+1,j-1)
+************
+************
+File USR$DISK:[ZUKER.MFOLD]LIN.FOR;7
+  614         if (force(i).eq.2.and.force(j).eq.2) ep = ep - eparam(9)
+  615    
+  616         if (i+2.gt.j-3) then
+  617   c        Tidy up loose ends (trivial).
+******
+File USR$DISK:[ZUKER.MFOLD]LIN.FOR;5
+  612    
+  613         if (i+2.gt.j-3) then
+  614   c        Tidy up loose ends (trivial).
+************
+
+************  new
+File USR$DISK:[ZUKER.MFOLD]CIRC.FOR;6
+   31                erg = erg + eparam(9)
+   32                if (force(i).eq.2.and.force(j).eq.2) erg = erg + eparam(9)
+   33            endif
+   34         endif
+   35    
+****** old
+File USR$DISK:[ZUKER.MFOLD]CIRC.FOR;4
+   31               erg = erg + eparam(9)
+   32            endif
+   33         endif
+   34    
+************
+************
+File USR$DISK:[ZUKER.MFOLD]CIRC.FOR;6
+  438         if (force(i).eq.2.and.force(j).eq.2) nforce = nforce + 1
+  439   c     Perhaps I,J stacks over I+1,J-1?
+  440         if (e.eq.erg(2,i,j,i+1,j-1)
+  441        . + v(i+1,j-1)) then
+******
+File USR$DISK:[ZUKER.MFOLD]CIRC.FOR;4
+  437   c     Perhaps I,J stacks over I+1,J-1?
+  438         if (e.eq.erg(2,i,j,i+1,j-1)
+  439        . + v(i+1,j-1)) then
+************
+************
+File USR$DISK:[ZUKER.MFOLD]CIRC.FOR;6
+  455         if (force(i).eq.2.and.force(j).eq.2) ep = ep - eparam(9)
+  456    
+  457         k = i+2
+  458   c     Perhaps I,J closes a multi-loop?
+******
+File USR$DISK:[ZUKER.MFOLD]CIRC.FOR;4
+  453    
+  454         k = i+2
+  455   c     Perhaps I,J closes a multi-loop?
+************
+
+5. February 27, 1990.
+
+Bug in EFN for circular foldings. The initial base-pair was being 
+treated as a closing pair for a multi-loop and was given the 
+eparam(10) penalty energy. The solution is to set 'open' to 1 in the 
+calling statement.
+************ new
+File USR$DISK:[ZUKER.MFOLD]EFN.FOR;25
+  151            call efn(nergy,basepr(i),n+i,1)
+  152            energy = ( energy + float(nergy) )/10.0
+******   old
+File USR$DISK:[ZUKER.MFOLD]EFN.FOR;24
+  151            call efn(nergy,basepr(i),n+i,0)
+  152            energy = ( energy + float(nergy) )/10.0
+************
+
+6. June 7, 1990.
+
+Small bug in batgen.f : attempt to write to standard input.
+
+290,291c290,291  < old     > new
+<         write (outunit,*) 'That save file doesn''t exist.'
+<         write (outunit,*) 'Continue anyway?'
+---
+>         write (inunit,*) 'That save file doesn''t exist.'
+>         write (inunit,*) 'Continue anyway?'
+
+7. July 10, 1990.
+
+Bug in mrna.f . Undefined dangling energies for single base stacking 
+should be set to zero instead of infinity. This bug can cause 
+traceback failures when modified bases are used (e.g lowercase : a, 
+c, g, or u; or symbols such as X). The fixup is simple.
+
+948c948  
+<               dangle(a,b,c,d) = infinity
+---
+>               dangle(a,b,c,d) = 0
+969c969
+<                      dangle(var1,var2,var3,var4) = j
+---
+>                      if (j.ne.infinity) dangle(var1,var2,var3,var4) = j
+
+8. July 12, 1990.
+
+Bug in efn.f . Closed excisions were being given the bonus energy of
+eparam(9) instead of a zero energy.
+
+------old-----------------------------------------
+400   size = j-i-1
+      if (size.eq.3) then
+c        Check for closed excision
+         if(seq(i+1).eq.' '.and.seq(i+2).eq.' '.and.seq(i+3).eq.' ') then
+            erg = eparam(9)
+            return
+--------new----------------------------------------
+400   size = j-i-1
+      if (size.eq.3) then
+c        Check for closed excision
+         if(seq(i+1).eq.' '.and.seq(i+2).eq.' '.and.seq(i+3).eq.' ') then
+            erg = 0
+            return
+---------------------------------------------------
+
+9. August 8, 1990.
+
+Danielle Konings at the NIH noticed a small bug in the gettloops 
+subroutine in mrna.f . Format statement number 1 should be
+1      format(/)
+instead of
+1      format(//)
+This bug meant that the first special tetraloop (GAAA) was being 
+ignored.
+
+10. March 1, 1991.
+
+New version of IRIX objects to a parameter statement in prompt.f
+The X-11 versions never contained this bug.
+This should be replaced as follows:
+
+14,17c14,17 ==> new version
+<       parameter (CTRL$H = char(8),
+<      $           CTRL$J = char(10),
+<      $           CTRL$M = char(13),
+<      $           CTRL$U = char(21) )
+--- ===> old version
+>       parameter (CTRL$H = char(ichar('H')-ichar('@')),
+>      $           CTRL$J = char(ichar('J')-ichar('@')),
+>      $           CTRL$M = char(ichar('M')-ichar('@')),
+>      $           CTRL$U = char(ichar('U')-ichar('@'))  )
+
+11. April 3, 1991.
+
+IRIX 3.2.2 shifts the labelling of the energy dot plot. This is 
+corrected by the addition of a single line in dotplot.f :
+         write (st,fmt='(I5)') hstnum(j)
+c   Zuker corrects small label bug for IRIX 3.2.2 - extra line added on April 3, 1991.
+         vert1(1) = float(j-ct)
+         call cmov2(vert1(1),vert1(2))          !move graphic character pointer to (x,y)
+
+12. August 21, 1991.
+
+Joanne Ridgeway rewrote formid.f, multid.f and getseq.f for opening, 
+examining and reading sequence files. These three files are 
+completely rewritten. This rewrite corrects many poor coding 
+practices in the old versions, and enables the user to read sequences
+in the GenBank, EMBL, PIR, Stanford or GCG formats. A few changes are
+needed in mrna.f, as outlined below.
+
+Difference file for : 
+
+< old mrna.f
+  versus
+> new mrna.f
+===============================================================
+
+686,687d685
+<       logical used        !excise these two lines
+<       used = .false.
+
+716c714,717
+<          if (cntrl(7).eq.2) call mseq(cntrl(5))
+---
+>          if (cntrl(7).eq.2) then
+>              cntrl(5) = 0
+>              call mseq(cntrl(5))
+>          endif
+
+758c759
+<             call formid(seqlab,seq,n,maxsiz,used)
+---
+>             call formid(seqlab,seq,n,maxsiz)
+
+791,792d791
+<       logical used             !excise these two lines
+<       data used/.false./
+
+794,795c793,794
+<       if (.not.used) then
+<          call multid(seqlab,seq,n,maxsiz,used,i)
+---
+>       if (i.eq.0) then
+>          call multid(seqlab,seq,n,maxsiz,i)
+
+798c797
+<          call multid(seqlab,seq,n,maxsiz,used,i)
+---
+>          call multid(seqlab,seq,n,maxsiz,i)
+
+13. October 23, 1992.
+
+The line :
+      vmin  = infinity
+was accidentally commented out in the fill subroutine (in lin.f). 
+This caused an error if the minimum folding energy of a fragment was 
+positive.
+
+14. December 4, 1992.
+
+A tiny bug was found in the heap_sort subroutine. The last two i,j
+base pairs selected automatically by the computer (automatic
+traceback) were transposed during the sort. This bug meant that there
+was a remote possibility that the second to last of the predicted
+suboptimal structures would have a lower energy than the last
+structure.
+
+Bug in subroutine heap_sort in sort.f
+87c87
+<       do ir = num-1,1,-1      ! new code : continue to swap down to 1
+---
+>       do ir = num-1,2,-1      ! old code
+
+
+15. January 8, 1993.
+
+The pnumplot subroutine was found to produce total rubbish. The old 
+VAX version is correct. Roland Gaboury ported this incorrectly. 
+
+  < : old               > : new
+643,646c643,648
+<             if ((v(i,j) + v(j,i+n)).le.(vmin+vinc)) then
+<                sum = sum + 1
+<             end if
+<          end do
+---
+>             if (j.lt.i) then
+>                if ((v(j,i) + v(i,j+n)).le.(vmin+vinc)) sum = sum + 1
+>             else
+>                if ((v(i,j) + v(j,i+n)).le.(vmin+vinc)) sum = sum + 1
+>             endif
+>          enddo
+675,678c677,683
+<             if ((v(i,j) + v(j,i+n)).le.(vmin+vinc)) then
+<                sum = sum + 1
+<             end if
+<          end do
+---
+>             if (j.lt.i) then
+>                if ((v(j,i) + v(i,j+n)).le.(vmin+vinc)) sum = sum + 1
+>             else
+>                if ((v(i,j) + v(j,i+n)).le.(vmin+vinc)) sum = sum + 1
+>             endif
+>          enddo
+
+16. Sep 27, 1995.
+
+Finally cleaned up default names for output. Set 'dstr' to
+'                                        ' in a data statement
+in mrna.f and clean up the '.ct' assignment to '.ct '.
+ 
+
+17. Jan 25, 1996.
+
+Increased MAXREC from 80 to 120 in dot2ps.h
+Long sequence names were causing a problem on the mfold server.

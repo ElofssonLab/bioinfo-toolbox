@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Running the programs</TITLE>
+<META NAME="description" CONTENT="Running the programs">
+<META NAME="keywords" CONTENT="FEBS98-html">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="FEBS98-html.css">
+<LINK REL="next" HREF="node13.html">
+<LINK REL="previous" HREF="node6.html">
+<LINK REL="up" HREF="FEBS98-html.html">
+<LINK REL="next" HREF="node8.html">
+</HEAD>
+<BODY BGCOLOR=#FFDEAD TEXT=#202020 LINK=#800000 ALINK=#ffff00 VLINK=#353976>
+<!--Navigation Panel-->
+<A NAME="tex2html135"
+ HREF="node8.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="img/next_motif.gif"></A> 
+<A NAME="tex2html132"
+ HREF="FEBS98-html.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="img/up_motif.gif"></A> 
+<A NAME="tex2html126"
+ HREF="node6.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="img/previous_motif.gif"></A> 
+<A NAME="tex2html134"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="img/contents_motif.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html136"
+ HREF="node8.html">COMMAND LINE PARAMETERS</A>
+<B> Up:</B> <A NAME="tex2html133"
+ HREF="FEBS98-html.html">Algorithms and Thermodynamics for</A>
+<B> Previous:</B> <A NAME="tex2html127"
+ HREF="node6.html">Constrained folding</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00070000000000000000">
+Running the programs</A>
+</H1>
+
+<P>
+The main program in the <I>mfold</I> package is named <I>mfold</I> . It
+is really a (Unix shell) script that calls a number of Fortran and C
+programs and puts together a reasonable output. Calling the <I>mfold</I> script without any command line parameters will cause the
+following output:
+<PRE>
+Usage is
+mfold SEQ=`file_name' with optional parameters:
+[ AUX=`auxfile_name' ] [ RUN_TYPE=text (default) or html ]
+[ NA=RNA (default) or DNA ] [ LC=sequence type (default = linear) ]
+[ T=temperature (default = 37°) ] [ P=percent (default = 5) ]
+[ W=window parameter (default - set by sequence length) ]
+[ MAXBP=max base pair distance (default - no limit) ]
+[ MAX=maximum number of foldings to be computed (default 100) ]
+[ ANN=structure annotation (default = none, p-num or ss-count) ]
+[ START=5' base # (default = 1)] [ STOP=3' base # (default = end) ]
+[ REUSE=NO/YES (default=NO) reuse existing .sav file ]
+</PRE>The meaning and use of these parameters are discussed below.
+
+<P>
+<BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS">&#160;</A>
+<UL>
+<LI><A NAME="tex2html137"
+ HREF="node8.html"><SMALL>COMMAND LINE PARAMETERS</SMALL></A>
+<LI><A NAME="tex2html138"
+ HREF="node9.html">O<SMALL>UTPUT</SMALL></A>
+<UL>
+<LI><A NAME="tex2html139"
+ HREF="node10.html"><I>The energy dot plot</I></A>
+<LI><A NAME="tex2html140"
+ HREF="node11.html"><I>Optimal and suboptimal foldings</I></A>
+</UL>
+<LI><A NAME="tex2html141"
+ HREF="node12.html"><SMALL>AUXILIARY AND INDIVIDUAL PROGRAMS</SMALL></A>
+</UL>
+<!--End of Table of Child-Links-->
+<BR><HR>
+<ADDRESS>
+<TABLE><TR><TD><IMG SRC=img/shield16.gif HSPACE=20></TD><TD><I>Michael Zuker <BR>Institute for Biomedical Computing<BR>
+Washington University in St. Louis<BR>
+1998-12-05</I></TD></TR></TABLE>
+</ADDRESS>
+</BODY>
+</HTML>

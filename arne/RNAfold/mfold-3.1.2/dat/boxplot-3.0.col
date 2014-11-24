@@ -1,0 +1,87 @@
+#boxplot.col color map for boxplot May 12, 2000 Define colors below with rgb.
+0.00 0.00 0.15  # color 0, blue-black for text and outlines only.
+0.00 0.00 0.00  # 1 black  (optimal energy, Also lower triangle) set 1 
+0.95 0.00 0.00  # 2 red  (almost optimal) set 1
+0.00 0.85 0.00  # 3 green                 set 1
+0.75 0.75 0.00  # 4 yellow                set 1
+0.80 0.00 0.80  # 5 purple                set 1
+0.20 0.60 0.80  # 6 light blue    Last color of set 1
+0.65 0.50 0.20  # 7 , not used
+0.90 0.70 0.70  # 8   not used
+0.00 0.00 0.80  # 9 blue used for blue label dots
+0.99 0.99 0.99  # 10 white for background 
+0.65 0.65 0.65  # 11 for grid lines
+0.10 0.10 0.30  # 12 For copyright
+# 4 color scheme below for probabilities
+0.90 # use color 1 =black  for .9 < prob 
+0.5 # use color 2 = red   for .5 < prob <= .9
+0.2 # use color 3 = green for .2 < prob <= .5 and yellow for prob= < .2
+# 5 color scheme below
+0.90 # use color 1  for .9 < prob 
+0.75 # use red for  for .75 < prob <= .9
+0.50 # use green for    .5 < prob <= .75
+0.25 # use yellow for   .25 < prob <= .5 and purple for prob <= .25
+# 6 color scheme below
+1.40 # use color 1  for .9 < prob 
+1.0001 # use red for  for .8 < prob <= .9
+0.70 # use green for    .7 < prob <= .8
+0.50 # use yellow for   .5 < prob <= .7
+0.10 # use purple for   .35 < prob <= .5 and brown for prob <= .35
+# 7 color scheme below: Which probabilities for each color?
+0.90  # use color 1 = black for   .90 < prob
+0.50  # use color 2 = red for     .50 < prob <= .90
+0.20  # use color 3 = green for   .20 < prob <= .50
+0.10  # use color 4 = yellow for  .10 < prob <= .20
+0.01  # use color 5 = purple for  .01 < prob <= .10
+0.001 # use brown for .001 < prob <= .01 and light blue for prob <= .001
+# 8 color scheme below: can be adjusted, maintain 7 values
+0.9990             # use red above this,
+0.9900             #  orange from .990 < x <=.9990
+0.9000             #  Yellow  for  .900 < x <= .990  
+0.6500             #  Green   for  .650 < x <= .900  
+0.3500             #  Cyan    for  .350 < x < =.650
+0.1000             #  Blue    for  .100 < x < =.350 
+0.0100             #  black below this, Magenta  .010 < x <=.100
+# Minimum Size of dots for postscript for energies
+# first number is magnification, second is minimum size in points.
+1.2   1.2  # for black, 1.0 for first is maximum size without overlap.
+1.1   1.1  # for red    1.0 for second indicates dot is drawn 
+.9     .9  # for green     at least  1.0/72 inch
+.8     .8  # for yellow
+.8     .8  # for purble
+.8     .8  # for brown
+.8     .8  # for light blue
+# 8 color scheme for probability annotation, can be adjusted, also for 7 col.
+0.999 0.000 0.000  #  Red     for  .999 < x
+0.999 0.496 0.000  #  Orange  for  .990 < x <= .999 
+0.999 0.999 0.000  #  Yellow  for  .900 < x <= .990  
+0.000 0.999 0.000  #  Green   for  .650 < x <= .900  
+0.133 0.999 0.999  #  Cyan    for  .350 < x < =.650
+0.375 0.375 0.999  #  Blue    for  .100 < x < =.350   
+0.621 0.000 0.999  #  Magenta for  .010 < x < =.100  
+0.000 0.000 0.000  #  Black   for         x <= .010
+# To change colors or the probability range for each color,
+# Any floating point number of the form x.xx may be altered.
+# The comment text  following the # may be altered to describe changes.
+# Every line above is required.  The program is stupid.
+# The # symbol indicates comments, but the program does not look for it. 
+# The program ignores lines 1,12,16,21,27,and 34 on.  
+# Lines 2-8 must exist with colors  specified as red, green, and blue values
+# between 0.00 and 0.99   
+# Within a color scheme, the numbers must decrease as in .90,.75,.50,.25
+#
+# These colors are used for the screen, postscript, and gif files.
+# They are used for both energy and probability plot files.
+
+# Format of this file must match the format expected by boxplot_setcolor.h
+#
+# This file was changed dramatically May 12, 2000
+# An extra color was added.
+# 
+# Currently the first set of colors are used when 2 to 6 colors are 
+# specified.
+# When 7 or 8 colors are used, the 8 color scheme is used.
+# Color 1 from the first set is always used for the lower triangle.
+
+
+

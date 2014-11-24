@@ -1,0 +1,39 @@
+If mfold is used in work that is published, please cite:
+
+1. For the "classic" article on the suboptimal algorithm:
+
+M. Zuker 
+On Finding All Suboptimal Foldings of an RNA Molecule. 
+Science 244, 48-52 (1989) 
+
+2. The most up-to-date reference on the method:
+
+M. Zuker, D.H. Mathews & D.H. Turner 
+Algorithms and Thermodynamics for RNA Secondary Structure Prediction:
+A Practical Guide 
+in RNA Biochemistry and Biotechnology, J. Barciszewski & B.F.C. Clark,
+eds., NATO ASI Series, Kluwer Academic Publishers, (1999) 
+
+3. If you use version 2.3 free energy rules for folding RNA:
+
+A.E. Walter, D.H. Turner, J. Kim, M.H. Lyttle, P. Müller, D.H. Mathews
+& M. Zuker 
+Coaxial stacking of helixes enhances binding of oligoribonucleotides
+and improves predictions of RNA folding. 
+Proc. Natl. Acad. Sci. USA 91, 9218-9222 (1994) 
+
+4. If you fold RNA using the latest version 3.1 free energies:
+
+D.H. Mathews, J. Sabina, M. Zuker & D.H. Turner 
+Expanded Sequence Dependence of Thermodynamic Parameters Provides
+Robust Prediction of RNA Secondary Structure 
+J. Mol. Biol. (in press) (1999) 
+
+5. If you are folding DNA:
+
+J.Jr SantaLucia
+"A unified view of polymer, dumbbell, and oligonucleotide DNA 
+nearest-neighbor thermodynamics."
+Proc. Natl. Acad. Sci. USA 95, 1460-1465 (1998)
+
+          __________________________________________________

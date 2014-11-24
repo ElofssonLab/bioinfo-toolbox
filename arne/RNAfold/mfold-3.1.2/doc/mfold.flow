@@ -1,0 +1,77 @@
+                           MFOLD
+
+Interactive dot plot feature is inactive. A sepatate X11 application
+(boxplot97, boxplot99) has been created to work with the ".plot" files.
+
+Flow chart for RNA folding 
+---------------------------------
+         ----->    main        ------------.
+         ^           |                     |
+         |           |              read energy files
+         ^       (cont run)         |               |       
+         |           |           (reg)           (save)
+         ^      call cdump--.       |               |
+         |                 call outputs             |         
+         ^                  |       '--------- call menu
+         |                  |-----------------------'             **
+         ^                  |                                     |
+         |               mrep = 1 --(multiple)-- read MREPth sequence
+      err msg               |                         |
+         ^            zero bit arrays <---------------'
+         |            call process
+   (n*2.gt.fldmax)----------' 
+                           |
+                    ----(n ok)-----
+                    |              |
+            (save or reg run)  (cont run)              
+                    |              |
+                call fill--(reg)-->|
+                    |              |
+  putcont<-----(save run)          |
+    |                              |
+  stop.                         rep = 1 
+                               jump = 1
+                               flag = .true.  
+                                   |
+                                   |<------ *
+                                   | 
+     (mult or n best)----------------(plot run)
+       |                             |        |
+    sortout(rep)               (jump.eq.1) (jump.eq.2)
+     |        |                   |                |
+  (err)     (no err)       dotplt(start)       dotplt(cross-hairs)
+    |            |                '->  jump = 2  <-'
+error message->rep++                      |
+               mrep++                     |
+              /      \                    |
+         (reps done)  (more to go)        |
+             |           |                |                  
+     flag = .false.------------------------------->(not flag)->. 
+                                       (flag)                  |
+                                          |                    |
+                         <----(err) <---trace1                 |
+                        |                 |                    |
+                    errmsg             (no err)                |
+                        |                 |                    | 
+                         -----------------|------->(not flag)->|
+                                        (flag)                 |
+                                        trace2                 |
+                         <----(err) <---' |                    |
+                    errmsg             (no err)                |
+                        |                 |                    |
+                        '-----------------|------->(not flag)->|
+                                          |                    |
+                                   calculate energy            |
+                                   |              |            |
+                            (plot or n-best)     (mult)        |
+                                   |              |            |
+                               mark basepairs     |            | 
+                                   |              |            |
+                                   '-- call selected outputs   |
+                                                  |<-----------'
+                                        ------------------
+                                        |                |
+                                  (plot or n-best)      (mult)------
+                                   |          |         |           |
+                                (flag)     (not flag) (done)    (not done)
+                                goto *        '-> stop <-'       goto **

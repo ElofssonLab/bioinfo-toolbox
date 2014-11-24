@@ -1,0 +1,4 @@
+#   This is 'sourced' before running mfold
+
+export MFOLDLIB=/usr/local/lib
+

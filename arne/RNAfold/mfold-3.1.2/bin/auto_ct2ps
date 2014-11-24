@@ -1,0 +1,84 @@
+#!/bin/sh
+
+# auto_ct2ps
+# runs awk to split a multi-structure ct file into single structure files, then
+# runs NAVIEW and plt22ps for each structure, producing plot files in PostScript
+# plt2ps.exe changed to plt22ps by D.S. on December 30,1997
+# As of 2/6/98: 
+# CHAR_SIZE no longer used. Naview now scales CHAR_SIZE based on size of image.
+# LAB_FR (labeling frequency) added on /8/21/98 - environment variable
+# ROT_ANG (structure rotation angle) added on 12/15/98 - environment variable
+
+LIBDIR=${MFOLDLIB:-$MFOLD/dat}
+
+if [ $# -lt 2 ]; then
+    echo " *** Usage: auto_ct2ps control_file in_fil1 [o]\n" 
+    echo "            suffix  .nav  is assumed for control_file "
+    echo "            suffix  .ct   is assumed for in_fil1 "
+    echo "            o  is optional - (o)verwrite existing file  in_fil1.ps"
+elif [ -s $2.ct ]; then 
+    if [ -s $1.nav ]; then
+        control=$1.nav
+    elif [ -s $LIBDIR/$1.nav ]; then
+        control=$LIBDIR/$1.nav
+    else
+        echo " *** control_file  "$1.nav"  does not exist or is empty.\n"
+        exit    
+    fi
+    if [ $# -lt 3 ]; then
+        overw=null
+    else
+        overw=$3
+    fi
+    if [ -s $2_1.ct -a $overw != "o" ]; then
+        echo " *** A file named  "$2"_1.ct  already exists . . .\n" 
+        echo "     Use:  auto_ct2ps "$2" o  to overwrite this file."
+    else
+        # Determine labeling frequency and ROT_ANG
+        ROT_ANG=${ROT_ANG:-0}
+        LAB_FR=${LAB_FR:-default}
+        if [ $LAB_FR = "default" ] ; then
+           LENGTH=`head -1 $2.ct | cut -c1-5`
+           if [ $LENGTH -le 50 ]; then
+              LAB_FR=10
+           elif [ $LENGTH -le 300 ]; then
+              LAB_FR=20
+           else
+              LAB_FR=50
+           fi
+        fi
+        count=`awk '
+            BEGIN  {
+                count = 0;
+                CurrentFile = prefix;
+            }
+
+            $3  ~ /\=/  {
+                if ( CurrentFile != prefix ) close(CurrentFile);
+                count++;
+                CurrentFile = prefix "_" count ".ct";
+            }
+
+            { print $0 > CurrentFile; }
+
+            END  { 
+                if ( count ) close(CurrentFile); 
+                print count;
+            }'  prefix=$2  $2.ct`
+
+        while [ "$count" -gt 0 ]; do
+           cat $control | cut -d# -f1 | sed s/LAB_FR/$LAB_FR/ | sed s/ROT_ANG/$ROT_ANG/ | naview.exe $2_$count.ct $2_$count.plt2 > /dev/null
+           plt22ps  $2_$count.plt2  &&
+           echo "    ====>  New PostScript plot file is  "$2_$count.ps
+           count=`expr $count - 1`
+        done
+
+# For the mfold-server version, Zuker keeps the individual .ct files.
+#       \rm $2_*.ct
+#       \rm $2_*.plt2
+    fi
+else
+    echo " *** in_fil1  "$2.ct"  does not exist or is empty."
+fi
+echo " "
+

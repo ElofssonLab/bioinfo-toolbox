@@ -1,0 +1,168 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>EXAMPLE 1</TITLE>
+<META NAME="description" CONTENT="EXAMPLE 1">
+<META NAME="keywords" CONTENT="FEBS98-html">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="FEBS98-html.css">
+<LINK REL="next" HREF="node15.html">
+<LINK REL="previous" HREF="node13.html">
+<LINK REL="up" HREF="node13.html">
+<LINK REL="next" HREF="node15.html">
+</HEAD>
+<BODY BGCOLOR=#FFDEAD TEXT=#202020 LINK=#800000 ALINK=#ffff00 VLINK=#353976>
+<!--Navigation Panel-->
+<A NAME="tex2html218"
+ HREF="node15.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="img/next_motif.gif"></A> 
+<A NAME="tex2html215"
+ HREF="node13.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="img/up_motif.gif"></A> 
+<A NAME="tex2html209"
+ HREF="node13.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="img/previous_motif.gif"></A> 
+<A NAME="tex2html217"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="img/contents_motif.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html219"
+ HREF="node15.html">EXAMPLE 2</A>
+<B> Up:</B> <A NAME="tex2html216"
+ HREF="node13.html">Sample foldings</A>
+<B> Previous:</B> <A NAME="tex2html210"
+ HREF="node13.html">Sample foldings</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00081000000000000000">
+ E<SMALL>XAMPLE 1</SMALL></A>
+</H2>
+
+<P>
+The <I>energy dot plot</I> is an integral part of the folding prediction. Consider the
+folding of a short RNA sequence: <BR> <TT>ACCCCCUCCU UCCUUGGAUC
+AAGGGGCUCA A</TT>, <BR>
+using default parameters. 
+<!-- MATH: $\Delta G= -9.8$ -->
+<IMG
+ WIDTH="83" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img7.gif"
+ ALT="$\Delta G= -9.8$">
+kcal/mole at
+37<IMG
+ WIDTH="11" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img29.gif"
+ ALT="$^{\circ}$">,
+so 
+<!-- MATH: $\Delta \Delta G= 1.0$ -->
+<IMG
+ WIDTH="84" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img121.gif"
+ ALT="$\Delta \Delta G= 1.0$">
+rather than 5% of <IMG
+ WIDTH="29" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img6.gif"
+ ALT="$\Delta G$">.
+A single,
+optimal folding is computed.  A glance of the <I>energy dot plot</I> , shown in Figure
+<A HREF="node14.html#EX1P">13</A>, reveals the optimal folding in black dots (symbols), but
+another set of yellow dots, indicating base pairs in at least 1 other
+suboptimal folding. The default value of `W' (2, from Table
+<A HREF="#WINDOW">3</A>) is too large for this other folding to be predicted, but
+a glance at the dot plot shows that something else is there. When
+the sequence is refolded with `W'=0, a second, totally different
+folding is predicted. Figure <A HREF="node14.html#EX1S">14</A> displays these foldings with
+individual bases drawn.
+<BR>
+<DIV ALIGN="CENTER"><A NAME="EX1P">&#160;</A><A NAME="839">&#160;</A>
+<TABLE WIDTH="50%">
+<CAPTION><STRONG>Figure 13:</STRONG>
+The <I> energy dot plot</I> for the ``Example 1''
+sequence. Surrounding annotation, which would not be legible at this
+scale, has been removed. The yellow dots indicate base pairs in
+foldings within 0.3 kcal/mole of the optimal folding free energy of
+-9.8 kcal/mole.</CAPTION>
+<TR><TD><IMG
+ WIDTH="354" HEIGHT="350"
+ SRC="img122.gif"
+ ALT="\begin{figure}\centering
+\epsfig{file=1_zoom.ps}
+\end{figure}"></TD></TR>
+</TABLE>
+</DIV>
+<BR>
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="EX1S">&#160;</A><A NAME="842">&#160;</A>
+<TABLE WIDTH="50%">
+<CAPTION><STRONG>Figure 14:</STRONG>
+The 2 predicted foldings for the ``Example 1''
+sequence. (a) The optimal folding with 
+<!-- MATH: $\Delta G= -9.8$ -->
+<IMG
+ WIDTH="83" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img7.gif"
+ ALT="$\Delta G= -9.8$">kcal/mole. (b) The suboptimal fold (
+<!-- MATH: $\Delta G= -9.5$ -->
+<IMG
+ WIDTH="83" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img8.gif"
+ ALT="$\Delta G= -9.5$">
+kcal/mole)
+found after refolding with `W'=0.</CAPTION>
+<TR><TD><IMG
+ WIDTH="300" HEIGHT="245"
+ SRC="img123.gif"
+ ALT="\begin{figure}\centering
+\subfigure[]{\epsfig{file=1-again_1_zoom.ps,width=0.3\t...
+...\subfigure[]{\epsfig{file=1-again_2_zoom.ps,width=0.3\textwidth} }\end{figure}"></TD></TR>
+</TABLE>
+</DIV>
+<BR>
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html218"
+ HREF="node15.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="img/next_motif.gif"></A> 
+<A NAME="tex2html215"
+ HREF="node13.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="img/up_motif.gif"></A> 
+<A NAME="tex2html209"
+ HREF="node13.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="img/previous_motif.gif"></A> 
+<A NAME="tex2html217"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="img/contents_motif.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html219"
+ HREF="node15.html">EXAMPLE 2</A>
+<B> Up:</B> <A NAME="tex2html216"
+ HREF="node13.html">Sample foldings</A>
+<B> Previous:</B> <A NAME="tex2html210"
+ HREF="node13.html">Sample foldings</A>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<TABLE><TR><TD><IMG SRC=img/shield16.gif HSPACE=20></TD><TD><I>Michael Zuker <BR>Institute for Biomedical Computing<BR>
+Washington University in St. Louis<BR>
+1998-12-05</I></TD></TR></TABLE>
+</ADDRESS>
+</BODY>
+</HTML>

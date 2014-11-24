@@ -1,0 +1,60 @@
+
+October 7 1996
+
+Release tgd1.2c.  Fixed polygon and filledpolygon bugs
+thanks to notes from Ronan Waide (waider@cork.cig.mot.com).
+
+--------------------------
+
+February 9, 1996
+
+Release tgd1.2b.  Special filename stdout can now be used
+in commands gif and gd.  Use of stdout results in tgd
+output going to standard out instead of to a disk file.
+Suggested by Nathan J Kurz <nate@tripod.tripod.com>.
+
+--------------------------
+
+October 11, 1995
+
+Release tgd1.2a.  Received a complaint that tgdsamfont.c
+couldn't be assembled (assembler out of memory) so I
+decomposed the file into several files (tgdFont*.c).
+No functional changes. --bks
+
+--------------------------
+
+October 5, 1995 
+
+Hi,
+
+This release is tgd1.2, issued to correspond
+to the latest release of gd1.2.
+Documentation is in tgd1.2/docs/tgd.html.
+Latest documentation should be at:
+  http://s27w007.pswfs.gov/tgd/
+
+The gd 1.2 distribution is in tgd1.2/gd1.2
+To make tgd, try 
+   % cd tgd1.2
+   % make
+
+This should make both the gd graphics library (tgd0/gd1.1.1/libgd.a)
+and the program tgd.  However, fiddling may be necessary as this
+is only tested on SunOS 4.x.
+
+Please free to drop me a line:
+   bks@s27w007.pswfs.gov
+or
+   bks@netcom.com
+
+If I haven't given you credit, let me know immediately
+so that I can correct the credits section of the document
+at http://s27w007.pswfs.gov/tgd/.
+
+    --bks
+
+Bradley K. Sherman             | Institute of Forest Genetics
+bks@s27w007.pswfs.gov          |                 P.O. Box 245
+510-559-6437  FAX:510-559-6440 |       Berkeley, CA 94701 USA
+<a href="http://s27w007.pswfs.gov/~bks/">Dendrome Project</a>

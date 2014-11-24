@@ -1,0 +1,52 @@
+
+Structure    1
+
+Folding bases      1 to     57 of  foo                                              
+ Initial dG =    -18.9
+
+          10 
+.-TTTAA| A G 
+       GA G A
+       CT C G
+\ -----^ - A 
+             
+
+
+      20       
+  .-GA       T 
+      GGATGAG \
+      CCTACTC C
+  \ --       A 
+          30   
+
+
+             40   
+    GCC------   G 
+             CCC A
+             GGG A
+    GAGGTCATC   A 
+          50      
+
+
+
+Structure    2
+
+Folding bases      1 to     57 of  foo                                              
+ Initial dG =    -18.6
+
+        10          20       
+TTTAAGAAGGAGA | .-GA       T 
+             CTC    GGATGAG \
+             GAG    CCTACTC C
+------------- ^ \ --       A 
+                        30   
+
+
+                        40   
+                  GCC---   G 
+                        CCC A
+                        GGG A
+                  GTCATC   A 
+                     50      
+
+

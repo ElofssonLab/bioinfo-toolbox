@@ -1,0 +1,415 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>The energy dot plot</TITLE>
+<META NAME="description" CONTENT="The energy dot plot">
+<META NAME="keywords" CONTENT="FEBS98-html">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="FEBS98-html.css">
+<LINK REL="next" HREF="node11.html">
+<LINK REL="previous" HREF="node9.html">
+<LINK REL="up" HREF="node9.html">
+<LINK REL="next" HREF="node11.html">
+</HEAD>
+<BODY BGCOLOR=#FFDEAD TEXT=#202020 LINK=#800000 ALINK=#ffff00 VLINK=#353976>
+<!--Navigation Panel-->
+<A NAME="tex2html175"
+ HREF="node11.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="img/next_motif.gif"></A> 
+<A NAME="tex2html172"
+ HREF="node9.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="img/up_motif.gif"></A> 
+<A NAME="tex2html166"
+ HREF="node9.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="img/previous_motif.gif"></A> 
+<A NAME="tex2html174"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="img/contents_motif.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html176"
+ HREF="node11.html">Optimal and suboptimal foldings</A>
+<B> Up:</B> <A NAME="tex2html173"
+ HREF="node9.html">OUTPUT</A>
+<B> Previous:</B> <A NAME="tex2html167"
+ HREF="node9.html">OUTPUT</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00072100000000000000">
+<I>The energy dot plot</I></A>
+</H3>
+
+<P>
+A nucleic acid secondary structure dot plot is a triangular plot that
+depicts base pairs as dots or other symbols. We shall refer to these
+symbols as dots. A dot in column <I>i</I> and row <I>j</I> of a triangular
+array, 
+<!-- MATH: $\{ (i,j) | 1 \leq i \leq j \leq n \}$ -->
+<IMG
+ WIDTH="150" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img100.gif"
+ ALT="$\{ (i,j) \vert 1 \leq i \leq j \leq n \}$">
+represents the base pair
+<I>i</I>.<I>j</I>. The advantage of a dot plot is that it can display the base
+pairs in more than 1 folding simultaneously. It can be used to compare
+a few foldings, or the base pair distribution in many millions of
+foldings. 
+
+<P>
+<I>Mfold</I> computes a number, 
+<!-- MATH: $\Delta G(i,j)$ -->
+<IMG
+ WIDTH="62" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img101.gif"
+ ALT="$\Delta G(i,j)$">
+for every possible base
+pair, <I>i</I>.<I>j</I>. This is the minimum free energy of any folding that
+contains the <I>i</I>.<I>j</I> base pair. As above, we let <IMG
+ WIDTH="29" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img6.gif"
+ ALT="$\Delta G$">
+be the
+overall minimum folding free energy, and 
+<!-- MATH: $\Delta \Delta G$ -->
+<IMG
+ WIDTH="42" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img9.gif"
+ ALT="$\Delta \Delta G$">
+a user
+selected free energy increment. Clearly
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<!-- MATH: \begin{displaymath}
+\Delta G= \min_{1 \leq i < j \leq n} \Delta G(i,j).
+\end{displaymath} -->
+
+
+<IMG
+ WIDTH="166" HEIGHT="38"
+ SRC="img102.gif"
+ ALT="\begin{displaymath}\Delta G= \min_{1 \leq i < j \leq n} \Delta G(i,j).
+\end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
+The energy increment is derived from <IMG
+ WIDTH="29" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img6.gif"
+ ALT="$\Delta G$">
+and <I>P</I>. That is,
+
+<!-- MATH: $\Delta \Delta G= P \times \Delta G/ 100$ -->
+<IMG
+ WIDTH="153" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img103.gif"
+ ALT="$\Delta \Delta G= P \times \Delta G/ 100$">.
+The current convention is
+to lower 
+<!-- MATH: $\Delta \Delta G$ -->
+<IMG
+ WIDTH="42" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img9.gif"
+ ALT="$\Delta \Delta G$">
+to 12 kcal/mole when it would otherwise
+be greater, and to raise it to 1 kcal/mole when it would otherwise
+be smaller. Then the <I>energy dot plot</I> is defined to be the
+collection of all base pairs <I>i</I>.<I>j</I> satisfying:
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<!-- MATH: \begin{displaymath}
+\Delta G(i,j) \leq \Delta G+ \Delta \Delta G.
+\end{displaymath} -->
+
+
+<IMG
+ WIDTH="167" HEIGHT="28"
+ SRC="img104.gif"
+ ALT="\begin{displaymath}\Delta G(i,j) \leq \Delta G+ \Delta \Delta G.
+\end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
+This dot plot contains the <B>superposition of all possible
+foldings</B> whose folding energy is within 
+<!-- MATH: $\Delta \Delta G$ -->
+<IMG
+ WIDTH="42" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img9.gif"
+ ALT="$\Delta \Delta G$">
+of the
+minimum folding energy. Typically, 
+<!-- MATH: $|\Delta \Delta G|$ -->
+<IMG
+ WIDTH="51" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img105.gif"
+ ALT="$\vert\Delta \Delta G\vert$">
+is small
+compared to 
+<!-- MATH: $|\Delta G|$ -->
+<IMG
+ WIDTH="38" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img106.gif"
+ ALT="$\vert\Delta G\vert$">,
+or <I>P</I> is a small percentage. In this case,
+the <I>energy dot plot</I> contains the superposition of all close to optimal
+foldings. 
+
+<P>
+The <I>energy dot plot</I> gives an overall visual impression of how ``well-defined''
+the folding is. A cluttered plot, or cluttered regions, indicate either
+structural plasticity (the lack of well-defined structure) or else the
+inability of the algorithm to predict a structure with confidence. A
+couple of crude measures of ``well-definedness'' have been introduced
+in <I>mfold</I> . The first is ``P-num''. 
+<!-- MATH: $P\!-\!num(i)$ -->
+<IMG
+ WIDTH="80" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img107.gif"
+ ALT="$P\!-\!num(i)$">
+is a measure of the
+level of promiscuity of <I>r</I><SUB><I>i</I></SUB> in its pairing with other bases in
+foldings within 
+<!-- MATH: $\Delta \Delta G$ -->
+<IMG
+ WIDTH="42" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img9.gif"
+ ALT="$\Delta \Delta G$">
+of <IMG
+ WIDTH="29" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img6.gif"
+ ALT="$\Delta G$">.
+It is the number of different base
+pairs, <I>i</I>.<I>j</I>, or <I>k</I>.<I>i</I> that can form in this set of foldings, and is
+simply the number of dots in the <I>i</I><SUP><I>th</I></SUP> row and <I>i</I><SUP><I>th</I></SUP> column of
+the <I>energy dot plot</I> . If 
+<!-- MATH: $\delta(expression)$ -->
+<IMG
+ WIDTH="101" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img108.gif"
+ ALT="$\delta(expression)$">
+is defined to be 1 when
+``expression'' is true, and 0 otherwise, then P-num may be defined as:
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<!-- MATH: \begin{displaymath}
+P\!-\!num(i) =  \sum_{k < i} \delta (\Delta G(k,i) \leq \Delta G+ \Delta \Delta G) +
+\sum_{i < j} \delta (\Delta G(i,j) \leq \Delta G+ \Delta \Delta G).
+\end{displaymath} -->
+
+
+<IMG
+ WIDTH="541" HEIGHT="47"
+ SRC="img109.gif"
+ ALT="\begin{displaymath}P\!-\!num(i) = \sum_{k < i} \delta (\Delta G(k,i) \leq \Delta...
+...{i < j} \delta (\Delta G(i,j) \leq \Delta G+ \Delta \Delta G).
+\end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
+P-num pertains to individual bases. H-num is  ``well-definedness'' measure for
+a base pair <I>i</I>.<I>j</I>. It is the average value of the two P-num quantities,
+adjusted by removing the ``desirable'' <I>i</I>.<I>j</I> base pair. That is:
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<!-- MATH: \begin{displaymath}
+H\!-\!num(i,j) =  ( P\!-\!num(i) + P\!-\!num(j) - 1 )/2.
+\end{displaymath} -->
+
+
+<IMG
+ WIDTH="351" HEIGHT="28"
+ SRC="img110.gif"
+ ALT="\begin{displaymath}H\!-\!num(i,j) = ( P\!-\!num(i) + P\!-\!num(j) - 1 )/2.
+\end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
+A helix, already defined as a collection of two or more consecutive
+base pairs, may be described as a triple <I>i</I>,<I>j</I>,<I>k</I>, where <I>k</I> is the
+number of base pairs, and the actual base pairs are 
+<!-- MATH: $i.j,
+i\!+\!1.j\!-\!1, \dots, i\!+\!k\!-\!1.j\!-\!k\!+\!1$ -->
+<IMG
+ WIDTH="231" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img111.gif"
+ ALT="$i.j,
+i\!+\!1.j\!-\!1, \dots, i\!+\!k\!-\!1.j\!-\!k\!+\!1$">.
+When <I>k</I>=1, the
+helix becomes a single base pair.  With some abuse of notation, we may
+also write 
+<!-- MATH: $H\!-\!num(i,j,k)$ -->
+<IMG
+ WIDTH="112" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img112.gif"
+ ALT="$H\!-\!num(i,j,k)$">
+to be the H-num value of the helix,
+<I>i</I>,<I>j</I>,<I>k</I>. This is the average value of H-num over all the base pairs in
+the helix.
+
+<P>
+There are 5 files associated with the <I>energy dot plot</I> . 
+
+<P>
+ `<SMALL>FILE_NAME.PLOT' :  </SMALL> This is a text file that contains all the
+base pairs on the <I>energy dot plot</I> , organized into helices for which 
+<!-- MATH: $\Delta G(i,j)$ -->
+<IMG
+ WIDTH="62" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img101.gif"
+ ALT="$\Delta G(i,j)$">
+is
+constant. The first record is a header, and each subsequent record
+describes a single helix. The records are usually sorted by
+
+<!-- MATH: $\Delta G(i,j)$ -->
+<IMG
+ WIDTH="62" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img101.gif"
+ ALT="$\Delta G(i,j)$">,
+and are often filtered so that short helices or isolated
+base pairs (helices of length 1) in suboptimal foldings are
+removed. Figure <A HREF="node10.html#PLOT">9</A> shows a sample plot file.
+<BR>
+<DIV ALIGN="CENTER"><A NAME="PLOT">&#160;</A><A NAME="829">&#160;</A>
+<TABLE WIDTH="70%" BORDER=5 CELLPADDING=10>
+<CAPTION><STRONG>Figure 9:</STRONG>
+Selected records from a plot file. ``level''
+refers to a free energy range that is to be plotted in the same color,
+where 1 is always optimal. The ``level'' parameter is obsolete in
+the newer plotting programs of <I> mfold</I> 3.0. ``istart'', ``jstart'' and
+``length'' define a helix and refer to <I>i</I>,<I>j</I>,<I>k</I>, respectively. The
+``energy'' is free energy expressed as an integer in 10<SUP><I>th</I></SUP>s of a
+kcal/mole. Note that this is not the free energy of the helix, but the
+mimimum free energy of any folding that contains the helix.</CAPTION>
+<TR><TD BGCOLOR=#FFFFFF ALIGN=CENTER><PRE>
+   level  length istart jstart energy
+      1      8    206    242   -972
+      1      7    319    434   -972
+      1      7    108    141   -972
+      1      7     53    185   -972
+      1      6    334    412   -972
+      1      6    308    444   -972
+      1      6    288    472   -972
+      1      6    247    279   -972
+     ...
+      2      4      8     23   -971
+      2      2     69     78   -971
+      2      4      1     24   -970
+      2      2     10     17   -970
+      2      3    345    400   -967
+      2      2    297    462   -967
+     ...</PRE>
+</TD></TR>
+</TABLE>
+</DIV>
+<BR>
+<P>
+ `<SMALL>FILE_NAME.ANN' :  </SMALL> This file contains P-num information for a
+particular 
+<!-- MATH: $\Delta \Delta G$ -->
+<IMG
+ WIDTH="42" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img9.gif"
+ ALT="$\Delta \Delta G$">.
+The <I>i</I><SUP><I>th</I></SUP> record contains <I>i</I> and
+
+<!-- MATH: $P\!-\!num(i)$ -->
+<IMG
+ WIDTH="80" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img107.gif"
+ ALT="$P\!-\!num(i)$">.
+This file is used for annotating plotted structures.
+
+<P>
+ `<SMALL>FILE_NAME.H-NUM' :  </SMALL> This file is the same as
+`file_name.plot', except that the ``energy'' column is replaced by an
+``h-num'' column. These files are usually sorted by h-num; lowest to
+highest, or best determined to worst determined. Often, only helices
+in optimal foldings are retained. Figure <A HREF="node10.html#H-NUM">10</A> shows part of a
+sorted and filtered h-num file corresponding to the plot file in
+Figure <A HREF="node10.html#PLOT">9</A>.
+<BR>
+<DIV ALIGN="CENTER"><A NAME="H-NUM">&#160;</A><A NAME="830">&#160;</A>
+<TABLE WIDTH="50%" BORDER=5 CELLPADDING=10>
+<CAPTION><STRONG>Figure 10:</STRONG>
+The beginning and end of an h-num file sorted by
+h-num and filtered to include only helices in optimal foldings.
+As with P-num, H-num values are relative to a particular sequence and
+free energy increment.</CAPTION>
+<TR><TD BGCOLOR=#FFFFFF><PRE>
+   level  length istart jstart h-num
+      1      4     38    194    6.8
+      1      4    215    232    7.3
+      1      5     31    201    8.4
+      1      7     53    185    8.4
+      1      2     47    189   11.0
+      1      8    206    242   11.9
+      1      6     61    176   13.7
+      1      4     89    163   13.8
+      1      3    255    271   14.0
+      1      3    104    145   15.0
+      1      1     68     79   16.0
+      1      4    121    131   17.0
+      1      6    288    472   17.3
+    ...
+      1      2    353    389   35.0
+      1      3    364    377   38.7
+      1      3    297    459   39.0
+</PRE>
+</TD></TR>
+</TABLE>
+</DIV>
+<BR>
+<P>
+ `<SMALL>FILE_NAME.PS' :  </SMALL> This is a PostScript file of the <I>energy dot plot</I> .
+
+<P>
+ `<SMALL>FILE_NAME.GIF' :  </SMALL> This is an image of the <I>energy dot plot</I> in ``gif''
+format, suitable for display on web pages.
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html175"
+ HREF="node11.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="img/next_motif.gif"></A> 
+<A NAME="tex2html172"
+ HREF="node9.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="img/up_motif.gif"></A> 
+<A NAME="tex2html166"
+ HREF="node9.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="img/previous_motif.gif"></A> 
+<A NAME="tex2html174"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="img/contents_motif.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html176"
+ HREF="node11.html">Optimal and suboptimal foldings</A>
+<B> Up:</B> <A NAME="tex2html173"
+ HREF="node9.html">OUTPUT</A>
+<B> Previous:</B> <A NAME="tex2html167"
+ HREF="node9.html">OUTPUT</A>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<TABLE><TR><TD><IMG SRC=img/shield16.gif HSPACE=20></TD><TD><I>Michael Zuker <BR>Institute for Biomedical Computing<BR>
+Washington University in St. Louis<BR>
+1998-12-05</I></TD></TR></TABLE>
+</ADDRESS>
+</BODY>
+</HTML>

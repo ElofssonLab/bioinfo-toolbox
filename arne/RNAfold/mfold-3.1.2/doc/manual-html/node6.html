@@ -1,0 +1,251 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Constrained folding</TITLE>
+<META NAME="description" CONTENT="Constrained folding">
+<META NAME="keywords" CONTENT="FEBS98-html">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="FEBS98-html.css">
+<LINK REL="next" HREF="node7.html">
+<LINK REL="previous" HREF="node5.html">
+<LINK REL="up" HREF="FEBS98-html.html">
+<LINK REL="next" HREF="node7.html">
+</HEAD>
+<BODY BGCOLOR=#FFDEAD TEXT=#202020 LINK=#800000 ALINK=#ffff00 VLINK=#353976>
+<!--Navigation Panel-->
+<A NAME="tex2html124"
+ HREF="node7.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="img/next_motif.gif"></A> 
+<A NAME="tex2html121"
+ HREF="FEBS98-html.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="img/up_motif.gif"></A> 
+<A NAME="tex2html115"
+ HREF="node5.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="img/previous_motif.gif"></A> 
+<A NAME="tex2html123"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="img/contents_motif.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html125"
+ HREF="node7.html">Running the programs</A>
+<B> Up:</B> <A NAME="tex2html122"
+ HREF="FEBS98-html.html">Algorithms and Thermodynamics for</A>
+<B> Previous:</B> <A NAME="tex2html116"
+ HREF="node5.html">Loops and Nearest neighbor</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00060000000000000000">
+Constrained folding</A>
+</H1>
+
+<P>
+In addition to the free energy rules, specific constraints may be used
+to force or prohibit base pairs. A special file containing commands to
+constrain folding is used. The command syntax is rigid. The various
+commands and syntax are given below.
+
+<P>
+<DL COMPACT>
+<DT>1.
+<DD>Forcing a string of consecutive bases to pair.  <BR>
+Syntax: <I>F &nbsp; i &nbsp; 0 &nbsp; k</I> <BR>
+Ribonucleotides 
+<!-- MATH: $r_{i},r_{i+1}, \dots, r_{i+k-1}$ -->
+<IMG
+ WIDTH="132" HEIGHT="28" ALIGN="MIDDLE" BORDER="0"
+ SRC="img86.gif"
+ ALT="$r_{i},r_{i+1}, \dots, r_{i+k-1}$">
+are forced to be
+double stranded. The partners for these bases are chosen by the program.
+As an example, the command: <BR>
+<I>F &nbsp; 23 &nbsp;  0 &nbsp;  5</I> <BR>
+would cause bases 23, 24, 25, 26 and 27 to pair. 
+<P>
+<DT>2.
+<DD>Forcing a string of consecutive base pairs. <BR>
+Syntax: <I>F &nbsp; i &nbsp; j &nbsp; k</I> <BR>
+Base pairs 
+<!-- MATH: $r_{i}-r_{j}, r_{i+1}-r_{j-1}, r_{i+2}-r_{j-2}, \dots,
+r_{i+k-1}.r_{j-k+1}$ -->
+<IMG
+ WIDTH="352" HEIGHT="28" ALIGN="MIDDLE" BORDER="0"
+ SRC="img87.gif"
+ ALT="$r_{i}-r_{j}, r_{i+1}-r_{j-1}, r_{i+2}-r_{j-2}, \dots,
+r_{i+k-1}.r_{j-k+1}$">
+are forced to occur.
+This is the same thing as forcing a helix to form. The helix is
+designated by its (external) closing base pair, <I>i</I>.<I>j</I>.
+As an example, the command: <BR>
+<I>F &nbsp;  2 &nbsp;  110 &nbsp;  3</I> <BR>
+would force base pairs 2.110, 3.109 and  4.108. Note that these
+base pairs <B>must be able to form!</B> Be aware also that <I>mfold</I> 
+filters out isolated base pairs. 
+ <P>
+<DT>3.
+<DD>Prohibiting a string of consecutive bases from pairing. <BR>
+Syntax: <I>P &nbsp; i &nbsp; 0 &nbsp; k</I> <BR>
+Ribonucleotides 
+<!-- MATH: $r_{i},r_{i+1}, \dots, r_{i+k-1}$ -->
+<IMG
+ WIDTH="132" HEIGHT="28" ALIGN="MIDDLE" BORDER="0"
+ SRC="img86.gif"
+ ALT="$r_{i},r_{i+1}, \dots, r_{i+k-1}$">
+are prevented from
+pairing. 
+ <P>
+<DT>4.
+<DD>Prohibiting a string of consecutive base pairs <BR>
+Syntax: <I>P  &nbsp; i &nbsp; j &nbsp; k</I> <BR>
+Base pairs 
+<!-- MATH: $r_{i}-r_{j}, r_{i+1}-r_{j-1}, r_{i+2}-r_{j-2}, \dots,
+r_{i+k-1}.r_{j-k+1}$ -->
+<IMG
+ WIDTH="352" HEIGHT="28" ALIGN="MIDDLE" BORDER="0"
+ SRC="img87.gif"
+ ALT="$r_{i}-r_{j}, r_{i+1}-r_{j-1}, r_{i+2}-r_{j-2}, \dots,
+r_{i+k-1}.r_{j-k+1}$">
+are not allowed to form. This is equivalent to
+prohibiting a helix.
+<DT>5.
+<DD>Prohibiting 1 segment of a sequence from pairing with another <BR>
+Syntax: <I>P &nbsp; i-j &nbsp; k-l</I> <BR>
+where <IMG
+ WIDTH="37" HEIGHT="28" ALIGN="MIDDLE" BORDER="0"
+ SRC="img88.gif"
+ ALT="$i \leq j$">
+and <IMG
+ WIDTH="38" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img89.gif"
+ ALT="$k \leq l$">.
+In this case,
+no base pairs are allowed between 
+<!-- MATH: $r_{i}, r_{i+1}, \dots, r_{j}$ -->
+<IMG
+ WIDTH="101" HEIGHT="28" ALIGN="MIDDLE" BORDER="0"
+ SRC="img90.gif"
+ ALT="$r_{i}, r_{i+1}, \dots, r_{j}$">
+and
+
+<!-- MATH: $r_{k}, r_{k+1}, \dots, r_{l}$ -->
+<IMG
+ WIDTH="104" HEIGHT="28" ALIGN="MIDDLE" BORDER="0"
+ SRC="img91.gif"
+ ALT="$r_{k}, r_{k+1}, \dots, r_{l}$">.
+Note that the 2 segments need not be
+distinct. For example, the command: <BR>
+<I>P &nbsp; i-j &nbsp; i-j</I> <BR>
+will not allow 
+<!-- MATH: $r_{i}, r_{i+1}, \dots, r_{j}$ -->
+<IMG
+ WIDTH="101" HEIGHT="28" ALIGN="MIDDLE" BORDER="0"
+ SRC="img90.gif"
+ ALT="$r_{i}, r_{i+1}, \dots, r_{j}$">
+to pair with itself.
+<DT>6.
+<DD>Annotated bases. <BR>
+<DL COMPACT>
+<DT>(a)
+<DD><I>mfold</I> recognizes A, C, G, U and T. In RNA folding, a `T' will be
+treated as a `U'; and <I>vice versa</I> for DNA folding. In addition,
+B, D, H and V are recognized as A, C, G and U/T, respectively. 
+Bases marked in this way are regarded as susceptible to nuclease
+cleavage. They are allowed to pair only if their 3' neighbor is
+unpaired. This is an old feature of <I>mfold</I> .  
+<DT>(b)
+<DD><I>mfold</I> also recognizes W, X, Y and Z as A, C, G and U/T,
+respectively. These bases are regarded as ``modified'' and are allowed
+to pair only at the ends of helices. At this time, the
+commonly used ambiguous codes shown in Table <A HREF="#AMBIG">2</A> are not
+supported by <I>mfold</I> .
+<BR>
+<DIV ALIGN="CENTER"><A NAME="824">&#160;</A>
+<TABLE>
+<CAPTION><STRONG>Table 2:</STRONG>
+Unsupported ambiguous codes for RNA/DNA. 
+<I> mfold</I> does not currently support the convention for ambiguous
+codes. Unrecognized bases will not be allowed to pair.</CAPTION>
+<TR><TD><TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="LEFT"><B> Ambiguity</B></TD>
+<TD ALIGN="CENTER">A,G</TD>
+<TD ALIGN="CENTER">C,U/T</TD>
+<TD ALIGN="CENTER">A,U/T</TD>
+<TD ALIGN="CENTER">C,G</TD>
+<TD ALIGN="CENTER">A,C</TD>
+<TD ALIGN="CENTER">G,U/T</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><B> Code letter</B></TD>
+<TD ALIGN="CENTER">R</TD>
+<TD ALIGN="CENTER">Y</TD>
+<TD ALIGN="CENTER">W</TD>
+<TD ALIGN="CENTER">S</TD>
+<TD ALIGN="CENTER">M</TD>
+<TD ALIGN="CENTER">K</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><B> Ambiguity</B></TD>
+<TD ALIGN="CENTER">C,G,U/T</TD>
+<TD ALIGN="CENTER">A,G,U/T</TD>
+<TD ALIGN="CENTER">A,C,U/T</TD>
+<TD ALIGN="CENTER">A,C,G</TD>
+<TD ALIGN="CENTER">A,C,G,U/T</TD>
+<TD ALIGN="CENTER">&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><B> Code letter</B></TD>
+<TD ALIGN="CENTER">B</TD>
+<TD ALIGN="CENTER">D</TD>
+<TD ALIGN="CENTER">H</TD>
+<TD ALIGN="CENTER">V</TD>
+<TD ALIGN="CENTER">N</TD>
+<TD ALIGN="CENTER">&nbsp;</TD>
+</TR>
+</TABLE>
+</TD></TR>
+</TABLE>
+</DIV>
+<BR></DL></DL>
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html124"
+ HREF="node7.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="img/next_motif.gif"></A> 
+<A NAME="tex2html121"
+ HREF="FEBS98-html.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="img/up_motif.gif"></A> 
+<A NAME="tex2html115"
+ HREF="node5.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="img/previous_motif.gif"></A> 
+<A NAME="tex2html123"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="img/contents_motif.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html125"
+ HREF="node7.html">Running the programs</A>
+<B> Up:</B> <A NAME="tex2html122"
+ HREF="FEBS98-html.html">Algorithms and Thermodynamics for</A>
+<B> Previous:</B> <A NAME="tex2html116"
+ HREF="node5.html">Loops and Nearest neighbor</A>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<TABLE><TR><TD><IMG SRC=img/shield16.gif HSPACE=20></TD><TD><I>Michael Zuker <BR>Institute for Biomedical Computing<BR>
+Washington University in St. Louis<BR>
+1998-12-05</I></TD></TR></TABLE>
+</ADDRESS>
+</BODY>
+</HTML>

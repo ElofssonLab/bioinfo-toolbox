@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>EXAMPLE 2</TITLE>
+<META NAME="description" CONTENT="EXAMPLE 2">
+<META NAME="keywords" CONTENT="FEBS98-html">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="FEBS98-html.css">
+<LINK REL="next" HREF="node16.html">
+<LINK REL="previous" HREF="node14.html">
+<LINK REL="up" HREF="node13.html">
+<LINK REL="next" HREF="node16.html">
+</HEAD>
+<BODY BGCOLOR=#FFDEAD TEXT=#202020 LINK=#800000 ALINK=#ffff00 VLINK=#353976>
+<!--Navigation Panel-->
+<A NAME="tex2html229"
+ HREF="node16.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="img/next_motif.gif"></A> 
+<A NAME="tex2html226"
+ HREF="node13.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="img/up_motif.gif"></A> 
+<A NAME="tex2html220"
+ HREF="node14.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="img/previous_motif.gif"></A> 
+<A NAME="tex2html228"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="img/contents_motif.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html230"
+ HREF="node16.html">EXAMPLE 3</A>
+<B> Up:</B> <A NAME="tex2html227"
+ HREF="node13.html">Sample foldings</A>
+<B> Previous:</B> <A NAME="tex2html221"
+ HREF="node14.html">EXAMPLE 1</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00082000000000000000">
+ E<SMALL>XAMPLE 2</SMALL></A>
+</H2>
+
+<P>
+Important alternative foldings might not appear in the <I>energy dot plot</I> if 
+<!-- MATH: $\Delta \Delta G$ -->
+<IMG
+ WIDTH="42" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img9.gif"
+ ALT="$\Delta \Delta G$">is too small. This is especially true in the folding of short
+sequences.  When the short sequence: <BR> <TT>AAGGGGUUGG UCGCCUCGAC
+UAAGCGGCUU GGAAUUCC</TT>, <BR>
+is folded, also with default parameters, a
+single optimal folding is computed. However, the <I>energy dot plot</I> contains only
+the optimal, black dots from Figure <A HREF="node15.html#EX2P">15</A>. Changing the window
+size would not reveal anything new. When the value of P is increased
+to 25 (25%), the <I>energy dot plot</I> now reveals a very distinct alternate folding
+as shown in Figure <A HREF="node15.html#EX2P">15</A>. The <I>mfold</I> program now computes 2
+foldings, plotted in Figure <A HREF="node15.html#EX2S">16</A>, using the default value of W.
+
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="EX2P">&#160;</A><A NAME="844">&#160;</A>
+<TABLE WIDTH="50%">
+<CAPTION><STRONG>Figure 15:</STRONG>
+The <I> energy dot plot</I> for ``Example 2'' sequence with 
+<!-- MATH: $\Delta \Delta G$ -->
+<IMG
+ WIDTH="42" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img9.gif"
+ ALT="$\Delta \Delta G$">
+increased to 25%
+of 10.1, or 2.5 kcal/mole. The value of 
+<!-- MATH: $\Delta \Delta G$ -->
+<IMG
+ WIDTH="42" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img9.gif"
+ ALT="$\Delta \Delta G$">
+in the plot may be less
+than this maximum value, since there may be no base pairs in foldings
+that are <I> exactly</I> 
+<!-- MATH: $\Delta \Delta G$ -->
+<IMG
+ WIDTH="42" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img9.gif"
+ ALT="$\Delta \Delta G$">
+from the minimum free energy. The 2
+green dots represent base pairs that can be in foldings with <IMG
+ WIDTH="29" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img6.gif"
+ ALT="$\Delta G$">between  -9.4 and -8.6 kcal/mole. These numbers are -8.6 and -7.9 for
+the yellow dots. In this case, the black dots comprise the optimal
+folding, and the yellow dots comprise the single suboptimal folding
+that is computed. The green dots would only be found in a folding if
+the value of W were lowered sufficiently.</CAPTION>
+<TR><TD><IMG
+ WIDTH="358" HEIGHT="353"
+ SRC="img124.gif"
+ ALT="\begin{figure}\centering
+\epsfig{file=1b-again_zoom.ps}
+\end{figure}"></TD></TR>
+</TABLE>
+</DIV>
+<BR>
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="EX2S">&#160;</A><A NAME="847">&#160;</A>
+<TABLE WIDTH="50%">
+<CAPTION><STRONG>Figure 16:</STRONG>
+The 2 predicted foldings for the ``Example 2''
+sequence. (a) The optimal folding with 
+<!-- MATH: $\Delta G= -10.1$ -->
+<IMG
+ WIDTH="91" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img10.gif"
+ ALT="$\Delta G= -10.1$">kcal/mole. (b) The suboptimal fold (
+<!-- MATH: $\Delta G= -7.9$ -->
+<IMG
+ WIDTH="83" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img11.gif"
+ ALT="$\Delta G= -7.9$">
+kcal/mole)
+found after refolding with `P'=25.</CAPTION>
+<TR><TD><IMG
+ WIDTH="298" HEIGHT="371"
+ SRC="img125.gif"
+ ALT="\begin{figure}\centering
+\subfigure[]{\epsfig{file=1b-again_1_zoom.ps,width=0.3\...
+...subfigure[]{\epsfig{file=1b-again_2_zoom.ps,width=0.3\textwidth} }\end{figure}"></TD></TR>
+</TABLE>
+</DIV>
+<BR>
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html229"
+ HREF="node16.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="img/next_motif.gif"></A> 
+<A NAME="tex2html226"
+ HREF="node13.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="img/up_motif.gif"></A> 
+<A NAME="tex2html220"
+ HREF="node14.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="img/previous_motif.gif"></A> 
+<A NAME="tex2html228"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="img/contents_motif.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html230"
+ HREF="node16.html">EXAMPLE 3</A>
+<B> Up:</B> <A NAME="tex2html227"
+ HREF="node13.html">Sample foldings</A>
+<B> Previous:</B> <A NAME="tex2html221"
+ HREF="node14.html">EXAMPLE 1</A>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<TABLE><TR><TD><IMG SRC=img/shield16.gif HSPACE=20></TD><TD><I>Michael Zuker <BR>Institute for Biomedical Computing<BR>
+Washington University in St. Louis<BR>
+1998-12-05</I></TD></TR></TABLE>
+</ADDRESS>
+</BODY>
+</HTML>

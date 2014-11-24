@@ -1,0 +1,90 @@
+March 1999.
+
+                       INSTALLATION of mfold 3.1
+
+--------------------------------------------------------------------------
+A. The makefile
+--------------------------------------------------------------------------
+
+The file, "Makefile", contains instructions for compiling the
+programs.  The first portion of "Makefile" must be edited. A number of
+parameters should be set.
+
+1. FFLAGS: This must be set. At the least, the Fortran compiler must
+be able to accept lines longer that the standard 80 columns, and a
+"static" option must be selected so that variables do not change
+in functions or subroutines between calls. A number of options have
+been made available, including one for "Gnu Fortran", g77. The level
+of optimization should be as high as possible.
+
+2. CFLAGS: Choose the highest level of optimization that works.
+
+3. FTN, CC and C++: Define the Fortran, C and C++ compilers,
+respectively. For example, 'CC' could be gcc (Gnu C), or 'C++' could
+be C++.
+
+4. INCL and BITS: These must be defined together. Use the first option
+if your Fortran compiler has "iibset" and "iibits" for storing or
+retrieving single bits in 16 bit (short) integers. The "gnu" version
+will work anywhere, but it is slightly less efficient.
+
+5. BINDIR and LIBDIR: These are optional. If defined, BINDIR is where
+the binaries and scripts will be copied, and LIBDIR is where the
+energy files, images, and other data will be copied.
+
+------------------------------------------------------------------------------
+B. Environment variables and Path
+------------------------------------------------------------------------------
+
+1. Define MFOLDLIB to point to LIBDIR as defined in "Makefile". 
+   If the command
+
+make install
+
+is not issued, then LIBDIR is not used. In this case, MFOLDLIB should
+point to the 'dat' subdirectory of where the mfold package is stored.
+
+2. Make sure that all binaries are on your path. If you wish, you can
+   define an environment variable, MFOLD, that points to where the
+   mfold package is stored. In this case, you should add $MFOLD/bin
+   to your path. This can be accompished (for example) by adding:
+
+export PATH=$MFOLD/bin:$PATH
+
+to your $HOME/.profile file, or to the system /etc/profile file.
+
+--------------------------------------------------------------------------
+C. Compilation
+--------------------------------------------------------------------------
+
+Assuming that you have not downloaded ready-to-run binaries, you must
+compile the programs in the package.
+
+In general, the command:
+
+make all
+
+will create all binaries and place them in the bin subdirectory. You may
+individual programs if you wish.
+
+The command:
+
+make install
+
+will do the same and will then strip the binaries and copy them into
+BINDIR as defined in Makefile. If you set FFLAGS to create statically
+linked binaries, then you should remove the "strip" statement from
+"Makefile". 
+
+The command:
+
+make clean
+
+will perform a cleanup by erasing object modules and binaries in
+the bin subdirectory.
+
+Please report bugs, other problems or suggestions to zukerm@rpi.edu
+Look at the files in the "doc" directory, especially the manual, which
+is in PostScript, pdf and HTML form.
+
+          __________________________________________________

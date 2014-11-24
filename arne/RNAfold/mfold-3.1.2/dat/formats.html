@@ -1,0 +1,164 @@
+<HEAD><TITLE>Explanation of Output Formats</TITLE></HEAD>
+
+<!--body bgcolor="#60ad97" text="#111111" link="#800000" vlink="#806000" alink="#0000dd"-->
+<body BACKGROUND="back.gif" text="#111111" link="#800000" vlink="#806000" alink="#0000dd"-->
+
+Michael Zuker, Rensselaer Polytechnic Institute
+<HR>
+<FONT SIZE=2><I>
+<A HREF="#TXT">Text Output</A> |
+<A HREF="#RNAML"><I>RNAML</I> Syntax</A> |
+<A HREF="#PS">PostScript</A> |
+<A HREF="#GIF">gif</A> |
+<A HREF="#CT">ct file</A> |
+<A HREF="#MAC">Mac ct</A> |
+<A HREF="#GCG">GCG connect</A> |
+<A HREF="#XRNA">XRNA ss</A>
+</I></FONT><HR>
+
+<DL>
+<A NAME=TXT><DT> 
+<IMG SRC="l_purple.gif" HSPACE=5>
+<FONT SIZE=5 COLOR=#003000><I>Text Output</I></FONT></A> <P>
+
+<DD> This is the original form of output. All computed structures are
+placed in the same file. The hypertext link to the
+<I>i<SUP>th</SUP></I> structure is '<U>Structure i</U>'. This simple
+form of output is useful for small structures. It can also be a good
+reference for large foldings where only the outline has been plotted.
+
+<HR SIZE=3 NOSHADE> <P>
+<A NAME=RNAML><DT> 
+<IMG SRC="l_brown.gif" HSPACE=5>
+<FONT SIZE=5 COLOR=#003000><I>RNAML Syntax</I></FONT></A> <P>
+
+<DD> The RNAML (RNA Markup Language) was developed by a consortium of
+investigators and is a proposed syntax for RNA information files. The
+consortium has a long history of working together to address this
+issue: the current proposal is the culmination of discussions (formal
+and informal) that began at the Madison meeting of the RNA Society in
+1998. The consortium includes a reasonably broad representation of
+those active in the RNA informatics field, a feature that increases
+the chances that this proposed format will be accepted by the RNA
+community at large. A description was published in 2002: <BLOCKQUOTE>
+A. Waugh, P. Gendron, R. Altman, J.W. Brown, D. Case, D. Gautheret,
+S.C. Harvey, N. Leontis, J. Westbrook, E. Westhof, M. Zuker, &
+F. Major <BR> RNAML: A standard syntax for exchanging RNA
+information.<BR> <I>RNA</I> <B>8 (6)</B>, 707-717, (2002) &nbsp; &nbsp;
+<A HREF="http://www.rnajournal.org/cgi/content/abstract/8/6/707">Abtract</A> </BLOCKQUOTE>
+
+<HR SIZE=3 NOSHADE> <P>
+<A NAME=PS><DT> 
+<IMG SRC="l_green.gif" HSPACE=5>
+<FONT SIZE=5 COLOR=#003000><I>PostScript</I></FONT></A> <P>
+
+<DD> PostScript is a programming language that is used to describe
+output for printing and display. It was developed by Adobe Systems. It
+is common to have PostScript capability on most printers. Programs
+such as <A HREF="http://www.cs.wisc.edu/~ghost/">
+Ghostscript, Ghostview and GSview</A> can be used to display
+PostScript files.
+
+<HR SIZE=3 NOSHADE> <P>
+
+<A NAME=GIF><DT> 
+<IMG SRC="l_cyan.gif" HSPACE=5><FONT SIZE=5 COLOR=#003000><I>.gif</I></FONT></A> <P>
+
+<DD> A graphics file that ends with the suffix .gif or .jpeg should be
+displayed directly on the page of your web browser. These formats can
+also be displayed externally using a program such as 'xv'. 
+
+<HR SIZE=3 NOSHADE> <P>
+
+<A NAME=CT><DT> 
+<IMG SRC="l_grey.gif" HSPACE=5>
+<FONT SIZE=5 COLOR=#003000><I>.ct file</I></FONT></A> <P>
+
+<DD> The '.ct file' contains the nucleic acid sequence and base
+pairing information from which a structure plot may be computed. The
+web folding servers use the .ct files with the 'naview' program by <A
+HREF="http://bioinfo.math.rpi.edu/~zukerm/ref/BRUR88.html">
+ Bruccoleri &amp; Heinrich</A> to create the structure output files.
+This package may be obtained 
+<A HREF="http://bioinfo.math.rpi.edu/~zukerm/export//naview.tar.Z">
+here.</A>
+
+<HR SIZE=3 NOSHADE> <P>
+
+<A NAME=MAC><DT> 
+<IMG SRC="l_blue.gif" HSPACE=5>
+<FONT SIZE=5 COLOR=#003000><I>Mac .ct</I></FONT></A> <P>
+
+<DD> This is a variant of the .ct file designed for the Mac program
+'loopdloop' by Don Gilbert. It may be obtained from the 
+<A HREF="http://iubio.bio.indiana.edu/"><B>IUBio Archive</B></A> 
+at the University of Indiana. Go to the
+<A HREF="http://iubio.bio.indiana.edu/IUBio-Software%2bData/molbio/loopdloop/">
+<I>loopDloop</I></A> directory and take either the older version in
+mac-app directory or the newer java version in the java directory.
+
+<HR SIZE=3 NOSHADE> <P>
+
+<A NAME=GCG><DT>
+<IMG SRC="l_red.gif" HSPACE=5>
+<FONT SIZE=5 COLOR=#003000><I>GCG .connect</I></FONT></A> <P>
+
+<DD> This is another variant of the .ct file created by the Genetics
+Computer Group (<A HREF="http://www.gcg.com/">GCG</A>) of Madison, WI.
+This file can be used as input to any of the GCG programs that plot
+RNA secondary structure: <I>Circles, Domes, Mountains and Squiggles</I>.
+
+<HR SIZE=3 NOSHADE> <P>
+
+<A NAME=XRNA><DT>
+<IMG SRC="l_yellow.gif" HSPACE=5>
+<FONT SIZE=5 COLOR=#003000><I>XRNA ss</I></FONT></A> <P>
+
+<DD> This is an input file for the XRNA program by Bryn Weiser and Harry Noller. The new Java version is available from UC Santa Cruz <A HREF="http://rna.ucsc.edu/rnacenter/">RNA Center</A> web site: <A HREF="http://rna.ucsc.edu/rnacenter/xrna/xrna.html">XRNA</A>. The <I>ss</I> file can be regarded as an expanded <I>ct</I> file. It contains base and connect information as well a coordinates for plotting the bases.
+
+</DL>
+ <P><CENTER><IMG SRC="end2.gif"></CENTER>
+<PRE>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>

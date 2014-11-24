@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Abstract</TITLE>
+<META NAME="description" CONTENT="Abstract">
+<META NAME="keywords" CONTENT="FEBS98-html">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="FEBS98-html.css">
+<LINK REL="next" HREF="node3.html">
+<LINK REL="previous" HREF="node1.html">
+<LINK REL="up" HREF="FEBS98-html.html">
+<LINK REL="next" HREF="node3.html">
+</HEAD>
+<BODY BGCOLOR=#FFDEAD TEXT=#202020 LINK=#800000 ALINK=#ffff00 VLINK=#353976>
+<!--Navigation Panel-->
+<A NAME="tex2html80"
+ HREF="node3.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="img/next_motif.gif"></A> 
+<A NAME="tex2html77"
+ HREF="FEBS98-html.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="img/up_motif.gif"></A> 
+<A NAME="tex2html71"
+ HREF="node1.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="img/previous_motif.gif"></A> 
+<A NAME="tex2html79"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="img/contents_motif.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html81"
+ HREF="node3.html">Introduction</A>
+<B> Up:</B> <A NAME="tex2html78"
+ HREF="FEBS98-html.html">Algorithms and Thermodynamics for</A>
+<B> Previous:</B> <A NAME="tex2html72"
+ HREF="node1.html">Contents</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00020000000000000000">
+Abstract</A>
+</H1>
+
+<P>
+<IMG SRC="img/t.gif">
+his article is about the current status of the <I>mfold</I> package for RNA
+and DNA secondary structure prediction using nearest neighbor
+thermodynamic rules. The details of the free energy rules and of the
+latest version 3.0 software are described. Future plans are also
+discussed.
+
+<P>
+The <I>mfold</I> software now runs on a variety of Unix platforms;
+specifically SGI Irix, Sun Solaris, Dec alpha Ultrix and on
+Linux. While the older interactive programs of version 2 still exist,
+they are now run by a variety of scripts that make for much easier
+handling. There is both a command line interface for <I>mfold</I> and
+an HTML interface that runs in a Unix environment but can be accessed
+by anyone with a web browser.
+
+<P>
+The thermodynamic basis for the folding model is presented in detail,
+with references given for both specific free energy parameters and to
+overview articles that have summarized the state of these nearest
+neighbor parameters over the past dozen years. Both RNA and DNA rules
+are discussed, with some mention of parameters for RNA/DNA
+hybridization. Although the thermodynamic model has grown in
+complexity to accommodate new types of information, the folding
+algorithm has not yet incorporated some features, such as coaxial
+stacking of adjacent helices, and other features will probably remain
+too difficult or computationally expensive to implement. For this
+reason, a new energy calculation program has been introduced to
+recompute the free energies of predicted foldings to reflect the best
+of our knowledge.
+
+<P>
+The most significant improvements in the <I>mfold</I> software are:
+<DL COMPACT>
+<FONT COLOR="#8B1A1A">
+<DT>1.
+<DD>Folding times have been greatly reduced in recent years, partly
+because of faster computers and partly because of improvements in the
+algorithm. 
+<DT>2.
+<DD>Folding constraints have been expanded and are now implemented
+without the use of <I>bonus energies</I> that distort the results.
+<DT>3.
+<DD>The output is significantly improved. Clear and enlargeable
+images of <I>dot plots</I> and of predicted foldings are now produced
+in PostScript and <I>gif</I> formats. Bases in structures may be
+annotated using different colors that reflect how <I>well-determined</I>
+they are in terms of their tendency to pair with other bases or to be
+single-stranded. Similarly, base pair probabilities from partition
+function calculations may be used for annotation. A detailed
+decomposition of each predicted folding into stacked pairs and loops
+with associated free energies is now provided.
+</DL>
+</FONT>
+<P>
+The <I>mfold</I> software has a variety of parameters that may be
+adjusted to improve the predictions.  Several examples are
+presented to illustrate how to interpret folding results and how to
+adjust these parameters to obtain better results.
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html80"
+ HREF="node3.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="img/next_motif.gif"></A> 
+<A NAME="tex2html77"
+ HREF="FEBS98-html.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="img/up_motif.gif"></A> 
+<A NAME="tex2html71"
+ HREF="node1.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="img/previous_motif.gif"></A> 
+<A NAME="tex2html79"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="img/contents_motif.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html81"
+ HREF="node3.html">Introduction</A>
+<B> Up:</B> <A NAME="tex2html78"
+ HREF="FEBS98-html.html">Algorithms and Thermodynamics for</A>
+<B> Previous:</B> <A NAME="tex2html72"
+ HREF="node1.html">Contents</A>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<TABLE><TR><TD><IMG SRC=img/shield16.gif HSPACE=20></TD><TD><I>Michael Zuker <BR>Institute for Biomedical Computing<BR>
+Washington University in St. Louis<BR>
+1998-12-05</I></TD></TR></TABLE>
+</ADDRESS>
+</BODY>
+</HTML>
