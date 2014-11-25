@@ -55,7 +55,12 @@ done
 # Running other prediction programs
 
 # psipred can be replaced by addss.pl save some time
-if [ ! -s $seqfile.horiz ] ;then   $bin/runpsipred.py $seqfile ; fi
+#if [ ! -s $seqfile.ss2 ] ;then   $bin/runpsipred.py $seqfile ; fi
+if [ ! -s $seqfile.ss2 ]
+then   
+    $bin/addss.pl $seqfile.jhE0.a3m $seqfile.jhE0.addss -a3m 
+    cp $seqfile.jhE0.ss2 $seqfile.ss2
+fi
 if [ ! -s $seqfile.rsa ] ; then $bin/runnetsurfp.py $seqfile ; fi 
 
 
