@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
+from localconfig import *
 import joblib, sys, os, random
 import numpy as np
 
 
-homedir='/scratch/arne/PconsC3/'
 
 count = 0
 
@@ -52,7 +52,7 @@ if os.path.exists(infile[:infile.rfind('training')] + name + '.l{:d}'.format(lay
 #	sys.exit(0)
 
 try:
-	forest = joblib.load(homedir + 'forests/layer{:d}.dat'.format(layer))
+	forest = joblib.load(PconsC3 + 'forests/layer{:d}.dat'.format(layer))
 except:
 	sys.stderr.write('missing trained forest!\n')
 	sys.stderr.flush()

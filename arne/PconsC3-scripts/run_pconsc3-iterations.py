@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #A sslight modification of script by Maricn
-
+from localconfig import *
 import os, sys, subprocess
 
 affixes = []
@@ -9,7 +9,7 @@ for method in ['hh', 'jh']:
         for cutoff in ['E0', 'E4', 'E10', 'E40']:
                 affixes.append( method+cutoff )
 
-bin = '/scratch/arne/PconsC3/bin'
+bin = PconsC3 + '/bin/'
 l = sys.argv[1]
 
 # Trying to create inpu to scripts/constructsetG.py

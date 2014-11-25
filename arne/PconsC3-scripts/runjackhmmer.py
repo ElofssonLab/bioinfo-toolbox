@@ -52,7 +52,7 @@ if '-db' in sys.argv:
     del sys.argv[idx]
     del sys.argv[idx]
 else:
-    database = '/scratch/data/uniref90.fasta'
+    database = uniref
 
 if '-name' in sys.argv:
     idx = sys.argv.index('-name')

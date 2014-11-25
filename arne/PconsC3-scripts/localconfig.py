@@ -21,10 +21,12 @@ print root
 ### Jackhmmer executable ###
 #jackhmmer = root + 'dependencies/hmmer-3.0/src/jackhmmer'
 jackhmmer = '/scratch/arne/PconsC2-extra/hmmer-3.1b1-linux-intel-x86_64/binaries/jackhmmer'
+uniref = '/scratch/data/uniref90.fasta'
 
 ### HHblits executable ###
 #hhblits = root + 'dependencies/hhsuite-2.0.16/bin/hhblits'
 hhblits = '/usr/local/bin/hhblits'
+hhdatabase = '/scratch/data/hhsuite/hhsuite_dbs/nr20_12Aug11'
 
 ### PSICOV executable ###
 #psicov = root + 'dependencies/psicov-1.11/psicov'
@@ -49,6 +51,8 @@ matlab= '/pdc/vol/matlab/r2012a/bin/matlab'
 # Only needed if matlab is not available.
 matlabdir = '' 
 
+# Directory to PconsC3 scripts (i.e. this one)
+PconsC3 = '/scratch/arne/PconsC3/'
 
 
 ########################################################

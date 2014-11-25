@@ -1,5 +1,7 @@
 #!/bin/bash -x
 
+install_dir=/scratch/arne/PconsC2-extra/PhyCmap/phycmap.release
+
 #this script can be used for webserver other than standalone, since we do not
 #have a slim version of epad and matlab bioinformatics package, and R
 error_file_io="Writing or reading files error!"
@@ -35,7 +37,6 @@ fi
 
 echo "$BLAST_CPU : $pdbid : $seqfile : $seqbase"
 
-install_dir=/scratch/arne/PconsC2-extra/PhyCmap/phycmap.release
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$install_dir/bin
 export BIOPERL_DIR=$install_dir/bin/BioPerl-1.6.1/
 export PDBTOOLS_DIR=$install_dir/bin/pdbtools/

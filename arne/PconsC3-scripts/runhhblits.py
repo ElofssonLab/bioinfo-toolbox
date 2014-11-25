@@ -52,7 +52,7 @@ if '-db' in sys.argv:
     del sys.argv[idx]
     del sys.argv[idx]
 else:
-    database = '/scratch/data/hhsuite/hhsuite_dbs/nr20_12Aug11'
+    database = hhdatabase
 
 if '-name' in sys.argv:
     idx = sys.argv.index('-name')
