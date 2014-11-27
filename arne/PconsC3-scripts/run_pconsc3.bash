@@ -97,7 +97,7 @@ done
 # Running PconsC3
 
 
-$bin/run_pconsc3-iterations.py $seqfile
+    if [ ! -s $seqfile.PconsC3.pconsc25.l6 ] ; then $bin/run_pconsc3-iterations.py $seqfile ; fi
 
 
 # Cleaning up
