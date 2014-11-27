@@ -40,11 +40,11 @@ if not os.path.exists(q[-1]):
 try:
         subprocess.call(bin + '/pconsc26-p0-e.py ' + l + '.PconsC3.training', shell=True)
         subprocess.call(bin + '/pconsc26-p1-e.py 1 ' + l + '.PconsC3.training', shell=True)
-#        subprocess.call(bin + '/pconsc26-p1-e.py 2 ' + l + '.PconsC3.training', shell=True)
-#        subprocess.call(bin + '/pconsc26-p1-e.py 3 ' + l + '.PconsC3.training', shell=True)
-#        subprocess.call(bin + '/pconsc26-p1-e.py 4 ' + l + '.PconsC3.training', shell=True)
-#        subprocess.call(bin + '/pconsc26-p1-e.py 5 ' + l + '.PconsC3.training', shell=True)
-#        subprocess.call(bin + '/pconsc26-p1-e.py 6 ' + l + '.PconsC3.training', shell=True)
+        subprocess.call(bin + '/pconsc26-p1-e.py 2 ' + l + '.PconsC3.training', shell=True)
+        subprocess.call(bin + '/pconsc26-p1-e.py 3 ' + l + '.PconsC3.training', shell=True)
+        subprocess.call(bin + '/pconsc26-p1-e.py 4 ' + l + '.PconsC3.training', shell=True)
+        subprocess.call(bin + '/pconsc26-p1-e.py 5 ' + l + '.PconsC3.training', shell=True)
+        subprocess.call(bin + '/pconsc26-p1-e.py 6 ' + l + '.PconsC3.training', shell=True)
 except:
         pass
 

@@ -17,6 +17,9 @@ workdir=$2
 if [[ $workdir == '' ]];then 
     workdir=`echo '$dir=int(rand(100000));$dir=".PconsC3.$dir.$seqfile";if(-d $dir||-e $dir){ }else{print $dir}' | perl - $pdbid` 
     workdir=`pwd`/$workdir
+fi
+if [ ! -d $workdir ] 
+then
     mkdir -p $workdir
     if [ $? -ne 0 ];then echo "ERROR cannot make $workdir" ; exit $? ; fi
 fi
@@ -28,6 +31,7 @@ echo $seqfile $workdir
 cd $workdir
 
 if [ $? -ne 0 ];then echo "ERROR cannot cd to $workdir" ; exit $? ; fi
+
 
 
 # Make alignments

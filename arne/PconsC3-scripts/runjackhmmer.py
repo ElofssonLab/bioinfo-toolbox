@@ -94,6 +94,7 @@ else:
 f2.close()
 
 sys.stderr.write(str(datetime.now()) + ' ' + name + ': generating Jackhmmer alignment\nThis may take quite a few minutes!\n ')
-t = check_output([jackhmmer, '--cpu', str(n_cores), '-N', '5', '-E', str(evalue), '-A', seqfile +'.' + name + '.ali', seqfile + '.fasta', database])
+t = check_output([jackhmmer, '--cpu', str(n_cores), '-N', '5', '--incE', str(evalue), '-E', str(evalue), '-A', seqfile +'.' + name + '.ali', seqfile + '.fasta', database])
 check_output([reformat, 'sto', 'a3m', seqfile + '.' + name + '.ali', seqfile + '.' + name + '.a3m'])
 check_output(['rm', seqfile + '.' + name + '.ali'])
+

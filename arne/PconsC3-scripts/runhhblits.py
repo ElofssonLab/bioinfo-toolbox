@@ -97,4 +97,5 @@ else:
 f2.close()
 
 sys.stderr.write(str(datetime.now()) + ' ' + seqfile + ': generating HHblits alignment\nThis may take quite a few minutes!\n ')
-t = check_output([hhblits, '-all', '-oa3m', seqfile + '.' + name + '.a3m', '-e', str(evalue), '-cpu', str(n_cores), '-i', seqfile + '.fasta', '-d', database])
+t = check_output([hhblits, '-n','5','-all', '-oa3m', seqfile + '.' + name + '.a3m',  '-hfilt', '999999', '-realign_max', '999999', '-e', str(evalue), '-cpu', str(n_cores), '-i', seqfile + '.fasta', '-d', database])
+
