@@ -97,7 +97,7 @@ done
 # Running PconsC3
 
 
-$bin/run_pconsc3-iterations.py test.fa
+$bin/run_pconsc3-iterations.py $seqfile
 
 
 # Cleaning up
