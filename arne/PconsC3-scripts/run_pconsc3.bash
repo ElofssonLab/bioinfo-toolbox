@@ -81,8 +81,21 @@ then
 fi
 
 
+# Check that all files exist 
+for i in hhE0 hhE4 hhE10 hhE40 jhE0 jhE4 jhE10 jhE40
+do
+    for j in gdca plmdca20 stats trimmed
+    do 
+	if [ ! -s $seqfile.$i.$j ] ; then echo "Missing " $seqfile.$i.$j ; exit 1  ;  fi
+    done
+done
+for j in phycmap rsa ss2
+do 
+    if [ ! -s $seqfile.$j ] ; then echo "Missing " $seqfile.$j ; exit 1  ;  fi
+done
 
 # Running PconsC3
+
 
 $bin/run_pconsc3-iterations.py test.fa
 
