@@ -59,12 +59,16 @@ done
 # Running other prediction programs
 
 # psipred can be replaced by addss.pl save some time
-#if [ ! -s $seqfile.ss2 ] ;then   $bin/runpsipred.py $seqfile ; fi
+
 if [ ! -s $seqfile.ss2 ]
 then   
     $bin/addss.pl $seqfile.jhE0.a3m $seqfile.jhE0.addss -a3m 
     cp $seqfile.jhE0.ss2 $seqfile.ss2
 fi
+# This is just an extra check as addss.pl sometimes fails.
+#if [ ! -s $seqfile.ss2 ] ;then   $bin/runpsipred.py $seqfile ; fi
+
+
 if [ ! -s $seqfile.rsa ] ; then $bin/runnetsurfp.py $seqfile ; fi 
 
 
@@ -101,7 +105,7 @@ done
 # Running PconsC3
 
 
-    if [ ! -s $seqfile.PconsC3.pconsc25.l6 ] ; then $bin/run_pconsc3-iterations.py $seqfile ; fi
+    if [ ! -s $seqfile.PconsC3.pconsc26.l6 ] ; then $bin/run_pconsc3-iterations.py $seqfile ; fi
 
 
 # Cleaning up

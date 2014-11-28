@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-
+from localconfig import *
 import sys, subprocess, os
 import string as s
 
-plmdir='/scratch/arne/PconsC2-extra/plmDCA_asymmetric_v2/'
+
 
 def check_output(command):
 	return subprocess.Popen(command, stdout=subprocess.PIPE).communicate()[0]
 	
-matlab = '/pdc/vol/matlab/r2012a/bin/matlab'
 if not os.path.exists(matlab):
-	matlab = '/pdc/vol/matlab/r2012a/bin/matlab'
+        print "Matlab not found"
+	sys.exit(1)
 
 
 
@@ -38,6 +38,6 @@ infilestem = infilestem[:infilestem.rfind('.')]
 
 print "Running plmDCA"
         
-print ([matlab, '-nodesktop', '-r', "path(path, '"+ plmdir +"'); path(path, '"+ plmdir +"/functions'); path(path, " + plmdir + "/3rd_party_code/minFunc/'); plmDCA_asymmetric ( '" + infilestem + ".trimmed', '" + infilestem + ".plmdca20', 0.1, 4); exit;"])
-t = check_output([matlab, '-nodesktop', '-nosplash' , '-r', "path(path, '"+ plmdir +"'); path(path, '"+ plmdir +"/functions'); path(path, ' " + plmdir + "/3rd_party_code/minFunc/'); disp  'Starting plmDCA_asymmetric' ; plmDCA_asymmetric ( '" + infilestem + ".trimmed', '" + infilestem + ".plmdca20', 0.1, "+ str(cpu) +"); exit;"])
+print ([matlab, '-nodesktop', '-r', "path(path, '"+ plmdcapath +"'); path(path, '"+ plmdcapath +"/functions'); path(path, " + plmdcapath + "/3rd_party_code/minFunc/'); plmDCA_asymmetric ( '" + infilestem + ".trimmed', '" + infilestem + ".plmdca20', 0.1, 4); exit;"])
+t = check_output([matlab, '-nodesktop', '-nosplash' , '-r', "path(path, '"+ plmdcapath +"'); path(path, '"+ plmdcapath +"/functions'); path(path, ' " + plmdcapath + "/3rd_party_code/minFunc/'); disp  'Starting plmDCA_asymmetric' ; plmDCA_asymmetric ( '" + infilestem + ".trimmed', '" + infilestem + ".plmdca20', 0.1, "+ str(cpu) +"); exit;"])
 print t
