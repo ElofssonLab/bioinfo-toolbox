@@ -146,8 +146,13 @@ if ($tmpfile=~/.*\/(.*)/)  {$tmpfile_no_dir=$1;} else {$tmpfile_no_dir=$tmpfile;
 
 
 ############################################################################################
-
+my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst);
+($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)=localtime(time);
+#printf ( "TIME1: %04d%02d%02d %02d:%02d:%02d\n",$year+1900,$mon+1,$mday,$hour,$min,$sec);
 if ($informat ne "hmm") {
+    ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)=localtime(time);
+#    printf ( "TIME1: %04d%02d%02d %02d:%02d:%02d\n",$year+1900,$mon+1,$mday,$hour,$min,$sec);
+
     if (!$outfile) {$outfile="$inbase.a3m";}
 
     # Use first sequence to define match states and reformat input file to a3m and psi
@@ -177,6 +182,8 @@ if ($informat ne "hmm") {
     }
     close(INFILE);
     $/="\n"; # set input field separator
+    ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)=localtime(time);
+#    printf ( "TIME2: %04d%02d%02d %02d:%02d:%02d\n",$year+1900,$mon+1,$mday,$hour,$min,$sec);
 
     if ($qseq =~ /\-/) {
 	
@@ -190,16 +197,22 @@ if ($informat ne "hmm") {
 	
 	# Write query sequence file in FASTA format
 	open (QFILE, ">$tmpfile.sq") or die("ERROR: can't open $tmpfile.sq: $!\n");
-	printf(QFILE ">%s\n%s\n",$name,$qseq);
+#	printf(QFILE ">%s\n%s\n",$name,$qseq);
 	close (QFILE);
     }
     
+    ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)=localtime(time);
+#    printf ( "TIME3: %04d%02d%02d %02d:%02d:%02d\n",$year+1900,$mon+1,$mday,$hour,$min,$sec);
     # Filter alignment to diversity $neff 
     if ($v>=1) {printf ("Filtering alignment to diversity $neff ...\n");}
     &HHPaths::System("hhfilter -v $v2 -neff $neff -i $tmpfile.in.a3m -o $tmpfile.in.a3m");
-    
+
+#    printf ( "TIME3b: %04d%02d%02d %02d:%02d:%02d\n",$year+1900,$mon+1,$mday,$hour,$min,$sec);
     # Reformat into PSI-BLAST readable file for jumpstarting 
     &HHPaths::System("$hhscripts/reformat.pl -v $v2 -r -noss a3m psi $tmpfile.in.a3m $tmpfile.in.psi");
+
+    ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)=localtime(time);
+#    printf ( "TIME4: %04d%02d%02d %02d:%02d:%02d\n",$year+1900,$mon+1,$mday,$hour,$min,$sec);
     
     open (ALIFILE, ">$outfile") || die("ERROR: cannot open $outfile: $!\n");
     printf (ALIFILE "%s",$header);
@@ -214,11 +227,16 @@ if ($informat ne "hmm") {
 	    if ($v>=1) {print("\nAdding DSSP state sequence ...\n");}
         }
     }
+    ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)=localtime(time);
+#    printf ( "TIME5: %04d%02d%02d %02d:%02d:%02d\n",$year+1900,$mon+1,$mday,$hour,$min,$sec);
 
     # Secondary structure prediction with psipred
     if ($v>=2) {print("Predicting secondary structure with PSIPRED ... ");}
     &RunPsipred("$tmpfile.sq");
     
+    ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)=localtime(time);
+#    printf ( "TIME6: %04d%02d%02d %02d:%02d:%02d\n",$year+1900,$mon+1,$mday,$hour,$min,$sec);
+
     if (open (PSIPREDFILE, "<$tmpfile.horiz")) {
 	$ss_conf="";
 	$ss_pred="";
@@ -244,6 +262,8 @@ if ($informat ne "hmm") {
     }
     close(ALIFILE);
     if ($v>=2) {print("done \n");}
+    ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)=localtime(time);
+#    printf ( "TIME7: %04d%02d%02d %02d:%02d:%02d\n",$year+1900,$mon+1,$mday,$hour,$min,$sec);
 } 
 ##############################################################
 # HMMER format
@@ -402,6 +422,8 @@ if ($v<=3) {
     unlink("$tmpfile.horiz");
     unlink("$tmpfile.dssp");
 } 
+($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)=localtime(time);
+#printf ( "TIME8: %04d%02d%02d %02d:%02d:%02d\n",localtime(time));
 
 exit;
     
