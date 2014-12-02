@@ -26,8 +26,7 @@ fi
 cp $seqfile $workdir
 
 echo $seqfile $workdir
-
-
+rootname=`echo $seqfile | sed -E "s/\..*//"`
 cd $workdir
 
 if [ $? -ne 0 ];then echo "ERROR cannot cd to $workdir" ; exit $? ; fi
@@ -63,10 +62,21 @@ done
 if [ ! -s $seqfile.ss2 ]
 then   
     $bin/addss.pl $seqfile.jhE0.a3m $seqfile.jhE0.addss -a3m 
-    cp $seqfile.jhE0.ss2 $seqfile.ss2
-fi
+    if [ -s $seqfile.jhE0.ss2 ]
+    then
+	cp $seqfile.jhE0.ss2 $seqfile.ss2
+    else
 # This is just an extra check as addss.pl sometimes fails.
-#if [ ! -s $seqfile.ss2 ] ;then   $bin/runpsipred.py $seqfile ; fi
+	$bin/runpsipred.py $seqfile 
+	if [ -s $rootname.ss2 ]
+	then
+	    cp $rootname.ss2 $seqfile.ss2
+	else
+	    exit 1
+	fi
+    fi
+fi
+
 
 
 if [ ! -s $seqfile.rsa ] ; then $bin/runnetsurfp.py $seqfile ; fi 
