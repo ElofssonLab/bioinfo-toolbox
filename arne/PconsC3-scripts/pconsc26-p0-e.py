@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 import joblib, sys, os, random
-import numpy as np
-
 
 infile = sys.argv[1]
 name = 'pconsc26'

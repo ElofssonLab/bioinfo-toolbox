@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import joblib, sys, os, random
-import numpy as np
 
 count = 0
 
