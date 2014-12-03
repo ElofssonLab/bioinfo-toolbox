@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from localconfig import *
 import joblib, sys, os, random
 
 infile = sys.argv[1]
@@ -45,7 +46,7 @@ if os.path.exists(infile[:infile.find('training')] +name+ '.l0'):
 
 sys.stderr.write('Forest...')
 sys.stderr.flush()
-forest = joblib.load('forests/layer0.dat')
+forest = joblib.load( PconsC3 + 'forests/layer0.dat')
 X = []
 Y = []
 o = []

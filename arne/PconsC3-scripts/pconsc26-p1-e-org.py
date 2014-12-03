@@ -2,6 +2,9 @@
 
 from localconfig import *
 import joblib, sys, os, random
+import numpy as np
+
+
 
 count = 0
 
@@ -66,9 +69,8 @@ sys.stderr.flush()
 for l1 in open(infile[:infile.rfind('training')] + name + '.l{:d}'.format(layer-1)):
 	x = l1.split()
 	previouslayer[(int(x[0]), int(x[1]))] = float(x[-1])
-sys.stderr.write('reading initial data and predicting...')
+sys.stderr.write('initial data...')
 sys.stderr.flush()
-f = open(infile[:infile.rfind('training')] + name+ '.l{:d}'.format(layer), 'w')
 for l1 in open(infile):
 	pair = l1[:l1.find(')')+1]
 	data = l1[l1.find(')') + 1:].split()
@@ -84,6 +86,14 @@ for l1 in open(infile):
 				q.append(previouslayer[(p[0] + i, p[1] + j)])
 			except Exception as e:
 				q.append(-3)
-	f.write('{:d} {:d} {:6.4f}\n'.format(p[0], p[1], predict(q, forest) ) )
+	X.append( q )
+	Y.append(p)
+
+
+sys.stderr.write('predicting...')
+sys.stderr.flush()
+f = open(infile[:infile.rfind('training')] + name+ '.l{:d}'.format(layer), 'w')
+for i in range(len(Y)):
+	f.write('{:d} {:d} {:6.4f}\n'.format(Y[i][0], Y[i][1], predict(X[i], forest) ) )
 f.close()       
 sys.stderr.write('\n')
