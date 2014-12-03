@@ -1,10 +1,7 @@
 #!/usr/bin/env python
 
-from localconfig import *
 import joblib, sys, os, random
 import numpy as np
-
-
 
 count = 0
 
@@ -52,7 +49,7 @@ if os.path.exists(infile[:infile.rfind('training')] + name + '.l{:d}'.format(lay
 #	sys.exit(0)
 
 try:
-	forest = joblib.load(PconsC3 + 'forests/layer{:d}.dat'.format(layer))
+	forest = joblib.load('forests/layer{:d}.dat'.format(layer))
 except:
 	sys.stderr.write('missing trained forest!\n')
 	sys.stderr.flush()
@@ -69,8 +66,9 @@ sys.stderr.flush()
 for l1 in open(infile[:infile.rfind('training')] + name + '.l{:d}'.format(layer-1)):
 	x = l1.split()
 	previouslayer[(int(x[0]), int(x[1]))] = float(x[-1])
-sys.stderr.write('initial data...')
+sys.stderr.write('reading initial data and predicting...')
 sys.stderr.flush()
+f = open(infile[:infile.rfind('training')] + name+ '.l{:d}'.format(layer), 'w')
 for l1 in open(infile):
 	pair = l1[:l1.find(')')+1]
 	data = l1[l1.find(')') + 1:].split()
@@ -86,14 +84,6 @@ for l1 in open(infile):
 				q.append(previouslayer[(p[0] + i, p[1] + j)])
 			except Exception as e:
 				q.append(-3)
-	X.append( q )
-	Y.append(p)
-
-
-sys.stderr.write('predicting...')
-sys.stderr.flush()
-f = open(infile[:infile.rfind('training')] + name+ '.l{:d}'.format(layer), 'w')
-for i in range(len(Y)):
-	f.write('{:d} {:d} {:6.4f}\n'.format(Y[i][0], Y[i][1], predict(X[i], forest) ) )
+	f.write('{:d} {:d} {:6.4f}\n'.format(p[0], p[1], predict(q, forest) ) )
 f.close()       
 sys.stderr.write('\n')
