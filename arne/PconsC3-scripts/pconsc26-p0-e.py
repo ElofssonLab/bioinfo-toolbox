@@ -21,21 +21,21 @@ elif fraction > 1:
 def predict(X, forest):
         probability = []
         for t in range(len(forest)):
-            if random.random() > fraction:
-                continue
-        tree = forest[t]
-        while len(tree) > 2:
-            if X[tree[0][0]] <= tree[0][1]:
-                tree = tree[1]
-            else:
-                tree = tree[2]
-        if strict:
-            if tree[1] < tree[0]:
-                probability.append(0.)
-            else:
-                probability.append(1.)
-        else:
-            probability.append(tree[1]/float(tree[0] + tree[1]))
+		if random.random() > fraction:
+                        continue
+                tree = forest[t]
+                while len(tree) > 2:
+                        if X[tree[0][0]] <= tree[0][1]:
+                                tree = tree[1]
+                        else:
+                                tree = tree[2]
+		if strict:
+			if tree[1] < tree[0]:
+				probability.append(0.)
+			else:
+				probability.append(1.)
+		else:
+                	probability.append(tree[1]/float(tree[0] + tree[1]))
         return sum(probability)/len(probability)
 
 
