@@ -11,7 +11,6 @@ def parse(afile, sep=' ', min_dist=5):
     Ensures: Output is sorted by confidence score.
     @return [(score, residue a, residue b)]
     """
-
     contacts = []
     for aline in afile:
         if aline.strip() != '':
