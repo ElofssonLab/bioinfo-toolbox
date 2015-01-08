@@ -97,6 +97,8 @@ def parsePSSM(alignment):
 			if x[i] == '-':
 				gapcount += 1
 
+	if gapcount == 0:
+		gapcount += 1
 	b['-'] = gapcount/(seqcount * len(freqs.keys()))
 
 	entropy = []
