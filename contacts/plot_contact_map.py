@@ -134,7 +134,7 @@ def get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali):
     return tp_colors
  
 
-def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_filename='', pdb_filename='', is_heavy=False, chain='', sep=',', outfilename=''):  
+def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_horiz_fname='', psipred_vert_fname='', pdb_filename='', is_heavy=False, chain='', sep=',', outfilename=''):  
    
     #acc = c_filename.split('.')[0]
     acc = fasta_filename.split('.')[0][:4]
@@ -175,8 +175,14 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_filenam
     ax = fig.add_subplot(111)
 
     ### plot secondary structure on the diagonal if given
-    if psipred_filename:
-        ss = parse_psipred.horizontal(open(psipred_filename, 'r'))
+    if psipred_horiz_fname or psipred_vert_fname:
+        if psipred_horiz_fname:
+            ss = parse_psipred.horizontal(open(psipred_horiz_fname, 'r'))
+        else:
+            ss = parse_psipred.vertical(open(psipred_vert_fname, 'r'))
+
+        assert len(ss) == ref_len
+ 
         for i in range(len(ss)):
             if ss[i] == 'H':
                 plt.plot(i, i, 'o', c='#8B0043', mec="#8B0043", markersize=2)
@@ -314,6 +320,7 @@ if __name__ == "__main__":
     p.add_argument('-f', '--factor', default=2.0, type=float)
     p.add_argument('--c2', default='')
     p.add_argument('--psipred_horiz', default='')
+    p.add_argument('--psipred_vert', default='')
     p.add_argument('--pdb', default='')
     p.add_argument('--heavy', action='store_true')
     p.add_argument('--chain', default='')
@@ -333,5 +340,5 @@ if __name__ == "__main__":
     else:
         sep = '\t'
     
-    plot_map(args['fasta_file'], args['contact_file'], args['factor'], c2_filename=args['c2'], psipred_filename=args['psipred_horiz'], pdb_filename=args['pdb'], is_heavy=args['heavy'], chain=args['chain'], sep=sep, outfilename=args['outfile'])
+    plot_map(args['fasta_file'], args['contact_file'], args['factor'], c2_filename=args['c2'], psipred_horiz_fname=args['psipred_horiz'], psipred_vert_fname=args['psipred_vert'], pdb_filename=args['pdb'], is_heavy=args['heavy'], chain=args['chain'], sep=sep, outfilename=args['outfile'])
 
