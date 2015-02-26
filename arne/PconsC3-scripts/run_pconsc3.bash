@@ -4,8 +4,13 @@
 # A script to run PconsC3 and all necessary pre-calculations
 
 # Just two variables. The location of (all) scripts and the number of cores to use (max 4 I think)
-bin=/scratch/arne/PconsC3/bin
-cpu=4
+#bin=/scratch/arne/PconsC3/bin
+bin="$( cd "$( dirname "$0" )" && pwd )/bin"
+
+cpu=$3
+if [[ $cpu == '' ]];then
+    cpu='1'
+fi
 
 
 # Create working directory (to not fill up one directory)(
@@ -26,11 +31,11 @@ fi
 cp $seqfile $workdir
 
 echo $seqfile $workdir
-rootname=`echo $seqfile | sed -E "s/\..*//"`
+
+
 cd $workdir
 
 if [ $? -ne 0 ];then echo "ERROR cannot cd to $workdir" ; exit $? ; fi
-
 
 
 # Make alignments
@@ -78,9 +83,7 @@ then
 fi
 
 
-
 if [ ! -s $seqfile.rsa ] ; then $bin/runnetsurfp.py $seqfile ; fi 
-
 
 
 # Running contact predictions
@@ -112,11 +115,11 @@ do
     if [ ! -s $seqfile.$j ] ; then echo "Missing " $seqfile.$j ; exit 1  ;  fi
 done
 
+
 # Running PconsC3
-
-
-    if [ ! -s $seqfile.PconsC3.pconsc26.l6 ] ; then $bin/run_pconsc3-iterations.py $seqfile ; fi
+if [ ! -s $seqfile.PconsC3.pconsc26.l6 ] ; then $bin/run_pconsc3-iterations.py $seqfile ; fi
 
 
 # Cleaning up
 cd $currdir
+rm -r $workdir
