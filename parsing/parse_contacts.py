@@ -5,7 +5,7 @@ import numpy as np
 
 def parse(afile, sep=' ', min_dist=5):
     
-    """Parse contact file.
+    """Parse contact file (PcosnCX, plmDCA, PSICOV, PhyCMAP).
     @param  afile   contact file
     @param  sep     separator of contact file (default=' ')
     Ensures: Output is sorted by confidence score.
@@ -13,8 +13,11 @@ def parse(afile, sep=' ', min_dist=5):
     """
     contacts = []
     for aline in afile:
+        # exclude PhyCmap header/tail lines
+        if aline.strip()[0].isalpha():
+            continue
         if aline.strip() != '':
-            line_arr = aline.strip().split(sep)
+            line_arr = filter(None, aline.strip().split(sep))
             if line_arr[0].startswith('E'):
                 continue
             i = int(line_arr[0])
@@ -28,12 +31,11 @@ def parse(afile, sep=' ', min_dist=5):
     return contacts
 
 
-def get_numpy_cmap(contacts, seq_len=-1, sep=' '):
+def get_numpy_cmap(contacts, seq_len=-1):
 
     """Convert contacts into numpy matrix.
     @param  contacts    contact list as obtained from "parse"
     @param  seq_len     sequence length
-    @param  sep         separator of contact file (default=' ')
     @return np.array((seq_len, seq_len), score)
     """
 
