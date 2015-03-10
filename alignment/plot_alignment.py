@@ -76,6 +76,6 @@ def get_numseq_coverage(filename, coverage=0.9):
 
 if __name__ == "__main__":
     
-    #plot(sys.argv[1])
+    plot(sys.argv[1])
     #print get_frac_gaps(sys.argv[1])
-    print get_numseq_coverage(sys.argv[1])
+    #print get_numseq_coverage(sys.argv[1])

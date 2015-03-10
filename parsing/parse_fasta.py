@@ -95,6 +95,15 @@ def read_fasta_pdb(afile, query_id=''):
     return seq_dict
 
 
+def read_fasta_pfam(afile):
+    seq_dict = read_fasta(afile)
+    result_dict = {}
+    for header, seq_lst in seq_dict.iteritems():
+        new_header = header.strip('>')
+        new_seq = seq_lst[0].translate(None, '.')
+        result_dict[new_header] = [new_seq]
+    return result_dict
+
 
 if __name__ == "__main__":
 

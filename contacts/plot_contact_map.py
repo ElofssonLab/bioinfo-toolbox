@@ -134,7 +134,7 @@ def get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali):
     return tp_colors
  
 
-def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_filename='', pdb_filename='', is_heavy=False, chain='', sep=',', outfilename=''):  
+def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_horiz_fname='', psipred_vert_fname='', pdb_filename='', is_heavy=False, chain='', sep=',', outfilename=''):  
    
     #acc = c_filename.split('.')[0]
     acc = fasta_filename.split('.')[0][:4]
@@ -145,6 +145,7 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_filenam
 
     ### get top "factor" * "ref_len" predicted contacts
     contacts = parse_contacts.parse(open(c_filename, 'r'), sep)
+    contacts_np = parse_contacts.get_numpy_cmap(contacts)
 
     contacts_x = []
     contacts_y = []
@@ -175,8 +176,14 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_filenam
     ax = fig.add_subplot(111)
 
     ### plot secondary structure on the diagonal if given
-    if psipred_filename:
-        ss = parse_psipred.horizontal(open(psipred_filename, 'r'))
+    if psipred_horiz_fname or psipred_vert_fname:
+        if psipred_horiz_fname:
+            ss = parse_psipred.horizontal(open(psipred_horiz_fname, 'r'))
+        else:
+            ss = parse_psipred.vertical(open(psipred_vert_fname, 'r'))
+
+        assert len(ss) == ref_len
+ 
         for i in range(len(ss)):
             if ss[i] == 'H':
                 plt.plot(i, i, 'o', c='#8B0043', mec="#8B0043", markersize=2)
@@ -232,6 +239,10 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_filenam
         print '%s %s %s %s' % (pdb_filename, PPVs[-1], TPs[-1], FPs[-1])
       
         ax.scatter(ref_contacts_x, ref_contacts_y, marker='o', c='#CCCCCC', lw=0, edgecolor='#CCCCCC')
+        cmap = cm.get_cmap("binary_r")
+        cmap.set_bad([1,1,1,0])
+        dist_mat_masked = np.ma.array(dist_mat, mask=np.tri(dist_mat.shape[0], k=-1))
+        sc = ax.imshow(dist_mat_masked, cmap=cmap)
 
 
     ### plot predicted contacts from second contact map if given
@@ -279,11 +290,21 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_filenam
     else:
         if pdb_filename:
             fig.suptitle('%s\nPPV = %.2f' % (acc, PPVs[-1]))
+            cmap = cm.get_cmap("hot_r")
+            cmap.set_bad([1,1,1,0])
+            contacts_np_masked = np.ma.array(contacts_np, mask=np.tri(contacts_np.shape[0], k=-1))
+            #sc = ax.imshow(contacts_np_masked.T, cmap=cmap)
             sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c=tp_colors[::-1], s=6, alpha=0.75, linewidths=0.0)
             sc = ax.scatter(contacts_y[::-1], contacts_x[::-1], marker='o', c=tp_colors[::-1], s=6, alpha=0.75, linewidths=0.0)
         else:
-            sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c=scores[::-1], s=4, alpha=0.75, cmap=cm.jet, linewidths=0.1)
-            sc = ax.scatter(contacts_y[::-1], contacts_x[::-1], marker='o', c=scores[::-1], s=4, alpha=0.75, cmap=cm.jet, linewidths=0.1)
+            if c_filename.startswith('data'):
+                acc = c_filename.split('/')[1]
+            else:
+                acc = c_filename.split('/')[-1]
+            fig.suptitle('%s' % acc)
+            sc = ax.imshow(contacts_np + contacts_np.T, cmap=cm.hot_r)
+            #sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c=scores[::-1], s=4, alpha=0.75, cmap=cm.hot_r, linewidths=0.1, edgecolors='none')
+            #sc = ax.scatter(contacts_y[::-1], contacts_x[::-1], marker='o', c=scores[::-1], s=4, alpha=0.75, cmap=cm.hot_r, linewidths=0.1, edgecolors='none')
             plt.colorbar(sc)
 
     plt.gca().set_xlim([0,ref_len])
@@ -314,6 +335,7 @@ if __name__ == "__main__":
     p.add_argument('-f', '--factor', default=2.0, type=float)
     p.add_argument('--c2', default='')
     p.add_argument('--psipred_horiz', default='')
+    p.add_argument('--psipred_vert', default='')
     p.add_argument('--pdb', default='')
     p.add_argument('--heavy', action='store_true')
     p.add_argument('--chain', default='')
@@ -333,5 +355,5 @@ if __name__ == "__main__":
     else:
         sep = '\t'
     
-    plot_map(args['fasta_file'], args['contact_file'], args['factor'], c2_filename=args['c2'], psipred_filename=args['psipred_horiz'], pdb_filename=args['pdb'], is_heavy=args['heavy'], chain=args['chain'], sep=sep, outfilename=args['outfile'])
+    plot_map(args['fasta_file'], args['contact_file'], args['factor'], c2_filename=args['c2'], psipred_horiz_fname=args['psipred_horiz'], psipred_vert_fname=args['psipred_vert'], pdb_filename=args['pdb'], is_heavy=args['heavy'], chain=args['chain'], sep=sep, outfilename=args['outfile'])
 
