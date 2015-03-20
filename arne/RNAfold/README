@@ -1,0 +1,59 @@
+Dan Daley Project
+
+First GFP expression data
+ Double check the shift of the sequence (shoudl be 3 not 4 I think)
+
+
+Secon FACS seq data
+ 1. Extract sequences
+    narK sequence OK
+    araH sequence different (reverse strand fixed)
+ 2. Calculate 4 parameters
+    deltaG (mfold)
+    Nuclear composition %GC (of the 15 nucl isnertion)
+    Codon prefernce for the two first AA
+    Make LOGO for best/worse sequences
+
+		
+
+
+Notes U/T does not matter for RNAfold
+
+Fixed extract sequence script to handle reverse complementaries as well.
+
+
+PLOTS (in R)
+
+
+
+data <- read.csv(file="araH-FACS.txt",header=FALSE,sep=" ");
+
+data.DGsort=data[with(data,order(V4)), ]
+data.DGsort$V8 = filter(data.DGsort$V3,rep(1/101,101),sides=2)
+pdf("araH-DG.pdf")
+plot(data.DGsort$V4,data.DGsort$V3,xlab="deltaG",ylab="FACS",main="araH")
+lines(data.DGsort$V4,data.DGsort$V8,col="red")
+dev.off()
+
+data.GCsort=data[with(data,order(V5)), ]
+data.GCsort$V8 = filter(data.GCsort$V3,rep(1/101,101),sides=2)
+pdf("araH-GC.pdf")
+plot(data.GCsort$V5,data.GCsort$V3,xlab="%GC",ylab="FACS",main="araH")
+lines(data.GCsort$V5,data.GCsort$V8,col="red")
+dev.off()
+
+data <- read.csv(file="narK-FACS.txt",header=FALSE,sep=" ");
+
+data.DGsort=data[with(data,order(V4)), ]
+data.DGsort$V8 = filter(data.DGsort$V3,rep(1/101,101),sides=2)
+pdf("narK-DG.pdf")
+plot(data.DGsort$V4,data.DGsort$V3,xlab="deltaG",ylab="FACS",main="narK")
+lines(data.DGsort$V4,data.DGsort$V8,col="red")
+dev.off()
+
+data.GCsort=data[with(data,order(V5)), ]
+data.GCsort$V8 = filter(data.GCsort$V3,rep(1/101,101),sides=2)
+pdf("narK-GC.pdf")
+plot(data.GCsort$V5,data.GCsort$V3,xlab="%GC",ylab="FACS",main="narK")
+lines(data.GCsort$V5,data.GCsort$V8,col="red")
+dev.off()
