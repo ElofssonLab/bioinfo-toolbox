@@ -26,6 +26,7 @@ PLOTS (in R)
 
 
 
+
 data <- read.csv(file="araH-FACS.txt",header=FALSE,sep=" ");
 
 data.DGsort=data[with(data,order(V4)), ]
@@ -57,3 +58,20 @@ pdf("narK-GC.pdf")
 plot(data.GCsort$V5,data.GCsort$V3,xlab="%GC",ylab="FACS",main="narK")
 lines(data.GCsort$V5,data.GCsort$V8,col="red")
 dev.off()
+
+
+
+#------------------------------------------------------------------------
+
+GFP data
+ bin/runmfold-GFP.pl > GFP.dat
+
+R
+data<-read.csv(file="GFP.dat",header=FALSE,sep="\t");
+data.DGsort=data[with(data,order(V3)), ]
+data.DGsort$V5 = filter(data.DGsort$V4,rep(1/51,51),sides=2)
+pdf("gfp.pdf")
+plot(data$V3,data$V4,xlab="deltaG",ylab="GFP",main="GFP flourescence")
+lines(data.DGsort$V3,data.DGsort$V5,col="red")
+dev.off()
+# Moving average ? Running Average ??
