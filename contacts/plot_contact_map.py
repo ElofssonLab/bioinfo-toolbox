@@ -1,4 +1,4 @@
-import sys
+import sys, os
 import argparse
 from math import *
 
@@ -62,6 +62,11 @@ def get_cb_contacts(gapped_cb_lst):
     dist_mat = np.zeros((seqlen, seqlen), np.float)
     dist_mat.fill(float('inf'))
     
+    #offset = 0
+    #first_i = gapped_cb_lst[0].keys()[0]
+    #if first_i < 0:
+    #    offset = abs(first_i)
+
     for i, cb1 in enumerate(gapped_cb_lst):
         if cb1 == '-':
             continue
@@ -69,6 +74,7 @@ def get_cb_contacts(gapped_cb_lst):
             if cb2 == '-':
                 continue
             diff_vec = cb1 - cb2
+            #dist_mat[i+offset,j+offset] = np.sqrt(np.sum(diff_vec * diff_vec))
             dist_mat[i,j] = np.sqrt(np.sum(diff_vec * diff_vec))
     return dist_mat
 
@@ -137,7 +143,8 @@ def get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali):
 def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_horiz_fname='', psipred_vert_fname='', pdb_filename='', is_heavy=False, chain='', sep=',', outfilename=''):  
    
     #acc = c_filename.split('.')[0]
-    acc = fasta_filename.split('.')[0][:4]
+    #acc = fasta_filename.split('.')[0][:4]
+    acc = '.'.join(os.path.basename(fasta_filename).split('.')[:-1])
 
     ### get sequence
     seq = parse_fasta.read_fasta(open(fasta_filename, 'r')).values()[0][0]
@@ -315,6 +322,8 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_horiz_f
             pp = PdfPages(outfilename)
             pp.savefig(fig)
             pp.close()
+        elif outfilename.endswith('.png'):
+            plt.savefig(outfilename)
         else:
             pp = PdfPages('%s.pdf' % outfilename)
             pp.savefig(fig)

@@ -239,8 +239,11 @@ def get_ca_coordinates(pdbfile, chain):
     res_dict = get_res_dict(pdbfile, chain)
 
     ca_lst = []
-    num_res = len(res_dict)+2
-    for i in res_dict.keys():
+
+    # need to sort to get the sequence correct
+    sorted_keys = sorted(res_dict.keys())
+    
+    for i in sorted_keys:
         ca_lst.append(res_dict[i][0])
     pdbfile.close()
     return ca_lst
@@ -251,9 +254,12 @@ def get_cb_coordinates(pdbfile, chain):
     res_dict = get_res_dict(pdbfile, chain)
 
     cb_lst = []
-    num_res = len(res_dict)+2
     tmp_i = 0
-    for i in res_dict.keys():
+
+    # need to sort to get the sequence correct
+    sorted_keys = sorted(res_dict.keys())
+    
+    for i in sorted_keys:
         if len(res_dict[i]) > 1:
             tmp_i += 1
             cb_lst.append(res_dict[i][-1])
@@ -287,7 +293,6 @@ def get_atom_seq(pdbfile, chain='', model=1):
             continue
 
         res_i = atm_record['res_no']
-        
         if atm_record['insert'] == 'X':
             res_i = res_i * 0.001
          
