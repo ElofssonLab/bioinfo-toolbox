@@ -17,6 +17,9 @@ def parse(afile, sep=' ', min_dist=5):
         if aline.strip()[0].isalpha():
             continue
         if aline.strip() != '':
+            # ignore CASP RR format headers
+            if len(aline.strip().split(sep)) < 3:
+                continue
             line_arr = filter(None, aline.strip().split(sep))
             if line_arr[0].startswith('E'):
                 continue
