@@ -26,6 +26,14 @@ from parsing import parse_fasta
 from parsing import parse_pdb
 
 
+def s_score(d, d0):
+    return 1/(1+pow(d/d0, 2))
+
+def s_score_vec(d, d0):
+    f = np.vectorize(s_score, otypes=[np.float])
+    return f(d, d0)
+
+
 def get_min_dist(res1, res2):
     
     min_dist = float('inf')
@@ -210,6 +218,9 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_horiz_f
         atom_seq_ali = align[-1][0]
         seq_ali = align[-1][1]
 
+        #print atom_seq_ali
+        #print seq_ali
+
         j = 0
         gapped_res_lst = []
         gapped_cb_lst = []
@@ -236,20 +247,31 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_horiz_f
             cb_cutoff = 8
             ref_contact_map = dist_mat < cb_cutoff
             ref_contacts = np.where(dist_mat < cb_cutoff)
+            #ref_contacts = np.where(np.ma.array(dist_mat, mask=np.tri(dist_mat.shape[0]), fill_value=float("inf")) < cb_cutoff)
         
         ref_contacts_x = ref_contacts[0]
         ref_contacts_y = ref_contacts[1]
-       
+
         PPVs, TPs, FPs = get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, factor)
         tp_colors = get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali)
    
         print '%s %s %s %s' % (pdb_filename, PPVs[-1], TPs[-1], FPs[-1])
       
-        ax.scatter(ref_contacts_x, ref_contacts_y, marker='o', c='#CCCCCC', lw=0, edgecolor='#CCCCCC')
-        cmap = cm.get_cmap("binary_r")
+        cmap = cm.get_cmap("binary")
         cmap.set_bad([1,1,1,0])
         dist_mat_masked = np.ma.array(dist_mat, mask=np.tri(dist_mat.shape[0], k=-1))
-        sc = ax.imshow(dist_mat_masked, cmap=cmap)
+        sc = ax.imshow(s_score_vec(dist_mat_masked, 5), cmap=cmap)
+        
+        ref_contacts_diag_x = []
+        ref_contacts_diag_y = []
+        for i in range(len(ref_contacts_x)):
+            x_i = ref_contacts_x[i]
+            y_i = ref_contacts_y[i]
+            if not dist_mat_masked.mask[x_i, y_i]:
+                ref_contacts_diag_x.append(x_i)
+                ref_contacts_diag_y.append(y_i)
+       
+        ax.scatter(ref_contacts_diag_x, ref_contacts_diag_y, marker='o', c='#CCCCCC', lw=0, edgecolor='#CCCCCC')
 
 
     ### plot predicted contacts from second contact map if given
@@ -296,13 +318,20 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_horiz_f
     ### if no second contact map given
     else:
         if pdb_filename:
-            fig.suptitle('%s\nPPV = %.2f' % (acc, PPVs[-1]))
+            pdb_acc = parse_pdb.get_acc(open(pdb_filename))
+            if pdb_acc:
+                if chain:
+                    fig.suptitle('%s (PDB: %s, chain %s)\nPPV = %.2f' % (acc, pdb_acc, chain, PPVs[-1]))
+                else:
+                    fig.suptitle('%s (PDB: %s)\nPPV = %.2f' % (acc, pdb_acc, PPVs[-1]))
+            else:
+                fig.suptitle('%s\nPPV = %.2f' % (acc, PPVs[-1]))
             cmap = cm.get_cmap("hot_r")
             cmap.set_bad([1,1,1,0])
             contacts_np_masked = np.ma.array(contacts_np, mask=np.tri(contacts_np.shape[0], k=-1))
             #sc = ax.imshow(contacts_np_masked.T, cmap=cmap)
             sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c=tp_colors[::-1], s=6, alpha=0.75, linewidths=0.0)
-            sc = ax.scatter(contacts_y[::-1], contacts_x[::-1], marker='o', c=tp_colors[::-1], s=6, alpha=0.75, linewidths=0.0)
+            #sc = ax.scatter(contacts_y[::-1], contacts_x[::-1], marker='o', c=tp_colors[::-1], s=6, alpha=0.75, linewidths=0.0)
         else:
             if c_filename.startswith('data'):
                 acc = c_filename.split('/')[1]
