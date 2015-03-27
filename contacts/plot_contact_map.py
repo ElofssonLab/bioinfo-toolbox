@@ -1,4 +1,4 @@
-import sys
+import sys, os
 import argparse
 from math import *
 
@@ -62,6 +62,11 @@ def get_cb_contacts(gapped_cb_lst):
     dist_mat = np.zeros((seqlen, seqlen), np.float)
     dist_mat.fill(float('inf'))
     
+    #offset = 0
+    #first_i = gapped_cb_lst[0].keys()[0]
+    #if first_i < 0:
+    #    offset = abs(first_i)
+
     for i, cb1 in enumerate(gapped_cb_lst):
         if cb1 == '-':
             continue
@@ -69,6 +74,7 @@ def get_cb_contacts(gapped_cb_lst):
             if cb2 == '-':
                 continue
             diff_vec = cb1 - cb2
+            #dist_mat[i+offset,j+offset] = np.sqrt(np.sum(diff_vec * diff_vec))
             dist_mat[i,j] = np.sqrt(np.sum(diff_vec * diff_vec))
     return dist_mat
 
@@ -137,7 +143,8 @@ def get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali):
 def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_horiz_fname='', psipred_vert_fname='', pdb_filename='', is_heavy=False, chain='', sep=',', outfilename=''):  
    
     #acc = c_filename.split('.')[0]
-    acc = fasta_filename.split('.')[0][:4]
+    #acc = fasta_filename.split('.')[0][:4]
+    acc = '.'.join(os.path.basename(fasta_filename).split('.')[:-1])
 
     ### get sequence
     seq = parse_fasta.read_fasta(open(fasta_filename, 'r')).values()[0][0]
@@ -145,6 +152,7 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_horiz_f
 
     ### get top "factor" * "ref_len" predicted contacts
     contacts = parse_contacts.parse(open(c_filename, 'r'), sep)
+    contacts_np = parse_contacts.get_numpy_cmap(contacts)
 
     contacts_x = []
     contacts_y = []
@@ -238,6 +246,10 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_horiz_f
         print '%s %s %s %s' % (pdb_filename, PPVs[-1], TPs[-1], FPs[-1])
       
         ax.scatter(ref_contacts_x, ref_contacts_y, marker='o', c='#CCCCCC', lw=0, edgecolor='#CCCCCC')
+        cmap = cm.get_cmap("binary_r")
+        cmap.set_bad([1,1,1,0])
+        dist_mat_masked = np.ma.array(dist_mat, mask=np.tri(dist_mat.shape[0], k=-1))
+        sc = ax.imshow(dist_mat_masked, cmap=cmap)
 
 
     ### plot predicted contacts from second contact map if given
@@ -285,11 +297,21 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_horiz_f
     else:
         if pdb_filename:
             fig.suptitle('%s\nPPV = %.2f' % (acc, PPVs[-1]))
+            cmap = cm.get_cmap("hot_r")
+            cmap.set_bad([1,1,1,0])
+            contacts_np_masked = np.ma.array(contacts_np, mask=np.tri(contacts_np.shape[0], k=-1))
+            #sc = ax.imshow(contacts_np_masked.T, cmap=cmap)
             sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c=tp_colors[::-1], s=6, alpha=0.75, linewidths=0.0)
             sc = ax.scatter(contacts_y[::-1], contacts_x[::-1], marker='o', c=tp_colors[::-1], s=6, alpha=0.75, linewidths=0.0)
         else:
-            sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c=scores[::-1], s=4, alpha=0.75, cmap=cm.jet, linewidths=0.1)
-            sc = ax.scatter(contacts_y[::-1], contacts_x[::-1], marker='o', c=scores[::-1], s=4, alpha=0.75, cmap=cm.jet, linewidths=0.1)
+            if c_filename.startswith('data'):
+                acc = c_filename.split('/')[1]
+            else:
+                acc = c_filename.split('/')[-1]
+            fig.suptitle('%s' % acc)
+            sc = ax.imshow(contacts_np + contacts_np.T, cmap=cm.hot_r)
+            #sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c=scores[::-1], s=4, alpha=0.75, cmap=cm.hot_r, linewidths=0.1, edgecolors='none')
+            #sc = ax.scatter(contacts_y[::-1], contacts_x[::-1], marker='o', c=scores[::-1], s=4, alpha=0.75, cmap=cm.hot_r, linewidths=0.1, edgecolors='none')
             plt.colorbar(sc)
 
     plt.gca().set_xlim([0,ref_len])
@@ -300,6 +322,8 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_horiz_f
             pp = PdfPages(outfilename)
             pp.savefig(fig)
             pp.close()
+        elif outfilename.endswith('.png'):
+            plt.savefig(outfilename)
         else:
             pp = PdfPages('%s.pdf' % outfilename)
             pp.savefig(fig)
