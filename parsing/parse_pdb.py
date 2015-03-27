@@ -226,10 +226,10 @@ def get_res_dict(pdbfile, chain):
 
         if atm_record['atm_name'] == 'CA':
                 atm = [atm_record['x'], atm_record['y'], atm_record['z']]
-                res_dict[res_i].append(np.array(atm))    
+                res_dict[res_i].append(np.array(atm))   
         elif atm_record['atm_name'] == 'CB':
                 atm = [atm_record['x'], atm_record['y'], atm_record['z']]
-                res_dict[res_i].append(np.array(atm))  
+                res_dict[res_i].append(np.array(atm)) 
     
     return res_dict
 
@@ -328,6 +328,13 @@ def get_first_chain(pdbfile):
     return atm_record['chain']
  
 
+def get_acc(pdbfile):
+
+    for line in pdbfile:
+        if line.startswith('HEADER'):
+            return line[62:66].lower()
+    # if no header line in pdb file:
+    return ''
 
 
 if __name__ == '__main__':
