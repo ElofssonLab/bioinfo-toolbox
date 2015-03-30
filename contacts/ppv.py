@@ -132,7 +132,7 @@ def get_ppv(fasta_filename, c_filename, pdb_filename, factor=1.0,
    
         PPV, TP, FP = get_ppv_helper(contacts_x, contacts_y, ref_contact_map, ref_len, factor, atom_seq_ali=atom_seq_ali)
 
-    print '%s %s %s %s %s' % (fasta_filename, pdb_filename, PPV, TP, FP)
+    print '%s %s %s %s %s' % (fasta_filename, c_filename, PPV, TP, FP)
     return (pdb_filename, PPV, TP, FP)
   
     
@@ -218,7 +218,8 @@ if __name__ == "__main__":
     else:
         sep = '\t'
     
-    if len(open(args['pdb']).readline().split(' ')) != 3:
+    #if len(open(args['pdb']).readline().split(' ')) != 3:
+    if True:
         get_ppv(args['fasta_file'], args['contact_file'], args['pdb'],
                 args['factor'], chain=args['chain'], sep=sep,
                 outfilename=args['outfile'], noalign=args['noalign'],
