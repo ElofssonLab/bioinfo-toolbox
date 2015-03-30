@@ -1,0 +1,192 @@
+#!/bin/sh
+# This shell script folds an RNA or DNA sequence and creates output
+# files.
+LIBDIR=${MFOLDLIB:-$MFOLD/dat}
+
+if [ $# = 0 ]; then
+  echo -e "Usage is\nmfold  (with optional parameters:)
+   [ NA=RNA (default) or DNA ] 
+   [ T=temperature (default = 37°) ] [ P=percent (default = 5) ]
+   [ NA_CONC=[Na+] molar concentration (default = 1.0) ]
+   [ MG_CONC=[Mg++] molar concentration (default = 0.0) ]
+   [ W=window parameter (default - set by sequence length) ]
+   [ MAXBP=max base pair distance (default - no limit) ]
+   [ MAX=maximum number of foldings to be computed (default 100) ]
+   Sequences are entered by standard input."
+  exit 2
+fi
+# Abort subroutine
+abort()
+{
+  if [ $# -gt 0 ] ; then
+    echo "$1"
+  fi
+  echo "Job Aborted"
+  exit 1
+}
+# Write header
+cat $LIBDIR/begin.dat
+
+# Set default values.
+NA=RNA
+T=37
+P=5
+W=2
+MAXBP="no limit"
+MAX=100
+START=1
+STOP=30000
+
+# Process the command line arguments 1 at a time.
+COUNT=$#
+while [ $COUNT != 0 ]; do
+  if [ `echo $1 | cut -d= -f1` = "NA" ]; then
+    NA=`echo $1 | cut -d= -f2`     
+  elif [ `echo $1 | cut -d= -f1` = "T" ]; then
+    T=`echo $1 | cut -d= -f2`     
+  elif [ `echo $1 | cut -d= -f1` = "NA_CONC" ]; then
+    NA_CONC=`echo $1 | cut -d= -f2`
+  elif [ `echo $1 | cut -d= -f1` = "MG_CONC" ]; then
+    MG_CONC=`echo $1 | cut -d= -f2`     
+  elif [ `echo $1 | cut -d= -f1` = "P" ]; then
+    P=`echo $1 | cut -d= -f2`     
+  elif [ `echo $1 | cut -d= -f1` = "W" ]; then
+    W=`echo $1 | cut -d= -f2`     
+  elif [ `echo $1 | cut -d= -f1` = "MAXBP" ]; then
+    MAXBP=`echo $1 | cut -d= -f2`     
+  elif [ `echo $1 | cut -d= -f1` = "MAX" ]; then
+    MAX=`echo $1 | cut -d= -f2`     
+  else
+    echo "Invalid entry: $1 on command line."    
+    exit
+  fi
+COUNT=`expr $COUNT - 1`
+shift
+done
+NA_CONC=${NA_CONC:-1.0}
+MG_CONC=${MG_CONC:-0.0}
+
+NUM=`echo $SEQ | tr "." " " | wc | tr -s " " " " | cut -d" " -f3`
+SUFFIX=`echo $SEQ | cut -d"." -f$NUM`
+if [ $NUM -gt 1 -a $SUFFIX = seq ]; then
+  NUM=`expr $NUM - 1`
+  FILE_PREFIX=`echo $SEQ | cut -d"." -f1-$NUM`
+else
+  FILE_PREFIX=$SEQ
+fi
+
+# Eliminate possible old results file and begin a new one.
+\rm -f $FILE_PREFIX.results $FILE_PREFIX.out $FILE_PREFIX.ct
+touch $FILE_PREFIX.results
+
+# Generate energy tables for temperature T
+# EXT is extension for energy file names
+
+if [ $T -lt 0 ]; then
+   T=0
+elif [ $T -gt 100 ]; then
+   T=100
+fi
+EXT=$T
+
+COUNT=0
+while [ 1 = 1 ] ; do
+COUNT=`expr $COUNT + 1`
+
+# Read sequence name and sequence
+echo "Enter T, NA_CONC and MG_CONC"
+read T NA_CONC MG_CONC
+
+TEST=`head -1 $T|tr -d " "|tr "a-z" "A-Z"`
+if [ $TEST = END ] ; then
+  \rm -f fort.22 fort.3 fort.4 mfold.log 
+  echo "All done"
+  exit 0
+fi
+
+# Maximum range for base pairs
+#if [ "$MAXBP" != "no limit" ]; then
+#   echo -e "9\n" $MAXBP | tr -d " " >> $FILE_PREFIX.con
+#fi
+# Add MAXBP!
+
+newtemp >> $LOGFILE 2>&1 <<EOF || abort "newtemp failed"
+$NA
+$T
+$NA_CONC
+$MG_CONC
+EOF
+if [ $NA = RNA ]; then
+   echo "RNA free energy files (version 2.3) at $T degrees created."
+else
+   echo "DNA free energy files (version 3.0) at $T degrees created."
+fi
+
+# Create suboptimal foldings
+quikfold-tback <<EOF || abort "Folding failed"
+asint1x2.$EXT
+asint2x3.$EXT
+dangle.$EXT
+loop.$EXT
+miscloop.$EXT
+sint2.$EXT
+sint4.$EXT
+sint6.$EXT
+stack.$EXT
+tloop.$EXT
+triloop.$EXT
+tstackh.$EXT
+tstacki.$EXT
+$SEQLAB
+$SEQUENCE
+EOF
+
+if [ $NA = RNA ]; then
+   DH=dh
+else
+   DH=dhd
+fi
+@@@@@@@@@@ Need to define ct file.
+efn <<EOF > $FILE_PREFIX.dh 2>&1
+linear
+$FILE_PREFIX.ct
+n
+n
+asint1x2.$DH
+asint2x3.$DH
+dangle.$DH
+loop.$DH
+miscloop.$DH
+sint2.$DH
+sint4.$DH
+sint6.$DH
+stack.$DH
+tloop.$DH
+triloop.$DH
+tstackh.$DH
+tstacki.$DH
+EOF
+add-dHdSTm $FILE_PREFIX.out $FILE_PREFIX.dh $T text >> $LOGFILE 2>&1
+mv $FILE_PREFIX.dHdSTm $FILE_PREFIX.out >> $LOGFILE 2>&1
+# Add nucleic acid type, temperature and salt conditions at top of file.
+
+HEADER=`echo -e "Linear $NA folding at ${T}° C. [Na+] = $NA_CONC M, [Mg++] = $MG_CONC M.\n"`
+echo ${HEADER} > $FILE_PREFIX.temp
+cat $FILE_PREFIX.out >> $FILE_PREFIX.temp
+mv $FILE_PREFIX.temp $FILE_PREFIX.out
+
+echo "Suboptimal foldings created."
+
+echo "Sequence file number $COUNT"
+grep "[S ][td][rG][u ][c=][t ]" $FILE_PREFIX.out
+echo "Sequence file number $COUNT" >> $FILE_PREFIX.results
+grep "[S ][td][rG][u ][c=][t ]" $FILE_PREFIX.out >> $FILE_PREFIX.results
+
+echo "Finshed processing current sequence file."
+
+# Cleanup
+\rm -f *.$EXT $FILE_PREFIX.ct $FILE_PREFIX.dh $FILE_PREFIX.log $FILE_PREFIX.pnt $FILE_PREFIX.out $fort.22 fort.3 fort.4 mfold.log
+\rm $SEQ
+
+done
+

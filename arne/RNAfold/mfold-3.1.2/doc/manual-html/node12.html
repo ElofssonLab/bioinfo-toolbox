@@ -1,0 +1,237 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>AUXILIARY AND INDIVIDUAL PROGRAMS</TITLE>
+<META NAME="description" CONTENT="AUXILIARY AND INDIVIDUAL PROGRAMS">
+<META NAME="keywords" CONTENT="FEBS98-html">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="FEBS98-html.css">
+<LINK REL="previous" HREF="node9.html">
+<LINK REL="up" HREF="node7.html">
+<LINK REL="next" HREF="node13.html">
+</HEAD>
+<BODY BGCOLOR=#FFDEAD TEXT=#202020 LINK=#800000 ALINK=#ffff00 VLINK=#353976>
+<!--Navigation Panel-->
+<A NAME="tex2html193"
+ HREF="node13.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="img/next_motif.gif"></A> 
+<A NAME="tex2html190"
+ HREF="node7.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="img/up_motif.gif"></A> 
+<A NAME="tex2html186"
+ HREF="node11.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="img/previous_motif.gif"></A> 
+<A NAME="tex2html192"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="img/contents_motif.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html194"
+ HREF="node13.html">Sample foldings</A>
+<B> Up:</B> <A NAME="tex2html191"
+ HREF="node7.html">Running the programs</A>
+<B> Previous:</B> <A NAME="tex2html187"
+ HREF="node11.html">Optimal and suboptimal foldings</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00073000000000000000">
+ <SMALL>AUXILIARY AND INDIVIDUAL PROGRAMS</SMALL></A>
+</H2>
+
+<P>
+The <I>mfold</I> package contains a script, also named <I>mfold</I> , that performs
+a folding according to information entered on the command line. This
+script is itself composed of scripts and (Fortran or C) executable
+programs, many of which can be run separately. Some of these programs
+are now described.
+
+<P>
+<DL COMPACT>
+<DD><P>
+<DT>1.
+<DD><I>auxgen</I>: This program creates the  `<SMALL>FILE_NAME.PNT'</SMALL> file. 
+
+<P>
+<DT>2.
+<DD><I>boxplot97_ng</I>: This program creates an <I>energy dot plot</I> in PostScript or
+gif form from  `<SMALL>FILE_NAME.PLOT'</SMALL>. The file  <SMALL>BOXPLOT97_NG.DOC</SMALL>
+contains instructions. 
+
+<P>
+<DT>3.
+<DD><I>ct_boxplot</I>: This program creates a dot plot containing
+only those base pairs found in a collection of structures (in ``ct
+format'') that are specified on the command line. These must all be
+foldings of the same sequence fragment. At present, the <I>mfold</I> script
+does not use this program.
+
+<P>
+<DT>4.
+<DD><I>ct_compare</I>: This program compares 2 ``ct files''. The
+first contains a single reference structure. The second contains 1 or
+more foldings of the same sequence. The number of bases and helices
+from the first structure that are conserved in the other structures
+are computed and displayed. For the purposes of this program, a
+``helix'' may contain bulge or interior loops of size 1 or 2 and must
+have at least 3 base pairs [<A
+ HREF="node19.html#JAEJ8901">17</A>,<A
+ HREF="node19.html#ZUKM9102">40</A>].
+
+<P>
+<DT>5.
+<DD><I>efn</I>: This program computes <IMG
+ WIDTH="29" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img6.gif"
+ ALT="$\Delta G$">
+for all the foldings in a
+``ct file''. The energy rules correspond exactly to what is used in <I>mfold</I> .
+ 
+<DT>6.
+<DD><I>efn2</I>: This program computes <IMG
+ WIDTH="29" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img6.gif"
+ ALT="$\Delta G$">
+for all the foldings in
+a ``ct file'' using a more precise free energy computation that takes
+into account coaxial stacking and Jacobson-Stockmeyer theory for
+multi-branched loops. (See equation <A HREF="node5.html#DDGM2">7</A> and Figure <A HREF="node5.html#COAX">8</A>,
+respectively.)
+
+<P>
+<DT>7.
+<DD><I>h-num</I>: This program computes an ``h-num'' file from a
+``plot'' file.
+
+<P>
+<DT>8.
+<DD><I>nafold</I>: This is the principle folding program of the
+<I>mfold</I> package, and corresponds to the program ``lrna'' and ``crna''
+in earlier versions of <I>mfold</I> . It has 2 command line arguments. The
+first takes on the values `l' or `c', for linear (default) or
+circular folding, respectively. The second has values ``text''
+(default) or ``html'' for plain text output, and for some html
+output, as described above. It is run twice by the <I>mfold</I> script. It
+may be run alone, as it prompts the user for input on an interactive
+basis. In this mode, the user may fold all the sequences contained in
+a single file, an option not available with the <I>mfold</I> script. The
+instructions for running this program have been described in
+[<A  HREF="node19.html#ZUKM9401">19</A>] and also on the WWW at 
+<TT>http://www.bioinfo.rpi.edu/<code>~</code>zukerm/mfold-2.0</TT>. 
+The interactive <I>energy dot plot</I> is not functional in version 3.0.
+
+<P>
+<DT>9.
+<DD><I>naview</I>: This is a modified version of the <I>naview</I>
+program described in [<A
+ HREF="node19.html#BRUR8801">41</A>]. Actually, in <I>mfold</I> , <I>naview</I> is a script that runs a binary called <I>naview.exe</I>.  Both
+<I>naview</I> and <I>naview.exe</I> may be run alone in interactive
+form.  The <I>mfold</I> script uses the files ``bases.nav'' and
+``lines.nav'', stored in <I>MFOLDLIB</I> to direct ``naview''. The
+first produces an output that displays individual residues as letters,
+while the second gives a structure outline only.
+
+<P>
+<DT>10.
+<DD><I>newtemp</I>: The <I>newtemp</I> program creates free energy
+files for folding RNA or DNA at different temperatures. The latest RNA
+parameters consist only of free energies measured at 37&#176;.
+Since there are no corresponding enthalpy files, it is not possible to
+fold RNA at temperatures other than 37&#176;.
+If the user wishes
+to fold RNA at different temperatures, then the ``dg'' and ``dh''
+files from <I>mfold</I> version 2.3 should be copied into <I>MFOLDLIB</I>. These older free energy parameters will be supplied with
+<I>mfold</I> version 3.0. DNA folding may be done at arbitrary temperatures
+between 0 and 100 degrees. However, it should be remembered that the
+DNA loop parameters are all estimated from values published in the
+literature or by comparison with RNA.
+
+<P>
+<DT>11.
+<DD><I>plt22ps</I>: This program takes a ``plt2'' file from <I>naview</I> and creates a PostScript file of a plotted structure. It can
+use an ``ann'' file or an ``ss-count'' file to annotate with P-num or
+ss-count values, respectively.
+
+<P>
+<DT>12.
+<DD><I>plt22gif</I>: This program is the same as <I>plt22ps</I>,
+except that the structure output file is in gif format.
+
+<P>
+<DT>13.
+<DD><I>sav2p-num</I>: This interactive program uses an existing 
+`fold_name.sav' file to create a P-num file.
+
+<P>
+<DT>14.
+<DD><I>sav2plot</I>: This interactive program uses an existing 
+`fold_name.sav' file to create a ``plot'' file. The resulting
+``plot'' file may be sorted and filtered using the command:
+ <SMALL>FILTER-SORT NAME.PLOT N</SMALL>, where name.plot is a ``plot'' file, and
+ <SMALL>N</SMALL> is the minimum helix size that is desired. Helices shorter than
+ <SMALL>N</SMALL> and not removed in optimal foldings.
+
+<P>
+<DT>15.
+<DD><I>scorer</I>: This program is similar to <I>ct_compare</I>. It
+compares foldings helix by helix, displaying  a more detailed output.
+
+<P>
+<DT>16.
+<DD><I>split_ct.awk</I>: This is a Unix awk script that splits a ct
+file into multiple files, containing 1 folding in each. These
+individual files may be processed by <I>naview</I>, <I>plt22ps</I> and
+<I>plt22gif</I>. 
+
+<P>
+<DT>17.
+<DD><I>ss-count</I>: This program computes single stranded sample
+statistics from a collection of foldings stored in a single ct file.
+
+<P>
+</DL>
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html193"
+ HREF="node13.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="img/next_motif.gif"></A> 
+<A NAME="tex2html190"
+ HREF="node7.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="img/up_motif.gif"></A> 
+<A NAME="tex2html186"
+ HREF="node11.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="img/previous_motif.gif"></A> 
+<A NAME="tex2html192"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="img/contents_motif.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html194"
+ HREF="node13.html">Sample foldings</A>
+<B> Up:</B> <A NAME="tex2html191"
+ HREF="node7.html">Running the programs</A>
+<B> Previous:</B> <A NAME="tex2html187"
+ HREF="node11.html">Optimal and suboptimal foldings</A>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<TABLE><TR><TD><IMG SRC=img/shield16.gif HSPACE=20></TD><TD><I>Michael Zuker <BR>Institute for Biomedical Computing<BR>
+Washington University in St. Louis<BR>
+1998-12-05</I></TD></TR></TABLE>
+</ADDRESS>
+</BODY>
+</HTML>

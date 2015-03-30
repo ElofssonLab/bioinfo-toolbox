@@ -1,0 +1,677 @@
+#!/bin/bash 
+# This shell script folds an RNA or DNA sequence and creates output
+# files.
+export ZUKER_URL=http://bioinfo.math.rpi.edu/~zukerm/
+export MFOLDLIB=/scratch/arne/RNAfold/bin/mfold-3.1.2/dat/
+export LIBDIR=${MFOLDLIB:-$MFOLD/dat}
+export IMG_DIR=$LIBDIR
+
+if [ $# = 0 ]; then
+  echo -e "Usage is\nmfold SEQ='file_name' with optional parameters:
+   [ AUX='auxfile_name' ] [ RUN_TYPE=text (default) or html ]
+   [ NA=RNA (default) or DNA ] [ LC=sequence type (default = linear) ]
+   [ T=temperature (default = 37°) ] [ P=percent (default = 5) ]
+   [ NA_CONC=Na+ molar concentration (default = 1.0) ]
+   [ MG_CONC=Mg++ molar concentration (default = 0.0) ]
+   [ W=window parameter (default - set by sequence length) ]
+   [ MAXBP=max base pair distance (default - no limit) ]
+   [ MAX=maximum number of foldings to be computed (default 100) ]
+   [ MAX_LP=maximum bulge/interior loop size (default 30) ]
+   [ MAX_AS=maximum asymmetry of a bulge/interior loop (default 30) ]
+   [ ANN=structure annotation type: none (default), p-num or ss-count ]
+   [ MODE=structure display mode: auto (default), bases or lines ]
+   [ LAB_FR=base numbering frequency ] [ ROT_ANG=structure rotation angle ]
+   [ START=5' base # (default = 1)] [ STOP=3' base # (default = end) ]
+   [ REUSE=NO/YES (default=NO) reuse existing .sav file ]"
+  exit 2
+fi
+# Abort subroutine
+abort()
+{
+  \rm -f mfold.log  fort.*
+  if [ $# -gt 0 ] ; then
+    echo "$1"
+  fi
+  echo "Job Aborted"
+  exit 1
+}
+# Write header
+cat $IMG_DIR/begin.dat
+
+# Set default values.
+SEQ=/dev/null
+RUN_TYPE=text
+NA=RNA
+LC=linear
+T=default
+P=5
+W=-1
+MAXBP="no limit"
+MAX=100
+ANN=none
+MODE=auto
+LAB_FR=default
+ROT_ANG=0
+START=1
+STOP=30000
+REUSE=NO
+
+# Process the command line arguments 1 at a time.
+COUNT=$#
+while [ $COUNT != 0 ]; do
+  if [ `echo $1 | cut -d= -f1` = "SEQ" ]; then
+    SEQ=`echo $1 | cut -d= -f2`
+  elif [ `echo $1 | cut -d= -f1` = "AUX" ]; then
+    AUX=`echo $1 | cut -d= -f2`     
+  elif [ `echo $1 | cut -d= -f1` = "RUN_TYPE" ]; then
+    RUN_TYPE=`echo $1 | cut -d= -f2`     
+  elif [ `echo $1 | cut -d= -f1` = "NA" ]; then
+    NA=`echo $1 | cut -d= -f2`     
+  elif [ `echo $1 | cut -d= -f1` = "LC" ]; then
+    LC=`echo $1 | cut -d= -f2`     
+  elif [ `echo $1 | cut -d= -f1` = "T" ]; then
+    T=`echo $1 | cut -d= -f2`     
+  elif [ `echo $1 | cut -d= -f1` = "NA_CONC" ]; then
+    NA_CONC=`echo $1 | cut -d= -f2`
+  elif [ `echo $1 | cut -d= -f1` = "MG_CONC" ]; then
+    MG_CONC=`echo $1 | cut -d= -f2`     
+  elif [ `echo $1 | cut -d= -f1` = "P" ]; then
+    P=`echo $1 | cut -d= -f2`     
+  elif [ `echo $1 | cut -d= -f1` = "W" ]; then
+    W=`echo $1 | cut -d= -f2`     
+  elif [ `echo $1 | cut -d= -f1` = "MAXBP" ]; then
+    MAXBP=`echo $1 | cut -d= -f2`     
+  elif [ `echo $1 | cut -d= -f1` = "MAX" ]; then
+    MAX=`echo $1 | cut -d= -f2`     
+  elif [ `echo $1 | cut -d= -f1` = "MAX_LP" ]; then
+    MAX_LP=`echo $1 | cut -d= -f2`     
+  elif [ `echo $1 | cut -d= -f1` = "MAX_AS" ]; then
+    MAX_AS=`echo $1 | cut -d= -f2`     
+  elif [ `echo $1 | cut -d= -f1` = "ANN" ]; then
+    ANN=`echo $1 | cut -d= -f2`     
+  elif [ `echo $1 | cut -d= -f1` = "MODE" ]; then
+    MODE=`echo $1 | cut -d= -f2`     
+  elif [ `echo $1 | cut -d= -f1` = "LAB_FR" ]; then
+    LAB_FR=`echo $1 | cut -d= -f2`     
+  elif [ `echo $1 | cut -d= -f1` = "ROT_ANG" ]; then
+    ROT_ANG=`echo $1 | cut -d= -f2`     
+  elif [ `echo $1 | cut -d= -f1` = "START" ]; then
+    START=`echo $1 | cut -d= -f2`     
+  elif [ `echo $1 | cut -d= -f1` = "STOP" ]; then
+    STOP=`echo $1 | cut -d= -f2`     
+  elif [ `echo $1 | cut -d= -f1` = "REUSE" ]; then
+    REUSE=`echo $1 | cut -d= -f2`     
+  else
+    echo "Invalid entry: " $1 "on command line."    
+    exit
+  fi
+COUNT=`expr $COUNT - 1`
+shift
+done
+NA_CONC=${NA_CONC:-1.0}
+MG_CONC=${MG_CONC:-0.0}
+MAX_LP=${MAX_LP:-30}
+MAX_AS=${MAX_AS:-30}
+
+
+echo REUSE= $REUSE
+# Check for sequence
+if [ ! -s $SEQ ]; then
+  echo "Sequence has not been defined or it does not exist."
+  exit
+fi
+cp $SEQ .
+SEQ=`echo $SEQ|tr "/" "\012"|tail -1`
+NUM=`echo $SEQ | tr "." " " | wc | tr -s " " " " | cut -d" " -f3`
+SUFFIX=`echo $SEQ | cut -d"." -f$NUM`
+if [ $NUM -gt 1 -a $SUFFIX = seq ]; then
+  NUM=`expr $NUM - 1`
+  FILE_PREFIX=`echo $SEQ | cut -d"." -f1-$NUM`
+else
+  FILE_PREFIX=$SEQ
+fi
+
+#LOGFILE=/dev/null
+LOGFILE=$FILE_PREFIX.log
+
+# Create con file from aux file (for constrained folding)
+AUX=${AUX:-$FILE_PREFIX.aux}
+rm -f $FILE_PREFIX.con
+# Maximum range for base pairs
+if [ "$MAXBP" != "no limit" ]; then
+   echo -e "9\n" $MAXBP | tr -d " " >> $FILE_PREFIX.con
+fi
+if [ -s $AUX ]; then
+   echo "Constraint file is " $AUX
+#  Single force
+   grep F $AUX | tr "O" "0" | grep " 0 " | sed 's/F/2+/g' | \
+    sed 's/ 0 / /g' | tr "+" "\012" >> $FILE_PREFIX.con
+#  Double force
+   grep F $AUX | tr "O" "0" | grep -v " 0 " | sed 's/F/3+/g' | \
+    tr "+" "\012" >> $FILE_PREFIX.con
+#  Single prohibit
+   grep P $AUX | tr "O" "0" | grep " 0 " | sed 's/P/6+/g' | \
+    sed 's/ 0 / /g' | tr "+" "\012"  >> $FILE_PREFIX.con
+#  Double prohibit
+   grep P $AUX | tr "O" "0" | grep -v " 0 " | grep -v "-" | sed 's/P/7+/g' | \
+    tr "+" "\012" >> $FILE_PREFIX.con
+#  Range prohibit
+   grep P $AUX | grep "[0-9]-[0-9]" | tr "-" " " | sed 's/P/8+/g' | \
+    tr "+" "\012" >> $FILE_PREFIX.con
+fi
+
+# Write out sequence using 'auxgen'
+auxgen $FILE_PREFIX > $LOGFILE 2>&1 || abort "auxgen failed"
+echo $FILE_PREFIX.pnt "created."
+
+LENGTH=`grep "^#BASES= " $FILE_PREFIX.pnt | tr -d " " | cut -d= -f2`
+if [ $STOP -gt $LENGTH ]; then
+  STOP=$LENGTH
+fi
+if [ $START -lt 1 ]; then
+   START=1
+fi
+LENGTH=`expr $STOP - $START + 1`
+echo "Sequence length is" $LENGTH
+
+# Generate energy tables for temperature T
+# EXT is extension for energy file names
+# T=default means that T was not specified on the command line.
+# This yields version 3.0 energies at 37 degrees (.dat) for RNA
+VERSION=2.3
+if [ $T = default ]; then
+   T=37
+   if [ $NA = RNA ]; then
+      EXT=dat
+      VERSION=3.0
+   else
+      EXT=37
+   fi
+else
+   if [ $T -lt 0 ]; then
+      T=0
+   elif [ $T -gt 100 ]; then
+      T=100
+   fi
+   EXT=$T
+fi
+
+# Choose folding program
+if [ $LENGTH -le 800 ]; then
+  PROG=nafold2
+else
+  PROG=nafold
+fi
+if [ $PROG = nafold ]; then
+   SAV2PLOT=sav2plot
+   SAV2PNUM=sav2p-num
+else
+   SAV2PLOT=sav2plot2
+   SAV2PNUM=sav2p-num2
+fi
+ARG1=`echo $LC | cut -c1`
+ARG2=$RUN_TYPE
+
+if [ ! -s $FILE_PREFIX.sav -o $REUSE = NO ]; then
+
+if [ $EXT = dat ]; then
+   echo "Folding at 37 degrees using version 3.0 dat files."
+else
+newtemp >> $LOGFILE 2>&1 <<EOF || abort "newtemp failed"
+$NA
+$T
+$NA_CONC
+$MG_CONC
+EOF
+   if [ $NA = RNA ]; then
+      echo "RNA free energy files (version 2.3) at $T degrees created."
+   else
+      echo "DNA free energy files (version 3.0) at $T degrees created."
+   fi
+fi
+
+# Fold the sequence; creating a save file.
+# Skip this is the .sav file already exists.
+
+# First create a command file.
+cat > $FILE_PREFIX.cmd <<EOF
+1
+$FILE_PREFIX.sav
+$SEQ
+1
+$START
+$STOP
+asint1x2.$EXT
+asint2x3.$EXT
+dangle.$EXT
+loop.$EXT
+miscloop.$EXT
+sint2.$EXT
+sint4.$EXT
+sint6.$EXT
+stack.$EXT
+tloop.$EXT
+triloop.$EXT
+tstackh.$EXT
+tstacki.$EXT
+1
+7
+$MAX_LP
+8
+$MAX_AS
+
+EOF
+
+# Add constraints, if any.
+if [ -s $FILE_PREFIX.con ]; then
+   cat $FILE_PREFIX.con >> $FILE_PREFIX.cmd
+fi
+# Finish nafold command file.
+echo "10" >> $FILE_PREFIX.cmd
+
+$PROG $ARG1 $ARG2 < $FILE_PREFIX.cmd >>$LOGFILE 2>&1 || abort "Fill run failed"
+echo "Save file created using ${PROG}."
+if [ ! -s $FILE_PREFIX.sav ] ; then
+   abort "Save file is empty. No foldings."
+fi
+
+# End of REUSE=YES bypass
+fi
+
+# Create the ASCII KCAL plot file.
+# The energy increment, KCAL, should be (P * Vmin)/100
+
+# Run sav2plot2 program just to retrieve minimum
+# folding energy, ENERGY
+
+$SAV2PLOT > $FILE_PREFIX.tmp-log  <<EOF
+$FILE_PREFIX.sav
+$FILE_PREFIX.plot
+0
+1
+EOF
+
+# Get folding energy
+ENERGY=`cat $FILE_PREFIX.tmp-log | grep "vmin = " | fold -w 50 | cut -c7-14`
+EINT=`echo $ENERGY | tr -d "\-\."`  
+echo "Minimum folding energy is" $ENERGY "kcal/mole."
+
+
+# KCAL1=`expr \( $EINT \* $P \) / 1000`
+# KCAL2=`expr \( $EINT \* $P \) % 1000` 
+# 
+# if [ $KCAL2 -lt 10 ]
+#    then
+#    KCAL2=00$KCAL2
+# elif [ $KCAL2 -lt 100 ]
+#    then
+#    KCAL2=0$KCAL2
+# fi
+# 
+# if [ $KCAL1 -lt 1 ]
+#    then
+#    KCAL=1.0
+# elif [ $KCAL1 -gt 11 ]
+#    then
+#    KCAL=12.0
+# else
+#    KCAL=$KCAL1\.$KCAL2   
+# fi
+# echo "Energy increment is " $KCAL "kcal/mole."
+# 
+# rm -f $FILE_PREFIX.tmp-log
+# 
+# $SAV2PLOT >> $LOGFILE 2>&1 <<EOF || abort "Plot file generation failed"
+# $FILE_PREFIX.sav
+# $FILE_PREFIX.plot
+# $KCAL
+# 4
+# EOF
+# 
+# # Filter plot file. On 6/3/96, Zuker removes single base pairs only
+# FILTER=1
+# if [ $LENGTH -gt 100 ]; then
+#    FILTER=2
+#    filter-sort $FILE_PREFIX.plot $FILTER >> $LOGFILE 2>&1
+# fi
+# 
+# # Create the p-num file
+# $SAV2PNUM $FILTER >> $LOGFILE 2>&1 <<EOF || abort "P-num file not created"
+# $FILE_PREFIX.sav
+# $FILE_PREFIX.ann
+# $KCAL
+# EOF
+# 
+# # Run the h-num program.
+# 
+# h-num $FILE_PREFIX o >> $LOGFILE 2>&1 || abort "H-num file not created"
+# head -1 $FILE_PREFIX.h-num > temp1-$FILE_PREFIX
+# tail +2 $FILE_PREFIX.h-num | sort +4 > temp2-$FILE_PREFIX
+# cat temp1-$FILE_PREFIX temp2-$FILE_PREFIX > $FILE_PREFIX.h-num
+# rm -f temp1-$FILE_PREFIX temp2-$FILE_PREFIX 
+# echo "H-num file created from plot file."
+# 
+# # Create suboptimal foldings
+# if [ $W = -1 ]; then
+#  if [ $LENGTH -lt "30" ]
+#     then
+#     W="0"
+#  elif [ $LENGTH -lt "50" ]
+#     then
+#     W="1"
+#  elif [ $LENGTH -lt "120" ]
+#     then
+#     W="2"
+#  elif [ $LENGTH -lt "200" ]
+#     then
+#     W="3"
+#  elif [ $LENGTH -lt "300" ]
+#     then
+#     W="5"
+#  elif [ $LENGTH -lt "400" ]
+#     then
+#     W="7"
+#  elif [ $LENGTH -lt "500" ]
+#     then
+#     W="8"
+#  elif [ $LENGTH -lt "600" ]
+#     then
+#     W="10"
+#  elif [ $LENGTH -lt "700" ]
+#     then
+#     W="11"
+#  elif [ $LENGTH -lt "800" ]
+#     then
+#     W="12"
+#  elif [ $LENGTH -lt "1200" ]
+#     then
+#     W="15"
+#  elif [ $LENGTH -lt "2000" ]
+#     then
+#     W="20"
+#  else
+#     W="25"
+#  fi
+# fi 
+# 
+# if [ $RUN_TYPE = html ]; then
+#    OUT=out.html
+#    DET=det.html
+# else
+#    OUT=out
+#    DET=det
+# fi
+# $PROG $ARG1 $ARG2 >>$LOGFILE 2>&1 <<EOF || abort "Structures not computed"
+# 2
+# 1
+# $P
+# $MAX
+# $W
+# $FILE_PREFIX.sav
+# 
+# 
+# 
+# n
+# $FILE_PREFIX.$OUT
+# y
+# $FILE_PREFIX.ct
+# y
+# $FILE_PREFIX.$DET
+# EOF
+# 
+# # Compute enthalpies and add enthalpies, entropies and crude Tms to
+# # text and detailed output files.
+# 
+# if [ $EXT != dat -o $NA = DNA ]; then
+# 
+# if [ $NA = RNA ]; then
+#    DH=dh
+# else
+#    DH=dhd
+# fi
+# efn <<EOF > $FILE_PREFIX.dh 2>&1
+# $LC
+# $FILE_PREFIX.ct
+# n
+# n
+# asint1x2.$DH
+# asint2x3.$DH
+# dangle.$DH
+# loop.$DH
+# miscloop.$DH
+# sint2.$DH
+# sint4.$DH
+# sint6.$DH
+# stack.$DH
+# tloop.$DH
+# triloop.$DH
+# tstackh.$DH
+# tstacki.$DH
+# EOF
+# add-dHdSTm $FILE_PREFIX.$OUT $FILE_PREFIX.dh $T $RUN_TYPE >> $LOGFILE 2>&1
+# mv $FILE_PREFIX.dHdSTm $FILE_PREFIX.$OUT >> $LOGFILE 2>&1
+# add-dHdSTm $FILE_PREFIX.$DET $FILE_PREFIX.dh $T $RUN_TYPE >> $LOGFILE 2>&1
+# mv $FILE_PREFIX.dHdSTm $FILE_PREFIX.$DET >> $LOGFILE 2>&1
+# # Add nucleic acid type, temperature and salt conditions at top of file.
+# LorC=`echo $LC | tr "lc" "LC"`
+# if [ $RUN_TYPE = text ]; then
+#    HEADER=`echo -e "$LorC $NA folding at ${T}° C. [Na+] = $NA_CONC M, [Mg++] = $MG_CONC M.\n"`
+#    echo ${HEADER} > $FILE_PREFIX.temp
+#    cat $FILE_PREFIX.$OUT >> $FILE_PREFIX.temp
+#    mv $FILE_PREFIX.temp $FILE_PREFIX.$OUT
+#    echo ${HEADER} > $FILE_PREFIX.temp
+#    cat $FILE_PREFIX.$DET >> $FILE_PREFIX.temp
+#    mv $FILE_PREFIX.temp $FILE_PREFIX.$DET
+# else
+#    HEADER=`echo -e "$LorC $NA folding at ${T}° C. [Na<SUP>+</SUP>] = $NA_CONC M, [Mg<SUP>++</SUP>] = $MG_CONC M.\n"`
+#    head -1 $FILE_PREFIX.$OUT > $FILE_PREFIX.temp
+#    echo ${HEADER} >> $FILE_PREFIX.temp
+#    tail +1 $FILE_PREFIX.$OUT >> $FILE_PREFIX.temp
+#    mv $FILE_PREFIX.temp $FILE_PREFIX.$OUT
+#    head -1 $FILE_PREFIX.$DET > $FILE_PREFIX.temp
+#    echo ${HEADER} >> $FILE_PREFIX.temp
+#    tail +1 $FILE_PREFIX.$DET >> $FILE_PREFIX.temp
+#    mv $FILE_PREFIX.temp $FILE_PREFIX.$DET
+# fi
+# 
+# fi
+# 
+# # Create RNAML file
+# ct2rnaml $FILE_PREFIX.ct
+# 
+# # Create ss-count file.
+# ss-count < $FILE_PREFIX.ct > $FILE_PREFIX.ss-count
+# 
+# # Use lines mode for larger sequences, unless user overrides this.
+# if [ $MODE = auto ]; then
+#    if [ $LENGTH -lt 800 ]; then
+#       MODE=bases
+#    else
+#       MODE=lines
+#    fi
+#    if [ $MODE = bases ]; then
+#       ANN_TYPE=Both
+#    else
+#       ANN_TYPE=Dot
+#    fi
+# elif [ $MODE = bases ]; then
+#    ANN_TYPE=Character
+# else
+#    ANN_TYPE=Dot
+#    MODE=lines
+# fi
+# 
+# echo "Suboptimal foldings created."
+# 
+# # Generate a PostScript and gif energy dot plot.
+# SEQ_NAME=`grep "^Folding bases " $FILE_PREFIX.$OUT | head -1 |\
+#           tr -s " " " " | cut -d" " -f7-100`
+# boxplot_ng -d -c 4 -pg -r 72 -t "Fold of $SEQ_NAME at ${T}° C."\
+#           $FILE_PREFIX  >> $LOGFILE 2>&1 
+# echo "Energy dot plot created."
+# 
+# # Re-evaluate free energies using efn2 if using version 3 rules
+# if [ $EXT = dat -a $NA = RNA ]; then
+#    WDIR=`pwd`
+#    cut -c1-20 $FILE_PREFIX.ct | sed 's/  $/]  /' > $FILE_PREFIX-cut1.ct
+#    cut -c21-55 $FILE_PREFIX.ct > $FILE_PREFIX-cut2.ct
+#    paste $FILE_PREFIX-cut1.ct $FILE_PREFIX-cut2.ct | tr -d "\011" \
+#     | sed 's/= /= 0.0          [initially /' > $FILE_PREFIX-temp.ct
+#    if [ $WDIR != $LIBDIR ]; then
+#       cp $LIBDIR/*.dat .
+#    fi
+# # Split ct file into individual files.
+#    awk -f $LIBDIR/split_ct.awk $FILE_PREFIX-temp.ct $FILE_PREFIX-temp >> $LOGFILE 2>&1
+#    for i in ${FILE_PREFIX}-temp*.ct ; do
+#       j=`echo $i | sed 's/-temp//'`
+#       efn2 $i $j
+#    done
+#    if [ $WDIR != $LIBDIR ]; then
+#       \rm -f *.dat
+#    fi
+#    \rm -f $FILE_PREFIX-*.ct 
+#    cat $FILE_PREFIX.$OUT | sed 's/ dG =/ Initial dG =/' > $FILE_PREFIX-temp.$OUT
+#    mv $FILE_PREFIX-temp.$OUT $FILE_PREFIX.$OUT
+#    cat $FILE_PREFIX.$DET | sed 's/ dG =/ Initial dG =/' > $FILE_PREFIX-temp.$DET
+#    mv $FILE_PREFIX-temp.$DET $FILE_PREFIX.$DET
+#    echo "Free energies re-evaluated using efn2 and added to ct file."
+# else
+#    awk -f $LIBDIR/split_ct.awk $FILE_PREFIX.ct $FILE_PREFIX >> $LOGFILE 2>&1
+# fi
+# 
+# # Generate PostScript and gif output files for each folding
+# 
+# # Compute appropriate flags
+# # -t h added below by D.S on Oct 28, 1998 to create color annotation table
+# 
+# if [ $ANN = "None" ]; then
+#    FLAG=" "
+# elif [ $ANN = "p-num" ]; then
+#    if [ $ANN_TYPE = "Character" ]; then
+#       FLAG="-c -t h"
+#    elif [ $ANN_TYPE = "Dot" ]; then
+#       FLAG="-d -t h"
+#    else 
+#       FLAG="-c -d -t h"
+#    fi
+# elif [ $ANN = "ss-count" ]; then
+#    if [ $ANN_TYPE = "Character" ]; then
+#       FLAG="-c -n -t h"
+#    elif [ $ANN_TYPE = "Dot" ]; then
+#       FLAG="-d -n -t h"
+#    else 
+#       FLAG="-c -d -n -t h"
+#    fi
+# fi
+# 
+# # Determine labeling frequency
+# if [ $LAB_FR = default ] ; then
+#    if [ $LENGTH -le 50 ]; then
+#       LAB_FR=10
+#    elif [ $LENGTH -le 300 ]; then
+#       LAB_FR=20
+#    else
+#       LAB_FR=50
+#    fi
+# fi
+# 
+# GIFRES=72
+# for CTFILE in ${FILE_PREFIX}_*.ct ; do
+#    PREF=`echo $CTFILE | sed 's/.ct$//'`
+#    cat $LIBDIR/$MODE.nav | cut -d# -f1 | sed s/LAB_FR/$LAB_FR/ |\
+#     sed s/ROT_ANG/$ROT_ANG/ | naview.exe $CTFILE $PREF.plt2 >> $LOGFILE 2>&1
+#    plt22ps $FLAG $PREF.plt2 >> $LOGFILE 2>&1
+#    plt22gif $FLAG -r $GIFRES -x $PREF.plt2 >> $LOGFILE 2>&1
+#    genss $PREF.ct $PREF.plt2 $PREF.ss >> $LOGFILE 2>&1
+# done
+# 
+# echo "Structure plots generated."
+# 
+# if [ $RUN_TYPE = html ]; then
+# 
+#    NUM_FOLD=`grep STRUCTURE_ $FILE_PREFIX.out.html|wc|tr -s " " " "|\
+#              cut -d" " -f2`
+#    if [ $NUM_FOLD = 1 ]; then
+#       STRUCTURE=Structure
+#    else
+#       STRUCTURE=Structures
+#    fi
+#    YEAR=`date +%Y`
+#    echo "Creating html files."
+#    cat > $FILE_PREFIX.html <<EOF
+# <HTML><HEAD><TITLE>$NA folding results on $SEQ_NAME</TITLE></HEAD>
+# <BODY BGCOLOR=#DFC890 TEXT=#000000 VLINK=#2F4F4F LINK=#8E2323 ALINK=#00FFFF>
+# <FONT SIZE=2><I>mfold version 3.0</I> :
+# 1998-$YEAR, Michael Zuker, Rensselaer Polytechnic Institute<HR></FONT>
+# <CENTER><H1>Folding $SEQ_NAME at $T&#176; C. <FONT SIZE=2>($VERSION)</FONT><BR>
+# </H2></CENTER><B><HR SIZE=5><P><PRE>
+# EOF
+# 
+#    tail +3 $FILE_PREFIX.pnt >> $FILE_PREFIX.html
+#    echo "</PRE>" >> $FILE_PREFIX.html
+# 
+#    cat >> $FILE_PREFIX.html <<EOF
+#    <CENTER><IMG SRC=$IMG_DIR/Flower.gif ALT="flower" ALIGN=MIDDLE HSPACE=20>
+#    <FONT COLOR=#8E2323 SIZE=7><I><U>- Output -</U></I></FONT>
+#    <IMG SRC=$IMG_DIR/Flower.gif HSPACE=20 ALT="flower" ALIGN=MIDDLE>
+#    </CENTER><P><IMG SRC="$IMG_DIR/l_green.gif" ALT="-" HSPACE=10>
+#    The <I>energy dot plot</I> for $SEQ_NAME. 
+#    <A HREF="$LIBDIR/form1-doc.html#EDP">(<I>Definition</I>)</A><BR>
+#    File formats: <A HREF="$FILE_PREFIX.plot"> <I>Text</I>
+#    </A>,<A HREF="$FILE_PREFIX.ps"> <I>PostScript</I></A>,
+#    <A HREF="$FILE_PREFIX.gif"><I>gif</I></A><P>
+#    <IMG SRC="$IMG_DIR/l_green.gif" ALT="-" HSPACE=10> Computed $STRUCTURE: &nbsp; New <A HREF="$FILE_PREFIX.rnaml"><I>RNAML syntax</I></A>,
+#     &nbsp; <A HREF="$LIBDIR/formats.html">(<I>File Formats</I>)</A>
+# EOF
+# 
+#    NUM_FOLD=`grep STRUCTURE_ $FILE_PREFIX.out.html | wc | tr -s " " " " | cut -d" " -f2`
+#    if [ $NUM_FOLD = 1 ]; then
+#       STRUCTURE=Structure
+#    else
+#       STRUCTURE=Structures
+#    fi
+#    COUNT=0
+#    while [ $COUNT != $NUM_FOLD ]; do
+#       COUNT=`expr $COUNT + 1`
+#       echo "<P><IMG SRC=$IMG_DIR/green.gif ALT=->
+#       <A HREF=$FILE_PREFIX.out.html#STRUCTURE_$COUNT>Structure $COUNT</A> :" >> $FILE_PREFIX.html
+#       if [ $EXT = dat ]; then
+#          grep " dG =" ${FILE_PREFIX}_$COUNT.ct|tr -d "]"|tr -s " " " "|cut -d" " -f6-7|sed 's/\[initially/Initial dG =/'|sed 's@$@ kcal/mole,@' >> $FILE_PREFIX.html
+#       else
+#          grep " dG =" ${FILE_PREFIX}_$COUNT.ct|tr -d "]"|tr -s " " " "|cut -d" " -f3-5|sed 's@$@ kcal/mole,@' >> $FILE_PREFIX.html
+#       fi 
+#       echo "<A HREF=${FILE_PREFIX}.det.html#STRUCTURE_$COUNT>
+#       (<I>Thermodynamic Details</I>)</A>.<BR>Different structure file formats:
+#       <A HREF=${FILE_PREFIX}_$COUNT.ps><I>PostScript</I></A>,
+#       <A HREF=${FILE_PREFIX}_$COUNT.gif><I>gif</I></A>,
+#       <A HREF=${FILE_PREFIX}_$COUNT.ct><I>.ct file</I></A>,
+#       <A HREF=${FILE_PREFIX}_$COUNT.ss><I>XRNA ss</I></A>." >> $FILE_PREFIX.html
+#    done
+# 
+#    #Trailer
+#    DATE=`date +"%B %d, %Y."`
+#    TIME=`date +"%T %Z"`
+#    echo "<P> $DATE $TIME"  >> $FILE_PREFIX.html
+# 
+#    cat >> $FILE_PREFIX.html <<EOF
+#       <HR SIZE=5><BR><FONT SIZE=2><A HREF="$ZUKER_URL/">
+#      <IMG SRC="$LIBDIR/home.gif" BORDER=0 HSPACE=5>Zuker Home</A>
+#      <A HREF="$ZUKER_URL/rna/">
+#      <IMG SRC="$LIBDIR/rna.gif" BORDER=0 HSPACE=15>Zuker Lab</A>
+#      <A HREF="mailto:mfold@bioinfo.math.rpi.edu"><IMG SRC="$LIBDIR/mail.gif"
+#      BORDER=0 HSPACE=15><I>Zuker Lab</I></A>
+#      <A HREF="$LIBDIR/mfold-server-credit.gif">
+#      <IMG SRC="$LIBDIR/mfold-server-credit-sm.gif" BORDER=0 HSPACE=15>
+#      Credit</A></FONT><HR NOSHADE></BODY></HTML>
+# EOF
+# fi
+# 
+# Cleanup
+\rm -f mfold.log  fort.*
+WDIR=`pwd`
+if [ $WDIR != $LIBDIR -o $EXT != dat ]; then
+   \rm -f *.$EXT
+fi
+
+echo "All done."
+

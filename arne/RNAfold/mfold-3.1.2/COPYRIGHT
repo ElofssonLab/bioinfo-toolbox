@@ -1,0 +1,39 @@
+           ___     __   __                   _             ____  ___  
+    __ _  / _/__  / /__/ / _  _____ _______ (_)__  ___    |_  / / _ \ 
+   /  ' \/ _/ _ \/ / _  / | |/ / -_) __(_-</ / _ \/ _ \  _/_ <_/ // / 
+  /_/_/_/_/ \___/_/\_,_/  |___/\__/_/ /___/_/\___/_//_/ /____(_)___/  
+ 
+  The RNA and DNA folding package, 'mfold', referred to also as MFOLD,
+  mulfold, xmfold and other related names, is the creation of
+  Dr. Michael Zuker of the Institute for Biomedical Computing,
+  Washington University School of Medicine.
+                                                                            
+ © Copyright 1998-  Washington University, St. Louis, MO
+ All rights reserved under the copyright laws of the United States.         
+                                                                            
+1. This software or any copies of it may not be provided or otherwise
+made available to any other person or institute except as described in
+the license agreement.  No title to or ownership of the software is
+hereby transferred.
+                                                   
+2. Source code has been provided to facilitate the use of this
+software on a variety of platforms. The licensee may not alter the
+code except for minor changes as necessary to correct bugs or compiler
+specific problems.
+
+3. The information in this software is subject to change without
+notice and should not be construed as a commitment by the owners. We
+assume no responsibility for the use or inability to use any of our
+software.  This software is provided "as is" and any express or
+implied warranties, including, but not limited to, the implied
+warranties of merchantability and fitness for a particular purpose are
+disclaimed.  In no event shall Washington University or the authors be
+liable for any direct, indirect, incidental, special, exemplary, or
+consequential damages (including, but not limited to, procurement of
+substitute goods or services; loss of use, data, or profits; or
+business interruption) however caused and on any theory of liability,
+whether in contract, strict liability, or tort (including negligence
+or otherwise) arising in any way out of the use of this software, even
+if advised of the possibility of such damage.
+
+                     _____________________________

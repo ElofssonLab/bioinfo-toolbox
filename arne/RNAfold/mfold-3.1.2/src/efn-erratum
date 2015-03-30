@@ -1,0 +1,32 @@
+612c612
+<       integer e(4)
+---
+>       integer e(4),strand,d3,d5
+634,647c634,645
+<       if (size.lt.20) then
+<          k = i + 1
+<          do while (k.lt.j)
+<             if (seq(hstnum(k)).eq.'L') then
+< c           Treat as a dimer - done for John SantaLucia
+<                erg4 = eparam(15) + au_pen(i,j)
+<                if (seq(hstnum(i+1)).ne.'L') erg4 = erg4 + 
+<      .              dangle(numseq(i),numseq(j),numseq(i+1),1)
+<                if (seq(hstnum(j-1)).ne.'L') erg4 = erg4 + 
+<      .              dangle(numseq(i),numseq(j),numseq(j-1),2)
+<                return
+<             endif
+<             k = k + 1
+<          enddo
+---
+>       strand = 0
+>       do k=i+1,j-1
+>          if (seq(hstnum(k)).eq.'L') strand = strand + 1
+>       enddo
+>       if (strand.eq.3) then
+> c        Treat as a dimer - done for John SantaLucia (and hybridization server)
+>          erg4 = eparam(15) + au_pen(i,j)
+>          d3 = dangle(numseq(i),numseq(j),numseq(i+1),1)
+>          if (seq(hstnum(i+1)).ne.'L'.and.d3.lt.0) erg4 = erg4 + d3
+>          d5 = dangle(numseq(i),numseq(j),numseq(j-1),2)
+>          if (seq(hstnum(j-1)).ne.'L'.and.d5.lt.0) erg4 = erg4 + d5
+>          return

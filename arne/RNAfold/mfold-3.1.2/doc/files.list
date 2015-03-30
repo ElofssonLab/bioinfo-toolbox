@@ -1,0 +1,190 @@
+                           Directory of files
+
+NB: All information on the energy files is at the end of this file.
+
+    Suboptimal RNA/DNA folding package - M. Zuker and D. H. Turner
+
+                             Version 3.0
+
+Makefile - Standard UNIX makefile for RNA folding programs. 
+
+auto_ct2ps - The script takes a .ct file, splits it into single structure
+             files, and runs 'naview' and 'plt22ps' on each one to
+             produce (multiple) PostScript files. Uses one of the .nav
+             files copied from mfold-3.0/dat into $MFOLDLIB.
+
+batgen - This program creates input files for RNA folding. (source is
+         batgen.f) This is an obsolete program that is used directly
+         with nafold. It has some bugs in it when complicated
+         constraints are requested.
+
+begin.dat - Displays program name and version.
+
+begin2.dat - Displays author and reference information.
+
+bpin.f - Source code for a subroutine used by 'distance'. 
+
+bpsrch.f - Source code for a subroutine used by 'distance'.
+
+ct_compare - This program compares one secondary structure with a 
+             group of others. Similar to 'scorer'.
+
+ct_compare.f - Source code for ct_compare.
+
+ct2bp - Program that converts a ct file into the "Madison Format"
+        See: http://bioinfo.math.rpi.edu/~zukerm/rna/formats.html#BP
+        and
+        http://bioinfo.math.rpi.edu/~zukerm/rna/Madison.html
+        (source is ct2bp.f)
+
+ct_gcg.f - This file contains an alternte for of the ct subroutine
+           in misc.f . This alternate generates ct files that
+           can be read directly by GCG software.
+
+distance.f - This program reads a ct file containing between 2 and 15
+             structures and computes the distance between the first
+             and all the rest or else the distance between all pairs.
+
+efn - An independent program to compute the energies of foldings
+      using a ct file as input. This program requires energy table
+      input. The output consists of the computed energy of each
+      folding found in the input ct file. Text  output and/or
+      energy detail output are options. (source is efn.f and efn.inc)
+
+efn2 - Similar to efn, except that this program re-evaluates the
+       free energies of foldings using more realistic rules: coaxial
+       stacking of adjacent helices and Jacobson-Stockmeyer theory
+       for multi-branch loops. Source in c++ directory.
+
+errata3.list - List of errata found in version 3 folding programs  
+               with dates.
+
+filter-sort - A script that removes all helices containing fewer than
+              $1 base pairs (default = 3 for segments > 100) from a 
+              .plot file. No optimal helices are removed. The original 
+              file is overwritten!
+
+formid.f - Source code for formid. This subroutine reads and interprets
+           sequence data.
+
+getseq.f - Almost the same as formid.f. Used with batgen.
+
+h-num - A script that takes a .plot file containing optimal and
+        suboptimal helices and replaces the 'energy' value by
+        the 'h-num' value. Records are sorted in order of increasing
+        h-num, ie, from 'best-determined' to 'worst-determined'.
+        Uses h-num.exe, which is created from h-num.f.
+
+manual.ps - A somewhat updated version of :
+            M. Zuker, D.H. Mathews and D.H. Turner
+            Algorithms and Thermodynamics for RNA Secondary Structure 
+            Prediction: A Practical Guide.
+            In: RNA Biochemistry and Biotechnology, J. Barcisszewski
+            and B.F.C. Clark, eds., NATO ASI Series
+            Kluwer Academic Publishers, 1999.
+
+manual-html - Directory containing an html version of manual.ps
+
+mfold - This script runs "newtemp" to create energy tables (for
+        version 2.3 rules only), and then runs nafold and other
+        program to create the entire output.
+
+misc.f - Miscellaneous subroutines for both the linear and circular
+         versions of the folding program.
+
+multid.f - This subroutine reads and interprets sequence data. It
+           differs from formid in that it automatically returns
+           one sequence after another to the calling routine instead
+           of requesting a sequence number of identifier. 
+
+naview - Program to read in a .ct file from a folding program and
+         to create a device independent plot file (.plt2) for plotting
+         the structure in the file. (source naview.c)
+         Included with the permission of R.E. (Bob) Bruccoleri:
+         An improved algorithm for nucleic acid secondary structure display. 
+         R.E. Bruccoleri and G. Heinrich 
+         Comput Appl Biosci 4: 167-73 (1988) 
+         This program has been altered by M. Zuker and D. Stewart
+
+newtemp - This program reads the 37° free energy files : asint1x2.dg, 
+          asint2x3.dg, dangle.dg, loop.dg, miscloop.dg, sint2.dg, sint4.dg, 
+          sint6.dg, stack.dg, tloop.dg, triloop.dg, tstackh.dg, tstacki.dg;
+          as well as the correspondinf enthalpy files (.dh).
+          It computes new energy files for folding at any
+          user defined temperature between 0 and 100°.
+          The output files are labelled with the appropriate
+          temperature. For example, if 25°. is selected, the
+          output energy files will be named: asint2x3.25, dangle.25, 
+          loop.25, miscloop.25, sint2.25 etc. For DNA, the suffix would
+          be '25d' instead of '25', and the input files would end with
+          .dgd and .dhd instead of .dg and .dh, respectively.
+          (source is newtemp.f)
+
+plt22ps - This program creates PostScript output from naview plt2 files.
+          (source is plt22ps.c & plt22gif_or_ps.h)
+
+rna.f - Source code for important routines of nafold, the main
+        program of mfold
+
+rna.inc - An include file for rna.f
+
+scorer - A program to count consevered helices between a reference folding
+         and other (computed) foldings. Similar to ct_compare.
+
+sort.f - Source code for the sorting subroutines of folding program.
+         Used to sort base pairs from optimal to increasingly suboptimal
+         for automatic traceback procedure.
+
+sav2p-num - Takes a "sav" file and creates a p-num file (.ann)
+
+sav2plot - Takes a "sav" file and creates a plot file (.plot)
+
+                  __________________________________________
+
+
+                       Free Energy and Enthalpy Data
+
+mfold version 3.0 uses new free energy rules. Unfortunately, they are
+available only at 37° C. These data are stored in the following
+files:
+
+asint1x2.dat - free energies for 1x2 asymmetric interior loops
+asint2x3.dat - free energies for 2x3 asymmetric interior loops
+dangle.dat - single base stacking free energies
+loop.dat - entropic component for internal, bulge and hairpin loops.
+miscloop.dat - Miscellaneous loop file. Contains :
+               1. Extrapolation for large loops based on polymer theory
+               2. Asymmetric internal loop correction parameters.
+               3. Paremeters for multibranch loops
+               4. Paremeters for multibranch loops (for efn2 only)
+               5. Terminal AU or GU penalty
+               6. Bonus for GGG hairpin
+               7. C hairpin rules: a) slope  b) intercept c) value for size 3
+               8. Intermolecular initiation free energy
+               9. GAIL Rule (Grossly Asymmetric Interior Loop Rule) (on or off)
+sint2.dat - free energies for 1x1 symmetric interior loops
+sint4.dat - free energies for 2x2 symmetric interior loops
+sint6.dat - free energies for 3x3 symmetric interior loops
+stack.dat - free energies for base pair stacking
+tloop.dat - free energies for distinguished tetraloops
+triloop.dat - free energies for distinguished triloops
+tstackh.dat - free energies for terminal mismatch stacking in hairpin loops
+tstacki.dat - free energies for terminal mismatch stacking in internal loops
+
+Of these, asint1x2.dat, asint2x3.dat, sint2.dat, sint4.dat, sint6.dat and
+triloop.dat are new to version 3.0. The tloop.dat file now contains
+information on the closing base pair, and the miscloop.dat file has
+been expanded. Both asint2x3.dat and sint6.dat are not used since at
+present we do not have sufficient data for them. 
+
+Because the energy "dat" files are available only at 37° C, we have
+retained the version 2.3 rules for folding both DNA and RNA at
+arbitrary temperatures. The version 2.3 data are stored in energy
+files with suffixes "dg" (free energies at 37°) and "dh"
+(enthalpies; assumed constant over the range 0-100°). The "newtemp"
+program works with these files. When the mfold script is used, the
+version 3.0 rules will be used by default for folding RNA, as long as
+the entry 'T=37' DOES NOT appear on the command line. If 'T=37'
+appears on the command line, then version 2.3 rules will be used. Of
+course, when DNA is folded, or when a temperature other than 37° is
+requested, version 2.3 rules will be used.

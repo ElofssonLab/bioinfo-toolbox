@@ -1,0 +1,14 @@
+
+bin/histo.pl joined.txt > histo.txt
+
+gawk '{print $2,$3,$17,$18,$19}' joined.txt | sort -n -k +3 | grep -v GFP > RNAfold.txt
+
+bin/max.pl RNAfold.txt > max.txt
+
+
+GNUPLOT:
+ set xlabel "Kcal/Mol"
+ set ylabel "mg/L"
+
+
+plot "histo.txt" using 1:3 with lines title "Max", "RNAfold.txt" using 3:2 title "Expression", "histo.txt" using 1:2 with lines title "Average"

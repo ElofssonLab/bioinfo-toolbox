@@ -1,0 +1,186 @@
+Documentation for plt22gif.c
+
+plt22gif.c
+
+
+Darrin Stewart  and Michael Zuker
+June 10, 1998 
+
+The program is similar to plt22ps.c
+The documentation is similar to plt22ps.doc
+
+execute with plt22gif name 
+                                      
+  name is a plt2 file that already exists
+  The program will add .plt2 if necessary
+
+For annotating the dots or characters based on the files
+name.ann or name.ss-count,
+
+Use:       plt22gif 'name'.plt2                               ]
+[        Where 'name'.plt2 is a plt2 file                     ]
+[        and 'name'.ann exists for -c or -d and is a p-num    ]
+[        (default) or a probability annotation file (see -q   ]
+[        flag below).                                         ]
+[        If -n flag is used, the file 'name'.ss-count is used ]
+[        instead of 'name'.ann                     
+
+
+  Valid lower case parameters
+  
+ -a name2      Specify alternate name for annotation file with -c or -d,
+         .ann or .ss-count extensions will be appended.
+ 
+ -b   enables transparent background for GIF files                             
+ -c           Use colored bases for annotation               
+ -d           Use colored dots for annotation                
+ -n           read ss-count file, default is                 
+                   .ann for -c or -d option above        
+
+ -o name.out                  
+     gif file named name.out.gif 
+     Default is name.gif 
+     The default name is produced from name.plt2 by removing the .plt2 
+
+ -p
+     forces portrait mode 
+     The default is to guess between portrait and landscape  by reading 
+     the file and determining which direction works better.
+
+
+ -q   read probability annotation file,              
+     default is 'name'_k.ann, then name.ann     
+     for -c -d option above 
+
+
+ -r resolution 
+    resolution is an integer value between 20 and 400 
+    Small values do not look as good, but large ones can produce files 
+    that are too big. 
+    The default value is 72 
+    Multiply resolution by 8.5 for width, by 11 for height of gif */
+     or vice versa if in landscape mode */
+       72  for    612 x  792 GIF */
+      110  for    935 x 1210 GIF */
+      200  for   1700 x 2200 GIF */
+      300  for   2550 x 3300 GIF */
+ 
+ -s  
+    Saves the tgd file. 
+    To customize a gif slightly.
+    Edit this file, run tgd on it.  Then delete it.
+
+
+ -t h
+ -t g
+      For annotation,
+      Create html or gif color table with -c or -d option.
+      The color table is specific to the given .ann or .ss-count file.
+      Name is name.ann.col.html or name.ss-count.col.html or
+              name.ss-count.col.gif or name.ss-count.col.gif
+      (gif option of .ann not created yet)
+      (This option does not work with -q, try the program color_table.)
+      The file will not be created if it already exists.
+ -x 
+    create a file named name.gif2bp or name_out.gif2bp
+    This lists the locations of the basepairs, (dots, midpoint of line),
+    within the gif image.
+    The origin is upper left, with x across and y down.
+    record consists of:
+    x_location y_location base_1 base_2
+    All are integers.
+    gif2bp.pl can use this program. See gif2bp.doc
+    See below for more information.    
+                                      
+ -z s x y   zoom with scale s > 0.0 and                    ]
+[              integers x,y at the center 
+
+The program assumes naview is run with 21.59 27.94 as input for size of page.
+
+See auto_ct2ps of mfold-3.0 for the usual execution.
+ 
+ Note:  The file name must be the last parameter 
+ Other parameters will be searched for and processed whenever found 
+ Invalid parameters will probably be ignored and default values used 
+ ----------------------------------------------------------- 
+
+ For GIF files, this program creates a temporary file name.temp.tgd 
+ The program runs tgd name.temp.tgd to convert name.temp.tgd 
+ into a gif file */
+ If there is an error, name.temp.tgd may need to be deleted. */
+
+ To compile cc -o plt22gif plt22gif.c -lm 
+
+
+
+For the -x option to work:
+The plt2 file must contain:
+  1.  a)    CM BASE PAIRING LINES WITH BASE PAIRS (occurs exactly once)
+      c)     MOV  real_number real_number i j ( occurs multiple times)
+      d)     CIA  0.0                     ( as a pair)
+        or 
+             LI real_number real_number i j (occurs multiple times )
+      h)  Some comment CM indicating the end of the basepairs.
+
+
+The CM comments are essential.  When 1.a) is encountered, each circle or
+line will be plotted and the .gif2bp file will be appended with x y i j
+where x y are the location in pixels of the center of the segment or circle
+representing basepair i j.
+
+
+The name.gif2bp file contains:
+max_dis
+x y base_i base_j (occurs number_basepairs times)
+
+where max_dis is the maximum distance in pixels from the center x,y
+of a basepair that a user can click and expect to be told that
+base i pairs with base j when viewing the gif file name.gif
+max_dis has been multiplied by -1
+The rest of the file has been sorted.
+
+
+
+
+____________________________________________________________________
+
+
+-z   s  x  y
+      Given a location (x,y) in the original image, create
+      a new image with data from location (x,y) in the center
+      scaled by s.  (s=1 can be used to shift the image)
+      ( s=2 will double the size of the basepair dots in the region)
+      ( s=.5 will make the dots half as big).
+      (using -z 1 hor_size/2 vert_size/2 will produce the original image.)
+      The original image has 0,0 as the upper left
+      with x increasing across and y increasing down.
+      The image is then scaled by s.  
+      It is intended that an image is produced without the -z
+      The program is then run again based on a (x,y) pixel point specified
+      The -r value should be the same on both runs.
+      s should be a floating point value greater than zero and less
+      than 100.  
+      The image size will be the same in both instances.
+      x and y are integers >=0 and < image size in the appropriate
+      directions.
+
+Sample Run:
+
+plt22gif -z 2.0 319 514 trna_2
+
+
+
+
+
+
+
+__________________________________________________________________
+
+
+Files used:
+plt22gif.c        Main source code.
+color_ann.h        Defines annotation colors.
+plt22gif_or_ps.h  More color setup and opening of files.
+copyright_gif.h   For copyright in corner
+Makefile          The makefile
+

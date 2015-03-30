@@ -1,0 +1,222 @@
+Documentation for boxplot_ng Version 2.0
+Feb 5, 1999
+
+Darrin Stewart  Michael Zuker
+
+boxplot_ng.c 
+
+compile with make -f Makefile_ng
+
+Required files:
+boxplot_ng.doc         This file
+boxplot_ng.c           Source code
+boxplot_setcolor.inc   Reads color file
+boxplot.col            A list of colors to use. (See below)
+Makefile_ng            The make file
+
+Input:  a plot file
+Output: Postscript (.ps) or gif (.gif) files
+
+
+At run time boxplot.col is searched for within:
+1.  The current working directory.
+2.  The path given in the environmental variable MFOLDLIB
+3.  /dat within the path given by the environmental variable MFOLD
+
+
+execute with:
+
+ boxplot_ng name.plot 
+                                       
+ 
+name.plot is any plot file that already exists.
+The .plot portion is optional and will be added if omitted.  
+Whenever parameters are used,
+name.plot must be the last parameter!
+
+
+ Valid lower case parameters  (no upper case parameters are recognized. )
+
+ -b
+     Enables transparent background for GIF files.
+
+ -c colors 
+     Colors is an integer from 4 to 7 
+     Default value is 4 
+
+ -d  i j
+     (Obscure Option) This option creates a file name.gifdat that contains
+     resolution,left,top,step_x,step_y,farthest_base,display_l,display_t
+      for zooming on gif images being displayed on the WEB.
+     left is location of left border of gif.
+     top is location of top border of gif.
+     step_x is pixels per basepair dot horizontally.
+     step_y is pixels per basepair dot vertically.
+     farthest base is the label on the top right corner.
+     display_l is leftmost value on displayed horizontal axis
+     display_t is smallest value on displayed vertical axis
+
+ 
+-f filter 
+      Filter is an integer 
+      Helices with length greater than or equal to filter will be displayed 
+      Default value is 1. 
+      This option is not valid for probability files. 
+-g
+      indicates to create a GIF file. (tgd must exist for this to work.)
+      default is a postscript file
+
+-go   No grid lines.
+
+-i increment 
+      For energy plot files: 
+      Increment is a floating point number with one digit right of the decimal 
+      point.  Positive values will be added to the optimal energy and 
+      energies within the range will be displayed. 
+      Negative values will be used as an absolute cutoff. 
+      valid values are 5.1 3.0   or -113.5  
+      values refer to Kcal/mole 
+      The Default value is the worst energy in the file. 
+
+      For probability plot files:
+      Increment  is a floating point number with 3 digits
+      right of the decimal point 0.000 to 1.000 are allowed.
+ 
+ -l  i j
+     Label the point i,j in the gif or postscript image and create a file
+     name.gifeng  that gives the energy at i,j;
+
+
+ -o out-name
+      Creates a postscript file out-name.ps or gif file out-name.gif
+      The default name is produced from name.plot by removing the .plot
+      and adding .gif or .ps  
+
+ -p   Treat the plot file as a probability, default is an energy file.
+
+ -pg  
+      Create both a postscript file and a gif file for output.
+      It should be faster to create both at once, than to
+      run the program once for each type of file.
+
+ -r resolution
+      Resolution is an integer value of 72,110,200, or 300 
+      The default value is 72 
+      Multiply resolution by 8.5 for width and  by 11 for height of gif 
+        72  for   612 x  792 GIF 
+        110 for   935 x 1210 GIF 
+        200 for  1700 x 2200 GIF 
+        300 for  2550 x 3300 GIF 
+      Resolutions from 50 to 400 will work 
+      resolution is valid only for GIF files.
+
+-s   
+     Save the tgd file for editing.
+     (Please delete it when finished.)
+
+-t "This is the Title"
+     This creates a title for the top of the postscript or gif file.
+     The quotation marks are required. (60 characters maximum)
+
+
+-z left right top bottom */
+      left right top and bottom are integers specifying the boundaries of 
+      a  zoom region.  Some care is made by the program to make the region 
+      valid.  Regions below the main diagonal may be adjusted.
+      The default value is no zoom.
+-------------------------------------------------------------- 
+                       
+ Note:  The plot file name must be the last parameter. 
+ Other parameters will be searched for and processed whenever found. 
+ Invalid parameters will probably be ignored and default values used. 
+ ----------------------------------------------------------- 
+
+ The plot file may contain  energies or probabilities 
+
+ For GIF files, this program creates a temporary file name.tgd 
+ The program runs tgd name.tgd to convert name.tgd into a gif file. 
+ name.tgd may need to be deleted if an error occurs.
+
+ Examples:
+ ms2.plot is an energy plot file.
+ prob.plot is a probability plot file.
+
+GIF:  (Requires tgd executable code see below)
+
+1.  boxpot_ng -g  -o dot ms2
+Creates a 72 resolution dot.gif of ms2.plot in 4 colors, with filter of 1,
+ and displays the entire region.  All helices are displayed.
+
+2.  boxplot_ng -g -r 100 -c 5 -f 4 -z 1565 1728 1555 1632 ms2.plot
+Creates 100 resolution ms2.gif in 5 colors with a filter of 4 and shows
+the zoom region from column 1565 to 1728 and rows 1555 to 1632.
+
+3.  boxplot_ng -g -i 5.5 -z 100 200 50 200 ms2
+Creates a 72 resolution ms2.gif in 4 colors from columns 100 to 200 and
+rows 50 to 200.  All helices from -1126.1 to -1120.6 will be displayed.
+
+4.  boxplot_ng -g -i -1120.6 -z 100 200 50 200 ms2.plot
+Same as #3.
+
+5.  boxplot_ng -p -g -i .30 -z 1 300 5 450 prob.plot
+Creates a prob.gif displaying all helices with probability greater than
+ or equal to .30  The displayed region is columns 1 to 300 and rows 1 to 300.
+The extra space described by the 450 below the main diagonal is not shown.
+
+6.  boxplot_ng -p -g -i .80 -z prob
+Creates a prob.gif displaying all helices with probability greater
+ than or equal to .80
+
+7.  boxplot_ng -p -b -g -t "Nice gif" prob.plot
+Creates a gif named prob.gif with a title of Nice gif and
+a transparent background.
+
+
+Postscript:
+1.  boxpot_ng -o dot -c 6 ms2.plot  
+Creates a postscript file dot.ps in 6 colors and displays the entire region.
+All helices are displayed.
+ 
+2.  boxplot_ng -p prob
+Creates a postscript file prob.ps for the probability file prob.plot
+with 4 colors.  The entire region is shown. 
+
+10.  boxplot_ng -p -t "Nice Postscript" prob.plot
+Creates a postscript named prob.ps with title: Nice Postscript.
+
+11.  boxplot_ng -r 100 -c 5 -f 4 -z 1565 1728 1555 1632 ms2.plot
+Creates 100 resolution ms2.ps in 5 colors with a filter of 4 and shows
+the zoom region from column 1565 to 1728 and rows 1555 to 1632.
+
+12.  boxplot_ng -i 5.5 -z 100 200 50 200 ms2.plot
+Creates a postscript file ms2.ps in 4 colors from columns 100 to 200 and
+rows 50 to 200.  All helices with energy -1126.1 to -1120.6 kcal/mole 
+will be displayed.
+
+
+
+Edit boxplot.col to change colors, or adjust colors used for ranges 
+of probabilities in probability plot files.
+
+About tgd:
+This product was used in creating the GIF files.       
+tgd is a text based tool for creating and manipulating Gif
+images that was written by Bradly K. Sherman with
+credit to the Dendrome project, Institute of
+Forest Genetics, USDA Forest Service.
+More can be found at
+ http://s27w007.pswfs.gov/tgd/tgd.html
+Sherman's product uses gd1.2 by Thomas Boutell of
+Quest Protein Database Center, Cold Spring Harbor Labs.
+See tgd/tgd1.2c/gd1.2/README or www.boutell.com for
+more information.
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,220 @@
+<TITLE></TITLE>
+<HEAD><TITLE>mfold Documentation</TITLE></HEAD>
+
+<BODY BGCOLOR=#527F76 TEXT=#D8D8BF LINK=#ff8080 VLINK=#ffff80>
+
+&#169; Copyright 1996, Michael Zuker, Washington University School of Medicine
+<HR>
+
+<DL><A NAME=PERCENT><DT> 
+<IMG SRC="l_green.gif" HSPACE=10>
+<FONT SIZE=5><I>Percent suboptimality</I></FONT></A>
+
+<DD> If this number is set to <I>p</I>, then only foldings within
+<I>p%</I> from the minimum free energy will be computed. The <I>energy
+dot plot</I> contains the superposition of all possible foldings
+within <I>p%</I> of the minimum energy. An energy increment of <B>less
+than</B> 1 kcal/mole is rounded up to 1 kcal/mole.  Similarly, an
+increment of more than 12.0 kcal/mole is rounded down to 12.0
+kcal/mole.
+
+<HR SIZE=2 NOSHADE> <P>
+
+<A NAME=EDP><DT> 
+<IMG SRC="l_cyan.gif" HSPACE=10><FONT SIZE=5><I>Energy dot plot</I></FONT></A>
+
+<DD> In the upper triangular region, a dot in row <I>i</I> and column
+<I>j</I> represents a base pair between the <I>i<SUP>th</SUP></I> and
+<I>j<SUP>th</SUP></I> bases. The black dots represent all the optimal
+foldings. The colored, smaller dots represent the superposition of all
+possible suboptimal foldings within <I>p%</I> of the minimum free
+energy, where <I>p</I> is the maximium percent deviation from the
+minimum free energy. The color ranges are red, blue and yellow;
+representing base pairs that are in foldings within <I>p/3%</I>,
+<I>2p/3%</I> and <I>p%</I> of the minimum free energy,
+respectively. Thus the yellow dots represent base pairs that are least
+likely to form.
+
+<HR SIZE=2 NOSHADE> <P>
+
+<A NAME=MAX_FOLDS><DT> 
+<IMG SRC="l_purple.gif" HSPACE=10>
+<FONT SIZE=5><I>Maximium number of foldings</I></FONT></A>
+
+<DD> The <I>upper bound</I> on the number of foldings that are
+computed is not necessary. The folding algorithm automatically
+computes a selection of secondary structures within the prescribed
+energy increment and stops when no more <I>sufficiently different</I>
+foldings can be found.  See also the definition of the <I>window</I>
+parameter <A HREF="#WINDOW">(below)</A>.
+<HR SIZE=2 NOSHADE> <P>
+
+<A NAME=GIFRES><DT> 
+<IMG SRC="l_blue.gif" HSPACE=10>
+<FONT SIZE=5><I>Image resolution - gif files</I></FONT></A>
+
+<DD> The default value of 72 pixels per inch (Low) gives images that
+are very good for relatively short sequences. Longer sequences with
+complicated folds require higher resolution. The resolution option
+now computes gif images faster than before using custom software
+that in turn uses Bradley Sherman's <B>tgd</B> package which itself is
+based on Tom Boutell's <B>gd</B> gif-manipulating library. 
+<HR SIZE=2 NOSHADE> <P>
+
+<A NAME=MODE><DT> 
+<IMG SRC="l_red.gif" HSPACE=10>
+<FONT SIZE=5><I>Structure format</I></FONT></A>
+
+<DD> The PostScript and gif plots of secondary structure have 2 formats.
+In the first format, individual bases are shown and base pairs are
+depicted by colored dots. This is the "Bases" option. Otherwise, only
+an outline of the secondary structure is drawn, and base pairs become
+colored line segments. This is the "Outline" option. The default
+"Automatic" option draws bases when sequence length is less than 800,
+and an outline otherwise.
+
+<HR SIZE=2 NOSHADE> <P>
+
+<A NAME=LAB_FR><DT> 
+<IMG SRC="l_grey.gif" HSPACE=10>
+<FONT SIZE=5><I>Structure numbering frequency</I></FONT></A>
+
+<DD> Individual structures are numbered, starting at some number
+<B>N</B>, and continuing with every multiple of <B>N</B>. When
+<B>N</B>=0, there is no structure numbering. If the user does not
+choose a value, it will be taken from the table below.
+ <P>
+<CENTER><TABLE BORDER=3	 CELLSPACING=3 CELLPADDING=3>
+<CAPTION ALIGN=BOTTOM><I>Default numbering increment for structures.
+</I></CAPTION>
+<TR><TH ALIGN=CENTER BGCOLOR="#808000">Sequence length    </TD>
+    <TH ALIGN=CENTER BGCOLOR="#008080">Numbering increment</TD></TR>
+<TR><TD ALIGN=CENTER>      1-50 </TD><TD ALIGN=CENTER> 10  </TD></TR>
+<TR><TD ALIGN=CENTER>    51-300 </TD><TD ALIGN=CENTER> 20  </TD></TR>
+<TR><TD ALIGN=CENTER> &gt;  300 </TD><TD ALIGN=CENTER> 50  </TD></TR>
+</TABLE></CENTER>
+
+<HR SIZE=2 NOSHADE> <P>
+
+<A NAME=ROT_ANG><DT> 
+<IMG SRC="l_brown.gif" HSPACE=10>
+<FONT SIZE=5><I>Structure rotation</I></FONT></A>
+
+<DD> Plotted structures may be rotated through a user selected angle (in degrees). The default value is 0, and entries between ±360 are acceptable. The default value of 0 always places a closing stem in a vertical orientation, with the closing base pair at the bottom.
+
+<HR SIZE=2 NOSHADE> <P>
+
+<A NAME=ANN><DT> 
+<IMG SRC="l_yellow.gif" HSPACE=10>
+<FONT SIZE=5><I>Structure annotation</I></FONT></A>
+
+<DD> Individual structures may be annotated using colored base characters, 
+colored dots, or both. The annotation is based on either p-num or ss-count 
+information. The color scheme is given in <A HREF="http://bioinfo.math.rpi.edu/~zukerm/articles/s-annotate/colors.html">here</A>. ss-count coloring follows the reverse scheme as p-num coloring. 
+(red: most likely to be single stranded; high value of ss-count) See article by <A HREF="http://bioinfo.math.rpi.edu/~zukerm/ref/ZUKM9801.html">Zuker and Jacobson</A>.
+
+<HR SIZE=2 NOSHADE> <P>
+
+<A NAME=WINDOW><DT> 
+<IMG SRC="l_green.gif" HSPACE=10>
+<FONT SIZE=5><I>Window</I></FONT></A>
+
+<DD> The <I>window parameter</I> controls how many foldings will be
+automatically computed and how different they will be from one
+another. It takes on positive whole number values. A smaller value of
+this parameter will usually result in more computed foldings that may
+be quite similar to one another. A larger value will result in fewer
+foldings that are very different from one another. If this parameter
+is not chosen by the user, a default value will be selected from the
+table below according to the sequence size. <P>
+
+<CENTER><TABLE BORDER=3	 CELLSPACING=3 CELLPADDING=3>
+<CAPTION ALIGN=BOTTOM><I>Default window parameters depending 
+on sequence length. The user 
+is encouraged to experiment with this parameter.</I></CAPTION>
+<TR><TH ALIGN=CENTER BGCOLOR="#808000">Sequence length    </TD>
+    <TH ALIGN=CENTER BGCOLOR="#008080">Default window size</TD></TR>
+<TR><TD ALIGN=CENTER>      0-29 </TD><TD ALIGN=CENTER> 0  </TD></TR>
+<TR><TD ALIGN=CENTER>     30-49 </TD><TD ALIGN=CENTER> 2  </TD></TR>
+<TR><TD ALIGN=CENTER>    50-119 </TD><TD ALIGN=CENTER> 3  </TD></TR>
+<TR><TD ALIGN=CENTER>   120-299 </TD><TD ALIGN=CENTER> 5  </TD></TR>
+<TR><TD ALIGN=CENTER>   300-399 </TD><TD ALIGN=CENTER> 7  </TD></TR>
+<TR><TD ALIGN=CENTER>   400-499 </TD><TD ALIGN=CENTER> 8  </TD></TR>
+<TR><TD ALIGN=CENTER>   500-599 </TD><TD ALIGN=CENTER> 10 </TD></TR>
+<TR><TD ALIGN=CENTER>   600-699 </TD><TD ALIGN=CENTER> 11 </TD></TR>
+<TR><TD ALIGN=CENTER>   700-799 </TD><TD ALIGN=CENTER> 12 </TD></TR>
+<TR><TD ALIGN=CENTER>  800-1199 </TD><TD ALIGN=CENTER> 15 </TD></TR>
+<TR><TD ALIGN=CENTER> 1200-1999 </TD><TD ALIGN=CENTER> 20 </TD></TR>
+<TR><TD ALIGN=CENTER> &gt; 1999 </TD><TD ALIGN=CENTER> 25 </TD></TR>
+</TABLE></CENTER>
+
+<HR SIZE=2 NOSHADE> <P>
+<A NAME=MAXBP><DT> 
+<IMG SRC="l_cyan.gif" HSPACE=10><FONT SIZE=5><I>Maximum distance between paired bases</I></FONT></A>
+
+<DD> If this parameter is set to <I>max</I>, then a base pair between bases numbered <I>i</I> to <I>j</I> will not be allowed if <I>j-i &gt; max</I>. In a sequence of 1000 nucleotides, setting <I>max</I> to 50, for example, will force the server to compute foldings involving only short range base pairs. Please note that in circular sequences, a base pair <I>i.j</I> will be disallowed if and only if <I>min{j-i,N+i-j} &gt; max</I>. This takes into account the circular nature of the molecule.
+
+<HR SIZE=2 NOSHADE> <P>
+<A NAME=SSC><DT> 
+<IMG SRC="l_purple.gif" HSPACE=10><FONT SIZE=5><I>ss-count</I></FONT></A>
+
+<DD> <I>ss-count</I> is the propensity of a base to be single
+stranded, as measured by the number of times it is single stranded in
+a group of predicted foldings. The <I>ss-count</I> file gives the
+number of predicted foldings on the first line. The i<SUP>th</SUP>
+subsequent line contains <I>i</I> and the number of foldings in which the
+i<SUP>th</SUP> base was single stranded. The plotting option gives
+plots of <I>ss-count</I> values averaged over a user selected window.
+
+<P> </DL>
+<CENTER><IMG SRC="end-break.gif"></CENTER> 
+<PRE>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</HTML></BODY>

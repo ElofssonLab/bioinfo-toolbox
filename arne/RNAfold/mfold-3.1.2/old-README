@@ -1,0 +1,107 @@
+______________________________________________________________________________
+mfold 2.3: © Copyright 1996, Michael Zuker, Washington University in St. Louis
+------------------------------------------------------------------------------
+         - Prediction of RNA/DNA secondary structure by free energy 
+           minimization.
+         - Version 2.3
+         - Michael Zuker and Doug Turner
+         - C++ version by David Mathews
+       
+Read INSTALL for installation instructions, and the version-2.3 file
+for valuable information.  Look also in the doc directory.
+
+The original version (1.0) was designed by Michael Zuker and
+programmed by Eric Nelson in the summer of 1987 in the Division of
+Biological Sciences at the National Research Council of Canada. John
+Jaeger, a graduate student with Doug Turner, added the tetraloop bonus
+energy feature and created the BATGEN program for batch file generation.
+       
+Version 2.3 brings the RNA energy parameters up-to-date with those
+published by Walter et al., 1994 (below), and introduces DNA folding
+for the first time using the parameters of John SantaLucia (below).
+Previous versions called upon the user to run various program
+interactively. This can still be done, but foldings can now be
+generated more automatically with a single command line. For example,
+the command:
+
+mfold SEQ=test.seq T=25 P=6 START=51
+
+will fold the sequence stored in 'test.seq' at 25° C starting with
+the 51st base and will produce optimal and suboptimal foldings within
+6% of the computed minimum free energy. Foldings are drawn using the
+'naview' program. (R.E. Bruccoleri & G. Heinrich, An improved algorithm
+for nucleic acid secondary structure display. Comput Appl Biosci 4:
+167-73, 1988.)
+
+METHOD : A dynamic programming algorithm is used to find optimal and
+suboptimal foldings of an RNA/DNA molecule starting from linear sequence
+data. Auxiliary information can be used to constrain the folding. 
+       
+Energy data from (RNA): 
+
+Freier, S.M., Kierzek, R., Jaeger, J.A., Sugimoto, N., Caruthers, 
+M.H., Neilson, T., & Turner, D.H. (1986). 
+Improved free-energy parameters for predictions of RNA duplex stability. 
+Proc. Natl. Acad. Sci. USA, 83, 9373-9377. 
+
+Turner, D.H., Sugimoto, N., Jaeger, J.A., Longfellow, C.E., 
+Freier, S.M., & Kierzek, R. (1987). 
+Improved parameters for prediction of RNA structure. 
+Cold Spring Harb. Symp. Quant. Biol., 52, 123-133. 
+
+Turner, D.H., & Sugimoto, N. (1988). 
+RNA structure prediction. 
+Annu. Rev. Biophys. Biophys. Chem., 17, 167-192. 
+
+Walter, A.E., Turner, D.H., Kim, J., Lyttle, M.H., Muller, P., 
+Mathews, D.H., & Zuker, M. (1994).
+Coaxial stacking of helixes enhances binding of oligoribonucleotides 
+and improves predictions of RNA folding. 
+Proc Natl Acad Sci USA, 91, 9218-9222. 
+
+DNA:
+
+SantaLucia, J, Jr., Allawi, HT, & Seneviratne, PA (1996) 
+Improved Nearest-neighbor Parameters for Predicting DNA Duplex Stability
+Biochemistry 35, 3555-3562. 
+
+SantaLucia, J, Jr. & Allawi, HT, (unpublished results) 
+       
+Algorithm and testing :
+
+M. Zuker 
+On Finding All Suboptimal Foldings of an RNA Molecule.
+Science, 244, 48-52, (1989)
+
+J. A. Jaeger, D. H. Turner and M. Zuker 
+Improved Predictions of Secondary Structures for RNA.
+Proc. Natl. Acad. Sci. USA, BIOCHEMISTRY, 86, 7706-7710, (1989)
+       
+J. A. Jaeger, D. H. Turner and M. Zuker 
+Predicting Optimal and Suboptimal Secondary Structure for RNA.
+in "Molecular Evolution: Computer Analysis of Protein and
+Nucleic Acid Sequences", R. F. Doolittle ed.
+Methods in Enzymology, 183, 281-306 (1989)
+
+M. Zuker, J.A. Jaeger & D.H. Turner 
+A Comparison of Optimal and Suboptimal RNA Secondary Structures 
+Predicted by Free Energy Minimization with Structures Determined 
+by Phylogenetic Comparison. 
+Nucleic Acids Research 19, 2707-2714 (1991) 
+
+Manual :
+
+M. Zuker 
+Prediction of RNA Secondary Structure by Energy Minimization. 
+in Computer Analysis of Sequence Data A.M. Griffin and H.G. Griffin eds. 
+Methods in Molecular Biology, Humana Press Inc., 267-294 (1994) 
+A more up-to-date version can be found at:
+http://www.ibc.wustl.edu/~zuker/seqanal/
+
+see also:
+M. Zuker 
+The Use of Dynamic Programming Algorithms in RNA Secondary
+Structure Prediction.
+in "Mathematical Methods for DNA Sequences", M. S. Waterman ed.
+CRC Press, Inc.,  159-184, (1989)
+

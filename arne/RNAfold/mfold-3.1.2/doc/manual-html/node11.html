@@ -1,0 +1,507 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Optimal and suboptimal foldings</TITLE>
+<META NAME="description" CONTENT="Optimal and suboptimal foldings">
+<META NAME="keywords" CONTENT="FEBS98-html">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="FEBS98-html.css">
+<LINK REL="previous" HREF="node10.html">
+<LINK REL="up" HREF="node9.html">
+<LINK REL="next" HREF="node12.html">
+</HEAD>
+<BODY BGCOLOR=#FFDEAD TEXT=#202020 LINK=#800000 ALINK=#ffff00 VLINK=#353976>
+<!--Navigation Panel-->
+<A NAME="tex2html184"
+ HREF="node12.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="img/next_motif.gif"></A> 
+<A NAME="tex2html181"
+ HREF="node9.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="img/up_motif.gif"></A> 
+<A NAME="tex2html177"
+ HREF="node10.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="img/previous_motif.gif"></A> 
+<A NAME="tex2html183"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="img/contents_motif.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html185"
+ HREF="node12.html">AUXILIARY AND INDIVIDUAL PROGRAMS</A>
+<B> Up:</B> <A NAME="tex2html182"
+ HREF="node9.html">OUTPUT</A>
+<B> Previous:</B> <A NAME="tex2html178"
+ HREF="node10.html">The energy dot plot</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00072200000000000000">
+<I>Optimal and suboptimal foldings</I></A>
+</H3>
+
+<P>
+<I>Mfold</I> predicts a number of optimal and suboptimal foldings. They are
+automatically predicted in order of increasing free energy, although
+this order may change when the more exact <I>efn2</I> program is used
+to re-evaluate free energies. The number of computed foldings is
+limited directly by the MAX parameter, and in more subtle ways by the
+P and W parameters. It should be stated clearly here that while the
+<I>energy dot plot</I> rigorously displays all possible base pairs that can take part in
+all possible foldings within 
+<!-- MATH: $\Delta \Delta G$ -->
+<IMG
+ WIDTH="42" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img9.gif"
+ ALT="$\Delta \Delta G$">
+of <IMG
+ WIDTH="29" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img6.gif"
+ ALT="$\Delta G$">,
+the computation of
+foldings is arbitrary. They do not represent a statistical sample of
+likely foldings, but rather a collection of foldings that show the
+variation that is possible within optimal and suboptimal foldings. 
+
+<P>
+The collection of triples, 
+<!-- MATH: $i,j,\Delta G(i,j)$ -->
+<IMG
+ WIDTH="88" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img115.gif"
+ ALT="$i,j,\Delta G(i,j)$">,
+for all possible base pairs
+is sorted in order of increasing 
+<!-- MATH: $\Delta G(i,j)$ -->
+<IMG
+ WIDTH="62" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img101.gif"
+ ALT="$\Delta G(i,j)$">.
+The algorithm to
+construct foldings proceeds as follows:
+<DL COMPACT>
+<DT>1.
+<DD>The base pair at the top of the list is selected, and an optimal
+folding <I>containing the selected base pair</I> is computed.
+<DT>2.
+<DD>All base pairs in the computed folding, as well as all those
+within a distance of W of base pairs in the computed folding, are
+crossed off the list.
+<DT>3.
+<DD>The computed folding is retained if it contains at least W base
+pairs that were not found in previous foldings.
+</DL>The first structure is always retained, even if it
+contains fewer than W base pairs. Steps 1 to 3 are repeated until
+either MAX structures have been computed and retained, or until there
+are no more base pairs on the list.
+
+<P>
+<I>Mfold</I> creates a number of files associated with predicted structures.
+The files marked with an optional ``html'' are created only when
+RUN_TYPE is html. Files that contain an underscore, `_', in their
+names enumerate the individual foldings, so that `file_name_<I>i</I>.ct'
+refers to the ct file for the <I>i</I><SUP><I>th</I></SUP> predicted structure.
+
+<P>
+ <SMALL>`FILE_NAME.OUT(.HTML)' :  </SMALL> This is a text file (html file)
+containing a plain text form of output for each of the predicted
+foldings. It is useful because it can always be displayed and is
+intelligible for foldings on short sequences. The selected base pairs
+for computing each structure are specially marked with a <code>`|'</code> above
+and a <code>`^'</code> below. A sample output is shown in Figure <A HREF="node11.html#OUT">11</A>.
+
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="OUT">&#160;</A><A NAME="834">&#160;</A>
+<TABLE WIDTH="100%">
+<CAPTION><STRONG>Figure 11:</STRONG>
+The second and final folding of <I> S. cerevisiae</I>
+Phe-tRNA at 37&#176;,
+with P=5% and W=3 (default values). (a) The
+selected base pair is G<SUP>51</SUP>-C<SUP>63</SUP>. The base numbers are placed
+so that the least significant digit, always a 0, is above or
+below the enumerated base. (b) The usual plotted representation. The
+<I> efn2</I> program has adjusted <IMG
+ WIDTH="29" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img6.gif"
+ ALT="$\Delta G$">
+from -22.3 to -22.7 kcal/mole</CAPTION>
+<TR><TD>
+<PRE>
+ FOLDING BASES    1 TO   76 OF tRNA
+ Initial ENERGY  =     -22.3
+ 
+              10       
+----      UUA      AGU 
+    GCGGAU     GCUC   U
+    CGCUUA     CGAG   G
+ACCA      --A      AGG 
+     70            20  
+ 
+                    30     
+               G       CUG 
+                  CCAGA    
+                  GGUCU   A
+               -       AGA 
+                    40     
+ 
+                       50       
+                  AGGUC  |  UUC 
+                       CUGUG    
+                       GACAC   G
+                  -----  ^  CUA 
+                           60   
+</PRE>
+</TD><TD><IMG SRC="tRNA_1_zoom.gif" BORDER="0"></TD></TR>
+<TR><TH> (a) Text </TH><TH>(b) Plot</TH></TR>
+</TABLE>
+</DIV>
+<BR>
+<P>
+ <SMALL>`FILE_NAME_<I>I</I>.CT' :  </SMALL> The ``ct'' file (<U>c</U>onnect
+<U>t</U>able) contains the sequence and base pair information,
+and is meant to be an input file for a structure drawing program. In
+addition to containing base pair information, it also lists the 5'and 3' neighbor of each base, allowing for the representation of
+circular RNA or multiple molecules.  The ct file also lists the
+historical base numbering in the original sequence, as bases and base
+pairs are numbered according from 1 to the size of the folded
+segment. A portion of a ct file is displayed in Figure <A HREF="node11.html#CT">12</A>.
+<BR>
+<DIV ALIGN="CENTER"><A NAME="CT">&#160;</A><A NAME="835">&#160;</A>
+<TABLE BORDER=5 CELLPADDING=10>
+<CAPTION><STRONG>Figure 12:</STRONG>
+The ct file for the second and final folding of <I>
+S. cerevisiae</I> Phe-tRNA at 37&#176;,
+with default parameters.
+The first record displays the fragment size (76), <IMG
+ WIDTH="29" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img6.gif"
+ ALT="$\Delta G$">
+and sequence
+name. The <I>i</I><SUP><I>th</I></SUP> subsequent record contains, in order, <I>i</I>,
+<I>r</I><SUB><I>i</I></SUB>, the index of the 5'-connecting base, the index of the
+3'-connecting base, the index of the paired base and the historical
+numbering of the <I>i</I><SUP><I>th</I></SUP> base in the original sequence. The 5',
+3' and base pair indices are 0 when there is no connection or base
+pair.</CAPTION>
+<TR><TD BGCOLOR=#CCCC80>
+<PRE>
+   76   ENERGY = -24.4 [initially  -23.2]  yeast tRNA Phe
+    1 G       0    2   72    1
+    2 C       1    3   71    2
+    3 G       2    4   70    3
+    4 G       3    5   69    4
+    5 A       4    6   68    5
+    6 U       5    7   67    6
+    7 U       6    8    0    7
+    8 U       7    9    0    8
+   ...
+   67 A      66   68    6   67
+   68 U      67   69    5   68
+   69 U      68   70    4   69
+   70 C      69   71    3   70
+   71 G      70   72    2   71
+   72 C      71   73    1   72
+   73 A      72   74    0   73
+   74 C      73   75    0   74
+   75 C      74   76    0   75
+   76 A      75    0    0   76
+</PRE>
+</TD></TR>
+</TABLE>
+</DIV>
+<BR>
+<P>
+ <SMALL>`FILE_NAME.DET(.HTML)' :  </SMALL> This is a text file (html file)
+containing the <U>det</U>ailed breakdown of each folding into
+loops, and the corresponding decomposition of the overall free energy,
+<IMG
+ WIDTH="29" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img6.gif"
+ ALT="$\Delta G$">,
+into the free energy contributions, 
+<!-- MATH: $\delta \delta G$ -->
+<IMG
+ WIDTH="31" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img27.gif"
+ ALT="$\delta \delta G$">,
+for each loop.
+A sample output is shown in Table <A HREF="#DET">4</A>.
+<BR>
+<DIV ALIGN="CENTER"><A NAME="836">&#160;</A>
+<TABLE>
+<CAPTION><STRONG>Table 4:</STRONG>
+Free energy details for the second and final
+folding of <I> S. cerevisiae</I> Phe-tRNA at 37&#176;,
+with default
+folding parameters. This layout mimics the html output.</CAPTION>
+<TR><TD>Loop Free-Energy Decomposition <BR>
+Structure 3 <BR>
+tRNA.seq   Initial Free energy =   -22.3 <BR> 
+<TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="LEFT"><B> Structural element</B></TD>
+<TD ALIGN="RIGHT"><B> 
+<!-- MATH: $\delta \delta G$ -->
+<IMG
+ WIDTH="31" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img27.gif"
+ ALT="$\delta \delta G$"></B></TD>
+<TD ALIGN="LEFT"><B> Information</B></TD>
+</TR>
+<TR><TD ALIGN="LEFT">External loop:</TD>
+<TD ALIGN="RIGHT">-1.7</TD>
+<TD ALIGN="LEFT">4 ss bases &amp;  1 closing helices.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Stack:</TD>
+<TD ALIGN="RIGHT">-3.4</TD>
+<TD ALIGN="LEFT">External closing pair is G<SUP>1</SUP>-C<SUP>72</SUP></TD>
+</TR>
+<TR><TD ALIGN="LEFT">Stack:</TD>
+<TD ALIGN="RIGHT">-2.4</TD>
+<TD ALIGN="LEFT">External closing pair is C<SUP>2</SUP>-G<SUP>71</SUP></TD>
+</TR>
+<TR><TD ALIGN="LEFT">Stack:</TD>
+<TD ALIGN="RIGHT">-1.5</TD>
+<TD ALIGN="LEFT">External closing pair is G<SUP>3</SUP>-C<SUP>70</SUP></TD>
+</TR>
+<TR><TD ALIGN="LEFT">Stack:</TD>
+<TD ALIGN="RIGHT">-1.3</TD>
+<TD ALIGN="LEFT">External closing pair is G<SUP>4</SUP>-U<SUP>69</SUP></TD>
+</TR>
+<TR><TD ALIGN="LEFT">Stack:</TD>
+<TD ALIGN="RIGHT">-1.1</TD>
+<TD ALIGN="LEFT">External closing pair is A<SUP>5</SUP>-U<SUP>68</SUP></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><B> Helix</B></TD>
+<TD ALIGN="RIGHT">-9.7</TD>
+<TD ALIGN="LEFT">6 base pairs.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Multi-loop:</TD>
+<TD ALIGN="RIGHT">1.0</TD>
+<TD ALIGN="LEFT">External closing pair is U<SUP>6</SUP>-A<SUP>67</SUP></TD>
+</TR>
+<TR><TD ALIGN="LEFT">&nbsp;</TD>
+<TD ALIGN="RIGHT">&nbsp;</TD>
+<TD ALIGN="LEFT">10 ss bases &amp;  4 closing helices.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Stack:</TD>
+<TD ALIGN="RIGHT">-2.1</TD>
+<TD ALIGN="LEFT">External closing pair is C<SUP>49</SUP>-G<SUP>65</SUP></TD>
+</TR>
+<TR><TD ALIGN="LEFT">Stack:</TD>
+<TD ALIGN="RIGHT">-2.1</TD>
+<TD ALIGN="LEFT">External closing pair is U<SUP>50</SUP>-A<SUP>64</SUP></TD>
+</TR>
+<TR><TD ALIGN="LEFT">Stack:</TD>
+<TD ALIGN="RIGHT">-2.2</TD>
+<TD ALIGN="LEFT">External closing pair is G<SUP>51</SUP>-C<SUP>63</SUP></TD>
+</TR>
+<TR><TD ALIGN="LEFT">Stack:</TD>
+<TD ALIGN="RIGHT">-2.1</TD>
+<TD ALIGN="LEFT">External closing pair is U<SUP>52</SUP>-A<SUP>62</SUP></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><B> Helix</B></TD>
+<TD ALIGN="RIGHT">-8.5</TD>
+<TD ALIGN="LEFT">5 base pairs.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Hairpin loop:</TD>
+<TD ALIGN="RIGHT">4.8</TD>
+<TD ALIGN="LEFT">Closing pair is G<SUP>53</SUP>-C<SUP>61</SUP></TD>
+</TR>
+<TR><TD ALIGN="LEFT">Stack:</TD>
+<TD ALIGN="RIGHT">-3.3</TD>
+<TD ALIGN="LEFT">External closing pair is C<SUP>27</SUP>-G<SUP>43</SUP></TD>
+</TR>
+<TR><TD ALIGN="LEFT">Stack:</TD>
+<TD ALIGN="RIGHT">-2.1</TD>
+<TD ALIGN="LEFT">External closing pair is C<SUP>28</SUP>-G<SUP>42</SUP></TD>
+</TR>
+<TR><TD ALIGN="LEFT">Stack:</TD>
+<TD ALIGN="RIGHT">-2.1</TD>
+<TD ALIGN="LEFT">External closing pair is A<SUP>29</SUP>-U<SUP>41</SUP></TD>
+</TR>
+<TR><TD ALIGN="LEFT">Stack:</TD>
+<TD ALIGN="RIGHT">-2.4</TD>
+<TD ALIGN="LEFT">External closing pair is G<SUP>30</SUP>-C<SUP>40</SUP></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><B> Helix</B></TD>
+<TD ALIGN="RIGHT">-9.9</TD>
+<TD ALIGN="LEFT">5 base pairs.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Hairpin loop:</TD>
+<TD ALIGN="RIGHT">5.7</TD>
+<TD ALIGN="LEFT">Closing pair is A<SUP>31</SUP>-U<SUP>39</SUP></TD>
+</TR>
+<TR><TD ALIGN="LEFT">Stack:</TD>
+<TD ALIGN="RIGHT">-3.4</TD>
+<TD ALIGN="LEFT">External closing pair is G<SUP>10</SUP>-C<SUP>25</SUP></TD>
+</TR>
+<TR><TD ALIGN="LEFT">Stack:</TD>
+<TD ALIGN="RIGHT">-2.1</TD>
+<TD ALIGN="LEFT">External closing pair is C<SUP>11</SUP>-G<SUP>24</SUP></TD>
+</TR>
+<TR><TD ALIGN="LEFT">Stack:</TD>
+<TD ALIGN="RIGHT">-2.4</TD>
+<TD ALIGN="LEFT">External closing pair is U<SUP>12</SUP>-A<SUP>23</SUP></TD>
+</TR>
+<TR><TD ALIGN="LEFT"><B> Helix</B></TD>
+<TD ALIGN="RIGHT">-7.9</TD>
+<TD ALIGN="LEFT">4 base pairs.</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Hairpin loop:</TD>
+<TD ALIGN="RIGHT">3.9</TD>
+<TD ALIGN="LEFT">Closing pair is C<SUP>13</SUP>-G<SUP>22</SUP></TD>
+</TR>
+</TABLE></TD></TR>
+</TABLE>
+</DIV>
+<BR>
+<P>
+ <SMALL>`FILE_NAME.SS-COUNT' :  </SMALL> If <I>l</I> foldings are predicted, then <I>ss-count(i)</I>
+is the number of times that <I>r</I><SUB><I>i</I></SUB> is single
+stranded in these foldings. Thus 
+<I>ss-count(i)/l</I>
+is a <I>sample based probability</I> for single strandedness. The ss-count file contains
+the number of computed foldings in the first record.  The <I>i</I><SUP><I>th</I></SUP>subsequent record contains <I>i</I> and <I>ss-count(i)</I>.
+This file may be
+used to predict which regions of an RNA are likely to be single
+stranded, and values of ss-count, averaged over a window of perhaps
+5 to 25 base pairs, are often plotted.  This file is also used for
+annotating plotted structures.
+
+<P>
+ <SMALL>`FILE_NAME_<I>I</I>.PLT2' :  </SMALL> This is an intermediate, device
+independent plot file. It is the output of <I>mfold</I>'s adaptation of
+the <I>naview</I> program for plotting secondary structures. This file
+is used as input to the <I>plt22ps</I> and <I>plt22gif</I> programs. It
+was originally intended to be used as input to the <I>plt2</I> plotting
+package [<A
+ HREF="node19.html#BEAR8101">39</A>], but this software is now old and not maintained.
+
+<P>
+ <SMALL>`FILE_NAME_<I>I</I>.PS' :  </SMALL> This is a PostScript file of a
+secondary structure. It is the output of the <I>plt22ps</I> program.
+
+<P>
+ <SMALL>`FILE_NAME_<I>I</I>.GIF' :  </SMALL> This is an image file (gif) of a
+secondary structure. It is the output of the <I>plt22gif</I> program.
+
+<P>
+The progression from ct file to images of secondary structures is: <BR>
+`file_name_i.ct' 
+<!-- MATH: $\rightarrow$ -->
+<IMG
+ WIDTH="19" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img120.gif"
+ ALT="$\rightarrow$">
+<I>naview</I> 
+<!-- MATH: $\rightarrow$ -->
+<IMG
+ WIDTH="19" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img120.gif"
+ ALT="$\rightarrow$">`file_name_i.plt2' 
+<!-- MATH: $\rightarrow$ -->
+<IMG
+ WIDTH="19" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img120.gif"
+ ALT="$\rightarrow$">
+<I>plt22ps</I> 
+<!-- MATH: $\rightarrow$ -->
+<IMG
+ WIDTH="19" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img120.gif"
+ ALT="$\rightarrow$">`file_name_i.ps' <BR>
+or  <BR>
+`file_name_i.ct' 
+<!-- MATH: $\rightarrow$ -->
+<IMG
+ WIDTH="19" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img120.gif"
+ ALT="$\rightarrow$">
+naview 
+<!-- MATH: $\rightarrow$ -->
+<IMG
+ WIDTH="19" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img120.gif"
+ ALT="$\rightarrow$">`file_name_i.plt2' 
+<!-- MATH: $\rightarrow$ -->
+<IMG
+ WIDTH="19" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img120.gif"
+ ALT="$\rightarrow$">
+<I>plt22gif</I> 
+<!-- MATH: $\rightarrow$ -->
+<IMG
+ WIDTH="19" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img120.gif"
+ ALT="$\rightarrow$">`file_name_i.gif'
+
+<P>
+ <SMALL>`FILE_NAME.HTML' :  </SMALL> This is a simple html file that links
+together some of the output files. It is an early version of a format
+originally used by the <I>mfold</I> web server.
+
+<P>
+ <SMALL>`FILE_NAME.LOG' :  </SMALL> This is a log file containing the standard
+output and standard error of the various programs and scripts that
+make up <I>mfold</I> . It can be useful for debugging.
+
+<P>
+ <SMALL>`FILE_NAME.PNT' :  </SMALL> This is a human readable file containing
+the entire input sequence. Every 10<SUP><I>th</I></SUP> base is labeled. In
+addition, auxiliary information is incorporated, if there is any. 
+Bases that are forced to be double stranded have the
+letter `F' underneath. Those that are forced to be single stranded have the
+letter `P' underneath. Pairs of rounded brackets `(` and `)'
+underline forced base pairs, and pairs of curly brackets `{` and
+`}' underline prohibited base pairs. If 2 disjoint segments are
+prohibited from pairing with one another, then these segments are
+highlighted by underlining the residues of the first with a common
+lowercase letter, and the residues of the second with the same letter
+in uppercase. Different letters are used for different prohibited
+pairs. `F' and `P' are not used in this case.
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html184"
+ HREF="node12.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="img/next_motif.gif"></A> 
+<A NAME="tex2html181"
+ HREF="node9.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="img/up_motif.gif"></A> 
+<A NAME="tex2html177"
+ HREF="node10.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="img/previous_motif.gif"></A> 
+<A NAME="tex2html183"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="img/contents_motif.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html185"
+ HREF="node12.html">AUXILIARY AND INDIVIDUAL PROGRAMS</A>
+<B> Up:</B> <A NAME="tex2html182"
+ HREF="node9.html">OUTPUT</A>
+<B> Previous:</B> <A NAME="tex2html178"
+ HREF="node10.html">The energy dot plot</A>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<TABLE><TR><TD><IMG SRC=img/shield16.gif HSPACE=20></TD><TD><I>Michael Zuker <BR>Institute for Biomedical Computing<BR>
+Washington University in St. Louis<BR>
+1998-12-05</I></TD></TR></TABLE>
+</ADDRESS>
+</BODY>
+</HTML>

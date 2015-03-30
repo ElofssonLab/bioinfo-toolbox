@@ -1,4 +1,4 @@
-import sys
+import sys, os
 import argparse
 from math import *
 
@@ -24,6 +24,14 @@ from parsing import parse_contacts
 from parsing import parse_psipred
 from parsing import parse_fasta
 from parsing import parse_pdb
+
+
+def s_score(d, d0):
+    return 1/(1+pow(d/d0, 2))
+
+def s_score_vec(d, d0):
+    f = np.vectorize(s_score, otypes=[np.float])
+    return f(d, d0)
 
 
 def get_min_dist(res1, res2):
@@ -62,6 +70,11 @@ def get_cb_contacts(gapped_cb_lst):
     dist_mat = np.zeros((seqlen, seqlen), np.float)
     dist_mat.fill(float('inf'))
     
+    #offset = 0
+    #first_i = gapped_cb_lst[0].keys()[0]
+    #if first_i < 0:
+    #    offset = abs(first_i)
+
     for i, cb1 in enumerate(gapped_cb_lst):
         if cb1 == '-':
             continue
@@ -69,6 +82,7 @@ def get_cb_contacts(gapped_cb_lst):
             if cb2 == '-':
                 continue
             diff_vec = cb1 - cb2
+            #dist_mat[i+offset,j+offset] = np.sqrt(np.sum(diff_vec * diff_vec))
             dist_mat[i,j] = np.sqrt(np.sum(diff_vec * diff_vec))
     return dist_mat
 
@@ -134,10 +148,11 @@ def get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali):
     return tp_colors
  
 
-def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_filename='', pdb_filename='', is_heavy=False, chain='', sep=',', outfilename=''):  
+def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_horiz_fname='', psipred_vert_fname='', pdb_filename='', is_heavy=False, chain='', sep=',', outfilename=''):  
    
     #acc = c_filename.split('.')[0]
-    acc = fasta_filename.split('.')[0][:4]
+    #acc = fasta_filename.split('.')[0][:4]
+    acc = '.'.join(os.path.basename(fasta_filename).split('.')[:-1])
 
     ### get sequence
     seq = parse_fasta.read_fasta(open(fasta_filename, 'r')).values()[0][0]
@@ -145,6 +160,7 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_filenam
 
     ### get top "factor" * "ref_len" predicted contacts
     contacts = parse_contacts.parse(open(c_filename, 'r'), sep)
+    contacts_np = parse_contacts.get_numpy_cmap(contacts)
 
     contacts_x = []
     contacts_y = []
@@ -175,8 +191,14 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_filenam
     ax = fig.add_subplot(111)
 
     ### plot secondary structure on the diagonal if given
-    if psipred_filename:
-        ss = parse_psipred.horizontal(open(psipred_filename, 'r'))
+    if psipred_horiz_fname or psipred_vert_fname:
+        if psipred_horiz_fname:
+            ss = parse_psipred.horizontal(open(psipred_horiz_fname, 'r'))
+        else:
+            ss = parse_psipred.vertical(open(psipred_vert_fname, 'r'))
+
+        assert len(ss) == ref_len
+ 
         for i in range(len(ss)):
             if ss[i] == 'H':
                 plt.plot(i, i, 'o', c='#8B0043', mec="#8B0043", markersize=2)
@@ -195,6 +217,9 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_filenam
 
         atom_seq_ali = align[-1][0]
         seq_ali = align[-1][1]
+
+        #print atom_seq_ali
+        #print seq_ali
 
         j = 0
         gapped_res_lst = []
@@ -222,16 +247,31 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_filenam
             cb_cutoff = 8
             ref_contact_map = dist_mat < cb_cutoff
             ref_contacts = np.where(dist_mat < cb_cutoff)
+            #ref_contacts = np.where(np.ma.array(dist_mat, mask=np.tri(dist_mat.shape[0]), fill_value=float("inf")) < cb_cutoff)
         
         ref_contacts_x = ref_contacts[0]
         ref_contacts_y = ref_contacts[1]
-       
+
         PPVs, TPs, FPs = get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, factor)
         tp_colors = get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali)
    
         print '%s %s %s %s' % (pdb_filename, PPVs[-1], TPs[-1], FPs[-1])
       
-        ax.scatter(ref_contacts_x, ref_contacts_y, marker='o', c='#CCCCCC', lw=0, edgecolor='#CCCCCC')
+        cmap = cm.get_cmap("binary")
+        cmap.set_bad([1,1,1,0])
+        dist_mat_masked = np.ma.array(dist_mat, mask=np.tri(dist_mat.shape[0], k=-1))
+        sc = ax.imshow(s_score_vec(dist_mat_masked, 5), cmap=cmap)
+        
+        ref_contacts_diag_x = []
+        ref_contacts_diag_y = []
+        for i in range(len(ref_contacts_x)):
+            x_i = ref_contacts_x[i]
+            y_i = ref_contacts_y[i]
+            if not dist_mat_masked.mask[x_i, y_i]:
+                ref_contacts_diag_x.append(x_i)
+                ref_contacts_diag_y.append(y_i)
+       
+        ax.scatter(ref_contacts_diag_x, ref_contacts_diag_y, marker='o', c='#CCCCCC', lw=0, edgecolor='#CCCCCC')
 
 
     ### plot predicted contacts from second contact map if given
@@ -278,12 +318,29 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_filenam
     ### if no second contact map given
     else:
         if pdb_filename:
-            fig.suptitle('%s\nPPV = %.2f' % (acc, PPVs[-1]))
+            pdb_acc = parse_pdb.get_acc(open(pdb_filename))
+            if pdb_acc:
+                if chain:
+                    fig.suptitle('%s (PDB: %s, chain %s)\nPPV = %.2f' % (acc, pdb_acc, chain, PPVs[-1]))
+                else:
+                    fig.suptitle('%s (PDB: %s)\nPPV = %.2f' % (acc, pdb_acc, PPVs[-1]))
+            else:
+                fig.suptitle('%s\nPPV = %.2f' % (acc, PPVs[-1]))
+            cmap = cm.get_cmap("hot_r")
+            cmap.set_bad([1,1,1,0])
+            contacts_np_masked = np.ma.array(contacts_np, mask=np.tri(contacts_np.shape[0], k=-1))
+            #sc = ax.imshow(contacts_np_masked.T, cmap=cmap)
             sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c=tp_colors[::-1], s=6, alpha=0.75, linewidths=0.0)
-            sc = ax.scatter(contacts_y[::-1], contacts_x[::-1], marker='o', c=tp_colors[::-1], s=6, alpha=0.75, linewidths=0.0)
+            #sc = ax.scatter(contacts_y[::-1], contacts_x[::-1], marker='o', c=tp_colors[::-1], s=6, alpha=0.75, linewidths=0.0)
         else:
-            sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c=scores[::-1], s=4, alpha=0.75, cmap=cm.jet, linewidths=0.1)
-            sc = ax.scatter(contacts_y[::-1], contacts_x[::-1], marker='o', c=scores[::-1], s=4, alpha=0.75, cmap=cm.jet, linewidths=0.1)
+            if c_filename.startswith('data'):
+                acc = c_filename.split('/')[1]
+            else:
+                acc = c_filename.split('/')[-1]
+            fig.suptitle('%s' % acc)
+            sc = ax.imshow(contacts_np + contacts_np.T, cmap=cm.hot_r)
+            #sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c=scores[::-1], s=4, alpha=0.75, cmap=cm.hot_r, linewidths=0.1, edgecolors='none')
+            #sc = ax.scatter(contacts_y[::-1], contacts_x[::-1], marker='o', c=scores[::-1], s=4, alpha=0.75, cmap=cm.hot_r, linewidths=0.1, edgecolors='none')
             plt.colorbar(sc)
 
     plt.gca().set_xlim([0,ref_len])
@@ -294,6 +351,8 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_filenam
             pp = PdfPages(outfilename)
             pp.savefig(fig)
             pp.close()
+        elif outfilename.endswith('.png'):
+            plt.savefig(outfilename)
         else:
             pp = PdfPages('%s.pdf' % outfilename)
             pp.savefig(fig)
@@ -314,6 +373,7 @@ if __name__ == "__main__":
     p.add_argument('-f', '--factor', default=2.0, type=float)
     p.add_argument('--c2', default='')
     p.add_argument('--psipred_horiz', default='')
+    p.add_argument('--psipred_vert', default='')
     p.add_argument('--pdb', default='')
     p.add_argument('--heavy', action='store_true')
     p.add_argument('--chain', default='')
@@ -333,5 +393,5 @@ if __name__ == "__main__":
     else:
         sep = '\t'
     
-    plot_map(args['fasta_file'], args['contact_file'], args['factor'], c2_filename=args['c2'], psipred_filename=args['psipred_horiz'], pdb_filename=args['pdb'], is_heavy=args['heavy'], chain=args['chain'], sep=sep, outfilename=args['outfile'])
+    plot_map(args['fasta_file'], args['contact_file'], args['factor'], c2_filename=args['c2'], psipred_horiz_fname=args['psipred_horiz'], psipred_vert_fname=args['psipred_vert'], pdb_filename=args['pdb'], is_heavy=args['heavy'], chain=args['chain'], sep=sep, outfilename=args['outfile'])
 

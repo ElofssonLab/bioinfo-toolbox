@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Software platforms and environment</TITLE>
+<META NAME="description" CONTENT="Software platforms and environment">
+<META NAME="keywords" CONTENT="FEBS98-html">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="FEBS98-html.css">
+<LINK REL="next" HREF="node5.html">
+<LINK REL="previous" HREF="node3.html">
+<LINK REL="up" HREF="FEBS98-html.html">
+<LINK REL="next" HREF="node5.html">
+</HEAD>
+<BODY BGCOLOR=#FFDEAD TEXT=#202020 LINK=#800000 ALINK=#ffff00 VLINK=#353976>
+<!--Navigation Panel-->
+<A NAME="tex2html102"
+ HREF="node5.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="img/next_motif.gif"></A> 
+<A NAME="tex2html99"
+ HREF="FEBS98-html.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="img/up_motif.gif"></A> 
+<A NAME="tex2html93"
+ HREF="node3.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="img/previous_motif.gif"></A> 
+<A NAME="tex2html101"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="img/contents_motif.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html103"
+ HREF="node5.html">Loops and Nearest neighbor</A>
+<B> Up:</B> <A NAME="tex2html100"
+ HREF="FEBS98-html.html">Algorithms and Thermodynamics for</A>
+<B> Previous:</B> <A NAME="tex2html94"
+ HREF="node3.html">Introduction</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00040000000000000000">
+Software platforms and environment</A>
+</H1>
+
+<P>
+The <I>mfold</I> package [<A
+ HREF="node19.html#ZUKM8901">16</A>,<A
+ HREF="node19.html#JAEJ8901">17</A>,<A
+ HREF="node19.html#JAEJ9001">18</A>,<A
+ HREF="node19.html#ZUKM9401">19</A>] consists
+of a group of programs written in Fortran or C, and a group of Bourne
+shell or Perl scripts. All of these programs and scripts run in a Unix
+environment. The <I>mfold</I> software is currently running on a number of
+different platforms, as indicated in Table <A HREF="#PLATFORM">1</A>.
+<BR>
+<DIV ALIGN="CENTER"><A NAME="809">&#160;</A>
+<TABLE>
+<CAPTION><STRONG>Table 1:</STRONG>
+<I> mfold</I> runs on a variety of Unix
+platforms. The ones shown have been tested by the first author.</CAPTION>
+<TR><TD><TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="LEFT"><B> Operating System</B></TD>
+<TD ALIGN="LEFT"><B> Hardware</B></TD>
+</TR>
+<TR><TD ALIGN="LEFT">Irix</TD>
+<TD ALIGN="LEFT">SGI</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Solaris</TD>
+<TD ALIGN="LEFT">Sun SPARC</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Ultrix</TD>
+<TD ALIGN="LEFT">Dec Alpha</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Solaris</TD>
+<TD ALIGN="LEFT">Intel</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Linux</TD>
+<TD ALIGN="LEFT">Intel</TD>
+</TR>
+</TABLE></TD></TR>
+</TABLE>
+</DIV>
+<BR>
+<P>
+In addition, some of the core programs of <I>mfold</I> have been translated
+into C++ and the resulting software is running on Windows 98/Windows
+NT (Intel hardware) with a point and click interface that uses
+proprietary Microsoft windowing tools. This program is called <I>RNAstructure</I>[<A
+ HREF="node19.html#MATD9801">20</A>]. 
+
+<P> 
+Up to version 2.2, the programs in <I>mfold</I> were interactive and
+had to be run individually. Versions 2.3 and 3.0 provide a simple
+command line interface, as described below, although it is still
+possible to run individual programs interactively or, for that matter,
+to write one's own scripts to link programs together in novel
+ways. The RNA folding web server 
+(<A HREF="http://www.bioinfo.rpi.edu/~zukerm/rna/form1.cgi")
+<TT>www.bioinfo.rpi.edu/<code>~</code>zukerm/rna/form1.cgi</TT>)</A>
+provides an HTML interface to <I>mfold</I> that uses a similar, but
+not identical script. This server will be described elsewhere. It's
+main advantage is that anyone with a web browser can use it.
+
+<P>
+An early version of <I>mfold</I> (2.0) was ported to run on Mac
+computers. It lacked the <I>energy dot plot</I> and could only fold about 350 bases. We
+no longer recommend its further use, especially since the energy
+parameters it uses have not been updated.  The current <I>mfold</I> version
+3.0 runs in command line mode under Windows, but this implementation
+requires a type of Unix emulation program to be run.
+
+<P>
+Two Unix ``environment variables'' must be defined for <I>mfold</I> to
+function. The first, <I>MFOLDBIN</I>, defines the directory where all
+the executable files for <I>mfold</I> are stored. The second, <I>MFOLDLIB</I>, defines the directory containing all the free energy and
+other data files. Dynamic memory allocation is not yet available for
+<I>mfold</I> , and the largest fragment size that can be folded is defined by
+the value of the <I>MAXN</I> parameter in the ``Makefile'' file.
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html102"
+ HREF="node5.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="img/next_motif.gif"></A> 
+<A NAME="tex2html99"
+ HREF="FEBS98-html.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="img/up_motif.gif"></A> 
+<A NAME="tex2html93"
+ HREF="node3.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="img/previous_motif.gif"></A> 
+<A NAME="tex2html101"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="img/contents_motif.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html103"
+ HREF="node5.html">Loops and Nearest neighbor</A>
+<B> Up:</B> <A NAME="tex2html100"
+ HREF="FEBS98-html.html">Algorithms and Thermodynamics for</A>
+<B> Previous:</B> <A NAME="tex2html94"
+ HREF="node3.html">Introduction</A>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<TABLE><TR><TD><IMG SRC=img/shield16.gif HSPACE=20></TD><TD><I>Michael Zuker <BR>Institute for Biomedical Computing<BR>
+Washington University in St. Louis<BR>
+1998-12-05</I></TD></TR></TABLE>
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,1018 @@
+This is the errata file for versions 3.0, 3.1
+
+1. 3/22/99
+
+Bug in trace (traceback algorithm) fixed.
+
+The large loop:
+
+c     Perhaps i,j closes a multi-loop?
+      k = i
+      do while (k.le.j)
+         write(6,*) 'Looking for multi-branch loop: i,k,j = ',i,k,j
+         if (k.ne.break.and.k.ge.i+2.and.k.le.j-3) then
+     ...   stuff ...
+         else
+     ...   more stuff
+         endif
+         k = k + 1
+      enddo
+
+becomes:
+
+c     Perhaps i,j closes a multi-loop?
+      k = i
+      do while (k.le.j)
+         write(6,*) 'Looking for multi-branch loop: i,k,j = ',i,k,j
+         if (k.ne.break.and.k.ge.i+2.and.k.le.j-3) then
+     ...   stuff ...
+         elseif (k.eq.break) then
+     ...   more stuff
+         endif
+         k = k + 1
+      enddo
+
+2. 3/31/99
+
+tstackcoax.dat file corrected. It now has symmetry.
+
+3. 4/5/99
+
+New feature. The sequence base identity is now added to the ss-count
+file. This is the third item in each record after the first record.
+
+4. 4/22/99
+
+The efn function is brought up-to-date with version 3.0. This is not a
+bug correction, since the previous version of efn was for 2.3 rules.
+The detailed output of efn now gives free energies for all
+multi-branch loops. These, together with free energies for all other
+closed loops, can be used to check the results of the nafold program.
+Only the free energy of the exterior loop is not explicitly computed
+by efn as of this date.
+
+5. 4/23/99
+
+The new efn program revealed some slight problems with the folding
+algorithm. A particular case made this problem visible:
+
+Sequence: (part of E. coli 16S rRNA)
+
+         10         20         30         40         50
+ UUACGACCAG GGCUACACAC GUGCUACAAU GGCGCAUACA AAGAGAAGCG
+                                                       
+         60         70         80         90        100
+ ACCUCGCGAG AGCAAGCGGA CCUCAUAAAG UGCGUCGUAG UCCGGAUUGG
+                                                       
+        110        120        130        140        150
+ AGUCUGCAAC UCGACUCCAU GAAGUCGGAA UCGCUAGUAA UCGUGGAUCA
+                                                       
+        160        170        180        190        200
+ GAAUGCCACG GUGAAUACGU UCCCGGGCCU UGUACACACC GCCCGUCACA
+
+        210        220        230        240        250
+ CCAUGGGAGU GGGUUGCAAA AGAAGUAGGU AGCUUAACCU UCGGGAGGGC
+                                                       
+        260        270        280        290
+ GCUUACCACU UUGUGAUUCA UGACUGGGGU GAAGUCGUAA
+
+ Initial ENERGY  =    -107.7 (really -107.4 using efn!)
+ 
+          10                  20               30        40          50       
+U|     CA      --------UACA      --     ---CA           ACAAA   --AA  GAC   G 
+ UACGAC    GGGC              CACG  UGCUA       AUGGCGCAU     GAG    GC   CUC C
+ AUGCUG    CCCG              GUGC  AUGAU       UGCUGCGUG     CUC    CG   GAG G
+A^     -A      CCACACAUGUUC      UA     CGCUA           AAAUA   CAGG  AAC   A 
+.            190       180      140       130         80        70        60  
+ 
+                                               90          100        
+                                               AG     ---AU       UGC 
+                                                 UCCGG     UGGAGUC   A
+                                                 AGGCU     ACCUCAG   A
+                                               --     GAAGU       CUC 
+                                                        120       110 
+ 
+                               150       160       
+                             GAUCAGAAU   A   U   U 
+                                      GCC CGG GAA A
+                                      CGG GCC CUU C
+                             ---------   -   -   G 
+                                              170  
+ 
+              200       210       220       230       240 
+           G    A  A   GA      UG    A AA      A    AA  U 
+            UCAC CC UGG  GUGGGU  CAAA G  GUAGGU GCUU  CC U
+            AGUG GG GUC  UACUUA  GUUU C  CAUUCG CGGG  GG C
+           -    -  -   AG      GU    - AC      -    -A  G 
+            280         270       260         250         
+
+instead of 
+
+          10                  20               30        40          50       
+U|     CA      --------UACA      --     ---CA           ACAAA   --AA  GAC   G 
+ UACGAC    GGGC              CACG  UGCUA       AUGGCGCAU     GAG    GC   CUC C
+ AUGCUG    CCCG              GUGC  AUGAU       UGCUGCGUG     CUC    CG   GAG G
+A^     AA      CCACACAUGUUC      UA     CGCUA           AAAUA   CAGG  AAC   A 
+.            190       180      140       130         80        70        60  
+ 
+                                               90          100        
+                                               AG     ---AU       UGC 
+                                                 UCCGG     UGGAGUC   A
+                                                 AGGCU     ACCUCAG   A
+                                               --     GAAGU       CUC 
+                                                        120       110 
+ 
+                               150       160       
+                             GAUCAGAAU   A   U   U 
+                                      GCC CGG GAA A
+                                      CGG GCC CUU C
+                             ---------   -   -   G 
+                                              170  
+ 
+              200       210       220       230       240 
+           GUCA    AU  GA      UG    A AA      A    AA  U 
+               CACC  GG  GUGGGU  CAAA G  GUAGGU GCUU  CC U
+               GUGG  UC  UACUUA  GUUU C  CAUUCG CGGG  GG C
+           ----    GG  AG      GU    - AC      -    -A  G 
+              280       270       260         250         
+
+The problem was found because of an energy discrepancy of 0.3
+kcal/mole between the multi-branch loop closed by C7-G184 (first
+folding) as computed by nafold and efn. The efn fill value for
+V(7,194) was traced to W(9,195) + W(196,282), with a double dangle on
+the C7-G184 base pair. (This is clearly wrong, since a 3' dangle of
+A283 on U196-A282 should be prefered.) 
+
+It turns out that V(196,282) = W(196,282) = -33.8 kcal/mol (3.0).
+A traceback on the fragment 196-282 should not begin with the
+U196-A282 base pair, because there is a param(9) penalty and a
+terminal AU penalty. Thus an incorrect folding (first) was found with
+the U196-A282 base pair. The real free energy of this folding is +0.3
+worse. When the traceback algorithm was corrected, the second folding
+was found.
+
+Differences:
+
+402c402 - This is a bug correction, since 'erg' has been replaced by erg2, ...
+< d     write(6,*) 'THIRD',i,j,erg5
+---
+> d     write(6,*) 'THIRD',i,j,erg
+803,807c803 - Don't push initial base pair on stack. Call it a base
+              pair and continue on that basis.
+<       i = ii
+<       j = ji
+<       e = v(i,j)
+<       open = 0
+<       go to 300
+---
+>       call push(ii,ji,v(ii,ji),0)
+810,816c806,816
+< c     Pull a fragment ( i to j ) and its expected energy ( e ) from
+< c     the stack. open = 1 indicates that the free bases are part of
+< c     an exterior loop. open = 0 (ie. closed) indicates that the
+< c     free bases are part of a multi-loop.
+<       stz = pull(i,j,e,open)
+<       if (stz.ne.0) return
+< 
+---
+>       do while (i.eq.j)
+> c       Pull a fragment ( i to j ) and its expected energy ( e ) from
+> c       the stack. open = 1 indicates that the free bases are part of
+> c       an exterior loop. open = 0 (ie. closed) indicates that the
+> c       free bases are part of a multi-loop.
+>         stz = pull(i,j,e,open)
+>         if (stz.ne.0) return
+>       enddo
+> c     Do i and j base-pair with one another?
+>       if (e.eq.v(i,j)) goto 300
+>  
+818c818
+< c     Multibranch loop
+---
+>  
+877,879d876
+< c        Check for stem closing an exterior loop.
+<          if (e.eq.v(i,j)+au_pen(i,j)) e = v(i,j)
+<  
+881a879,881
+> c     Check for stem closing an exterior loop.
+>       if (e.eq.v(i,j)+au_pen(i,j)) e = v(i,j)
+>  
+
+6. 4/23/99
+
+A bug was found relating to filtering out isolated base pairs. If
+(1,j) is isolated, then there is a problem when (j,n+1) (which is the
+same base pair; also isolated, and therefore forbidden) is tested
+early in the 'do i' loop. When j = break (which is n for linear
+folding), computation resumes at 100, which looks for a closed
+bifurcation. This should not be allowed if the base pair cannot
+form. Thus an extra test:
+
+              if (vst((n-1)*(i-1)+j).gt.0.or.inc(numseq(i),numseq(j)).eq.0) goto 200
+
+is inserted after statement 100 in the fill subroutine.
+
+7. 4/27/99
+
+A bug was found that could allow a base that is forbidden from pairing
+to pair in a folding. This is purely a traceback error. It is fixed by
+adding a test for 'force() = 2' when whittling away at the ends of a
+fragment. This is not needed when efn6 (dangle) free energies are
+involved, since efn6 checks for dangling bases that must pair and
+reutrns an infinite energy. The fix is:
+
+             do while (e.eq.w(i+1,j)+eparam(6).and.force(i).ne.2)
+c            Whittle away from the 5' end.
+
+
+and
+
+             do while (e.eq.w(i,j-1)+eparam(6).and.force(j).ne.2)
+c            Whittle away from the 3' end.
+
+
+8. 5/7/99
+
+Change formid.f and multid.f to read FASTA format instead of PIR
+format. Sequence identifier is in columns 2-31 of line beginning with
+'>'. Sequence follows in subsequent lines. No comment line. Below is
+difference file for formid. Changes in multid are similar.
+
+5c5
+< c                                             3  -  FASTA
+---
+> c                                             3  -  PIR
+136c136
+<       elseif (rec(1:1).eq.'>') then                                ! FASTA
+---
+>       elseif (rec(1:1).eq.'>') then                                ! PIR
+140,142c140,142
+<           pline(idno) = line
+<           ssid = rec(2:31)
+<           seqid(idno) = ssid
+---
+>           pline(idno) = line + 1
+>           ssid = rec((index(rec,';')+1):30)
+>           seqid(idno) = ssid(1:index(ssid,' '))
+
+9. 5/12/99
+Another traceback error! v energies cannot be pushed onto the stack
+since the program cannot later know that the energy belongs to v(i,j)
+instead of to w(i,j). The 'open' parameter only distinguishes between
+w and (w5 or w3). We could add a 3rd category for open. A better
+solution is adopted below. Instead of pushing a v energy to the stack,
+identify the base pair immediately and proceed to 300. Note that e is
+now defined at 300.
+
+< is new
+> is old
+900,901c900,901
+<                   i = k + 1
+<                   goto 300
+---
+>                   call push(k+1,j,v(k+1,j),0)
+>                   goto 100
+907,908c907,908
+<                   i = k + 2
+<                   goto 300
+---
+>                   call push(k+2,j,v(k+2,j),0)
+>                   goto 100
+914,916c914,915
+<                   i = k + 1
+<                   j = j - 1
+<                   goto 300
+---
+>                   call push(k+1,j-1,v(k+1,j-1),0)
+>                   goto 100
+923,925c922,923
+<                   i = k + 2
+<                   j = j - 1
+<                   goto 300
+---
+>                   call push(k+2,j-1,v(k+2,j-1),0)
+>                   goto 100
+930a929
+>                   call push(i,k+2,v(i,k+2),0)
+932,933c931
+<                   j = k + 2
+<                   goto 300
+---
+>                   goto 100
+937a936
+>                   call push(i+1,k+2,v(i+1,k+2),0)
+939,941c938
+<                   i = i + 1
+<                   j = k + 2
+<                   goto 300
+---
+>                   goto 100
+945a943
+>                   call push(i,k+1,v(i,k+1),0)
+947,948c945
+<                   j = k + 1
+<                   goto 300
+---
+>                   goto 100
+953a951
+>                   call push(i+1,k+1,v(i+1,k+1),0)
+955,957c953
+<                   i = i + 1
+<                   j = k + 1
+<                   goto 300
+---
+>                   goto 100
+973,974c969
+< 300   e = v(i,j)
+<       if (j.le.n) then
+---
+> 300   if (j.le.n) then
+987d981
+< 
+
+10. 6/2/99 
+Bug in auxgen.f on some systems.
+If the 'name'.con file does not exist, an error rather than an "end of
+file" may be generated in auxgen while attempting to read the
+constraint file. The fix is to skip immediately to the next section at
+"end of file" or on error. Thus any read error in a constraint file
+will cause auxgen to skip the rest of the constraint file.
+
+153a154
+>  25      continue
+155,156d155
+< c     Abort reading constraint file on first error.
+<  25   continue
+
+11. 6/2/99
+Gnu Fortran needs to have 'lorc' explicitly defined in efn (efn.inc)
+In any case, it is poor form not to define 'lorc' explicitly. 
+
+24c24
+<       character*1 seq(2*maxn),lorc
+---
+>       character*1 seq(2*maxn)
+
+12. 7/8/99
+Recent changes replacing 'ENERGY' by 'dG' and so on caused an error in
+ct2bp when reading the sequence name from a 'ct' file in version 2.3
+mode. The sequence name is no longer in columns 21-60, but in
+'lab_start' to 60, where lab_start is (usually) after the free energy
+information, if there is any.
+
+13. 7/19/99
+
+a. 'nawk' has been replaced by 'awk' in auto_ct2ps (a mostly obsolete
+script) and in the mfold script.
+
+b. ct2bp.f has been replaced by a cruder version that does not use
+structures. This has been done to accomodate "stupid" gnu Fortran.
+
+14. 9/30/99
+
+wmbij should not include the exterior loop possibility when i <= N <
+j. This is taken care of properly already.
+
+In the fill algorithm:
+
+c             Search for an open bifurcation.
+              do k = i,j-1
+                 if (k.ne.break) then
+                    wmbij = min0(wmbij,wst(index+k)+work(k+1,mod(j,3)))
+c		else wmbij = w5(i) + w3(j-n) has been removed!
+                 endif
+              enddo
+           endif
+           wij = min0(wij,wmbij)
+
+15. 10/14/99
+
+In the traceback algorithm, a closed bifurcation on the base pair i.j
+looks at break points i <= k <= j. If k = break, the structure may split
+into 2 separate pieces, but only if j > n. The correction is:
+
+==> old
+          elseif (k.eq.break) then
+==> new
+          elseif (k.eq.break.and.j.gt.n) then
+
+16. 11/14/99
+
+Default values for WINDOW altered for sequences between 30 and 199 in
+length.
+ 
+17. 12/13/99
+
+Both sav2p-num and sav2p-num2 were expanded to compute p-num's using
+filtered dot plots for .sav files. The minimum helix length, lmin, is
+the single command line argument. It is assumed to be 1 if no command
+line argument is given. When lmin = 1, sav2p-num behave as
+previously. Otherwise, only base pairs in helices of size >= lmin are
+counted when p-num is being computed.
+
+18. 12/17/99
+
+Change in rna.f No foldings are said to be found if vmin > 5000. This
+corresponds to 50 kcal/mole in nafold2 and 500 kcal/mole in
+nafold. The previous value, 500, was ruling out foldings > 5 kcal/mole
+in nafold, and this was undesirable.
+
+19. 1/5/00
+
+Change in newtemp.f The input values for [Na+] and [Mg++] have always
+been interpreted as molar quantities. Thus 0.1 or 1e-1 are both read
+as 100 mM. If the input is followed by 'mM', with or without a space,
+then the values are now interpreted as mM. Thus 10mM is a valid input
+and is equivalent to 0.01 or 1e-2.
+
+20. 2/24/00
+
+Change in rna.f. Hairpin loops of size 3 that contain an 'L' as the
+first single stranded base are given an initiation free energy instead
+of a hairpin loop free energy. However, I had forgotten to add the
+terminal AU (or AT) penalty in this case, since it is already built
+into the tstackh rules for hairpin loops. This is now corrected.
+
+< old
+> new
+
+<          erg4 = eparam(15)
+---
+>          erg4 = eparam(15) + au_pen(i,j)
+
+The same change is added to efn.f
+
+21. 3/1/00
+
+Change in newtemp.f. For bulge and interior loops of size > 10, use a
+salt correction for a size of 10, rather than no correction;
+
+22. 6/29/00
+
+It was noticed that forcing base pairs worked when an entire sequence
+was folded but not when a segment was folded. This bug pointed to a
+problem associated with either "newnum" or "hstnum". The "list" array
+in subroutine "process" (misc.f) stores up to 4 numbers i,j,k,l. These
+refer to historical numbering and must be converted into internal
+numbering. The old version kept historical numbering but then made the
+mistake of going through some do loops with "l = 1,n" instead of "l =
+histnum(1),nstnum(n)". This whole mess has been cleaned up by
+converting the "list" values to the new numbering scheme (internal) as
+soon as they are taken from the list array.
+
+< old   > new
+139,140c139,140
+<       i = list(ptr,2)
+<       j = list(ptr,3)
+---
+>       i = newnum(list(ptr,2))
+>       j = newnum(list(ptr,3))
+142c142
+<       if (list(ptr,1).eq.2.or.list(ptr,1).eq.6) k = j
+---
+>       if (list(ptr,1).eq.2.or.list(ptr,1).eq.6) k = list(ptr,3)
+174,175c174,175
+<          force(newnum(x)) = 2
+<          aux(newnum(x)) = 'F'
+---
+>          force(x) = 2
+>          aux(x) = 'F'
+180,183c180,183
+<         force(newnum(i+x)) = 2
+<         force(newnum(j-x)) = 2
+<         aux(newnum(j-x)) = ')'
+<         aux(newnum(i+x)) = '('
+---
+>         force(i+x) = 2
+>         force(j-x) = 2
+>         aux(j-x) = ')'
+>         aux(i+x) = '('
+186,189c186,189
+<                vst((n-1)*(newnum(l)-1) + newnum(i+x)) = infinity
+<                vst((n-1)*(newnum(i+x)-1) + newnum(l)+n) = infinity
+<                vst((n-1)*(newnum(l)-1) + newnum(j-x)) = infinity
+<                vst((n-1)*(newnum(j-x)-1) + newnum(l)+n) = infinity
+---
+>                vst((n-1)*(l-1) + i+x) = infinity
+>                vst((n-1)*(i+x-1) + l+n) = infinity
+>                vst((n-1)*(l-1) + j-x) = infinity
+>                vst((n-1)*(j-x-1) + l+n) = infinity
+191,194c191,194
+<                vst((n-1)*(newnum(i+x)-1) + newnum(l)) = infinity
+<                vst((n-1)*(newnum(l)-1) + newnum(i+x)+n) = infinity
+<                vst((n-1)*(newnum(l)-1) + newnum(j-x)) = infinity
+<                vst((n-1)*(newnum(j-x)-1) + newnum(l)+n) = infinity
+---
+>                vst((n-1)*(i+x-1) + l) = infinity
+>                vst((n-1)*(l-1) + i+x+n) = infinity
+>                vst((n-1)*(l-1) + j-x) = infinity
+>                vst((n-1)*(j-x-1) + l+n) = infinity
+196,199c196,199
+<                vst((n-1)*(newnum(i+x)-1) + newnum(l)) = infinity
+<                vst((n-1)*(newnum(l)-1) + newnum(i+x)+n) = infinity
+<                vst((n-1)*(newnum(j-x)-1) + newnum(l)) = infinity
+<                vst((n-1)*(newnum(l)-1) + newnum(j-x)+n) = infinity
+---
+>                vst((n-1)*(i+x-1) + l) = infinity
+>                vst((n-1)*(l-1) + i+x+n) = infinity
+>                vst((n-1)*(j-x-1) + l) = infinity
+>                vst((n-1)*(l-1) + j-x+n) = infinity
+209,210c209,210
+<                vst((n-1)*(newnum(l1)-1) + newnum(l2)) = infinity
+<                vst((n-1)*(newnum(l2)-1) + newnum(l1)+n) = infinity
+---
+>                vst((n-1)*(l1-1) + l2) = infinity
+>                vst((n-1)*(l2-1) + l1+n) = infinity
+217,220c217,220
+<                vst((n-1)*(newnum(l1)-1) + newnum(l2)) = infinity
+<                vst((n-1)*(newnum(l2)-1) + newnum(l1)+n) = infinity
+<                aux(newnum(j-x)) = '}'
+<                aux(newnum(i+x)) = '{'
+---
+>                vst((n-1)*(l1-1) + l2) = infinity
+>                vst((n-1)*(l2-1) + l1+n) = infinity
+>                aux(j-x) = '}'
+>                aux(i+x) = '{'
+229,232c229,232
+<       force(newnum(i)) = 2
+<       force(newnum(j)) = 2
+<       aux(newnum(j)) = ')'
+<       aux(newnum(i)) = '('
+---
+>       force(i) = 2
+>       force(j) = 2
+>       aux(j) = ')'
+>       aux(i) = '('
+235,236c235,236
+<             vst((n-1)*(newnum(l)-1) + newnum(i)) = infinity
+<             vst((n-1)*(newnum(i)-1) + newnum(l)+n) = infinity
+---
+>             vst((n-1)*(l-1) + i) = infinity
+>             vst((n-1)*(i-1) + l+n) = infinity
+238,239c238,239
+<             vst((n-1)*(newnum(i)-1) + newnum(l)) = infinity
+<             vst((n-1)*(newnum(l)-1) + newnum(i)+n) = infinity
+---
+>             vst((n-1)*(i-1) + l) = infinity
+>             vst((n-1)*(l-1) + i+n) = infinity
+242,243c242,243
+<             vst((n-1)*(newnum(l)-1) + newnum(j)) = infinity
+<             vst((n-1)*(newnum(j)-1) + newnum(l)+n) = infinity
+---
+>             vst((n-1)*(l-1) + j) = infinity
+>             vst((n-1)*(j-1) + l+n) = infinity
+245,246c245,246
+<             vst((n-1)*(newnum(j)-1) + newnum(l)) = infinity
+<             vst((n-1)*(newnum(l)-1) + newnum(j)+n) = infinity
+---
+>             vst((n-1)*(j-1) + l) = infinity
+>             vst((n-1)*(l-1) + j+n) = infinity
+252,253c252,253
+<           force(newnum(ii)) = 1
+<           aux(newnum(ii)) = 'P'
+---
+>           force(ii) = 1
+>           aux(ii) = 'P'
+259,260c259,260
+<            vst((n-1)*(newnum(i+x)-1)+newnum(j-x)) = infinity
+<            vst((n-1)*(newnum(j-x)-1)+newnum(i+x)+n) = infinity
+---
+>            vst((n-1)*(i+x-1)+j-x) = infinity
+>            vst((n-1)*(j-x-1)+i+x+n) = infinity
+266,269c266,269
+<          i = -list(ptr,1)
+<          j = list(ptr,2)
+<          k = list(ptr,3)
+<          l = list(ptr,4)
+---
+>          i = newnum(-list(ptr,1))
+>          j = newnum(list(ptr,2))
+>          k = newnum(list(ptr,3))
+>          l = newnum(list(ptr,4))
+273,274c273,274
+<                   vst((n-1)*(newnum(ii)-1)+newnum(jj)) = infinity
+<                   vst((n-1)*(newnum(jj)-1)+newnum(ii)+n) = infinity
+---
+>                   vst((n-1)*(ii-1)+jj) = infinity
+>                   vst((n-1)*(jj-1)+ii+n) = infinity
+276,277c276,277
+<                   vst((n-1)*(newnum(jj)-1)+newnum(ii)) = infinity
+<                   vst((n-1)*(newnum(ii)-1)+newnum(jj)+n) = infinity
+---
+>                   vst((n-1)*(jj-1)+ii) = infinity
+>                   vst((n-1)*(ii-1)+jj+n) = infinity
+
+23. 12/11/2000
+
+Dave Mathews corrects one number in tstackm.dat.
+
+UG/AA becomes -1.00 instead of -1.30
+
+24. 1/22/01
+
+Serious minor bug in multid corrected. EOF on read file name now
+points to 99, not 1, so that endless loops are avoided. Prompted by 
+a catastophic problem on the quikfold server.
+
+25. 2/15/01
+
+Minor bug in main.f. Multiple molecule folding was ignoring the limit on 
+the number of computed foldings per sequence. This was easily corrected.
+
+230c230
+old<         if (cntrl(7).eq.1.and.rep.gt.cntrl(6)) flag = .false.
+---
+new>         if (cntrl(7).ge.1.and.rep.gt.cntrl(6)) flag = .false.
+
+26. 3/14/01
+
+nafold and nafold2 stop in "fill" if a sequence is determined to have
+no possible fold. This is OK for folding a single sequence, but bad
+when multiple sequences are folded in a single run. Why abort the
+whole job for a single bad sequence? The chosen solution is to print a
+"no folding possible" message and to trap the error rather than to
+stop in "fill". Thus the "nofold" parameter is now passed to "fill"
+from "main". 0 by default, it is set to 1 if no folding can occur. In
+"main", "nofold = 1" skips the current sequence.
+
+Changes: In main.f  ( < old and > new )
+
+84c84,86
+<          call fill
+---
+>          nofold = 0
+>          call fill(nofold)
+>          if (nofold.eq.1) goto 910
+
+241c243
+<       if (cntrl(7).eq.2.and.mrep.lt.cntrl(5)) then
+---
+>  910  if (cntrl(7).eq.2.and.mrep.lt.cntrl(5)) then
+
+In rna.f:
+
+433c433
+<       subroutine fill
+---
+>       subroutine fill(nofold)
+
+740,741c740,741
+<          write(6,*) 'STOP: No folding possible in this segment.'
+<          call exit(1)
+---
+>          write(6,*) 'No folding possible in this segment.'
+>          nofold = 1
+
+27. 11/9/01
+
+'batgen' was discovered to be very much out-of-date. It no longer
+prompts for "Printer width". The default free energy files end in
+".dat" (version 3), rather than ".dg" (version 2). The miscloop.___
+file can now be read. "<" refers to "old" and ">" to "new"
+
+old batgen.f versus new batgen.f
+
+120,124c120,124
+<       data asint1x2/'asint1x2.dg'/asint2x3/'asint2x3.dg'/dangle/'dangle.dg'/
+<       data loop/'loop.dg'/miscloop/'miscloop.dg'/sint2/'sint2.dg'/
+<       data sint4/'sint4.dg'/sint6/'sint6.dg'/stack/'stack.dg'/
+<       data tloop/'tloop.dg'/triloop/'triloop.dg'/tstckh/'tstackh.dg'/
+<       data tstcki/'tstacki.dg'/
+---
+>       data asint1x2/'asint1x2.dat'/asint2x3/'asint2x3.dat'/dangle/'dangle.dat'/
+>       data loop/'loop.dat'/miscloop/'miscloop.dat'/sint2/'sint2.dat'/
+>       data sint4/'sint4.dat'/sint6/'sint6.dat'/stack/'stack.dat'/
+>       data tloop/'tloop.dat'/triloop/'triloop.dat'/tstckh/'tstackh.dat'/
+>       data tstcki/'tstacki.dat'/
+690c690
+<       if(find(32,3,' > ')) stop 'Premature end of Miscloop file.'
+---
+>       if(find(32,3,'-->')) stop 'Premature end of Miscloop file.'
+692c692
+<       if(find(32,3,' > ')) stop 'Premature end of Miscloop file.'
+---
+>       if(find(32,3,'-->')) stop 'Premature end of Miscloop file.'
+694c694
+<       if(find(32,3,' > ')) stop 'Premature end of Miscloop file.'
+---
+>       if(find(32,3,'-->')) stop 'Premature end of Miscloop file.'
+696c696
+<       if(find(32,3,' > ')) stop 'Premature end of Miscloop file.'
+---
+>       if(find(32,3,'-->')) stop 'Premature end of Miscloop file.'
+807,808d806
+<         write (outunit,5) cntrl(3)
+<         call getint(cntrl(3),40,144,cntrl(3))
+810d807
+<         write (20,6) cntrl(3)
+846d842
+< 5     format (1x,'Printer width? Default:',i3)
+
+28. 7/22/02
+
+In order to "simulate" the effect of having two strands, a linker of
+'LLL' (or 'lll') is meant to separate one strand from another. If
+'LLL' appears within a haipin loop, then the loop will be given the
+initiation free energy instead of the hairpin loop free energy. When
+this feature was added at the request of John SantaLucia, it was never
+imagined that such false hairpin loops would ever be large. Thus only
+loops of size 20 or less were tested for the 'LLL'. This was recently
+raised to 60. Finally, I realized that some people are putting in a
+very large first sequence, so that the false hairpin could be very
+large. However, testing every hairpin for 'LLL' somewhere in the
+interior is too expensive to do for all foldings. The 'strand' array
+now designates 1 or 2 for strands 1 and 2, respectively. For ordinary
+folding,
+ 
+29. 8/1/02
+
+The sort.f program assumed that sequences <= 500 in length used
+energies in 100ths of a kcal/mole (otherwise 10ths). This was very
+stupid since there is a global variable, 'prec' that gives the
+units. Thus 'factor' was replaced by 'prec' in sort.f
+
+30. 1/24/03
+
+a. The mfold script changed to remove fort.* and mfold.log
+during abort process.
+
+b. The mfold script changed to abort cleanly if the save file is empty
+(as would be the case if no folding is possible.)
+
+31. 5/27/03
+
+formid and multid (.f source files) altered to read fasta format
+correctly. The ">" symbol indicated end of sequence. Must backspace 1
+in formid. "End of file" notice is printed after the last sequence is
+read. This is harmless and merely indicates that the end of file
+indicated the end of a sequence.
+
+formid: old vs. new
+222c222
+<       if (chr.eq.'1'.or.chr.eq.'2'.or.chr.eq.'*') goto 55
+---
+>       if (chr.eq.'>'.or.chr.eq.'1'.or.chr.eq.'2'.or.chr.eq.'*') goto 55
+232c232,233
+<    55 write (iout,105) '   Length of retreived sequence = ',seqlen
+---
+>  55   if (chr.eq.'>') backspace(inseq)
+>       write (iout,105) '   Length of retrieved sequence = ',seqlen
+
+multid: old vs. new
+192c192
+<       if (rec(1:1).eq.'/') goto 55
+---
+>       if (rec(1:1).eq.'/') return
+200c200
+<       if (chr.eq.'1'.or.chr.eq.'2'.or.chr.eq.'*') goto 55
+---
+>       if (chr.eq.'>'.or.chr.eq.'1'.or.chr.eq.'2'.or.chr.eq.'*') return
+205c205
+<       if (seqlen.eq.stop) goto 55
+---
+>       if (seqlen.eq.stop) return
+210,212d209
+< c   55 write (iout,105) '   Length of retreived sequence = ',seqlen
+< c      write (iout,'(/)')
+<  55   continue
+
+32. 6/13/03
+
+An access violation was reported in erg3() by David Mathog of Caltech.
+i-j and ip-jp are the external and internal base pairs of a
+bulge/interior loop. When the loop is of type 1x2, the code tags the
+closing base pairs by 1, 2, 3, 4, 5 or 6 corresponding to A-U, C-G,
+G-C, U-A, G-U and U-G, respectively. These integers, a and b,
+respectively, must be between 1 and 6 inclusive. If a or b is not
+defined, then the loop does not have a valid closing base pair. This
+could cause a or b to be out of bounds and give an access violation
+when looking up an energy in the asint3 array.  This can never happen
+during the fill algorithm, but the traceback routine is not so careful
+and needn't be. What Dave Mahog found was an access violation during
+traceback. The fix is simple. In the following lines, the lines
+beginning with --> are new:
+
+          elseif(lopsid.eq.1.and.(size.eq.3))then
+c   Asymmetric interior loop with size1 < size2
+             if(size1.lt.size2)then
+                if((numseq(i)+numseq(j)).eq.5)then
+                   a=numseq(i)
+                elseif(numseq(i).eq.3.and.numseq(j).eq.4)then
+                   a=5
+                elseif(numseq(i).eq.4.and.numseq(j).eq.3)then 
+                   a=6
+-->             else
+-->                erg3 = infinity
+-->                return
+                endif
+
+                if((numseq(ip)+numseq(jp)).eq.5)then
+                   b=numseq(ip)
+                elseif(numseq(ip).eq.3.and.numseq(jp).eq.4)then
+                   b=5
+                elseif(numseq(ip).eq.4.and.numseq(jp).eq.3)then
+                   b=6
+-->             else
+-->                erg3 = infinity
+-->                return
+                endif
+
+c       Size = 3
+                if(size.eq.3) then
+                   erg3 = erg3 + eparam(3)+asint3(a,b,numseq(i+1),numseq(j-1),
+     .             numseq(jp+1))
+                   return
+
+33. In add-dHdSTm2.f, there was an error. "factor" was previously set
+to 4 for a homodimer and 2 for a heterodimer. The correct assignment
+is 4 for a heterodimer and 1 for a homedimer.
+
+61c61
+old<             factor = 4.0
+---
+new>             factor = 1.0
+63c63
+old<             factor = 2.0
+---
+new>             factor = 4.0
+
+34. 10/23/03
+
+Error in reading constraint file in auxgen corrected.
+
+If an energy constraint is encountered ('EN'), read past two
+more lines.
+
+100a101,104
+>          if (type.eq.'EN') then
+>             read(3,*,end=30,err=25) dummy
+>             read(3,*,end=30,err=25) dummy
+>          endif
+
+is inserted just before:
+
+         if (type(1:1).eq.'S') then
+            read(3,*,end=30,err=25) i,k
+            if (i+k-1.gt.n) then
+               write(4,205) type(2:2),i,0,k
+ 205           format('Invalid constraint: ',a1,3i6)
+ ...
+
+35. 2/26/04
+
+Not a bug, but a fix. In misc.f, change a number of formats from i5 to
+i6 to allow for 6 digit historical numbers. In ct file, make
+historical number i7 to ensure a space between the last two columns.
+
+
+36. 2/27/04
+
+Similar auxgen problem as in 34. If an MAXBP constraint is encountered
+('BF'), read past one more line. The corrections in 34. and 36. now
+become:
+
+          if (type.eq.'EN') then
+             read(3,*,end=30,err=25) dummy
+             read(3,*,end=30,err=25) dummy
+          endif
+          if (type.eq.'BF') then
+             read(3,*,end=30,err=25) dummy
+          endif
+
+37. 3/15/04
+
+Problem when using "prohibit range" together with START != 1 and STOP != n.
+newnum = 0 for regions < START and > STOP. If a prohibit range command is given:
+
+P i-j k-l
+
+and i or k < START or j or l > STOP, segmentation faults can occur
+when the process subroutine attempts to address positions that are way
+out of bounds for vst. The fix is given below (new vs. old).
+
+Set newnum to zero for entire initial sequence of length n, before n
+is changed to the length of the fragment.
+
+6c6
+<       do i = 1,n
+---
+>       do i = nsave(1),nsave(2)
+
+Test i, j, k and l to make sure they are within bounds.
+
+292,317d291
+<          if (-list(ptr,1).lt.nsave(1)) then
+<             i = 1
+<             if (list(ptr,2).lt.nsave(1)) then
+<                j = 0
+<             elseif (list(ptr,2).gt.nsave(2)) then
+<                j = n
+<             endif
+<          elseif (-list(ptr,1).gt.nsave(2)) then
+<             i = 1
+<             j = 0
+<          else
+<             if (list(ptr,2).gt.nsave(2)) j = n
+<          endif
+<          if (list(ptr,3).lt.nsave(1)) then
+<             k = 1
+<             if (list(ptr,4).lt.nsave(1)) then
+<                l = 0
+<             elseif (list(ptr,4).gt.nsave(2)) then
+<                l = n
+<             endif
+<          elseif (list(ptr,3).gt.nsave(2)) then
+<             k = 1
+<             l = 0
+<          else
+<             if (list(ptr,4).gt.nsave(2)) l = n
+<          endif
+1152c1126
+<                 write(u,1002) choices(-list(i,1)),-list(i,1),(list(i,k),k = 2,4)
+---
+>                 write(u,1002) choices(list(i,1)),-list(i,1),(list(i,k),k = 2,4)
+
+38. 5/19/04
+
+The mfold script is altered slightly so that the sequence file does
+not have to be in the working directory. The sequence file is copied
+to the working directory. A ".seq" suffix is removed if it exists and
+output files are generated in the usual way.
+
+39. 6/9/04
+
+Error in reading arguments in add-dHdSTm2.f.
+
+Old (very bad design and miss reading arg6 - homodimer flag)
+
+      call getarg(1,infile1)
+      call getarg(2,infile2)
+      call getarg(3,record1)
+      call getarg(4,mode)
+      call getarg(5,homodimer)
+      read(record1,*) t
+      t = t + 273.15
+      call getarg(5,record1)
+      read(record1,*) conc
+
+Corrected:
+
+      call getarg(1,infile1)
+      call getarg(2,infile2)
+      call getarg(3,record1)
+      read(record1,*) t
+      t = t + 273.15
+      call getarg(4,mode)
+      call getarg(5,record1)
+      read(record1,*) conc
+      call getarg(6,homodimer)
+
+40. 11/18/04
+
+Long overdue correction to efn.f to read ct files with some
+intelligence so that white space format does not have to be strict.
+
+New to old efn.f diff is:
+
+<  10   read(7,*,end=999) n,ctlabel
+---
+>  10   read(7,1030,end=999) n,ctlabel
+>  1030 format(i5,a50)
+65,67c66,68
+<          read(ctrec,*,err=997) k,seq(i)
+<          kb = index(ctrec,seq(i))
+<          read(ctrec(kb+1:80),*,err=997) itmp,itmp,basepr(i),hstnum(i)
+---
+>          read(ctrec,1040,err=997) k,seq(i)
+>  1040    format(i5,1x,a1)
+>          read(ctrec(8:80),*,err=997) itmp,itmp,basepr(i),hstnum(i)
+
+
+41. 12/10/04
+
+Not an error. mfold script is updated to include MAX_LP and MAX_AS
+(maximum bulge/interior loop size and maximum bulge/interior loop
+asymmetry. Diff with old script gives:
+
+
+18,19d17
+<    [ MAX_LP=maximum bulge/interior loop size (default 30) ]
+<    [ MAX_AS=maximum asymmetry of a bulge/interior loop (default 30) ]
+85,88d82
+<   elif [ `echo $1 | cut -d= -f1` = "MAX_LP" ]; then
+<     MAX_LP=`echo $1 | cut -d= -f2`     
+<   elif [ `echo $1 | cut -d= -f1` = "MAX_AS" ]; then
+<     MAX_AS=`echo $1 | cut -d= -f2`     
+112,114d105
+< MAX_LP=${MAX_LP:-30}
+< MAX_AS=${MAX_AS:-30}
+< 
+256,261d246
+< 1
+< 7
+< $MAX_LP
+< 8
+< $MAX_AS
+< 
+

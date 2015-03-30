@@ -1,0 +1,58 @@
+#boxplot.col color map for boxplot Apr 2, 1999: Define colors below with rgb.
+0.00 0.00 0.15  # blue-black is color 0 for text and outlines only.
+0.00 0.00 0.00  # black is color 1 (optimal energy) 
+0.95 0.00 0.00  # red is color 2 (almost optimal)
+0.00 0.85 0.00  # green is color 3
+0.75 0.75 0.00  # yellow is color 4
+0.80 0.00 0.80  # purple is color 5
+0.65 0.50 0.20  # brown is color 6
+0.20 0.60 0.80  # light blue is color 7
+0.00 0.00 0.80  # blue used for blue label dots
+0.99 0.99 0.99  # white for background 
+0.65 0.65 0.65  # for grid lines
+# 4 color scheme below for probabilities
+0.90 # use color 1 =black  for .9 < prob 
+0.5 # use color 2 = red   for .5 < prob <= .9
+0.2 # use color 3 = green for .2 < prob <= .5 and yellow for prob= < .2
+# 5 color scheme below
+0.90 # use color 1  for .9 < prob 
+0.75 # use red for  for .75 < prob <= .9
+0.50 # use green for    .5 < prob <= .75
+0.25 # use yellow for   .25 < prob <= .5 and purple for prob <= .25
+# 6 color scheme below
+0.90 # use color 1  for .9 < prob 
+0.80 # use red for  for .8 < prob <= .9
+0.70 # use green for    .7 < prob <= .8
+0.50 # use yellow for   .5 < prob <= .7
+0.35 # use purple for   .35 < prob <= .5 and brown for prob <= .35
+# 7 color scheme below: Which probabilities for each color?
+0.95 # use color 1 = black for   .95 < prob
+0.90 # use color 2 = red for     .90 < prob <= .95
+0.75 # use color 3 = green for   .75 < prob <= .90
+0.50 # use color 4 = yellow for  .50 < prob <= .75
+0.35 # use color 5 = purple for  .35 < prob <= .50
+0.20 # use brown for .20 < prob <= .35 and light blue for prob <= .2
+# Minimum Size of dots for postscript for all except non-zoom probability
+# first number is magnification, second is minimum size in points.
+1.2   1.2  # for black, 1.0 for first is maximum size without overlap.
+1.1   1.1  # for red    1.0 for second indicates dot is drawn 
+.9     .9  # for green     at least  1.0/72 inch
+.8     .8  # for yellow
+.8     .8  # for purble
+.8     .8  # for brown
+.8     .8  # for light blue
+# To change colors or the probability range for each color,
+# Any floating point number of the form x.xx may be altered.
+# The comment text  following the # may be altered to describe changes.
+# Every line above is required.  The program is stupid.
+# The # symbol indicates comments, but the program does not look for it. 
+# The program ignores lines 1,12,16,21,27,and 34 on.  
+# Lines 2-8 must exist with colors  specified as red, green, and blue values
+# between 0.00 and 0.99   
+# Within a color scheme, the numbers must decrease as in .90,.75,.50,.25
+#
+# These colors are used for the screen, postscript, and gif files.
+# They are used for both energy and probability plot files.
+
+# Format of this file must match the format expected by boxplot_setcolor.h
+

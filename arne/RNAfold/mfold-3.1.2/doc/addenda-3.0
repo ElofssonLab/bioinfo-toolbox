@@ -1,0 +1,35 @@
+1. 7/2/99
+
+"ENERGY =" has been changed to "dG =" throughout. The mfold script now
+creates a $FILE_PREFIX.dh file by running 'efn' to compute (RNA or
+DNA) enthalpies of the original ct file, when enthalpies are
+available.
+
+The new add-dHdSTm program reads a text output file (.out or
+.out.html) or a detailed out put file (.det or .det.html) and then
+reads in a corresponding .dh file, which should already be
+computed. The output file is identical to the input file, except that
+"dG = " records have enthalpies, entropies and Tm's appended. Note
+that Tm is computed from a simple 2 state model and should only be
+used for oligos.
+
+2. 7/19/99
+
+John SantaLucia spent July 12-16 in St. Louis. During this time, we
+added [Na+] and [Mg++] corrections for DNA folding. This is done
+entirely through the newtemp program, so changes were
+minimized. However, it was necessary to go from single decimal to 2
+decimal precision for all the free energy fules. This affected all the
+".dat", ".dg", ".dh", ".dgd" and ".dhd" files. In addition, nafold had
+to be altered to read the more precise energy files. Makefile now
+automatically creates 2 versions on nafold. The nafold2 version
+uses full integers and the free energies are stored as 100ths of a
+kcal/mol. This version will fold up to 500 bases. nafold2 can be
+made to fold more or fewer than 500 bases, depending on the value of
+'MAXN2' in Makefile. The value of 'MAXN' controls the number of bases
+that nafold can handle. This program continues to use 16 bit (short)
+integers and stores free energies in 10ths of a kcal/mole. 
+
+The changes affected other programs as well. sav2plot and sav2p-num
+have 2 new versions, sav2plot2 and sav2p-num2, corresponding to nafold
+and nafold2, respectively.

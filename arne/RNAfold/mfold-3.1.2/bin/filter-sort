@@ -1,0 +1,36 @@
+#!/bin/sh
+# 2/1/97 - Rewrite. Old version causing some errors on mfold server
+# when not all levels present. Old version was also too slow.
+# Sorts energy dot plot file $1 and removes helices of length
+# less than $SIZE, where SIZE = $2 (3 if $2 not defined). 
+# No optimal helices are removed.
+
+if [ $# -lt 1 ]; then
+    echo "\n*** Usage: filter-sort input_file size"
+    exit 1
+fi
+if [ ! -s $1 ]; then
+   echo "$1 does not exist or is empty."
+   exit
+else
+   if [ $# -lt 2 ]; then
+       SIZE=3
+   else
+       SIZE=$2
+   fi
+fi
+
+#   Remove all non-optimal helices of size < $SIZE
+echo "Removing helices of length less than" $SIZE
+
+SM1=`expr $SIZE - 1`
+head -1 $1 > tmp1-$1
+tail +2 $1 | grep -v "^      [2-9]      [1-$SM1]" > tmp2-$1
+
+# Now sort and replace
+
+sort -r +4 tmp2-$1  >> tmp1-$1
+mv tmp1-$1 $1
+rm -f tmp2-$1
+echo "$1 replaced by new file."
+

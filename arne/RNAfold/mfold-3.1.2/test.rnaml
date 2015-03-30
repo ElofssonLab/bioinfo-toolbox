@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+<!DOCTYPE rnaml PUBLIC "-//University of Montreal//RNAML 1.1//EN" "http://www-lbit.iro.umontreal.ca/rnaml/current/rnaml.dtd">
+
+<rnaml version="1.1" comment="Output from mFold">
+
+  <analysis id="mfold">
+    <program>
+      <prog-name>mFold</prog-name>
+      <prog-version>3.1</prog-version>
+    </program>
+  </analysis>
+
+
+  <!-- 1st sequence and its associated foldings ******************* -->
+  <molecule id="foo" type="dna">
+    <sequence circular="false" strand="1">
+      <seq-data>
+        TTTAAGAAGG AGACTCGAGG ATGAGTCACT CATCCGCCCC CGAAAGGGCT ACTGGAG
+      </seq-data>
+    </sequence>
+
+    <structure analysis-ids="mfold">
+      <!-- Start of folding 1 for sequence 1 ************************ -->
+      <model id="_1.1">
+        <model-info>
+          <free-energy>-18.90</free-energy>
+        </model-info>
+
+        <str-annotation>
+          <helix>
+            <base-id-5p>
+              <base-id>
+                <position>6</position>
+              </base-id>
+            </base-id-5p>
+            <base-id-3p>
+              <base-id>
+                <position>16</position>
+              </base-id>
+            </base-id-3p>
+            <length>2</length>
+          </helix>
+          <base-pair>
+            <base-id-5p>
+              <base-id>
+                <position>9</position>
+              </base-id>
+            </base-id-5p>
+            <base-id-3p>
+              <base-id>
+                <position>14</position>
+              </base-id>
+            </base-id-3p>
+          </base-pair>
+          <helix>
+            <base-id-5p>
+              <base-id>
+                <position>19</position>
+              </base-id>
+            </base-id-5p>
+            <base-id-3p>
+              <base-id>
+                <position>35</position>
+              </base-id>
+            </base-id-3p>
+            <length>7</length>
+          </helix>
+          <helix>
+            <base-id-5p>
+              <base-id>
+                <position>39</position>
+              </base-id>
+            </base-id-5p>
+            <base-id-3p>
+              <base-id>
+                <position>48</position>
+              </base-id>
+            </base-id-3p>
+            <length>3</length>
+          </helix>
+        </str-annotation>
+      </model>
+      <!-- End of folding 1 for sequence 1 ************************ -->
+
+      <!-- Start of folding 2 for sequence 1 ************************ -->
+      <model id="_1.2">
+        <model-info>
+          <free-energy>-18.60</free-energy>
+        </model-info>
+
+        <str-annotation>
+          <helix>
+            <base-id-5p>
+              <base-id>
+                <position>14</position>
+              </base-id>
+            </base-id-5p>
+            <base-id-3p>
+              <base-id>
+                <position>57</position>
+              </base-id>
+            </base-id-3p>
+            <length>3</length>
+          </helix>
+          <helix>
+            <base-id-5p>
+              <base-id>
+                <position>19</position>
+              </base-id>
+            </base-id-5p>
+            <base-id-3p>
+              <base-id>
+                <position>35</position>
+              </base-id>
+            </base-id-3p>
+            <length>7</length>
+          </helix>
+          <helix>
+            <base-id-5p>
+              <base-id>
+                <position>39</position>
+              </base-id>
+            </base-id-5p>
+            <base-id-3p>
+              <base-id>
+                <position>48</position>
+              </base-id>
+            </base-id-3p>
+            <length>3</length>
+          </helix>
+        </str-annotation>
+      </model>
+      <!-- End of folding 2 for sequence 1 ************************ -->
+
+    </structure>
+  </molecule>
+
+</rnaml>

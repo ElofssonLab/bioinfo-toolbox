@@ -1,0 +1,35 @@
+#!/bin/sh
+
+# naview
+# runs naview.exe which generates device independent plot commands used
+# to produce a modified radial drawing of nucleic acid secondary structure
+
+echo " "
+if [ $# -lt 1 ]
+then
+    echo " *** Usage: naview in_fil1  [o] "
+    echo " "
+    echo "            suffix  .ct  is assumed for in_fil1"
+    echo "            o  is optional - (o)verwrite existing file  in_fil1.plt2"
+elif [ -s $1.ct ] 
+then
+    if [ $# -lt 2 ]
+    then
+        overw=null
+    else
+        overw=$2
+    fi
+    if [ -s $1.plt2 -a $overw != "o" ]
+    then
+        echo " *** A file named  "$1".plt2  already exists . . ."  
+        echo " "
+        echo "     Use:  naview "$1" o  to overwrite this file."
+    else
+        naview.exe  $1.ct  $1.plt2  &&
+        echo " "
+        echo "    ====>  New device independent plot file is  "$1".plt2"
+    fi
+else
+    echo " *** Input dataset  "$1.ct"  does not exist or is empty."
+fi
+echo " "

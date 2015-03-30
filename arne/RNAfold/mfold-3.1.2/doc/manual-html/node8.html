@@ -1,0 +1,339 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>COMMAND LINE PARAMETERS</TITLE>
+<META NAME="description" CONTENT="COMMAND LINE PARAMETERS">
+<META NAME="keywords" CONTENT="FEBS98-html">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="FEBS98-html.css">
+<LINK REL="next" HREF="node9.html">
+<LINK REL="previous" HREF="node7.html">
+<LINK REL="up" HREF="node7.html">
+<LINK REL="next" HREF="node9.html">
+</HEAD>
+<BODY BGCOLOR=#FFDEAD TEXT=#202020 LINK=#800000 ALINK=#ffff00 VLINK=#353976>
+<!--Navigation Panel-->
+<A NAME="tex2html151"
+ HREF="node9.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="img/next_motif.gif"></A> 
+<A NAME="tex2html148"
+ HREF="node7.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="img/up_motif.gif"></A> 
+<A NAME="tex2html142"
+ HREF="node7.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="img/previous_motif.gif"></A> 
+<A NAME="tex2html150"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="img/contents_motif.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html152"
+ HREF="node9.html">OUTPUT</A>
+<B> Up:</B> <A NAME="tex2html149"
+ HREF="node7.html">Running the programs</A>
+<B> Previous:</B> <A NAME="tex2html143"
+ HREF="node7.html">Running the programs</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00071000000000000000">
+ <SMALL>COMMAND LINE PARAMETERS</SMALL></A>
+</H2>
+
+<P>
+These command line parameters can only be fully understood when the
+meaning of the different type of output files, described in the next
+subsection, is known.
+
+<P>
+SEQ :   The user must supply the name of a sequence file,
+called `file_name' here. If `file_name' ends with a suffix, that is, a
+period (`.') followed by other characters, then the suffix is removed
+and the result is called `fold_name'. If no periods exist in
+`file_name', then `fold_name' = `file_name'. For example, if the
+sequence is stored in `trna.seq', then `file_name' becomes `trna'. If,
+on the other hand, the sequence file is named `trna-file', then
+`file_name' becomes `trna-file'. The `file_name', which may contain
+periods, becomes the `prefix' for all the output files, such as
+`file_name.out', `file_name.det' and others.
+
+<P>
+Accepted sequence file formats are <I>GenBank</I>, <I>EMBL</I>, <I>FASTA</I> and <I>IntelliGenetics</I>. The sequence file may contain
+multiple sequences. At present, the <I>mfold</I> script will fold the
+first sequence by default. A new command line variable, NUM=`#' may be
+added that directs the script to fold the `#'<SUP><I>th</I></SUP> sequence in the
+input file.
+
+<P>
+AUX :   This is the name of an auxiliary input file of folding
+constraints. If this parameter is not used, <I>mfold</I> looks for a file
+named `fold_name.aux'. If this file exists and is not empty, then it
+is interpreted as a constraint file. Thus constraints may be used
+without the use of this command line parameter.
+
+<P>
+RUN_TYPE :   This parameter takes on 2 values; `text', by
+default, and `html' otherwise. The text option creates plain text
+files for the `fold_name.out' and `fold_name.det' files described
+below. The html option creates HTML versions of these files for
+display with a web browser.
+
+<P>
+NA :   This parameter takes on 2 values; `RNA' by default, and
+`DNA' otherwise. It tells <I>mfold</I> what type of nucleic acid is being folded.
+
+<P>
+LC :   This parameter takes on 2 values; `linear' by default,
+and `circular' otherwise. It indicates to <I>mfold</I> whether a linear or
+circular nucleic acid is being folded.
+
+<P>
+T :   This is the temperature, in &#176;C. By default, it
+is 37&#176;C.
+Non-integral values will be rounded down to the
+nearest integer. Values should be in the range 
+<!-- MATH: $0 \leq T \leq 100$ -->
+<IMG
+ WIDTH="89" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img92.gif"
+ ALT="$0 \leq T \leq 100$">.
+
+<P>
+P :   This is the percent suboptimality for computing the <I>energy dot plot</I> and suboptimal foldings. The default value is
+5%. This parameter controls the value of the free energy increment,
+
+<!-- MATH: $\Delta \Delta G$ -->
+<IMG
+ WIDTH="42" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img9.gif"
+ ALT="$\Delta \Delta G$">.
+
+<!-- MATH: $\Delta \Delta G$ -->
+<IMG
+ WIDTH="42" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img9.gif"
+ ALT="$\Delta \Delta G$">
+is set to P% of <IMG
+ WIDTH="29" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img6.gif"
+ ALT="$\Delta G$">,
+the
+computed minimum free energy. The <I>energy dot plot</I> shows only
+those base pairs that are in foldings with free energy  
+<!-- MATH: $\leq \Delta G
++ \Delta \Delta G$ -->
+<IMG
+ WIDTH="104" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img93.gif"
+ ALT="$\leq \Delta G
++ \Delta \Delta G$">.
+Similarly, the free energies of computed foldings
+are in the range from <IMG
+ WIDTH="29" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img6.gif"
+ ALT="$\Delta G$">
+to 
+<!-- MATH: $\Delta G+ \Delta \Delta G$ -->
+<IMG
+ WIDTH="88" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img94.gif"
+ ALT="$\Delta G+ \Delta \Delta G$">.
+No
+matter the value of P, <I>mfold</I> currently keeps 
+<!-- MATH: $\Delta \Delta G$ -->
+<IMG
+ WIDTH="42" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img9.gif"
+ ALT="$\Delta \Delta G$">
+in the
+range 
+<!-- MATH: $1 \leq \Delta \Delta G\leq 12$ -->
+<IMG
+ WIDTH="109" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img95.gif"
+ ALT="$1 \leq \Delta \Delta G\leq 12$">
+(kcal/mole).
+
+<P>
+W :   This is the window parameter that controls the number of
+foldings that are automatically computed by <I>mfold</I> . `W' may be thought
+of as a distance parameter. The distance between 2 base pairs, <I>i</I>.<I>j</I>and <I>i</I>'.<I>j</I>' may be defined as 
+<!-- MATH: $\max\{|i-i'|,|j-j'|\}$ -->
+<IMG
+ WIDTH="147" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img96.gif"
+ ALT="$\max\{\vert i-i'\vert,\vert j-j'\vert\}$">.
+Then if 
+<I>k</I>-1 foldings have already been predicted by <I>mfold</I> , the <I>k</I><SUP><I>th</I></SUP>folding will have at least <I>W</I> base pairs that are at least a distance
+<I>W</I> from any of the base pairs in the first <I>k</I>-1 foldings. As <I>W</I>increases, the number of predicted foldings decreases. If <I>W</I> is not
+specified, <I>mfold</I> selects a value by default based on sequence length,
+as displayed in Table <A HREF="#WINDOW">3</A>.
+<BR>
+<DIV ALIGN="CENTER"><A NAME="826">&#160;</A>
+<TABLE>
+<CAPTION><STRONG>Table 3:</STRONG>
+If `W' is not specified, <I> mfold</I> will choose
+its value from this table based on sequence length. The user is
+encouraged to experiment with this parameter.</CAPTION>
+<TR><TD><TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="CENTER"><B> Sequence length</B></TD>
+<TD ALIGN="CENTER"><B> Default window size</B></TD>
+</TR>
+<TR><TD ALIGN="CENTER">1-29</TD>
+<TD ALIGN="CENTER">0</TD>
+</TR>
+<TR><TD ALIGN="CENTER">30-49</TD>
+<TD ALIGN="CENTER">1</TD>
+</TR>
+<TR><TD ALIGN="CENTER">50-119</TD>
+<TD ALIGN="CENTER">2</TD>
+</TR>
+<TR><TD ALIGN="CENTER">120-199</TD>
+<TD ALIGN="CENTER">3</TD>
+</TR>
+<TR><TD ALIGN="CENTER">200-299</TD>
+<TD ALIGN="CENTER">5</TD>
+</TR>
+<TR><TD ALIGN="CENTER">300-399</TD>
+<TD ALIGN="CENTER">7</TD>
+</TR>
+<TR><TD ALIGN="CENTER">400-499</TD>
+<TD ALIGN="CENTER">8</TD>
+</TR>
+<TR><TD ALIGN="CENTER">500-599</TD>
+<TD ALIGN="CENTER">10</TD>
+</TR>
+<TR><TD ALIGN="CENTER">600-699</TD>
+<TD ALIGN="CENTER">11</TD>
+</TR>
+<TR><TD ALIGN="CENTER">700-799</TD>
+<TD ALIGN="CENTER">12</TD>
+</TR>
+<TR><TD ALIGN="CENTER">800-1199</TD>
+<TD ALIGN="CENTER">15</TD>
+</TR>
+<TR><TD ALIGN="CENTER">1200-1999</TD>
+<TD ALIGN="CENTER">20</TD>
+</TR>
+<TR><TD ALIGN="CENTER"><IMG
+ WIDTH="16" HEIGHT="28" ALIGN="MIDDLE" BORDER="0"
+ SRC="img97.gif"
+ ALT="$\geq$">
+2000</TD>
+<TD ALIGN="CENTER">25</TD>
+</TR>
+</TABLE></TD></TR>
+</TABLE>
+</DIV>
+<BR>
+<P>
+MAXBP :   A base pair <I>i</I>.<I>j</I> will not be allowed to form (in
+linear RNA) if 
+<!-- MATH: $j-i > MAXBP$ -->
+<I>j</I>-<I>i</I> &gt; <I>MAXBP</I>. For circular RNA, a base pair <I>i</I>.<I>j</I>cannot form if 
+<!-- MATH: $\min \{ j-i,n+i-j \} > MAXBP$ -->
+<IMG
+ WIDTH="237" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img98.gif"
+ ALT="$\min \{ j-i,n+i-j \} > MAXBP$">.
+Thus small values of
+MAXBP ensure that only short range base pairs will be predicted. By
+default, 
+<!-- MATH: $MAXBP = +\infty$ -->
+<IMG
+ WIDTH="122" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img99.gif"
+ ALT="$MAXBP = +\infty$">,
+indicating no constraint.
+
+<P>
+MAX :   This is the maximum number of foldings that <I>mfold</I> 
+will compute (50 by default). It is better to limit the number of
+foldings by careful selection of the P and W parameters.
+
+<P>
+ANN :   This parameter currently takes on 3 values. 1. `none'
+: secondary structures are drawn without any special
+annotation. Letters or outline are in black, while base pairs are red
+lines or dots for GC pairs and blue lines or dots for AU and GU
+pairs. 2. `p-num' : Colored dots, colored base characters or a
+combination are used to display in each folding how well-determined
+each base is according to the P-num values in the `fold_name.ann' file.
+3. `ss-count' : Colored dots, colored base characters or a
+combination are used to display in each folding how likely a base is
+to be single-stranded according to sample statistics stored in the
+`fold_name.ss-count' file. Both 2. and 3. were recently described
+[<A
+ HREF="node19.html#ZUKM9801">38</A>].
+
+<P>
+START :   A segment to be folded is selected from the entire
+sequence. START is the first base, and is 1 by default.
+
+<P>
+STOP :   This is the last base in the folded segment. It is
+the entire sequence length by default.
+
+<P>
+REUSE :   This parameter is either N (no, the default) or Y
+(yes). <I>mfold</I> creates a large save file, `fold_name.sav' that
+contains all the input parameters and the arrays of minimum folding
+energies for all sub-fragments of the folded sequence. This file,
+especially for large sequences, is expensive to create. If REUSE is
+`Y', then a file named `fold_name.sav' should exist from a previous
+run. You must specify the sequence file. Any (new) constraint file will
+be ignored, since constraints from the initial folding will be
+used. Similarly, NA, LC, T, MAXBP, START and STOP are determined from
+the initial run. However, RUN_TYPE, P, W, MAX and ANN may be altered
+to give different numbers of foldings, different <I>energy dot
+plots</I>, and/or different types of structure annotation.
+
+<P>
+Additional command line parameters for future development are
+discussed in the section on ``Future plans''.
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html151"
+ HREF="node9.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="img/next_motif.gif"></A> 
+<A NAME="tex2html148"
+ HREF="node7.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="img/up_motif.gif"></A> 
+<A NAME="tex2html142"
+ HREF="node7.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="img/previous_motif.gif"></A> 
+<A NAME="tex2html150"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="img/contents_motif.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html152"
+ HREF="node9.html">OUTPUT</A>
+<B> Up:</B> <A NAME="tex2html149"
+ HREF="node7.html">Running the programs</A>
+<B> Previous:</B> <A NAME="tex2html143"
+ HREF="node7.html">Running the programs</A>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<TABLE><TR><TD><IMG SRC=img/shield16.gif HSPACE=20></TD><TD><I>Michael Zuker <BR>Institute for Biomedical Computing<BR>
+Washington University in St. Louis<BR>
+1998-12-05</I></TD></TR></TABLE>
+</ADDRESS>
+</BODY>
+</HTML>

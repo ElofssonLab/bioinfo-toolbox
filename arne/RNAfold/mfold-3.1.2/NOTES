@@ -1,0 +1,7 @@
+Fix unit 4 output of nafold (sequence output with force
+information annotated)
+
+Make this match output of auxgen.
+
+bug: Constrained helix shows OK but program puts and extra { } in the
+interior??? 

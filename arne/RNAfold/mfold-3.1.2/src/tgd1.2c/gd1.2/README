@@ -1,0 +1,130 @@
+http://www.boutell.com/gd/
+
+Credits and license terms
+
+gd 1.2 is copyright 1994, 1995, Quest Protein Database Center, Cold Spring Harbor Labs.
+Permission granted to copy and distribute this work provided that this notice remains intact.
+Credit for the library must be given to the Quest Protein Database Center, Cold Spring Harbor
+Labs, in all derived works. This does not affect your ownership of the derived work itself, and
+the intent is to assure proper credit for Quest, not to interfere with your use of gd. If you have
+questions, ask. ("Derived works" includes all programs that utilize the library. Credit must be
+given in user-visible documentation.) 
+
+If you wish to release modifications to gd, please clear them first by sending email to
+boutell@boutell.com; if this is not done, any modified version of the gd library must be clearly
+labeled as such. 
+
+The Quest Protein Database Center is funded under Grant P41-RR02188 by the National
+Institutes of Health. 
+
+Written by Thomas Boutell, 2/94 - 7/95. 
+
+The GIF compression code is based on that found in the pbmplus utilities, which in turn is based
+on GIFENCOD by David Rowley. See the notice below: 
+
+/*
+** Based on GIFENCOD by David Rowley .A
+** Lempel-Zim compression based on "compress".
+**
+** Modified by Marcel Wijkstra 
+**
+** Copyright (C) 1989 by Jef Poskanzer.
+**
+** Permission to use, copy, modify, and distribute this software and its
+** documentation for any purpose and without fee is hereby granted, provided
+** that the above copyright notice appear in all copies and that both that
+** copyright notice and this permission notice appear in supporting
+** documentation.  This software is provided "as is" without express or
+** implied warranty.
+**
+** The Graphics Interchange Format(c) is the Copyright property of
+** CompuServe Incorporated.  GIF(sm) is a Service Mark property of
+** CompuServe Incorporated.
+*/
+
+The GIF decompression is based on that found in the pbmplus utilities, which in turn is based on
+GIFDECOD by David Koblas. See the notice below: 
+
+/* +-------------------------------------------------------------------+ */
+/* | Copyright 1990, 1991, 1993, David Koblas.  (koblas@netcom.com)    | */
+/* |   Permission to use, copy, modify, and distribute this software   | */
+/* |   and its documentation for any purpose and without fee is hereby | */
+/* |   granted, provided that the above copyright notice appear in all | */
+/* |   copies and that both that copyright notice and this permission  | */
+/* |   notice appear in supporting documentation.  This software is    | */
+/* |   provided "as is" without express or implied warranty.           | */
+/* +-------------------------------------------------------------------+ */
+
+
+
+
+This is the gd gif-manipulating library, version 1.2. It was
+created to allow graphs, charts and the like to be generated on the
+fly for use on the World wide Web, but is useful for any
+application in which custom .GIFs are useful. It is not a paint 
+program; it is a library. If you are looking for a paint program
+for the X Window System, check out David Koblas "xpaint", available 
+by anonymous FTP from ftp.netcom.com in pub/ko/koblas. (I'm just a
+fan of Dave's code.)
+
+NOTE TO THE IMPATIENT: the Sun 'cc' compiler shipped
+standard with SunOS 4.1.3 is NOT AN ANSI C COMPILER and
+will not compile gd. Get and use gcc if you don't
+already have it, or use Sun's own commercial-grade
+ANSI C compiler if you prefer to purchase it.
+"What's new in gd 1.2?"
+
+Many bug fixes, ANSI C compliance, several new fonts and more.
+
+"Where's the manual?"
+
+Load gd.html into your web browser. Print it if you like,
+but <em>every single reference to a function is a hyperlink</em>,
+so the manual is especially good when read online! Note
+that the entire manual is one document, so it should be
+reasonably pleasant to read offline when printed. 
+
+COPYRIGHT 1994,1995 BY THE QUEST CENTER AT COLD SPRING HARBOR LABS. 
+Permission granted for unlimited use, provided that 
+Thomas Boutell and the Quest Center at Cold Spring Harbor Labs are given
+credit for the library in the user-visible documentation of 
+your software. If you modify gd, we ask that you share the
+modifications with us so they can be added to the
+distribution. See gd.html for details.
+
+gd has been compiled in various forms on all major platforms.
+It is happiest on a machine with 32-bit addressing and
+a proper stack (ie, anything running Unix, VMS, Windows NT
+or any other modern operating system), but is entirely
+usable under DOS and Windows. Note, however, that the
+flood-fill routines are mildly recursive and may fail on machines
+with tiny stack areas. Also, the fonts require a significant
+amount of memory (they are optimized more for speed than
+for size), but they need not be linked by applications that
+do not use them. Otherwise the code is highly
+portable as long as you have an ANSI C compiler.
+
+Full documentation is provided in HTML (World Wide Web) format
+in the file gd.html (part of this distribution). You can access the 
+latest version of the file at the URL "http://siva.cshl.org/gd/gd.html". 
+If you are unfamiliar with the World Wide Web, consult the Frequently
+Asked Questions posting of the appropriate comp.infosystems.www.browsers
+subgroup for your operating system to obtain
+more information on where to locate a hypertext browser.
+The text-based browser "Lynx" does a particularly good job
+of navigating the manual and will run on nearly anything.
+Netscape works fine too.
+
+If you don't have the patience to consult the manual
+first, build and examine gddemo.c (see the Makefile)
+and run it. It will read in demoin.gif and output
+demoout.gif, which you will want to examine with your
+GIF viewer to see the results.
+
+Tom Boutell, boutell@boutell.com
+
+http://sunsite.unc.edu/boutell/index.html
+
+P.O. Box 20837
+Seattle, WA 98102
+

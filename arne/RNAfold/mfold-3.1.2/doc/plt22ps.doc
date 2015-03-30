@@ -1,0 +1,117 @@
+Documentation for plt22ps.c
+
+
+Darrin Stewart and Michael Zuker 
+June 10, 1998 
+
+This program is similar to plt22gif.c
+Some information in plt22gif.doc is similar and more detailed.
+
+execute with plt22ps name 
+                                      
+  name is a plt2 file that already exists
+  The program will add .plt2 if necessary
+
+For annotating the dots or characters based on the files
+name.ann or name.ss-count,
+
+Use:       plt22gif 'name'.plt2                               ]
+[        Where 'name'.plt2 is a plt2 file                     ]
+[        and 'name'.ann exists for -c or -d and is a p-num    ]
+[        (default) or a probability annotation file (see -q   ]
+[        flag below).                                         ]
+[        If -n flag is used, the file 'name'.ss-count is used ]
+[        instead of 'name'.ann                     
+
+
+
+  Valid lower case parameters  
+
+ -a name2      Specify alternate name for annotation file with -c or -d,
+         .ann or .ss-count extensions will be appended.
+                             
+ -c           Use colored bases for annotation               
+ -d           Use colored dots for annotation                
+ -n           read ss-count file, default is  ann for -c or -d above      
+  
+ -o name_out                  
+     ps file named name_out.ps 
+     Default is name.ps 
+     The default name is produced from name.plt2 by removing the .plt2
+     and adding .ps 
+
+-p forces portrait mode 
+     The default is to guess between portrait and landscape  by reading 
+     the file and determining which direction works better.
+
+-q   read probability annotation file,              
+     default is 'name'_k.ann, then name.ann     
+     for -c -d option above 
+
+
+ -s real_number
+     Scales the size of the postscript file by real number.
+     1.0 is the default.
+     0.25 produces an image .25 * 8.5 inches wide and .25 *11 inches tall
+     real_number must be between .05 and 1.00
+      
+     If it is preferred to make a size change after the .ps file is
+     generated, two lines within the file need to be edited.
+
+
+ -t h
+ -t g
+      Create html or gif color table with -c or -d option.
+      The color table is specific to the given .ann or .ss-count file.
+      Name is name.ann.col.html or name.ss-count.col.html or
+              name.ss-count.col.gif or name.ss-count.col.gif
+      (gif option of .ann not created yet)
+      The file will not be created if it already exists.
+          
+-y real_number ix,iy
+     zoom about the pixel (ix,iy) as gif coordinates with
+     magnification, real_number,  upper left is 0,0,
+     lower right is 612,792 or 792,612 depending on 
+     portrait or landscape mode.  The programs determines
+     whether portrait or landscape is best and treats
+     the coordinates that way.  Create the same image
+     with plt22gif and resolution 72 and enter
+     coordinates from the image.
+
+-z real_number ix iy
+     zoom about the point ix,iy with magnification real_number
+     lower left is 0,0 upper right is 612,792.
+
+The program assumes naview is run with 21.59 27.94 as input for size of page.
+The character size is expected to be 
+         60000/(100 +length of sequence).
+See auto_ct2ps of mfold-3.0 for the usual execution.
+ 
+
+                                      
+ Note:  The file name must be the last parameter 
+ Other parameters will be searched for and processed whenever found 
+ Invalid parameters will probably be ignored and default values used 
+ ----------------------------------------------------------- 
+
+ To compile cc -o plt22ps plt22ps.c -lm 
+ or use the make file
+
+
+__________________________________________________________________________
+
+Files used:
+plt22ps.c        Main source code.
+color_ann.h        Defines annotation colors.
+plt22gif_or_ps.h  More color setup and opening of files.
+copyright_ps.h    For the copyright in the corner
+Makefile          The makefile
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,1145 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!--Converted with LaTeX2HTML 98.1p1 release (March 2nd, 1998)
+originally by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Loops and Nearest neighbor rules</TITLE>
+<META NAME="description" CONTENT="Loops and Nearest neighbor rules">
+<META NAME="keywords" CONTENT="FEBS98-html">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<LINK REL="STYLESHEET" HREF="FEBS98-html.css">
+<LINK REL="next" HREF="node6.html">
+<LINK REL="previous" HREF="node4.html">
+<LINK REL="up" HREF="FEBS98-html.html">
+<LINK REL="next" HREF="node6.html">
+</HEAD>
+<BODY BGCOLOR=#FFDEAD TEXT=#202020 LINK=#800000 ALINK=#ffff00 VLINK=#353976>
+<!--Navigation Panel-->
+<A NAME="tex2html113"
+ HREF="node6.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="img/next_motif.gif"></A> 
+<A NAME="tex2html110"
+ HREF="FEBS98-html.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="img/up_motif.gif"></A> 
+<A NAME="tex2html104"
+ HREF="node4.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="img/previous_motif.gif"></A> 
+<A NAME="tex2html112"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="img/contents_motif.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html114"
+ HREF="node6.html">Constrained folding</A>
+<B> Up:</B> <A NAME="tex2html111"
+ HREF="FEBS98-html.html">Algorithms and Thermodynamics for</A>
+<B> Previous:</B> <A NAME="tex2html105"
+ HREF="node4.html">Software platforms and environment</A>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00050000000000000000">
+Loops and Nearest neighbor rules</A>
+</H1>
+
+<P>
+The <I>mfold</I> software uses what are called <I>nearest neighbor</I>
+energy rules. That is, free energies are assigned to loops rather than
+to base pairs. These have also been called loop dependent energy
+rules. In an effort to keep this article as self-contained as
+possible, we are including some well-known definitions that may be
+found elsewhere [<A
+ HREF="node19.html#SAND8301">21</A>,<A
+ HREF="node19.html#ZUKM8401">22</A>,<A
+ HREF="node19.html#ZUKM8601">23</A>].
+
+<P>
+A secondary structure, <B>S</B> on an RNA sequence, 
+<!-- MATH: ${\bf R} =
+r_1,r_2,r_3,\dots,r_n$ -->
+<IMG
+ WIDTH="147" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img15.gif"
+ ALT="${\bf R} =
+r_1,r_2,r_3,\dots,r_n$">,
+is a set of <I>base pairs</I>.  A base pair
+between nucleotides <I>r</I><SUB><I>i</I></SUB> and <I>r</I><SUB><I>j</I></SUB> (<I>i</I>&lt;<I>j</I>) is denoted by <I>i</I>.<I>j</I>. A
+few constraints are imposed.
+
+<P>
+<UL>
+<LI>Two base pairs, <I>i</I>.<I>j</I> and <I>i</I>'.<I>j</I>' are either identical, or else
+<IMG
+ WIDTH="40" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img16.gif"
+ ALT="$i \neq i'$">
+and <IMG
+ WIDTH="44" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img17.gif"
+ ALT="$j \neq j'$">.
+Thus base triples are deliberately
+excluded from the definition of secondary structure.
+<LI>Sharp U-turns are prohibited. A U-turn, called a hairpin loop,
+must contain at least 3 bases.
+<LI>Pseudoknots are prohibited. That is, if <I>i</I>.<I>j</I> and 
+<!-- MATH: $i'.j' \in
+{\bf S}$ -->
+<IMG
+ WIDTH="59" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img18.gif"
+ ALT="$i'.j' \in
+{\bf S}$">,
+then, assuming <I>i</I> &lt; <I>i</I>', either 
+<!-- MATH: $i < i' < j' < j$ -->
+<I>i</I> &lt; <I>i</I>' &lt; <I>j</I>' &lt; <I>j</I> or 
+<!-- MATH: $i < j
+< i' < j'$ -->
+<I>i</I> &lt; <I>j</I>
+&lt; <I>i</I>' &lt; <I>j</I>'.
+</UL>
+<P>
+Pseudoknots
+[<A
+ HREF="node19.html#PLEC8901">24</A>,<A
+ HREF="node19.html#ABRJ9001">25</A>,<A
+ HREF="node19.html#GUTR9001">26</A>,<A
+ HREF="node19.html#DAME9201">27</A>,<A
+ HREF="node19.html#PLEC9401">28</A>,<A
+ HREF="node19.html#DUZ9601">29</A>] and base
+triples are not excluded for frivolous reasons. When pseudoknots are
+included, the loop decomposition of a secondary structure breaks down
+and the energy rules break down. Although we can assign reasonable
+free energies to the helices in a pseudoknot, and even to possible
+coaxial stacking between them, it is not possible to estimate the
+effects of the new kinds of loops that are created. Base triples pose
+an even greater challenge, because the exact nature of the triple
+cannot be predicted in advance, and even if it could, we have no data
+for assigning free energies.
+
+<P>
+A base <I>r</I><SUB><I>i</I>'</SUB> or a base pair <I>i</I>'.<I>j</I>' is called accessible from a
+base pair <I>i</I>.<I>j</I> if 
+<!-- MATH: $i < i' ( < j') < j$ -->
+<I>i</I> &lt; <I>i</I>' ( &lt; <I>j</I>') &lt; <I>j</I> and if there is not other base
+pair, <I>k</I>.<I>l</I> such that 
+<!-- MATH: $i < k < i' ( < j' ) < l < j$ -->
+<I>i</I> &lt; <I>k</I> &lt; <I>i</I>' ( &lt; <I>j</I>' ) &lt; <I>l</I> &lt; <I>j</I>. The collection of
+bases and base pairs accessible from a given base pair, <I>i</I>.<I>j</I>, but
+<B>not</B> including that base pair, is called the loop closed by
+<I>i</I>.<I>j</I>. We denote it by <B>L</B>(<I>i.j</I>).
+The collection of bases and
+base pairs not accessible from any base pair is called the exterior
+(or external) loop, and will be denoted by <B>L</B><SUB>e</SUB>
+here. It is
+worth noting that if we imagine adding a 0<SUP><I>th</I></SUP> and an 
+<!-- MATH: $(n+1)^{st}$ -->
+(<I>n</I>+1)<SUP><I>st</I></SUP>base to the RNA, and a base pair 
+<I>0.(n+1)</I>,
+then the exterior loop
+becomes the loop closed by this imaginary base pair. We call this the
+<I>universal closing base pair</I> of an RNA structure. If <B>S</B>
+is a secondary structure, then <B>S'</B>
+denotes the same secondary
+structure with the addition of the universal closing base pair.  The
+exterior loop exists only in linear RNA. It is treated differently
+than other loops because we assume as a first approximation that there
+are no conformational constraints, and therefore no associated
+entropic costs.
+
+<P>
+Any secondary structure, <B>S</B> decomposes an RNA uniquely into
+loops. We can write this as:
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<!-- MATH: \begin{displaymath}
+{\bf R} = \bigcup_{i.j \in {\bf S'}} {\bf L}(i.j)
+\end{displaymath} -->
+
+
+<IMG
+ WIDTH="112" HEIGHT="47"
+ SRC="img24.gif"
+ ALT="\begin{displaymath}{\bf R} = \bigcup_{i.j \in {\bf S'}} {\bf L}(i.j)
+\end{displaymath}">
+</DIV>
+<BR CLEAR="ALL">
+<P></P>
+Loops may contain 0, 1 or more base pairs. The term <I>k</I>-loop
+denotes a loop containing <I>k</I>-1 base pairs, making a total of <I>k</I> base
+pairs by including the closing base pair.  We introduce the terms
+<I>l</I><SUB>s</SUB>(<B>L</B>) and <I>l</I><SUB>d</SUB>(<B>L</B>)
+to denote the number of
+single-stranded bases and base pairs in a loop, respectively. The size
+of a 1 or 2-loop is defined as <I>l</I><SUB>s</SUB>(<B>L</B>).
+
+<P>
+A 1-loop is called a hairpin loop. Polymer theory predicts that
+the free energy increment, 
+<!-- MATH: $\delta \delta G$ -->
+<IMG
+ WIDTH="31" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img27.gif"
+ ALT="$\delta \delta G$">,
+for such a loop is given by
+<BR><P></P>
+<DIV ALIGN="CENTER">
+
+<!-- MATH: \begin{equation}
+\delta \delta G =  1.75 \times RT \times \ln ( l_{s} ),
+\end{equation} -->
+
+<TABLE WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE"><TD ALIGN="CENTER" NOWRAP><A NAME="DDGLOG">&#160;</A><IMG
+ WIDTH="181" HEIGHT="28"
+ SRC="img28.gif"
+ ALT="\begin{displaymath}
+\delta \delta G = 1.75 \times RT \times \ln ( l_{s} ),
+\end{displaymath}"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+(1)</TD></TR>
+</TABLE>
+</DIV>
+<BR CLEAR="ALL"><P></P>
+where <I>T</I> is absolute temperature and <I>R</I> is the universal gas
+constant (1.9872 cal/mol/K). The factor 1.75 would be 2 if the
+chain were not self-avoiding in space. In reality, we use tabulated
+values for 
+<!-- MATH: $\delta \delta G$ -->
+<IMG
+ WIDTH="31" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img27.gif"
+ ALT="$\delta \delta G$">
+for <I>l</I><SUB><I>s</I></SUB> from 3 to 30. These values are based
+on measurements and interpolations of measurements, and are stored in
+an file named <I>loop.dg</I>, or <I>loop.TC</I>, where <I>TC</I> is a
+temperature (integral) in <IMG
+ WIDTH="11" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img29.gif"
+ ALT="$^{\circ}$">C. We use the latter only when
+departing from our temperature standard of 37 degrees. Thus <I>loop.dg</I> and <I>loop.</I>37 refer to the same file. The same
+convention holds for other files defined below. Equation <A HREF="node5.html#DDGLOG">1</A>
+is used to extrapolate beyond size 30. Thus, for 
+<!-- MATH: $l_{s} > 30$ -->
+<I>l</I><SUB><I>s</I></SUB> &gt; 30,
+<BR><P></P>
+<DIV ALIGN="CENTER">
+
+<!-- MATH: \begin{equation}
+\delta \delta G=  \delta \delta G_{30} + 1.75 \times RT \times \ln ( l_{s}/30 ).
+\end{equation} -->
+
+<TABLE WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE"><TD ALIGN="CENTER" NOWRAP><A NAME="DDGLOG2">&#160;</A><IMG
+ WIDTH="266" HEIGHT="28"
+ SRC="img30.gif"
+ ALT="\begin{displaymath}
+\delta \delta G= \delta \delta G_{30} + 1.75 \times RT \times \ln ( l_{s}/30 ).
+\end{displaymath}"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+(2)</TD></TR>
+</TABLE>
+</DIV>
+<BR CLEAR="ALL"><P></P>
+<P>
+Figure <A HREF="node5.html#LOOP">1</A> shows the information stored in the <I>loop</I> file.
+<BR>
+<DIV ALIGN="CENTER"><A NAME="LOOP">&#160;</A><A NAME="811">&#160;</A>
+<TABLE WIDTH="100%">
+<CAPTION><STRONG>Figure 1:</STRONG>
+The <I> loop.dg</I> or <I> loop.TC</I> contains
+size based free energy increments for hairpin, bulge and interior
+loops up to size 30. Entries with `.' are undefined.</CAPTION>
+<TR><TD ALIGN=CENTER><PRE>
+DESTABILIZING ENERGIES BY SIZE OF LOOP (INTERPOLATE WHERE NEEDED)
+hp3 ave calc no tmm;hp4 ave calc with tmm; ave all bulges
+SIZE         INTERNAL          BULGE            HAIRPIN
+-------------------------------------------------------
+1               .                3.8               . 
+2               .                2.8               . 
+3               .                3.2              5.6
+4              1.7               3.6              5.5
+5              1.8               4.0              5.6
+6              2.0               4.4              5.3
+7              2.2               4.6              5.8
+8              2.3               4.7              5.4
+ ...
+30             3.7               6.1              7.7
+</PRE>
+</TD></TR>
+</TABLE>
+</DIV>
+<BR>
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="TSTKH">&#160;</A><A NAME="812">&#160;</A>
+<TABLE WIDTH="50%">
+<CAPTION><STRONG>Figure 2:</STRONG>
+On the left, a typical 4 &#215; 4 table. The
+pairs WX and YZ are covalently linked. WZ is assumed to be the closing
+base pair of a hairpin loop, and XY is the mismatched pair. `X' refers
+to row , and `Y' to column, in order A, C, G and U. Thus `aGU' is the
+same as `a34' and is the mismatch free energy for a GU mismatch (X=G
+and Y=U). On the right is a sample table for W=C and Z=G.</CAPTION>
+<TR><TD ALIGN=LEFT>
+<PRE>
+         5' --> 3'              5' --> 3'               
+            WX                     CX                   
+            ZY                     GY                   
+         3' <-- 5'              3' <-- 5'               
+   Y: A    C    G    U       A    C    G    U           
+    ------------------      -----------------           
+X:A | aAA  aAC  aAG  aAU    -1.5 -1.5 -1.4 -1.8
+  C | aCA  aCC  aCG  aCU    -1.0 -0.9 -2.9 -0.8
+  G | aGA  aGC  aGG  aGU    -2.2 -2.0 -1.6 -1.2
+  U | aUA  aUC  aUG  aUU    -1.7 -1.4 -1.9 -2.0
+</PRE>
+</TD></TR>
+</TABLE>
+</DIV>
+<BR>
+<P>
+In addition, the effects of <I>terminal mismatched pairs</I> are taken
+into account for hairpin loops of size greater than 3. For loops of
+size 4 and greater closed by a base pair <I>i</I>.<I>j</I>, an extra 
+<!-- MATH: $\delta \delta G$ -->
+<IMG
+ WIDTH="31" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img27.gif"
+ ALT="$\delta \delta G$">
+is
+applied. This is referred to as the <I>terminal mismatch</I> free energy
+for hairpin loops. These parameters are stored in a file named <I>tstackh.dg</I> or <I>tstackh.TC</I>, as above. The data are arranged in 4 &#215; 4
+tables that each comprise 4 rows and columns. 
+Figure <A HREF="node5.html#TSTKH">2</A> illustrates how the parameters are stored.
+
+<P>
+Both the <I>loop</I> and <I>tstackh</I> files treat hairpin loops in a
+generic way, and assume no special structure for the bases in the
+loop. We know that this is not true in general. For example, the
+anti-codon loop of tRNA is certainly not unstructured. For certain
+small hairpin loops, special rules apply. Hairpin loops of size 3 are
+called triloops and those of size 4 are called tetraloops. Files of
+<I>distinguished</I> triloops and tetraloops have been created to store
+the free energy bonus assigned to those loops. These parameters are
+stored in files <I>triloop.dg</I> and <I>tloop.dg</I>, respectively (or <I>triloop.TC</I> and <I>tloop.TC</I> for a specific temperature, <I>TC</I>). Some typical entries are given in Figure <A HREF="node5.html#TLOOP">3</A>
+
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="TLOOP">&#160;</A><A NAME="813">&#160;</A>
+<TABLE WIDTH="50%">
+<CAPTION><STRONG>Figure 3:</STRONG>
+Sample <I> distinguished</I> tetraloops together
+with the free energy bonuses, in kcal/mole, attached to them. These
+entries include the closing base pair of the loop. Triloops are not
+shown since they are not currently in use for RNA folding.</CAPTION>
+<TR><TD><PRE>
+ Seq    Energy
+ -------------
+  GGGGAC -3.0
+   ...
+  CGAAGG -2.5 
+  CUACGG -2.5 
+   ...
+  GUGAAC -1.5 
+  UGGAAA -1.5 
+</PRE>
+</TD></TR>
+</TABLE>
+</DIV>
+<BR>
+<P>
+Finally, there are some special hairpin loop rules derived from
+experiments that will be defined explicitly here. A hairpin loop
+closed by <I>r</I><SUB><I>i</I></SUB> and <I>r</I><SUB><I>j</I></SUB> (<I>i</I>&lt;<I>j</I>) called a ``GGG'' loop if
+
+<!-- MATH: $r_{i-2} = r_{i-1} = r_{i} = G$ -->
+<I>r</I><SUB><I>i</I>-2</SUB> = <I>r</I><SUB><I>i</I>-1</SUB> = <I>r</I><SUB><I>i</I></SUB> = <I>G</I> and <I>r</I><SUB><I>j</I></SUB> = <I>U</I>. Such a loop receives
+a free energy bonus that is stored in the <I>miscloop.dg</I> or <I>miscloop.TC</I> file, which contains a variety of miscellaneous, or
+extra free energy parameters. Another special case is the ``poly-C''
+hairpin loop, where all the single stranded bases are C. If the loop
+has size 3, it is given a free energy penalty of <I>c</I>3. Otherwise, the
+penalty is c<SUB>2</SUB> + c<SUB>1</SUB> &#215; l<SUB>s</SUB>.
+The constants 
+<!-- MATH: $c_{1}, c_{2}$ -->
+<I>c</I><SUB>1</SUB>, <I>c</I><SUB>2</SUB>and <I>c</I><SUB>3</SUB> are all stored in the <I>miscloop</I> file.
+
+<P>
+To summarize, we can write the free energy, 
+<!-- MATH: $\delta \delta G_{H}$ -->
+<IMG
+ WIDTH="43" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img35.gif"
+ ALT="$\delta \delta G_{H}$">
+of a hairpin loop as:
+<BR><P></P>
+<DIV ALIGN="CENTER">
+
+<!-- MATH: \begin{equation}
+\delta \delta G_{H} = \delta \delta G_{H}^{1} + \delta \delta G_{H}^{2} + \delta \delta G_{H}^{3}+ \delta \delta G_{H}^{4},
+\end{equation} -->
+
+<TABLE WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE"><TD ALIGN="CENTER" NOWRAP><A NAME="DDGH">&#160;</A><IMG
+ WIDTH="283" HEIGHT="28"
+ SRC="img36.gif"
+ ALT="\begin{displaymath}
+\delta \delta G_{H} = \delta \delta G_{H}^{1} + \delta \delta G_{H}^{2} + \delta \delta G_{H}^{3}+ \delta \delta G_{H}^{4},
+\end{displaymath}"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+(3)</TD></TR>
+</TABLE>
+</DIV>
+<BR CLEAR="ALL"><P></P>
+where
+<DL COMPACT>
+<DT>1.
+<DD>
+<!-- MATH: $\delta \delta G_{H}^{1}$ -->
+<IMG
+ WIDTH="43" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img37.gif"
+ ALT="$\delta \delta G_{H}^{1}$">
+is the size dependent contribution from the <I>loop</I>
+file, or from equation <A HREF="node5.html#DDGLOG2">2</A> for sizes &gt; 30,
+<DT>2.
+<DD>
+<!-- MATH: $\delta \delta G_{H}^{2}$ -->
+<IMG
+ WIDTH="43" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img38.gif"
+ ALT="$\delta \delta G_{H}^{2}$">
+is the terminal mismatch stacking free energy, taken
+from the <I>tstackh</I> file (0 for hairpin loops of size 3),
+<DT>3.
+<DD>
+<!-- MATH: $\delta \delta G_{H}^{3}$ -->
+<IMG
+ WIDTH="43" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img39.gif"
+ ALT="$\delta \delta G_{H}^{3}$">
+is the bonus free energy for triloops or
+tetraloops listed in the  <SMALL>TRILOOP</SMALL> or  <SMALL>TLOOP</SMALL> files. This value is
+0 for loops not listed in the  <SMALL>TRILOOP</SMALL> or  <SMALL>TLOOP</SMALL> files and for
+loop sizes &gt; 4,
+<DT>4.
+<DD>
+<!-- MATH: $\delta \delta G_{H}^{4}$ -->
+<IMG
+ WIDTH="43" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img40.gif"
+ ALT="$\delta \delta G_{H}^{4}$">
+is the bonus or penalty free energy 
+for special cases not covered by the above.
+</DL>
+<P>
+A 2-loop, <B>L</B>
+is closed by a base pair <I>i</I>.<I>j</I> and contains a
+single base pair, <I>i</I>'.<I>j</I>', satisfying 
+<I>i</I> &lt; <I>i</I>' &lt; <I>j</I>' &lt; <I>j</I>. In this case,
+the loop size, l<SUB>s</SUB>(<B>L</B>),
+can be written as:
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<I>l</I><SUB>s</SUB>(<B>L</B>) = <I>l</I><SUB>s</SUB><SUP>1</SUP>(<B>L</B>) + <I>l</I><SUB>s</SUB><SUP>2</SUP>(<B>L</B>),
+</DIV><BR>
+
+where
+
+<I>l</I><SUB>s</SUB><SUP>1</SUP>(<B>L</B>) = <I>i'-i-1</I>
+and  
+<I>l</I><SUB>s</SUB><SUP>2</SUP>(<B>L</B>) = <I>j-j'-1</I>.
+
+<P>
+A 2-loop of size 0 is called a <I>stacked pair</I>. This refers to
+the stacking between the <I>i</I>.<I>j</I> and immediately adjacent 
+<!-- MATH: $i\!+\!1.j\!-\!1$ -->
+<IMG
+ WIDTH="65" HEIGHT="28" ALIGN="MIDDLE" BORDER="0"
+ SRC="img45.gif"
+ ALT="$i\!+\!1.j\!-\!1$">
+base
+pair contained in the loop. Free energies for these loops are stored
+in a file named <I>stack.dg</I>, or <I>stack.TC</I>, where <I>TC</I> is a
+temperature, as defined above. The layout is the same as for the
+<I>tstackh</I> file. A portion of such a file is given in Figure
+<A HREF="node5.html#STK">4</A>. A group of 2 or more consecutive base pairs is called a
+<I>helix</I>. The first and last are the closing base pairs of the
+helix. They may be written as <I>i</I>.<I>j</I> and <I>i</I>'.<I>j</I>', where 
+<!-- MATH: $i < i' < j' <
+j$ -->
+<I>i</I> &lt; <I>i</I>' &lt; <I>j</I>' &lt;
+<I>j</I>. Then <I>i</I>.<I>j</I> is called the external closing base pair and <I>i</I>'.<I>j</I>' is
+called the internal closing base pair. This nomenclature is used for
+circular RNA as well, even though it depends on the choice of origin.
+
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="STK">&#160;</A><A NAME="815">&#160;</A>
+<TABLE WIDTH="50%">
+<CAPTION><STRONG>Figure 4:</STRONG>
+Sample free energies in kcal/mole for CG base
+pairs stacked over all possible base pairs, XY.  X refers to row and
+Y refers to column, in the order A, C, G and U respectively. Entries
+denoted by an isolated period, `.', are undefined, and may be
+considered as <IMG
+ WIDTH="32" HEIGHT="28" ALIGN="MIDDLE" BORDER="0"
+ SRC="img2.gif"
+ ALT="$+\infty $">.</CAPTION>
+<TR><TD><PRE>
+          5' --> 3'     
+             CX         
+             GY         
+          3' <-- 5'     
+   Y:  A    C    G    U 
+  ----------------------
+X:A |  .    .    .   -2.1
+  C |  .    .   -3.3  . 
+  G |  .   -2.4  .   -1.4
+  U | -2.1  .   -2.1  . 
+</PRE>
+</TD></TR>
+</TABLE>
+</DIV>
+<BR>
+<P>
+Only Watson-Crick and wobble GU pairs are allowed as <I>bona fide</I>
+base pairs, even though the software is written to allow for any base
+pairs. The reason is that nearest neighbor rules break down for
+non-canonical, even GU base pairs, and that mismatches must instead be
+treated as small, symmetric interior loops. Note that the stacks
+
+<!-- MATH: $\begin{array}{ccc}
+5' & --&gt; & 3'  \\
+   &     WX      \\
+   &     ZY      \\
+     3' & <-- & 5'
+\end{array}
+and
+\begin{array}{ccc}
+     5'& --&gt;& 3'  \\
+   &     YZ      \\
+   &     XW      \\
+     3' & <-- & 5'  
+\end{array}$ -->
+<IMG
+ WIDTH="258" HEIGHT="92" ALIGN="MIDDLE" BORDER="0"
+ SRC="img47.gif"
+ ALT="$\begin{array}{ccc}
+5' & --&gt; & 3' \\
+& WX \\
+& ZY \\
+3' & <-- & 5'
+\end{...
+...in{array}{ccc}
+5'& --&gt;& 3' \\
+& YZ \\
+& XW \\
+3' & <-- & 5'
+\end{array}$">are identical, and yet formally different for <IMG
+ WIDTH="55" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img48.gif"
+ ALT="$W \neq Y$">
+and <IMG
+ WIDTH="51" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img49.gif"
+ ALT="$X \neq
+Z$">.
+These stacked pairs are stored twice in the file, and
+the <I>mfold</I> software checks for symmetry. This is an example of
+built in redundancy as a check on precision.
+
+<P>
+A 2-loop, L of size &gt; 0 is called a <I>bulge loop</I> if
+<I>l</I><SUB>s</SUB><SUP>1</SUP>(<B>L</B>) = 0
+or  
+<I>l</I><SUB>s</SUB><SUP>2</SUP>(<B>L</B>) = 0
+and an interior loop
+if <B>both</B> 
+<I>l</I><SUB>s</SUB><SUP>1</SUP>(<B>L</B>) = 0
+and 
+<I>l</I><SUB>s</SUB><SUP>2</SUP>(<B>L</B>) = 0.
+
+<P>
+Bulge loops up to size 30 are assigned free energies from the <I>loop</I> file (See Figure <A HREF="node5.html#LOOP">1</A>). For larger bulge loops, equation
+<A HREF="node5.html#DDGLOG2">2</A> is used. When a bulge loop has size 1, the stacking
+free energy for base pairs <I>i</I>.<I>j</I> and <I>i</I>'.<I>j</I>' are used (from the <I>stack</I> file).
+
+<P>
+Interior loops have size <IMG
+ WIDTH="28" HEIGHT="28" ALIGN="MIDDLE" BORDER="0"
+ SRC="img54.gif"
+ ALT="$\geq 2$">.
+If <I>l</I><SUB>s</SUB><SUP>1</SUP>(<B>L</B>) = 
+<I>l</I><SUB>s</SUB><SUP>2</SUP>(<B>L</B>), 
+the loop is called <I>symmetric</I>; otherwise, it is <I>asymmetric</I>, 
+or lopsided. The asymmetry of an interior loop, a(<B>L</B>) is defined by:
+<BR><P></P>
+<DIV ALIGN="CENTER">
+<TABLE WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE"><TD ALIGN="CENTER" NOWRAP><A NAME="ASYM">&#160;</A>
+a(<B>L</B>) = <B>|</B> <I>l</I><SUB>s</SUB><SUP>1</SUP>(<B>L</B>) - <I>l</I><SUB>s</SUB><SUP>2</SUP>(<B>L</B>) <B>|</B>
+</TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+(4)</TD></TR>
+</TABLE>
+</DIV>
+<BR CLEAR="ALL"><P></P>
+<P>
+The free energy, 
+<!-- MATH: $\delta \delta G_{I}$ -->
+<IMG
+ WIDTH="39" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img57.gif"
+ ALT="$\delta \delta G_{I}$">,
+of an interior loop is the sum of 4components:
+<BR><P></P>
+<DIV ALIGN="CENTER">
+
+<!-- MATH: \begin{equation}
+\delta \delta G_{I} = \delta \delta G_{I}^{1} + \delta \delta G_{I}^{2} + \delta \delta G_{I}^{3} + \delta \delta G_{I}^{4}.
+\end{equation} -->
+
+<TABLE WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE"><TD ALIGN="CENTER" NOWRAP><A NAME="DDGI">&#160;</A><IMG
+ WIDTH="259" HEIGHT="28"
+ SRC="img58.gif"
+ ALT="\begin{displaymath}
+\delta \delta G_{I} = \delta \delta G_{I}^{1} + \delta \delta G_{I}^{2} + \delta \delta G_{I}^{3} + \delta \delta G_{I}^{4}.
+\end{displaymath}"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+(5)</TD></TR>
+</TABLE>
+</DIV>
+<BR CLEAR="ALL"><P></P>
+<P>
+<DL COMPACT>
+<DT>1.
+<DD>
+<!-- MATH: $\delta \delta G_{I}^{1}$ -->
+<IMG
+ WIDTH="39" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img59.gif"
+ ALT="$\delta \delta G_{I}^{1}$">
+is the size dependent contribution from the <I>loop</I>
+file, or from equation <A HREF="node5.html#DDGLOG2">2</A> for sizes &gt; 30.
+<DT>2.
+<DD>
+<!-- MATH: $\delta \delta G_{I}^{2}$ -->
+<IMG
+ WIDTH="39" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img60.gif"
+ ALT="$\delta \delta G_{I}^{2}$">
+and 
+<!-- MATH: $\delta \delta G_{I}^{3}$ -->
+<IMG
+ WIDTH="39" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img61.gif"
+ ALT="$\delta \delta G_{I}^{3}$">
+are terminal mismatch stacking
+free energies, taken from the <I>tstacki</I> file. The format of this
+file is identical to the format of the <I>tstackh</I> file. There are 2
+terms because of the terminal stacking of both <I>r</I><SUB><I>i</I>+1</SUB> and <I>r</I><SUB><I>j</I>-1</SUB>on the <I>i</I>.<I>j</I> base pair, and of both <I>r</I><SUB><I>i</I>'-1</SUB> and <I>r</I><SUB><I>j</I>'+1</SUB> on the
+<I>i</I>'.<I>j</I>' base pair. This may be visualized as
+<BR>
+<DIV ALIGN="CENTER">
+
+<!-- MATH: \begin{eqnarray}
+\begin{array}{ccccc}
+{\rm 5'}-&r_{i}&-&r_{i+1}&-{\rm 3'} \\
+&    \bullet  & & \circ          \\
+{\rm 3'}-&r_{j}&-&r_{j-1}&-{\rm 5'}
+\end{array}  
+\: \: {\rm and} \: \:
+\begin{array}{ccccc}
+{\rm 5'}-&r_{j'}&-&r_{j'+1}&-{\rm 3'} \\
+           &   \bullet &  &  \circ           \\
+{\rm 3'}-&r_{i'}&-&r_{i'-1}&-{\rm 5'},
+\end{array} \nonumber
+
+\end{eqnarray} -->
+ <IMG  WIDTH="427" HEIGHT="73" ALIGN="MIDDLE" BORDER="0"  SRC="img62.gif"
+ ALT="$\displaystyle \begin{array}{ccccc}
+{\rm 5'}-&r_{i}&-&r_{i+1}&-{\rm 3'} \\
+& \b...
+... \\
+& \bullet & & \circ \\
+{\rm 3'}-&r_{i'}&-&r_{i'-1}&-{\rm 5'},
+\end{array}$">
+</DIV>
+<BR CLEAR="ALL"><P></P>
+where <IMG
+ WIDTH="11" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img63.gif"
+ ALT="$\bullet$">
+denotes a base pair and <IMG
+ WIDTH="11" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img64.gif"
+ ALT="$\circ$">
+denotes a mismatched pair.
+<DT>3.
+<DD>
+<!-- MATH: $\delta \delta G_{I}^{4}$ -->
+<IMG
+ WIDTH="39" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img65.gif"
+ ALT="$\delta \delta G_{I}^{4}$">
+is the asymmetry penalty, and is a function of
+a(<B>L</B>) defined in equation <A HREF="node5.html#ASYM">4</A>. The penalty is 0 for
+symmetric interior loops. The asymmetric penalty free energies come
+from the <I>miscloop.dg</I> or <I>miscloop.TC</I> file.
+</DL>
+<P>
+Equation <A HREF="node5.html#DDGI">5</A> is now used only for loops of size &gt; 4 or of
+asymmetry &gt; 1. This means that special rules apply to 
+1 &#215; 1, 1 &#215; 2 and  2 &#215; 2
+interior loops. Free energies for these
+symmetric and almost symmetric interior loops are stored in files <I>sint2.dg</I>, <I>asint1x2.dg</I> and <I>sint4.dg</I>, respectively. As
+above, the suffix <I>TC</I> is used in place of <I>dg</I> when explicit
+attention is paid to temperature. These files list all possible values
+of the single stranded bases, and all possible Watson-Crick and GU
+base pair closings. The <I>sint2</I> file comprises a 
+6 &#215; 6 array of 4 &#215; 4 tables. There is a table for all possible 
+6 &#215; 6 closing base pairs. The free energy values for each choice
+of closing base pairs are arranged in 4 &#215; 4 tables. The term
+``closing base pairs'' refers to the closing base pair of the loop and
+the contained base pair of the loop, as in the strict definition of a
+loop. An example of such a table is given in Figure <A HREF="node5.html#SINT2AND12">5</A>.
+
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="SINT2AND12">&#160;</A><A NAME="817">&#160;</A>
+<TABLE WIDTH="50%">
+<CAPTION><STRONG>Figure 5:</STRONG>
+Left: Free energies for all 1 &#215; 1
+interior loops in DNA closed by a CG and an AT base pair.  Right: Free
+energies for all 1 &#215; 2 interior loops in RNA closed by a CG and
+an AU base pair, with a single stranded U 3' to the double stranded
+U. As in similar Figures, X refers to row and Y to column.</CAPTION>
+<TR><TD><PRE>
+          5' --> 3'                  5' --> 3'        
+              X                          X            
+             C A                        C  A
+             G T                        G  U           
+              Y                          YA            
+          3' <-- 5'                  3' <-- 5'        
+   Y:   A    C    G    T      Y:   A    C    G    U
+   ---------------------      ---------------------   
+X:A | 1.1  2.1  0.8  1.0   X:A | 3.2  3.0  2.4  4.8   
+  C | 1.7  1.8  1.0  1.4     C | 3.1  3.0  4.8  3.0   
+  G | 0.5  1.0  0.3  2.0     G | 2.5  4.8  1.6  4.8   
+  T | 1.0  1.4  2.0  0.6     U | 4.8  4.8  4.8  4.8   
+</PRE>
+</TD></TR>
+</TABLE>
+</DIV>
+<BR>
+<P>
+The <I>asint1x2</I> file comprises a 24 row by 6 column array of 
+4 &#215; 4 tables. There is a 4 &#215; 4 table for all possible 6 &#215; 6
+closing base pairs and choice of one of the single
+stranded bases. The free energy values for each choice of closing base
+pairs and a single stranded base are arranged in 4 &#215; 4
+tables. An example of these tables is given in Figure <A HREF="node5.html#SINT2AND12">5</A>.
+
+<P>
+Finally, the <I>sint4</I> file contains 36 16 &#215; 16
+tables, 1 for each pair of closing base pairs. A 2 &#215; 2 interior loop can
+have 4<SUP>4</SUP> combinations of single stranded bases. If, for example,
+the loop is closed by a GC base pair and an AU base pair, we can write
+it as:
+<PRE>
+  5' ------&gt; 3'
+   G \/ \_/ A
+   C /\  |  U
+  3' &lt;------ 5'
+</PRE>Both the large `X' and large `Y' refer to an unmatched pair of
+bases that are juxtaposed. They can each take on 16 different values,
+from `AA',`AC', <IMG
+ WIDTH="22" HEIGHT="13" ALIGN="BOTTOM" BORDER="0"
+ SRC="img71.gif"
+ ALT="$\dots$">,
+to `UU', or 1 to 16, respectively. 
+The number in row `X' and column `Y' of the table is the free
+energy of the 2 &#215; 2 interior loop with the indicated single
+stranded bases. Figure <A HREF="node5.html#SINT4">6</A> shows the full table for the CG and
+AU closing base pairs.
+
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="SINT4">&#160;</A><A NAME="819">&#160;</A>
+<TABLE WIDTH="50%">
+<CAPTION><STRONG>Figure 6:</STRONG>
+Free energies for all interior loops in RNA
+closed by a CG and an AU base pair. Values of `X' or `Y' that
+correspond to bases that could form Watson-Crick pairs have been
+removed for brevity.</CAPTION>
+<TR><TD><PRE>
+                        5' ------> 3'
+                         C \/ \_/ A
+                         G /\  |  U
+                       3' <------ 5'
+ Y:   A    A    A    C    C    C    G    G    G    U    U    U  
+      A    C    G    A    C    U    A    G    U    C    G    U  
+ --------------------------------------------------------------
+  AA 2.0  1.6  1.0  2.0  2.6  2.6  1.0  1.4  0.2  2.3  1.5  2.2
+  AC 2.4  1.9  1.3  2.4  2.4  2.4  1.3  1.7 -0.4  2.1  0.8  1.5
+  AG 0.9  0.4 -0.1  0.9  1.9  1.9 -0.1  0.2 -0.1  1.6  1.2  1.8
+  CA 1.9  1.5  0.9  1.9  1.9  1.9  0.9  1.3 -0.9  1.6  0.4  1.1
+  CC 2.8  1.8  2.2  2.2  2.2  2.2  2.2  2.2  0.4  1.9  1.7  1.4
+X CU 2.7  1.6  2.0  2.1  2.1  2.1  2.0  2.0  0.3  1.8  1.5  1.2
+  GA 1.0  0.6  0.0  1.0  2.0  2.0  0.0  0.4  0.0  1.7  1.3  2.0
+  GG 1.8  1.3  0.7  1.8  2.4  2.4  0.7  1.1  0.0  2.1  1.2  1.9
+  GU 1.8  0.4  1.6  0.8  1.8  1.8  1.6  1.2 -2.0  1.5 -0.7  1.8
+  UC 2.7  1.6  2.0  2.1  2.1  2.1  2.0  2.0  0.3  1.8  1.5  1.2
+  UG 0.3 -1.1  0.1  0.7  0.3  0.3  0.1  0.3 -3.5  0.0 -2.2  0.3
+  UU 2.2  0.7  1.9  1.2  1.2  1.2  1.9  1.5  0.2  0.9  1.5  0.3
+</PRE>
+</TD></TR>
+</TABLE>
+</DIV>
+<BR>
+<P>
+Some special rules apply to 2-loops. A stacked pair that occurs at
+the end of a helix has a different free energy than if it were in the
+middle of a helix. Because of the availablility and precision of data,
+we distinguish between GC closing and non-GC closing base pairs. In
+particular, a penalty (terminal AU penalty) is assigned to each non-GC
+closing base pair in a helix. The value of this penalty is stored in
+the  <SMALL>MISCLOOP</SMALL> file. 
+
+<P>
+Because free energies are assigned to loops, and not to helices, there
+is no <I>a priori</I> way of knowing whether or not a stacked pair will
+be terminal or not. For this reason, the terminal AU penalty is built
+into the  <SMALL>TSTACKH</SMALL> and  <SMALL>TSTACKI</SMALL> tables. For bulge,
+multi-branch and exterior loops, the penalty is applied explicitly. In
+all of these cases, the penalty is <I>formally</I> assigned to the
+adjacent loop, although it really belongs to the helix.
+
+<P>
+A ``Grossly Asymmetry Interior Loop (GAIL)'' is an interior loop that
+is 1 &#215; n,
+where <I>n</I>&gt;2. The special ``GAIL'' rule that is used
+in this case substitutes AA mismatches next to both closing base
+pairs of the loop for use in assigning terminal stacking free energies
+from the  <SMALL>TSTACKI</SMALL> file.
+
+<P>
+A <I>k</I>-loop, <IMG
+ WIDTH="14" HEIGHT="14" ALIGN="BOTTOM" BORDER="0"
+ SRC="img41.gif"
+ ALT="${\bf L}$">,
+where <I>k</I> &gt; 2, is called a <I>multi-branch</I>
+loop. It contains <I>k</I>-1 base pairs, and is closed by a <I>k</I><SUP><I>th</I></SUP> base
+pair. Thus there are <I>k</I> stems radiating out from this loop.
+Because so little is known about the effects of multi-branch loops on
+RNA stability, we assign free energies in a way that makes the
+computations easy. This is the justification for the use of an <I>affine</I> free energy penalty for multi-branch loops. The free energy,
+
+<!-- MATH: $\delta \delta G({\bf L})$ -->
+<IMG
+ WIDTH="55" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img74.gif"
+ ALT="$\delta \delta G({\bf L})$">,
+is given by:
+<BR><P></P>
+<DIV ALIGN="CENTER">
+
+<!-- MATH: \begin{equation}
+\delta \delta G({\bf L}) = a + b \times l_{s}({\bf L}) + c \times l_{d}({\bf L})
++ \delta \delta G_{stack},
+\end{equation} -->
+
+<TABLE WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE"><TD ALIGN="CENTER" NOWRAP><A NAME="DDGM1">&#160;</A><IMG
+ WIDTH="325" HEIGHT="28"
+ SRC="img75.gif"
+ ALT="\begin{displaymath}
+\delta \delta G({\bf L}) = a + b \times l_{s}({\bf L}) + c \times l_{d}({\bf L})
++ \delta \delta G_{stack},
+\end{displaymath}"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+(6)</TD></TR>
+</TABLE>
+</DIV>
+<BR CLEAR="ALL"><P></P>
+where <I>a</I>, <I>b</I> and <I>c</I> are constants that are stored in the <I>miscloop</I> file and 
+<!-- MATH: $\delta \delta G_{stack}$ -->
+<IMG
+ WIDTH="62" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img76.gif"
+ ALT="$\delta \delta G_{stack}$">
+includes stacking interactions that
+will be explained below.  This simple energy function allows the
+dynamic programming algorithm used by <I>mfold</I> to find optimal
+multi-branch loops in time proportional to <I>n</I><SUP>3</SUP>. It would take
+exponentially increasing time (with sequence length) to use a more
+appropriate energy function derived from Jacobson-Stockmeyer theory
+[<A
+ HREF="node19.html#JACH5001">30</A>] that grows logarithmically with 
+<!-- MATH: $l_{s}({\bf L})$ -->
+<IMG
+ WIDTH="38" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img25.gif"
+ ALT="$l_{s}({\bf L})$">.
+In
+the <I>efn2</I> program that recalculates folding free energies using
+more realistic rules (defined below), equation <A HREF="node5.html#DDGM1">6</A> is replaced
+by:
+<BR><P></P>
+<DIV ALIGN="CENTER">
+
+<!-- MATH: \begin{equation}
+\delta \delta G({\bf L}) = a + 6b + 1.75 \times RT \times \ln (l_{s}({\bf L})/6) +
+c \times l_{d}({\bf L}) + \delta \delta G_{stack}.
+\end{equation} -->
+
+<TABLE WIDTH="100%" ALIGN="CENTER">
+<TR VALIGN="MIDDLE"><TD ALIGN="CENTER" NOWRAP><A NAME="DDGM2">&#160;</A><IMG
+ WIDTH="465" HEIGHT="28"
+ SRC="img77.gif"
+ ALT="\begin{displaymath}
+\delta \delta G({\bf L}) = a + 6b + 1.75 \times RT \times \l...
+...bf L})/6) +
+c \times l_{d}({\bf L}) + \delta \delta G_{stack}.
+\end{displaymath}"></TD>
+<TD WIDTH=10 ALIGN="RIGHT">
+(7)</TD></TR>
+</TABLE>
+</DIV>
+<BR CLEAR="ALL"><P></P>
+That is, the linear dependence on <I>l</I><SUB><I>s</I></SUB> changes to a logarithmic
+dependence for more than 6 single stranded bases in a multi-branch
+loop. 
+
+<P>
+Stacking free energies, 
+<!-- MATH: $\delta \delta G_{stack}$ -->
+<IMG
+ WIDTH="62" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img76.gif"
+ ALT="$\delta \delta G_{stack}$">
+are computed for multi-branch
+and exterior loops. In the folding algorithm these are single strand
+stacking free energies, also known as <I>dangling base</I> free
+energies, because they are applied to single stranded bases adjacent
+to a base pair that is either in the loop, or closes the loop.  This
+single stranded base may ``dangle'' from the 5' or 3' end of the
+base pair.  These parameters are stored in a file named <I>dangle.dg</I> or <I>dangle.TC</I>, as above. 
+
+<P>
+Figure <A HREF="node5.html#DANGLE">7</A> shows some single strand stacking
+free energies.
+
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="DANGLE">&#160;</A><A NAME="821">&#160;</A>
+<TABLE WIDTH="50%">
+<CAPTION><STRONG>Figure 7:</STRONG>
+Free energies for all possible single stranded
+bases that are adjacent to a CG base pair. `X' refers to column. Note
+that the 3' dangling free energies are larger in magnitude than the
+5' dangling free energies.</CAPTION>
+<TR><TD><PRE>
+         X                           X          
+ ------------------          ------------------ 
+  A    C    G    U            A    C    G    U  
+ ------------------          ------------------ 
+     5' --> 3'                   5' --> 3'      
+        CX                          C           
+        G                           GX          
+     3' <-- 5'                   3' <-- 5'      
+ -1.7 -0.8 -1.7 -1.2         -0.2 -0.3  0.0  0.0
+</PRE>
+</TD></TR>
+</TABLE>
+</DIV>
+<BR>
+<P>
+If <I>i</I>.<I>j</I> and <IMG
+ WIDTH="46" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img79.gif"
+ ALT="$j\!+\!2.k$">
+are 2 base pairs, then <I>r</I><SUB><I>j</I>+1</SUB> can interact
+with both of them. In this case, the stacking is assigned to only 1 of
+the 2 base pairs, whichever has a lower free energy (usually the 3'stack). If <I>k</I>.<I>l</I> is a base pair and both <I>r</I><SUB><I>k</I>-1</SUB> and <I>r</I><SUB><I>l</I>+1</SUB> are
+single stranded, then both the 5' and 3' stacking are
+permitted. The value of 
+<!-- MATH: $\delta \delta G_{stack}$ -->
+<IMG
+ WIDTH="62" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img76.gif"
+ ALT="$\delta \delta G_{stack}$">
+is then the sum of all the
+single base stacking free energies associated with the base pairs and
+closing base pair of the loop.
+
+<P>
+It has been evident for some time that to make the free energy rules
+more realistic for multi-branch and exterior loops, and to improve
+folding predictions, we would be compelled to take into account the
+stacking interactions between adjacent helices. Two helices, <IMG
+ WIDTH="26" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img80.gif"
+ ALT="$\bf
+H_{1}$">
+and <IMG
+ WIDTH="26" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img81.gif"
+ ALT="$\bf H_{2}$">
+in a multi-branch or exterior loop are adjacent
+if there are 2 base pairs <I>i</I>.<I>j</I> and <IMG
+ WIDTH="46" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img82.gif"
+ ALT="$j\!+\!1.k$">,
+<I>i</I>.<I>j</I> and <IMG
+ WIDTH="44" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img83.gif"
+ ALT="$i\!+\!1.k$">
+or
+<I>i</I>.<I>j</I> and <IMG
+ WIDTH="46" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img84.gif"
+ ALT="$k.j\!-\!1$">
+that close <IMG
+ WIDTH="26" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img80.gif"
+ ALT="$\bf
+H_{1}$">
+and <IMG
+ WIDTH="26" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img81.gif"
+ ALT="$\bf H_{2}$">,
+respectively. The last 2 cases can only occur in a multi-branch loop.
+In addition, we define <I>almost adjacent</I> helices as 2 helices
+where the addition of a single base pair (usually non-canonical),
+results in an adjacent pair. The concept of adjacent helices is
+important, since they are often coaxial in 3 dimensions, with a
+stacking interaction between the adjacent closing base pairs. The
+concept of almost adjacent comes from tRNA where, in many cases, the
+addition of a GA base pair at the base of the anti-codon stem creates
+a helix that is adjacent to, and stacks on, the D-loop stem.
+
+<P>
+<I>Mfold</I> does not yet take into account coaxial stacking of adjacent or
+almost adjacent helices. The <I>efn2</I> program that re-evaluates
+folding energies based on our best estimates does take this into
+account. It is not a trivial matter to decide which combination of
+coaxial stacking and single base stacking gives the lowest free energy
+in a multi-branch or external loop, and a recursive algorithm is
+employed to find this optimal combination. For example, coaxial
+stacking excludes single base stacking adjacent to the stacked
+helices. Free energies for the stacking of adjacent helices are stored
+in a file called <I>coaxial.dg</I>. The format is the same as for <I>stack.dg</I>. When 2 helices are almost adjacent, then 2 files, named
+<I>coaxstack.dg</I> and <I>tstackcoax.dg</I> are used. The format is the
+same as for stacking free energies. The use of these 2 files is
+explained with the aid of Figure <A HREF="node5.html#COAX">8</A>.
+Thus, in the <I>efn2</I> program, 
+<!-- MATH: $\delta \delta G_{stack}$ -->
+<IMG
+ WIDTH="62" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img76.gif"
+ ALT="$\delta \delta G_{stack}$">
+is a combination of
+single base stacking and coaxial stacking, depending on the loop.
+
+<P>
+<BR>
+<DIV ALIGN="CENTER"><A NAME="COAX">&#160;</A><A NAME="822">&#160;</A>
+<TABLE WIDTH="50%">
+<CAPTION><STRONG>Figure 8:</STRONG>
+The helices closed by G<SUP>3</SUP>-C<SUP>18</SUP> and
+C<SUP>20</SUP>-G<SUP>36</SUP> are almost adjacent. Their stacking is mediated by
+a non-canonical G<SUP>19</SUP>-A<SUP>37</SUP> base pair. The free energy for the 
+G<SUP>19</SUP>-A<SUP>37</SUP> to C<SUP>20</SUP>-G<SUP>36</SUP> comes from the <I>
+tstackcoax.dg</I> file. This is used where the phosphate backbone is
+unbroken, since there are 2 covalent links. The C<SUP>18</SUP>-G<SUP>3</SUP> to
+G<SUP>19</SUP>-A<SUP>37</SUP> stacking free energy comes from the <I>
+coaxstack.dg</I>, which is used for stacking where the backbone is
+broken. In this case, G<SUP>3</SUP> and A<SUP>37</SUP> are not linked.</CAPTION>
+<TR><TD><IMG
+ WIDTH="461" HEIGHT="188"
+ SRC="img85.gif"
+ ALT="\begin{figure}\centering
+\epsfig{file=figure.2dps,width=0.9\textwidth}
+\end{figure}"></TD></TR>
+</TABLE>
+</DIV>
+<BR>
+<P>
+In the case of circular RNA, the choice of origin is
+arbitrary. However, once it is made, what would be the exterior loop 
+in linear RNA becomes equivalent to a  hairpin, bulge, interior or
+multi-branch loop, or a stacked pair.
+
+<P>
+The Turner parameters for RNA folding have been published and
+summarized a number of times. The most significant older publications
+are [<A
+ HREF="node19.html#FRES8601">31</A>,<A
+ HREF="node19.html#TURD8701">32</A>,<A
+ HREF="node19.html#TURD8801">33</A>], and <I>mfold</I> was originally used
+these results alone.  Version 1 of <I>mfold</I> had no <I>tloop.dg</I> file,
+and there was a single terminal stacking free energy file, <I>tstack.dg</I>. Tetraloop bonus free energies were added in version
+2.0. The <I>tstack</I> file was split into 2 files in version 2.2. Version
+3.0 introduces triloop bonus energies, and both tetraloop and triloop
+bonus energies now depend on the closing base pair. Special rules for
+small interior loops are also new. For example, the 2 &#215; 2
+interior loop rules have evolved from [<A
+ HREF="node19.html#WUM9501">34</A>].  Coaxial
+stacking was also introduced in version 3.0, although it's importance
+was realized eariler [<A
+ HREF="node19.html#WALA9401">35</A>].
+
+<P>
+A complete set of DNA folding parameters have recently become
+available [<A
+ HREF="node19.html#SANJ9801">36</A>]. These are based on measuremments for
+stacking and mismatches, and on the literature for loop and other
+effects. Parameters are also available for predicting the formation of
+RNA/DNA duplexes [<A
+ HREF="node19.html#SUGN9501">37</A>].
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html113"
+ HREF="node6.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="img/next_motif.gif"></A> 
+<A NAME="tex2html110"
+ HREF="FEBS98-html.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="img/up_motif.gif"></A> 
+<A NAME="tex2html104"
+ HREF="node4.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="img/previous_motif.gif"></A> 
+<A NAME="tex2html112"
+ HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="img/contents_motif.gif"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html114"
+ HREF="node6.html">Constrained folding</A>
+<B> Up:</B> <A NAME="tex2html111"
+ HREF="FEBS98-html.html">Algorithms and Thermodynamics for</A>
+<B> Previous:</B> <A NAME="tex2html105"
+ HREF="node4.html">Software platforms and environment</A>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<TABLE><TR><TD><IMG SRC=img/shield16.gif HSPACE=20></TD><TD><I>Michael Zuker <BR>Institute for Biomedical Computing<BR>
+Washington University in St. Louis<BR>
+1998-12-05</I></TD></TR></TABLE>
+</ADDRESS>
+</BODY>
+</HTML>
