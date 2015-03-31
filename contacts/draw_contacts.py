@@ -2,13 +2,6 @@ from pymol import cmd
 
 import sys
 
-sys.path.append('/home/mirco_local/bioinfo-toolbox')
-print sys.path
-#from parsing import parse_contacts
-#from parsing import parse_fasta
-#import parse_contacts
-#import parse_fasta
-
 def parse_contacts(afile, sep=' '):
     
     """Parse contact file.
