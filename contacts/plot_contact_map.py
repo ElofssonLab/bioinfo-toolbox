@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, re, string
 import argparse
 from math import *
 
@@ -15,6 +15,7 @@ matplotlib.use('Agg')
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from os.path import expanduser
 home = expanduser("~")
@@ -148,7 +149,38 @@ def get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali):
     return tp_colors
  
 
-def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_horiz_fname='', psipred_vert_fname='', pdb_filename='', is_heavy=False, chain='', sep=',', outfilename=''):  
+def get_seqlen(filename):
+    alifile = open(filename, 'r')
+    l = alifile.readline()
+    if l.startswith('>'):
+        L = len(alifile.readline().strip())
+    else:
+        L = len(l.strip())
+    alifile.close()
+    return L
+
+
+def get_ali_coverage(filename):
+    L = get_seqlen(filename)
+    N = 0
+    alifile = open(filename, 'r')
+    coverage = dict.fromkeys(range(L), 0)
+    for line in alifile:
+        # ignore headers
+        if line.startswith('>'):
+            continue
+        # remove possible inserts
+        line = line.translate(None,string.ascii_lowercase)
+        pos_lst = [m.start() for m in re.finditer('-', line)]
+        for pos in pos_lst:
+            coverage[pos] += 1
+        N += 1
+    alifile.close()
+    coverage_lst = [1-(coverage[i]/float(N)) for i in range(L)]
+    return coverage_lst
+
+
+def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_horiz_fname='', psipred_vert_fname='', pdb_filename='', is_heavy=False, chain='', sep=',', outfilename='', ali_filename=''):  
    
     #acc = c_filename.split('.')[0]
     #acc = fasta_filename.split('.')[0][:4]
@@ -187,8 +219,13 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_horiz_f
  
 
     ### start plotting
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
+    fig = plt.figure(figsize=(8, 8), dpi=96, facecolor='w')
+    #ax = fig.add_subplot(111)
+    ax = plt.subplot2grid((8,8), (1, 1), colspan=7, rowspan=7)
+    ax.tick_params(labelleft='off')
+    ax.set_xlim([-3,ref_len])
+    ax.set_ylim([-3,ref_len])
+
 
     ### plot secondary structure on the diagonal if given
     if psipred_horiz_fname or psipred_vert_fname:
@@ -201,11 +238,50 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_horiz_f
  
         for i in range(len(ss)):
             if ss[i] == 'H':
-                plt.plot(i, i, 'o', c='#8B0043', mec="#8B0043", markersize=2)
+                ax.plot(-1.5, i, 'o', c='#8B0043', mec="#8B0043", markersize=2)
+                ax.plot(i, -1.5, 'o', c='#8B0043', mec="#8B0043", markersize=2)
             if ss[i] == 'E':
-                plt.plot(i, i, 'D', c='#0080AD', mec="#0080AD", markersize=2)
+                ax.plot(-1.5, i, 'D', c='#0080AD', mec="#0080AD", markersize=2)
+                ax.plot(i, -1.5, 'D', c='#0080AD', mec="#0080AD", markersize=2)
             if ss[i] == 'C':
                 continue
+        ax2.axis('off')
+
+    
+    ### plot alignment coverage if alignemnt given
+    if ali_filename:
+        coverage_lst = get_ali_coverage(ali_filename)
+        ax2 = plt.subplot2grid((8,8), (1,0), rowspan=7, sharey=ax)
+        ax2.plot([0]+coverage_lst+[0], [0]+range(ref_len)+[ref_len-1], 'k', lw=0)
+        ax2.axvline(x=0.25, lw=0.5, c='black', ls=':')
+        ax2.axvline(x=0.5, lw=0.5, c='black', ls=':')
+        ax2.axvline(x=0.75, lw=0.5, c='black', ls=':')
+        ax2.fill([0]+coverage_lst+[0], [0]+range(ref_len)+[ref_len-1], facecolor='gray', lw=0, alpha=0.5)
+        ax2.set_ylim([-3,ref_len])
+        ax2.set_xticks([0, 1])
+        ax2.invert_xaxis()
+        #ax2.spines['top'].set_visible(False)
+        #ax2.spines['left'].set_visible(False)
+        #ax.get_xaxis().tick_bottom()
+        #ax.get_yaxis().tick_right()
+        ax2.grid()
+
+        ax3 = plt.subplot2grid((8,8), (0,1), colspan=7, sharex=ax)
+        ax3.plot([0]+range(ref_len)+[ref_len-1], [0]+coverage_lst+[0], 'k', lw=0)
+        ax3.axhline(y=0.25, lw=0.5, c='black', ls=':')
+        ax3.axhline(y=0.5, lw=0.5, c='black', ls=':')
+        ax3.axhline(y=0.75, lw=0.5, c='black', ls=':')
+        ax3.fill([0]+range(ref_len)+[ref_len-1], [0]+coverage_lst+[0], facecolor='gray', lw=0, alpha=0.5)
+        #ax3.xaxis.tick_top()
+        ax3.set_xlim([-3,ref_len])
+        ax3.set_yticks([0, 1])
+        ax3.tick_params(labelbottom='off')
+        #ax3.spines['top'].set_visible(False)
+        #ax3.spines['right'].set_visible(False)
+        #ax.get_xaxis().tick_top()
+        #ax.get_yaxis().tick_left()
+        ax3.grid()
+
 
     ### plot reference contacts in the background if given
     if pdb_filename:
@@ -260,7 +336,7 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_horiz_f
         cmap = cm.get_cmap("binary")
         cmap.set_bad([1,1,1,0])
         dist_mat_masked = np.ma.array(dist_mat, mask=np.tri(dist_mat.shape[0], k=-1))
-        sc = ax.imshow(s_score_vec(dist_mat_masked, 5), cmap=cmap)
+        sc = ax.imshow(s_score_vec(dist_mat_masked, 5), cmap=cmap, interpolation='none')
         
         ref_contacts_diag_x = []
         ref_contacts_diag_y = []
@@ -307,8 +383,8 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_horiz_f
             tp2_colors = get_tp_colors(contacts2_x, contacts2_y, ref_contact_map, atom_seq_ali)
             print '%s %s %s %s' % (pdb_filename, PPVs2[-1], TPs2[-1], FPs2[-1])
             fig.suptitle('%s\nPPV (upper left) = %.2f | PPV (lower right) = %.2f' % (acc, PPVs[-1], PPVs2[-1]))
-            sc = ax.scatter(contacts2_y[::-1], contacts2_x[::-1], marker='o', c=tp2_colors[::-1], s=6, alpha=0.75, linewidths=0.0)
-            sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c=tp_colors[::-1], s=6, alpha=0.75, linewidths=0.0)
+            sc = ax.scatter(contacts2_y[::-1], contacts2_x[::-1], marker='o', c=tp2_colors[::-1], s=6, alpha=0.75, lw=0)
+            sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c=tp_colors[::-1], s=6, alpha=0.75, lw=0)
         else:
             sc = ax.scatter(contacts2_y[::-1], contacts2_x[::-1], marker='o', c='#D70909', edgecolor='#D70909', s=4, linewidths=0.5)
             sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c='#004F9D', edgecolor='#004F9D', s=4, linewidths=0.5)
@@ -333,18 +409,27 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_horiz_f
             sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c=tp_colors[::-1], s=6, alpha=0.75, linewidths=0.0)
             #sc = ax.scatter(contacts_y[::-1], contacts_x[::-1], marker='o', c=tp_colors[::-1], s=6, alpha=0.75, linewidths=0.0)
         else:
-            if c_filename.startswith('data'):
-                acc = c_filename.split('/')[1]
-            else:
-                acc = c_filename.split('/')[-1]
+            #if c_filename.startswith('data'):
+            #    acc = c_filename.split('/')[1]
+            #else:
+            #    acc = c_filename.split('/')[-1]
             fig.suptitle('%s' % acc)
-            sc = ax.imshow(contacts_np + contacts_np.T, cmap=cm.hot_r)
-            #sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c=scores[::-1], s=4, alpha=0.75, cmap=cm.hot_r, linewidths=0.1, edgecolors='none')
+            #sc = ax.imshow(contacts_np + contacts_np.T, cmap=cm.hot_r)
+            sc = ax.imshow(contacts_np, cmap=cm.hot_r, vmin=0.2, vmax=1.0, interpolation='none')
+            #divider1 = make_axes_locatable(ax)
+            #cax1 = divider1.append_axes("right", size="2%", pad=0.05)
+            #plt.colorbar(sc, cax=cax1)
+            #plt.colorbar(sc, ax=ax)
+            sc = ax.scatter(contacts_x[::-1], contacts_y[::-1],
+                    marker='o', c="black", s=4, alpha=0.75,
+                    linewidths=0.1, edgecolors='none')
             #sc = ax.scatter(contacts_y[::-1], contacts_x[::-1], marker='o', c=scores[::-1], s=4, alpha=0.75, cmap=cm.hot_r, linewidths=0.1, edgecolors='none')
-            plt.colorbar(sc)
 
-    plt.gca().set_xlim([0,ref_len])
-    plt.gca().set_ylim([0,ref_len])
+    #plt.gca().set_xlim([0,ref_len])
+    #plt.gca().set_ylim([0,ref_len])
+
+    ax.grid()
+    #ax.invert_yaxis()
 
     if outfilename:
         if outfilename.endswith('.pdf'):
@@ -377,6 +462,7 @@ if __name__ == "__main__":
     p.add_argument('--pdb', default='')
     p.add_argument('--heavy', action='store_true')
     p.add_argument('--chain', default='')
+    p.add_argument('--alignment', default='')
 
     args = vars(p.parse_args(sys.argv[1:]))
 
@@ -393,5 +479,5 @@ if __name__ == "__main__":
     else:
         sep = '\t'
     
-    plot_map(args['fasta_file'], args['contact_file'], args['factor'], c2_filename=args['c2'], psipred_horiz_fname=args['psipred_horiz'], psipred_vert_fname=args['psipred_vert'], pdb_filename=args['pdb'], is_heavy=args['heavy'], chain=args['chain'], sep=sep, outfilename=args['outfile'])
+    plot_map(args['fasta_file'], args['contact_file'], args['factor'], c2_filename=args['c2'], psipred_horiz_fname=args['psipred_horiz'], psipred_vert_fname=args['psipred_vert'], pdb_filename=args['pdb'], is_heavy=args['heavy'], chain=args['chain'], sep=sep, outfilename=args['outfile'], ali_filename=args['alignment'])
 
