@@ -220,36 +220,18 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_horiz_f
 
     ### start plotting
     fig = plt.figure(figsize=(8, 8), dpi=96, facecolor='w')
-    #ax = fig.add_subplot(111)
-    ax = plt.subplot2grid((8,8), (1, 1), colspan=7, rowspan=7)
-    ax.tick_params(labelleft='off')
+    ax = fig.add_subplot(111)
     ax.set_xlim([-3,ref_len])
     ax.set_ylim([-3,ref_len])
-
-
-    ### plot secondary structure on the diagonal if given
-    if psipred_horiz_fname or psipred_vert_fname:
-        if psipred_horiz_fname:
-            ss = parse_psipred.horizontal(open(psipred_horiz_fname, 'r'))
-        else:
-            ss = parse_psipred.vertical(open(psipred_vert_fname, 'r'))
-
-        assert len(ss) == ref_len
- 
-        for i in range(len(ss)):
-            if ss[i] == 'H':
-                ax.plot(-1.5, i, 'o', c='#8B0043', mec="#8B0043", markersize=2)
-                ax.plot(i, -1.5, 'o', c='#8B0043', mec="#8B0043", markersize=2)
-            if ss[i] == 'E':
-                ax.plot(-1.5, i, 'D', c='#0080AD', mec="#0080AD", markersize=2)
-                ax.plot(i, -1.5, 'D', c='#0080AD', mec="#0080AD", markersize=2)
-            if ss[i] == 'C':
-                continue
-        ax2.axis('off')
-
     
     ### plot alignment coverage if alignemnt given
     if ali_filename:
+        # adjust overall canvas  
+        ax = plt.subplot2grid((8,8), (1, 1), colspan=7, rowspan=7)
+        ax.tick_params(labelleft='off')
+        ax.set_xlim([-3,ref_len])
+        ax.set_ylim([-3,ref_len])
+
         coverage_lst = get_ali_coverage(ali_filename)
         ax2 = plt.subplot2grid((8,8), (1,0), rowspan=7, sharey=ax)
         ax2.plot([0]+coverage_lst+[0], [0]+range(ref_len)+[ref_len-1], 'k', lw=0)
@@ -281,6 +263,26 @@ def plot_map(fasta_filename, c_filename, factor, c2_filename='', psipred_horiz_f
         #ax.get_xaxis().tick_top()
         #ax.get_yaxis().tick_left()
         ax3.grid()
+
+
+    ### plot secondary structure on the diagonal if given
+    if psipred_horiz_fname or psipred_vert_fname:
+        if psipred_horiz_fname:
+            ss = parse_psipred.horizontal(open(psipred_horiz_fname, 'r'))
+        else:
+            ss = parse_psipred.vertical(open(psipred_vert_fname, 'r'))
+
+        assert len(ss) == ref_len
+ 
+        for i in range(len(ss)):
+            if ss[i] == 'H':
+                ax.plot(-1.5, i, 'o', c='#8B0043', mec="#8B0043", markersize=2)
+                ax.plot(i, -1.5, 'o', c='#8B0043', mec="#8B0043", markersize=2)
+            if ss[i] == 'E':
+                ax.plot(-1.5, i, 'D', c='#0080AD', mec="#0080AD", markersize=2)
+                ax.plot(i, -1.5, 'D', c='#0080AD', mec="#0080AD", markersize=2)
+            if ss[i] == 'C':
+                continue
 
 
     ### plot reference contacts in the background if given
