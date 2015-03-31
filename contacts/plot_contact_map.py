@@ -15,7 +15,7 @@ matplotlib.use('Agg')
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-from mpl_toolkits.axes_grid1 import make_axes_locatable
+#from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from os.path import expanduser
 home = expanduser("~")
