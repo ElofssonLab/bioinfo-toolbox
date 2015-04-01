@@ -7,7 +7,7 @@ araH <- read.csv(file="araH-FACS.txt",header=FALSE,sep=" ");
 araH.DGsort=araH[with(araH,order(V4)), ]
 araH.DGsort$V8 = filter(araH.DGsort$V3,rep(1/101,101),sides=2)
 pdf("araH-DG.pdf")
-plot(araH.DGsort$V4,araH.DGsort$V3,xlab="deltaG",ylab="FACS",main="araH")
+plot(araH.DGsort$V4,araH.DGsort$V3,xlab="deltaG",ylab="FACS",main="araH",col="black",type="p",pch = ".")
 lines(araH.DGsort$V4,araH.DGsort$V8,col="red")
 dev.off()
 
@@ -74,9 +74,9 @@ dev.off()
 narK <- read.csv(file="narK-FACS.txt",header=FALSE,sep=" ");
 
 narK.DGsort=narK[with(narK,order(V4)), ]
-narK.DGsort$V8 = filter(narK.DGsort$V3,rep(1/101,101),sides=2)
+narK.DGsort$V8 = filter(narK.DGsort$V3,rep(1/151,151),sides=2)
 pdf("narK-DG.pdf")
-plot(narK.DGsort$V4,narK.DGsort$V3,araH.lab="deltaG",ylab="FACS",main="narK")
+plot(narK.DGsort$V4,narK.DGsort$V3,xlab="deltaG",ylab="FACS",main="narK",col="black",type="p",pch = ".")
 lines(narK.DGsort$V4,narK.DGsort$V8,col="red")
 dev.off()
 
@@ -135,4 +135,13 @@ vioplot( narK.codon1.33,narK.codon1.34,narK.codon1.35,narK.codon1.36,narK.codon1
         names=c("1:TCT","1:TCC","1:TCA","1:TCG","1:AGT","1:AGC","2:CAT","2:CAC"),
         col="grey")
 
+dev.off()
+
+
+data<-read.csv(file="GFP.dat",header=FALSE,sep="\t");
+data.DGsort=data[with(data,order(V3)), ]
+data.DGsort$V5 = filter(data.DGsort$V4,rep(1/51,51),sides=2)
+pdf("gfp.pdf")
+plot(data$V3,data$V4,xlab="deltaG",ylab="GFP",main="GFP flourescence",,col="black",type="p",pch = ".")
+lines(data.DGsort$V3,data.DGsort$V5,col="red")
 dev.off()

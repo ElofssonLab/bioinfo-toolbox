@@ -237,5 +237,10 @@ if __name__ == "__main__":
         with open(sys.argv[2]) as ids:
             for id in ids:
                 id = id.strip()
-                print id, domtblout[2][id]
+                if id in domtblout[2].keys():
+                    minpos = min(domtblout[2][id], key=lambda x: x[1])
+                    print id, minpos[0], minpos[1]
+                else:
+                    print id
+
 
