@@ -32,15 +32,15 @@ data <- read.csv(file="araH-FACS.txt",header=FALSE,sep=" ");
 data.DGsort=data[with(data,order(V4)), ]
 data.DGsort$V8 = filter(data.DGsort$V3,rep(1/101,101),sides=2)
 pdf("araH-DG.pdf")
-plot(data.DGsort$V4,data.DGsort$V3,xlab="deltaG",ylab="FACS",main="araH")
-lines(data.DGsort$V4,data.DGsort$V8,col="red")
+plot(data.DGsort$V4,data.DGsort$V3,xlab="deltaG",ylab="FACS",main="araH",col="grey",cex=0.5)
+lines(data.DGsort$V4,data.DGsort$V8,col="red",lwd=4)
 dev.off()
 
 data.GCsort=data[with(data,order(V5)), ]
 data.GCsort$V8 = filter(data.GCsort$V3,rep(1/101,101),sides=2)
 pdf("araH-GC.pdf")
-plot(data.GCsort$V5,data.GCsort$V3,xlab="%GC",ylab="FACS",main="araH")
-lines(data.GCsort$V5,data.GCsort$V8,col="red")
+plot(data.GCsort$V5,data.GCsort$V3,xlab="%GC",ylab="FACS",main="araH",col="grey",cex=0.5)
+lines(data.GCsort$V5,data.GCsort$V8,col="red",lwd=4)
 dev.off()
 
 data <- read.csv(file="narK-FACS.txt",header=FALSE,sep=" ");
@@ -48,15 +48,15 @@ data <- read.csv(file="narK-FACS.txt",header=FALSE,sep=" ");
 data.DGsort=data[with(data,order(V4)), ]
 data.DGsort$V8 = filter(data.DGsort$V3,rep(1/101,101),sides=2)
 pdf("narK-DG.pdf")
-plot(data.DGsort$V4,data.DGsort$V3,xlab="deltaG",ylab="FACS",main="narK")
-lines(data.DGsort$V4,data.DGsort$V8,col="red")
+plot(data.DGsort$V4,data.DGsort$V3,xlab="deltaG",ylab="FACS",main="narK",col="grey",cex=0.5)
+lines(data.DGsort$V4,data.DGsort$V8,col="red",lwd=4)
 dev.off()
 
 data.GCsort=data[with(data,order(V5)), ]
 data.GCsort$V8 = filter(data.GCsort$V3,rep(1/101,101),sides=2)
 pdf("narK-GC.pdf")
-plot(data.GCsort$V5,data.GCsort$V3,xlab="%GC",ylab="FACS",main="narK")
-lines(data.GCsort$V5,data.GCsort$V8,col="red")
+plot(data.GCsort$V5,data.GCsort$V3,xlab="%GC",ylab="FACS",main="narK",col="grey",cex=0.5)
+lines(data.GCsort$V5,data.GCsort$V8,col="red",lwd=4)
 dev.off()
 
 
