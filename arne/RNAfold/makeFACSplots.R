@@ -6,10 +6,19 @@ araH <- read.csv(file="araH-FACS.txt",header=FALSE,sep=" ");
 
 araH.DGsort=araH[with(araH,order(V4)), ]
 araH.DGsort$V8 = filter(araH.DGsort$V3,rep(1/101,101),sides=2)
+araH.fit <- lm( araH.DGsort$V3 ~ araH.DGsort$V4)
+
+
 pdf("araH-DG.pdf")
-plot(araH.DGsort$V4,araH.DGsort$V3,xlab="deltaG",ylab="FACS",main="araH",col="black",type="p",pch = ".")
-lines(araH.DGsort$V4,araH.DGsort$V8,col="red")
+plot(araH.DGsort$V4,araH.DGsort$V3,xlab="deltaG",ylab="FACS",main="araH",col="grey",type="p",cex=0.5)
+lines(araH.DGsort$V4,araH.DGsort$V8,col="red",lwd=4)
 dev.off()
+
+pdf("araH-DG-fit.pdf")
+plot(araH.DGsort$V4,araH.DGsort$V3,xlab="deltaG",ylab="FACS",main="araH",col="grey",type="p",cex=0.5)
+abline(araH.fit,col="blue",lwd=4)
+dev.off()
+
 
 araH.GCsort=araH[with(araH,order(V5)), ]
 araH.GCsort$V8 = filter(araH.GCsort$V3,rep(1/101,101),sides=2)
@@ -46,7 +55,10 @@ pdf("araH-GC.pdf")
 #vioplot(  araH.3, araH.4 , araH.5 ,araH.6, araH.7,araH.8,araH.9,araH.10,
 #        names=c("20.0%","26.7%","33.3%","40.0%","46.7%","53.3%","60.0%","66.7%"),
 #        col="grey")
-vioplot(   araH.4 , araH.5 ,araH.6, araH.7,araH.8,araH.9,araH.10,
+#vioplot(   araH.4 , araH.5 ,araH.6, araH.7,araH.8,araH.9,araH.10,
+#        names=c("26.7%","33.3%","40.0%","46.7%","53.3%","60.0%","66.7%"),
+#        col="grey")
+boxplot(   araH.4 , araH.5 ,araH.6, araH.7,araH.8,araH.9,araH.10,
         names=c("26.7%","33.3%","40.0%","46.7%","53.3%","60.0%","66.7%"),
         col="grey")
 title("araH %GC")
@@ -63,7 +75,11 @@ araH.codon2.35<-araH.DGsort$V3[araH.DGsort$V7==35]
 araH.codon2.36<-araH.DGsort$V3[araH.DGsort$V7==36]
 araH.codon2.57<-araH.DGsort$V3[araH.DGsort$V7==57]
 araH.codon2.58<-araH.DGsort$V3[araH.DGsort$V7==58]
-vioplot(   araH.codon1.12,araH.codon1.44,
+#vioplot(   araH.codon1.12,araH.codon1.44,
+#        araH.codon2.33,araH.codon2.34,araH.codon2.35,araH.codon2.36,araH.codon2.57,araH.codon2.58,
+#        names=c("1:ATG","1:ACG","2:TCT","2:TCC","2:TCA","2:TCG","2:AGT","2:AGC"),
+#        col="grey")
+boxplot(   araH.codon1.12,araH.codon1.44,
         araH.codon2.33,araH.codon2.34,araH.codon2.35,araH.codon2.36,araH.codon2.57,araH.codon2.58,
         names=c("1:ATG","1:ACG","2:TCT","2:TCC","2:TCA","2:TCG","2:AGT","2:AGC"),
         col="grey")
@@ -75,10 +91,19 @@ narK <- read.csv(file="narK-FACS.txt",header=FALSE,sep=" ");
 
 narK.DGsort=narK[with(narK,order(V4)), ]
 narK.DGsort$V8 = filter(narK.DGsort$V3,rep(1/151,151),sides=2)
+narK.fit <- lm( narK.DGsort$V3 ~ narK.DGsort$V4)
+
+
 pdf("narK-DG.pdf")
-plot(narK.DGsort$V4,narK.DGsort$V3,xlab="deltaG",ylab="FACS",main="narK",col="black",type="p",pch = ".")
-lines(narK.DGsort$V4,narK.DGsort$V8,col="red")
+plot(narK.DGsort$V4,narK.DGsort$V3,xlab="deltaG",ylab="FACS",main="narK",col="grey",type="p",cex=0.5)
+lines(narK.DGsort$V4,narK.DGsort$V8,col="red",lwd=4)
 dev.off()
+
+pdf("narK-DG-fit.pdf")
+plot(narK.DGsort$V4,narK.DGsort$V3,xlab="deltaG",ylab="FACS",main="narK",col="grey",type="p",cex=0.5)
+abline(narK.fit,col="blue",lwd=4)
+dev.off()
+
 
 narK.GCsort=narK[with(narK,order(V5)), ]
 narK.GCsort$V8 = filter(narK.GCsort$V3,rep(1/201,201),sides=2)
@@ -111,7 +136,10 @@ pdf("narK-GC.pdf")
 #vioplot(  narK.3, narK.4 , narK.5 ,narK.6, narK.7,narK.8,narK.9,narK.10,narK.11,
 #        names=c("20.0%","26.7%","33.3%","40.0%","46.7%","53.3%","60.0%","66.7%","73.3%"),
 #        col="grey")
-vioplot(   narK.4 , narK.5 ,narK.6, narK.7,narK.8,narK.9,narK.10,
+#vioplot(   narK.4 , narK.5 ,narK.6, narK.7,narK.8,narK.9,narK.10,
+#        names=c("26.7%","33.3%","40.0%","46.7%","53.3%","60.0%","66.7%"),
+#        col="grey")
+boxplot(   narK.4 , narK.5 ,narK.6, narK.7,narK.8,narK.9,narK.10,
         names=c("26.7%","33.3%","40.0%","46.7%","53.3%","60.0%","66.7%"),
         col="grey")
 title("narK %GC")
@@ -130,7 +158,11 @@ narK.codon2.21<-narK.DGsort$V3[narK.DGsort$V7==21]
 narK.codon2.22<-narK.DGsort$V3[narK.DGsort$V7==22]
 
 
-vioplot( narK.codon1.33,narK.codon1.34,narK.codon1.35,narK.codon1.36,narK.codon1.57,narK.codon1.58,
+#vioplot( narK.codon1.33,narK.codon1.34,narK.codon1.35,narK.codon1.36,narK.codon1.57,narK.codon1.58,
+#        narK.codon2.21,narK.codon2.22,
+#        names=c("1:TCT","1:TCC","1:TCA","1:TCG","1:AGT","1:AGC","2:CAT","2:CAC"),
+#        col="grey")
+boxplot( narK.codon1.33,narK.codon1.34,narK.codon1.35,narK.codon1.36,narK.codon1.57,narK.codon1.58,
         narK.codon2.21,narK.codon2.22,
         names=c("1:TCT","1:TCC","1:TCA","1:TCG","1:AGT","1:AGC","2:CAT","2:CAC"),
         col="grey")

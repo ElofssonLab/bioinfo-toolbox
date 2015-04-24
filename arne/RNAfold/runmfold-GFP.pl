@@ -38,7 +38,7 @@ while (my $csv=<$CSV>){
 
     my $energyA=9999;
     my $energyB=9999;
-    my $energyB=9999;
+    my $energyC=9999;
 
     $seq='TTTAAGAAGGAGACTCGAGGAUG'.substr($inseq,3,33);
 #    printf "%s %s \n",$RUNMFOLD,$seq;
@@ -53,7 +53,7 @@ while (my $csv=<$CSV>){
 
     $seq=substr($inseq,0,56);
 #    printf "%s %s \n",$RUNMFOLD,$seq;
-    my @OUT=qx($RUNMFOLD $seq 2>/dev/null); # == 0 or die "mfold call died";
+    @OUT=qx($RUNMFOLD $seq 2>/dev/null); # == 0 or die "mfold call died";
     foreach (@OUT){
 	chomp;
 	if (/Energy/) {
@@ -64,7 +64,7 @@ while (my $csv=<$CSV>){
 
     $seq=substr($inseq,33,56);
 #    printf "%s %s \n",$RUNMFOLD,$seq;
-    my @OUT=qx($RUNMFOLD $seq 2>/dev/null); # == 0 or die "mfold call died";
+    @OUT=qx($RUNMFOLD $seq 2>/dev/null); # == 0 or die "mfold call died";
     foreach (@OUT){
 	chomp;
 	if (/Energy/) {
@@ -74,7 +74,7 @@ while (my $csv=<$CSV>){
     }
 
 
-    printf "%s\t%s\t%s\t%f\n",$id,$seq,$energyA,$csv[8],$energyB,$energyC ;
+    printf "%s\t%s\t%s\t%f\t%f\t%f\n",$id,$seq,$energyA,$csv[8],$energyB,$energyC ;
 }
 
 
