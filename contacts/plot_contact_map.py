@@ -253,8 +253,8 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=0.5, c2_filename='', psi
             scores.append(score)
             count += 1
            
-        #if count >= ref_len * factor:
-        if score < th:
+        if count >= ref_len * factor:
+        #if score < th:
             break
  
 
@@ -285,6 +285,9 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=0.5, c2_filename='', psi
         #ax2.set_adjustable('box-forced')
         #ax2.set_autoscale_on(False) 
         ax2.autoscale(False)
+        #print len([0]+coverage_lst+[0])
+        #print len([0]+range(ref_len)+[ref_len-1])
+
         ax2.plot([0]+coverage_lst+[0], [0]+range(ref_len)+[ref_len-1], 'k', lw=0)
         ax2.axvline(x=max_cover*0.25, lw=0.5, c='black', ls=':')
         ax2.axvline(x=max_cover*0.5, lw=0.5, c='black', ls=':')
