@@ -197,26 +197,22 @@ if __name__ == "__main__":
     long_mRNA = "".join([random.choice(('A','G','C','T')) for x in range(100)]) + 'ATG' + "".join([random.choice(('A','G','C','T')) for x in range(999)]) + 'ATG' + "".join([random.choice(('A','G','C','T')) for x in range(9)]) + 'TAA' +  "".join([random.choice(('A','G','C','T')) for x in range(999)]) + 'TAA'
 
 # Read in sequecnes from  a file
-    list=("TTTAAGAAGGAGACCCGCGAATGATGTCTTCTGTTTCTACATCGGGGTCTGGCGCAC","TTTAAGAAGGAGACGTGCGAATGATGAGTTCTGTTTCTACATCGGGGTCTGGCGCAC")
-    
+    list=("TTTAAGAAGGAGACCCGCGAATGATGTCTTCTGTTTCTACATCGGGGTCTGGCGCAC",
+          "TTTAAGAAGGAGACGCTATTATGTCGCACCACTCATCCGCCCCCGAAAGGGCTACTG")
 #How to Call Jobs
-    for i in list:
+    for mRNA in list:
         #mRNA="TTTAAGAAGGAGACCGACATATGATGAGTTCTGTTTCTACATCGGGGTCTGGCGCAC"
         #        CDS = 'ATG' + "".join([random.choice(('A','G','C','T')) for x in range(50)])
         #response = ForwardRBS(CDS=CDS,TargetTranslationInitRate = targetTIR)
         response = ReverseRBS(mRNA=mRNA)
-        print "TEST1"
-        print response
+#        print response
 
         #How to Retrieve Results
     resultList= sendGet('Result', {})
     for result in resultList:
-        print "TEST2"
-        print result.split('/')[-1]
+#        print result.split('/')[-1]
         response = sendGet('Result',{'id' : result.split('/')[-1]})
-        print "TEST3"
         print response
         response = sendDelete('Result', {'id' : result.split('/')[-1]})
-        print "TEST4"
-        print response
+#        print response
     
