@@ -2,7 +2,7 @@
 library(vioplot)
 
 
-araH <- read.csv(file="araH-FACS.txt",header=FALSE,sep=" ");
+araH <- read.csv(file="araH-FACS-new.txt",header=FALSE,sep=" ");
 
 araH.DGsort=araH[with(araH,order(V4)), ]
 araH.DGsort$V8 = filter(araH.DGsort$V3,rep(1/101,101),sides=2)
@@ -87,7 +87,7 @@ boxplot(   araH.codon1.12,araH.codon1.44,
 dev.off()
 
 #-----------------------------------------------------------------------
-narK <- read.csv(file="narK-FACS.txt",header=FALSE,sep=" ");
+narK <- read.csv(file="narK-FACS-new.txt",header=FALSE,sep=" ");
 
 narK.DGsort=narK[with(narK,order(V4)), ]
 narK.DGsort$V8 = filter(narK.DGsort$V3,rep(1/151,151),sides=2)
