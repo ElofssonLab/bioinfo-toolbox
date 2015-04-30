@@ -210,7 +210,11 @@ if __name__ == "__main__":
         j=0
         for i in reply['ReverseRBS']['RBS_list']:
             if reply['ReverseRBS']['RBS_list'][j]['start_position']==20:
-                print reply['ReverseRBS']['RBS_list'][j]['sequence'],reply['ReverseRBS']['RBS_list'][j]['start_position'],reply['ReverseRBS']['RBS_list'][j]['tir'],expression[reply['ReverseRBS']['RBS_list'][j]['sequence'][0:54]]
+                key=reply['ReverseRBS']['RBS_list'][j]['sequence'][0:54]
+                if key in expresion.keys():
+                    print reply['ReverseRBS']['RBS_list'][j]['sequence'],reply['ReverseRBS']['RBS_list'][j]['start_position'],reply['ReverseRBS']['RBS_list'][j]['tir'],expression[reply['ReverseRBS']['RBS_list'][j]['sequence'][0:54]]
+                else:
+                    print reply['ReverseRBS']['RBS_list'][j]['sequence'],reply['ReverseRBS']['RBS_list'][j]['start_position'],reply['ReverseRBS']['RBS_list'][j]['tir'],0.0000
 #            print 'mRNA:  ',reply['ReverseRBS']['RBS_list'][j]['sequence']
 #            print 'Start: ',reply['ReverseRBS']['RBS_list'][j]['start_position']
 #            print 'TIR: ',reply['ReverseRBS']['RBS_list'][j]['tir']
