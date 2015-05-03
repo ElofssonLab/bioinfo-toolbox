@@ -14,12 +14,12 @@ pdf("narKH-RBS.pdf")
  plot(narK$V4,narK$V3,col="black",ylab="TIR",xlab="FACS",log="y")
 dev.off()
 
-#pdf("araH-RBS2.pdf")
-#plot (narK$V3,narK$V4,col="red",ylab="TIR",xlab="FACS",log="x")
-#dev.off()
-#pdf("araH-RBS2.pdf")
-#plot (narK$V3,narK$V4,col="red",ylab="TIR",xlab="FACS",log="x")
-#dev.off()
+pdf("araH-RBS2.pdf")
+plot (narK$V3,narK$V4,col="red",ylab="TIR",xlab="FACS",log="x")
+dev.off()
+pdf("araH-RBS2.pdf")
+plot (narK$V3,narK$V4,col="red",ylab="TIR",xlab="FACS",log="x")
+dev.off()
 
 pdf("araH-RBS-box.pdf")
 araH.0<-araH$V3[araH$V4>=4.0 ][ araH$V4<4.2 ]
