@@ -5,27 +5,29 @@ import matplotlib.cm as cm
 from scipy.spatial.distance import pdist
 from scipy.spatial.distance import squareform
 
-sys.path.append('/bubo/sw/apps/bioinfo/biopython/1.59/tintin/lib/python')
 from Bio.SubsMat import MatrixInfo
 
+"""
+TODO: MSP length approximation by Karlin and Altschul
+def calc_MSP(seq):
 
-#TODO: MSP length approximation by Karlin and Altschul
-#def calc_MSP(seq):
-#
-#    b62 = MatrixInfo.blosum62
-#    N = len(seq)
-#    MSP_global = np.log(N * N)
-#    MSP_res =
-#    
-#    return MSP_global / MSP_res
+    b62 = MatrixInfo.blosum62
+    N = len(seq)
+    MSP_global = np.log(N * N)
+    MSP_res =
+    
+    return MSP_global / MSP_res
+"""
 
 
-# calculates similarity score matrix for given sequence to itself
-# according to the DOTTER dot-plot program
-# Reference: Erik L.L. Sonnhammer, Richard Durbin - "A dot-matrix program 
-#            with dynamic threshold control suited for genomic DNA and protein
-#            sequence analysis" - Gene 167 (1996) 1-10
 def calc_dot_matrix(seq):
+"""
+ calculates similarity score matrix for given sequence to itself
+ according to the DOTTER dot-plot program
+ Reference: Erik L.L. Sonnhammer, Richard Durbin - "A dot-matrix program 
+            with dynamic threshold control suited for genomic DNA and protein
+            sequence analysis" - Gene 167 (1996) 1-10
+"""
 
     aa_list = ['A', 'R', 'N', 'D', 'C', 'E', 'Q', 'G', 'H', 'I', 'L', 'K', 'M',
            'F', 'P', 'S', 'T', 'W', 'Y', 'V'] #, '-', 'B', 'Z', 'J']
@@ -69,10 +71,6 @@ def calc_dot_matrix(seq):
             newsum[j] = oldsum[j - 1] + add_vec[j] - del_vec[j - W]
             if newsum[j] > 0 and i > W:
                 score = newsum[j] / float(W)
-                #if score < 0.8:
-                #    score = 0.0
-                #if score > 2:
-                #    score = 2.0
                 dot_matrix[i - W/2, j - W/2] = score
      
     return dot_matrix
@@ -83,15 +81,14 @@ def calc_dot_matrix(seq):
 
 
 
-# calculates similarity score matrix for given profile hmm to itself
-# according to the DOTTER dot-plot program
-# Reference: Erik L.L. Sonnhammer, Richard Durbin - "A dot-matrix program 
-#            with dynamic threshold control suited for genomic DNA and protein
-#            sequence analysis" - Gene 167 (1996) 1-10
 def calc_dot_matrix_profile(seq, profile):
+""" calculates similarity score matrix for given profile hmm to itself
+    according to the DOTTER dot-plot program
+    Reference: Erik L.L. Sonnhammer, Richard Durbin - "A dot-matrix program 
+        with dynamic threshold control suited for genomic DNA and protein
+        sequence analysis" - Gene 167 (1996) 1-10
+"""
 
-    #aa_list = ['A', 'R', 'N', 'D', 'C', 'E', 'Q', 'G', 'H', 'I', 'L', 'K', 'M',
-    #       'F', 'P', 'S', 'T', 'W', 'Y', 'V'] #, '-', 'B', 'Z', 'J']
     aa_list = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P',
            'Q', 'R', 'S', 'T', 'V', 'W', 'Y'] #, '-', 'B', 'Z', 'J']
     b62 = MatrixInfo.blosum62
@@ -148,10 +145,6 @@ def calc_dot_matrix_profile(seq, profile):
             newsum[j] = oldsum[j - 1] + add_vec[j] - del_vec[j - W]
             if newsum[j] > 0 and i > W:
                 score = newsum[j] / float(W)
-                #if score < 0.8:
-                #    score = 0.0
-                #if score > 2:
-                #    score = 2.0
                 dot_matrix[i - W/2, j - W/2] = score
      
     #plt.imshow(dot_matrix, origin='lower', cmap=cm.binary)

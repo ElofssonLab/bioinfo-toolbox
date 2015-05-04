@@ -8,28 +8,64 @@ from Bio.SeqRecord import SeqRecord
 from Bio import SearchIO
 #from Bio.SearchIO import HmmerIO
 #from Bio.SeqFeature import SeqFeature, FeatureLocation
+from pprint import pprint
 
 
+cutoff=0.001
 
-
-file=sys.argv[1]
+PfamFile=sys.argv[1]
 # directory with fasta files.
-#dir=sys.argv[2]
+SeqFile=sys.argv[2]
 
 
-print "opening "+ file +"\n"
+# Open GenBank file
+handle = open(SeqFile, 'rU')
+
+print "opening "+ SeqFile +"\n"
 # For each record (mitochrodrial genome, in this case)...
-for record in SearchIO.parse(file, 'hmmscan3-domtab') :
+SeqRecord=SeqIO.parse(handle, 'fasta')
+
+
+#print SeqRecord
+
+#print "opening "+ PfamFile +"\n"
+# For each record (mitochrodrial genome, in this case)...
+for record in SearchIO.parse(PfamFile, 'hmmscan3-domtab') :
 #for record in SearchIO.parse(file, 'hmmer3-text') :
    for target in record:
       print "\n\n **** target ****\n\n"
       print target
+      print "\n\n **** info ****\n\n"
+
       print target.id
       print target.accession
       print target.evalue
-      
-#      for qresult in record:
-#         print qresult
-#      for frag in record:
-#         print frag
-#   sys.exit()
+      print target.description
+
+
+      pprint (vars(target))
+
+      for hit in target:
+         if (hit.evalue < cutoff):
+            print "\n\n **** hit ****\n\n"
+            print hit
+            print "\n\n **** info ****\n\n"
+            pprint (vars(hit))
+
+
+      #sys.exit()
+RECORD={}
+for entry in SeqRecord:
+#   print entry.seq
+#  print entry.id
+   RECORD[entry.id]=entry
+
+#for entry in RECORD:
+#   print entry.seq
+#   print entry.id
+
+
+print RECORD["sp|P0ACS2|SOXR_ECOLI"]
+#print RECORD
+
+
