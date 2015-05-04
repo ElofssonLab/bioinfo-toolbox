@@ -1,8 +1,12 @@
 library(vioplot)
- narK<-read.csv(file="narK-RBS.out",header=FALSE,sep=" ");
- araH<-read.csv(file="araH-RBS.out",header=FALSE,sep=" ");
+
+narK<-read.csv(file="narK-RBS.out",header=FALSE,sep=" ");
+araH<-read.csv(file="araH-RBS.out",header=FALSE,sep=" ");
 
 araH.sort=araH[with(araH,order(V3)), ]
+narK.sort=narK[with(narK,order(V3)), ]
+
+
 
 pdf("araH-RBS.pdf")
 plot(araH$V4,araH$V3,col="black",ylab="TIR",xlab="FACS",log="y")
