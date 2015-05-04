@@ -3,26 +3,25 @@ library(vioplot)
 narK<-read.csv(file="narK-RBS.out",header=FALSE,sep=" ");
 araH<-read.csv(file="araH-RBS.out",header=FALSE,sep=" ");
 
-araH.sort=araH[with(araH,order(V3)), ]
-narK.sort=narK[with(narK,order(V3)), ]
+araH$V5 = log10(araH$V3)
+narK$V5 = log10(narK$V3)
+
+araH.sort=araH[with(araH,order(V5)), ]
+narK.sort=narK[with(narK,order(V5)), ]
+
+araH.sort$V6 = filter(araH.sort$V4,rep(1/101,101),sides=2)
+narK.sort$V6 = filter(narK.sort$V4,rep(1/101,101),sides=2)
+
 
 
 
 pdf("araH-RBS.pdf")
-plot(araH$V4,araH$V3,col="black",ylab="TIR",xlab="FACS",log="y")
-araH.fit =lm (araH$V3~log(araH$V4))
-abline(araH.fit,col="blue",lwd=4)
+plot (araH.sort$V5,araH.sort$V4,col="grey",xlab="log10(TIR)",ylab="FACS",type="p",cex=0.5)
+lines(araH.sort$V5,araH.sort$V6,col="red",lwd=4)
 dev.off()
-
-pdf("narKH-RBS.pdf")
- plot(narK$V4,narK$V3,col="black",ylab="TIR",xlab="FACS",log="y")
-dev.off()
-
-pdf("araH-RBS2.pdf")
-plot (narK$V3,narK$V4,col="red",ylab="TIR",xlab="FACS",log="x")
-dev.off()
-pdf("araH-RBS2.pdf")
-plot (narK$V3,narK$V4,col="red",ylab="TIR",xlab="FACS",log="x")
+pdf("narK-RBS.pdf")
+plot (narK.sort$V5,narK.sort$V4,col="grey",xlab="log10(TIR)",ylab="FACS",type="p",cex=0.5)
+lines(narK.sort$V5,narK.sort$V6,col="red",lwd=4)
 dev.off()
 
 pdf("araH-RBS-box.pdf")
