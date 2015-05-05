@@ -209,7 +209,7 @@ if __name__ == "__main__":
 
         j=0
         for i in reply['ReverseRBS']['RBS_list']:
-            if reply['ReverseRBS']['RBS_list'][j]['start_position']==20:
+            if reply['ReverseRBS']['RBS_list'][j]['start_position']==31:
                 key=reply['ReverseRBS']['RBS_list'][j]['sequence'][0:54]
                 if key in expression.keys():
                     print reply['ReverseRBS']['RBS_list'][j]['sequence'],reply['ReverseRBS']['RBS_list'][j]['start_position'],reply['ReverseRBS']['RBS_list'][j]['tir'],expression[reply['ReverseRBS']['RBS_list'][j]['sequence'][0:54]]
@@ -225,7 +225,7 @@ if __name__ == "__main__":
 
 
 #AraH: TAATTTTGTTTAACTTTAAGAAGGAGACNNNNNNATGNNNNNNTCTGTTTCTACATCGGGGTCTGGCGCACCTAAGTCGTCATTCAGCTTCGGGCGTATCTGGGATCAGTACGGCATGCTGGTGGTGTTTGCGGTGCTCTTTATCGCCTGTGCCATTTTTGTCCCAAATTTTGCCACCTTCATT     (ATG pos=31)
-#                 TTTAAGAAGGAGACCTGAGTATGATGCGTTCTGTTTCTACATCGGGGTCTGGCGCAC  (ATG pos=20)
+#                    TTTAAGAAGGAGACCTGAGTATGATGCGTTCTGTTTCTACATCGGGGTCTGGCGCAC  (ATG pos=20)
 
 #NarK: TAATTTTGTTTAACTTTAAGAAGGAGACNNNNNNATGNNNNNNTCATCCGCCCCCGAAAGGGCTACTGGAGCTGTCATTACAGATTGGCGACCGGAAGATCCTGCGTTTTGGCAACAACGCGGTCAACGTATTGCCAGCCGCAACCTGTGGATTTCCGTTCCCTGTCTGCTGCTGGCGTTTTGC     (ATG pos=31)
-#                 TTTAAGAAGGAGACTTGTATATGTCGCATCACTCATCCGCCCCCGAAAGGGCTACTG  (ATG pos=20)
+#                    TTTAAGAAGGAGACTTGTATATGTCGCATCACTCATCCGCCCCCGAAAGGGCTACTG  (ATG pos=20)
