@@ -1,8 +1,8 @@
 library(vioplot)
 
-                                        #dat<-read.table("escherichia_coli.df.tsv", sep='\t', header=T)
+dat<-read.table("escherichia_coli.df.tsv", sep='\t', header=T)
 #dat<-read.table("saccharomyces_cerevisae.df.tsv", sep='\t', header=T)
-dat<-read.table("homo_sapiens.df.tsv", sep='\t', header=T)
+#dat<-read.table("homo_sapiens.df.tsv", sep='\t', header=T)
 
 
 attach(dat)
@@ -47,26 +47,41 @@ Meff500=NULL
     lines(frac,Meff500,col="green")
     lines(frac,Meff1000,col="grey")
 
-    TM.var=NULL
-    TM.var[0]=1
-    TM.var[1]=2
-    TM.var[2]=3
+    TMvar=NULL
+    TMvar[1]=1
+    TMvar[2]=2
+    TMvar[3]=3
 
-    TM.PFam=NULL
-    TM.PFam[0]=length(which(TM == "M"  & Pfam_ID != "" ))/length(which(TM == "M"))
-    TM.PFam[1]=length(which(TM == "i"  & Pfam_ID != "" ))/length(which(TM == "i"))
-    TM.PFam[2]=length(which(TM == "o"  & Pfam_ID != "" ))/length(which(TM == "o"))
+    TMPFam=NULL
+    TMPFam[1]=length(which(TM_topogy== "M"  & Pfam_ID != "" ))/length(which(TM_topogy== "M"))
+    TMPFam[2]=length(which(TM_topogy== "i"  & Pfam_ID != "" ))/length(which(TM_topogy== "i"))
+    TMPFam[3]=length(which(TM_topogy== "o"  & Pfam_ID != "" ))/length(which(TM_topogy== "o"))
 
-    TM.Meff100=NULL
-    TM.Meff100[0]=length(which(TM == "M"  & Pfam_Meff >100 ))/length(which(TM == "M"))
-    TM.Meff100[1]=length(which(TM == "i"  & Pfam_Meff >100  ))/length(which(TM == "i"))
-    TM.Meff100[2]=length(which(TM == "o"  & Pfam_Meff >100  ))/length(which(TM == "o"))
+    TMMeff100=NULL
+    TMMeff100[1]=length(which(TM_topogy== "M"  & Pfam_Meff >100 ))/length(which(TM_topogy== "M"))
+    TMMeff100[2]=length(which(TM_topogy== "i"  & Pfam_Meff >100  ))/length(which(TM_topogy== "i"))
+    TMMeff100[3]=length(which(TM_topogy== "o"  & Pfam_Meff >100  ))/length(which(TM_topogy== "o"))
 
-    plot(TM.var,TM.Pfam,type="l",ylim=c(0,1),ylab="%residues",xlab="TM",name=c("M","i","o"))
-    lines(TM.Meff100,Meff100,col="blue")
-    lines(TM.Meff200,Meff200,col="red")
-    lines(TM.Meff500,Meff500,col="green")
-    lines(TM.Meff1000,Meff1000,col="grey")
+    TMMeff200=NULL
+    TMMeff200[1]=length(which(TM_topogy== "M"  & Pfam_Meff >200 ))/length(which(TM_topogy== "M"))
+    TMMeff200[2]=length(which(TM_topogy== "i"  & Pfam_Meff >200  ))/length(which(TM_topogy== "i"))
+    TMMeff200[3]=length(which(TM_topogy== "o"  & Pfam_Meff >200  ))/length(which(TM_topogy== "o"))
+
+    TMMeff500=NULL
+    TMMeff500[1]=length(which(TM_topogy== "M"  & Pfam_Meff >500 ))/length(which(TM_topogy== "M"))
+    TMMeff500[2]=length(which(TM_topogy== "i"  & Pfam_Meff >500  ))/length(which(TM_topogy== "i"))
+    TMMeff500[3]=length(which(TM_topogy== "o"  & Pfam_Meff >500  ))/length(which(TM_topogy== "o"))
+
+    TMMeff1000=NULL
+    TMMeff1000[1]=length(which(TM_topogy== "M"  & Pfam_Meff >1000 ))/length(which(TM_topogy== "M"))
+    TMMeff1000[2]=length(which(TM_topogy== "i"  & Pfam_Meff >1000  ))/length(which(TM_topogy== "i"))
+    TMMeff1000[3]=length(which(TM_topogy== "o"  & Pfam_Meff >1000  ))/length(which(TM_topogy== "o"))
+
+    plot(TMvar,TMPFam,type="l",ylim=c(0,1),ylab="%residues",xlab="TM")
+    lines(TMvar,TMMeff100,col="blue")
+    lines(TMvar,TMMeff200,col="red")
+    lines(TMvar,TMMeff500,col="green")
+    lines(TMvar,TMMeff1000,col="grey")
 
     
 Pfam_Meff[is.na(Pfam_Meff)] <- 1
