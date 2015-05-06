@@ -170,6 +170,7 @@ if __name__ == "__main__":
     sequence=[]
     list=[]
     expression={}
+    start = sys.argv[2] # Should be 34 for long and 20 for short 
     with open(sys.argv[1]) as fp:
         for line in fp:
             sequence=line.strip().split(' ')
@@ -203,25 +204,24 @@ if __name__ == "__main__":
                                 reply[key][keyB][keyC]=valueC
                                 if keyC=='status':
                                     status=valueC
-                        if valueB=='RBS_list':
-                            for keyC,valueC in value.iteritems():
-                                print "test: ",keyC,valueC
+#                        if valueB=='RBS_list':
+#                            for keyC,valueC in value.iteritems():
+#                                print "test: ",keyC,valueC
 
         j=0
         for i in reply['ReverseRBS']['RBS_list']:
-            if reply['ReverseRBS']['RBS_list'][j]['start_position']==31:
+            if reply['ReverseRBS']['RBS_list'][j]['start_position']==start:  
                 key=reply['ReverseRBS']['RBS_list'][j]['sequence'][0:54]
                 if key in expression.keys():
-                    print reply['ReverseRBS']['RBS_list'][j]['sequence'],reply['ReverseRBS']['RBS_list'][j]['start_position'],reply['ReverseRBS']['RBS_list'][j]['tir'],expression[reply['ReverseRBS']['RBS_list'][j]['sequence'][0:54]]
+                    print "HIT: ",reply['ReverseRBS']['RBS_list'][j]['sequence'],reply['ReverseRBS']['RBS_list'][j]['start_position'],reply['ReverseRBS']['RBS_list'][j]['tir'],expression[reply['ReverseRBS']['RBS_list'][j]['sequence'][0:54]]
                 else:
-                    print reply['ReverseRBS']['RBS_list'][j]['sequence'],reply['ReverseRBS']['RBS_list'][j]['start_position'],reply['ReverseRBS']['RBS_list'][j]['tir'],0.0000
-#            print 'mRNA:  ',reply['ReverseRBS']['RBS_list'][j]['sequence']
-#            print 'Start: ',reply['ReverseRBS']['RBS_list'][j]['start_position']
-#            print 'TIR: ',reply['ReverseRBS']['RBS_list'][j]['tir']
+                    print "HIT: ",reply['ReverseRBS']['RBS_list'][j]['sequence'],reply['ReverseRBS']['RBS_list'][j]['start_position'],reply['ReverseRBS']['RBS_list'][j]['tir'],0.0000
+            else:
+                print "UNK: ",reply['ReverseRBS']['RBS_list'][j]['sequence'],reply['ReverseRBS']['RBS_list'][j]['start_position'],reply['ReverseRBS']['RBS_list'][j]['tir'],0.0000
             j=j+1
-#        print "sendGET: ",json.dumps(response,indent=1)
+            print reply.dumps(sort_keys=True,indent=4, separators=(',', ': '))
+
         response = sendDelete('Result', {'id' : result.split('/')[-1]})
-#        print "sendDelete: ",response
 
 
 #AraH: TAATTTTGTTTAACTTTAAGAAGGAGACNNNNNNATGNNNNNNTCTGTTTCTACATCGGGGTCTGGCGCACCTAAGTCGTCATTCAGCTTCGGGCGTATCTGGGATCAGTACGGCATGCTGGTGGTGTTTGCGGTGCTCTTTATCGCCTGTGCCATTTTTGTCCCAAATTTTGCCACCTTCATT     (ATG pos=31)
