@@ -190,7 +190,7 @@ if __name__ == "__main__":
         while status != 'Finished': 
             response = sendGet('Result',{'id' : result.split('/')[-1]})
             for key,value in response.iteritems():
-#                print key,value
+                print "DATA: ", key,value
                 reply[key]=value
                 if key=='status':
                     status=value
@@ -208,18 +208,19 @@ if __name__ == "__main__":
 #                            for keyC,valueC in value.iteritems():
 #                                print "test: ",keyC,valueC
 
+#        print "RESPONSE: ",response
         j=0
         for i in reply['ReverseRBS']['RBS_list']:
-            if reply['ReverseRBS']['RBS_list'][j]['start_position']==start:  
+            if reply['ReverseRBS']['RBS_list'][j]['start_position'] == 34:  
                 key=reply['ReverseRBS']['RBS_list'][j]['sequence'][0:54]
                 if key in expression.keys():
-                    print "HIT: ",reply['ReverseRBS']['RBS_list'][j]['sequence'],reply['ReverseRBS']['RBS_list'][j]['start_position'],reply['ReverseRBS']['RBS_list'][j]['tir'],expression[reply['ReverseRBS']['RBS_list'][j]['sequence'][0:54]]
+                    print "HIT:   ",reply['ReverseRBS']['RBS_list'][j]['sequence'],reply['ReverseRBS']['RBS_list'][j]['start_position'],reply['ReverseRBS']['RBS_list'][j]['tir'],expression[reply['ReverseRBS']['RBS_list'][j]['sequence'][0:54]]
                 else:
-                    print "HIT: ",reply['ReverseRBS']['RBS_list'][j]['sequence'],reply['ReverseRBS']['RBS_list'][j]['start_position'],reply['ReverseRBS']['RBS_list'][j]['tir'],0.0000
+                    print "NOSEQ: ",reply['ReverseRBS']['RBS_list'][j]['sequence'],reply['ReverseRBS']['RBS_list'][j]['start_position'],reply['ReverseRBS']['RBS_list'][j]['tir'],0.0000
             else:
-                print "UNK: ",reply['ReverseRBS']['RBS_list'][j]['sequence'],reply['ReverseRBS']['RBS_list'][j]['start_position'],reply['ReverseRBS']['RBS_list'][j]['tir'],0.0000
+                print "UNKNO: ",reply['ReverseRBS']['RBS_list'][j]['sequence'],reply['ReverseRBS']['RBS_list'][j]['start_position'],reply['ReverseRBS']['RBS_list'][j]['tir'],0.0000
             j=j+1
-            print reply.dumps(sort_keys=True,indent=4, separators=(',', ': '))
+
 
         response = sendDelete('Result', {'id' : result.split('/')[-1]})
 

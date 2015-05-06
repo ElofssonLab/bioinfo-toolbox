@@ -66,12 +66,12 @@ dev.off()
 GFP data
  bin/runmfold-GFP.pl > GFP.dat
 
-R
+R 
 data<-read.csv(file="GFP.dat",header=FALSE,sep="\t");
 data.DGsort=data[with(data,order(V3)), ]
 data.DGsort$V5 = filter(data.DGsort$V4,rep(1/51,51),sides=2)
 pdf("gfp.pdf")
-plot(data$V3,data$V4,xlab="deltaG",ylab="GFP",main="GFP flourescence")
-lines(data.DGsort$V3,data.DGsort$V5,col="red")
+plot(data$V3,data$V4,xlab="deltaG",ylab="GFP",main="GFP flourescence",col="grey",cex=0.5)
+lines(data.DGsort$V3,data.DGsort$V5,col="red",lwd=4)
 dev.off()
 # Moving average ? Running Average ??
