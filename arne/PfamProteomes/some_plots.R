@@ -90,7 +90,7 @@ disoMeff9<-dat$Pfam_Meff[dat$Disorder > 0.9][dat$Disorder <1.0]
 
 outfile=paste(genome,"-DisoBox.pdf",sep="")
 pdf(outfile)
-boxplot(disoMeff0,disoMeff1,disoMeff2,disoMeff3,disoMeff4,disoMeff5,disoMeff6,disoMeff7,disoMeff8,disoMeff9,names=c(0.05,0.15,0.25,0.35,0.45,0.55,0.65,0.75,0.85,0.95),log="y",main=genome,ylab="%residues",xlab="% disorder")
+boxplot(disoMeff0,disoMeff1,disoMeff2,disoMeff3,disoMeff4,disoMeff5,disoMeff6,disoMeff7,disoMeff8,disoMeff9,names=c("0.05","0.15","0.25","0.35","0.45","0.55","0.65","0.75","0.85","0.95"),log="y",main=genome,ylab="%residues",xlab="% disorder")
 dev.off()
 
 
@@ -154,8 +154,8 @@ labels[5]=">100"
 coverage[6]=length(which(dat$Pfam_ID != "" & dat$Pfam_Meff))
 labels[6]="Pfam"
 pct <- round(coverage/sum(coverage)*100)
-outfile=paste(genome,"-coverage.pdf",sep="")
-pdf(outfile)
+outfile=paste(genome,"-coverage.png",sep="")
+png(outfile)
 pie(coverage,labels = labels, col=rainbow(length(labels)),main=genome)
 dev.off()
 
@@ -182,11 +182,11 @@ covorder[2]=length(which(dat$Pfam_ID != "" & dat$Pfam_Meff & dat$Disorder<0.5))
 labels[2]="Pfam"
 colors[2]="cadetblue2"
 pct <- round(covorder/sum(covorder)*100)
-labels <- paste(labels,pct)
-labels <- paste(labels,"%",sep="")
-outfile=paste(genome,"-pie-order.pdf",sep="")
-pdf(outfile)
-pie(covorder,labels = labels, col=rainbow(length(labels)),main=genome)
+newlabels <- paste(labels,pct)
+newlabels <- paste(newlabels,"%",sep="")
+outfile=paste(genome,"-pie-order.png",sep="")
+png(outfile)
+pie(covorder,labels = newlabels, col=rainbow(length(labels)),main=genome)
 dev.off()
 
 covdisorder=NULL
@@ -226,16 +226,16 @@ colors[8]="lightpink2"
 pct <- round(covdisorder/sum(covdisorder)*100,digits=2)
 dislabels <- paste(dislabels,pct)
 dislabels <- paste(dislabels,"%",sep="")
-outfile=paste(genome,"-pie-disorder.pdf",sep="")
-pdf(outfile)
+outfile=paste(genome,"-pie-disorder.png",sep="")
+png(outfile)
 pie(covdisorder,labels = labels, col=rainbow(length(labels)),main=genome)
 dev.off()
 
 pct <- round(covorder/sum(covorder)*100,digits=2)
 labels <- paste(labels,pct)
 labels <- paste(labels,"%",sep="")
-outfile=paste(genome,"-pie-all.pdf",sep="")
-pdf(outfile)
+outfile=paste(genome,"-pie-all.png",sep="")
+png(outfile)
 pie(covorder,labels = labels, col=colors   ,main=genome,cex=0.3)
 dev.off()
 
