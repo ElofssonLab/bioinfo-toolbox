@@ -6,7 +6,7 @@ genomes[3]="homo_sapiens"
 #genome="escherichia_coli"
 for (genome in genomes){
 
-file=paste(genome,".df.tsv",sep="")
+file=paste("data/",genome,".df.tsv",sep="")
 
 #dat<-read.table("escherichia_coli.df.tsv", sep='\t', header=T)
 #dat<-read.table("saccharomyces_cerevisae.df.tsv", sep='\t', header=T)
