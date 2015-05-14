@@ -170,7 +170,6 @@ legend(-.4,.0,"NoDiso",cex=0.4,border=NA)
 dev.off()
 
 
-
 #-----------------------  Sacharomyces  --------------------------------
 sacchAll=NULL
 sacchTM=NULL
@@ -463,12 +462,49 @@ dev.off()
 
                                         #Summary of all
 genome="All"
-outfile=paste(genome,"-Diso-pie.png",sep="")
+outfile=paste(genome,"-pie.png",sep="")
 png(outfile)
 
 pie(homoPDBAll, labels=labels,col=colors,main=genome,radius=iniR,border = NA)
 floating.pie(0,0,sacchPDBAll, col=colors,main='',radius=0.7)
 floating.pie(0,0,ecoliPDBAll, col=colors,main='',radius=0.4)
+floating.pie(0,0,c(1), radius=0.1, col=c('white'), border = NA)
+legend(-1,.0,"Homo",cex=0.4,border=NA)
+legend(-.7,.0,"Sacc",cex=0.4,border=NA)
+legend(-.4,.0,"EColi",cex=0.4,border=NA)
+dev.off()
+
+
+labels[7]="Diso-NoPfam"
+colors[7]="lightpink"
+labels[8]="Pfam diso"
+colors[8]="lightpink2"
+labels[9]=">100 diso"
+colors[9]="deeppink1"
+labels[10]=">200 diso"
+colors[10]="deeppink2"
+labels[11]=">500 diso"
+colors[11]="deeppink3"
+labels[12]=">1000 diso"
+colors[12]="red"
+labels[13]="PDB"
+colors[13]="green"
+
+ecoliDisoAll=c(ecoliPDBNoDiso,ecoliPDBDiso,ecoliPDBAll[7])
+sacchDisoAll=c(sacchPDBNoDiso,sacchPDBDiso,sacchPDBAll[7])
+homoDisoAll=c(homoPDBNoDiso,homoPDBDiso,homoPDBAll[7])
+
+genome="All"
+outfile=paste(genome,"-pie.png",sep="")
+
+pct <- round(ecoliDisoAll/sum(ecoliDisoAll)*100,digits=1)
+ames <- paste(labels,pct)
+names <- paste(names,"%",sep="")
+png(outfile)
+
+pie(homoDisoAll, labels=labels,col=colors,main=genome,radius=iniR,border = NA)
+floating.pie(0,0,sacchDisoAll, col=colors,main='',radius=0.7)
+floating.pie(0,0,ecoliDisoAll, col=colors,main='',radius=0.4)
 floating.pie(0,0,c(1), radius=0.1, col=c('white'), border = NA)
 legend(-1,.0,"Homo",cex=0.4,border=NA)
 legend(-.7,.0,"Sacc",cex=0.4,border=NA)
