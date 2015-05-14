@@ -216,12 +216,12 @@ covdisorder[5]=length(which(dat$Pfam_Meff > 500 & dat$Pfam_Meff <= 1000 & dat$Di
 covorder[11]=length(which(dat$Pfam_Meff > 500 & dat$Pfam_Meff <= 1000 & dat$Disorder>=0.5))
 dislabels[5]=">500"
 labels[11]=">500 diso"
-colors[9]="deepink3"
+colors[11]="deepink3"
 covdisorder[4]=length(which(dat$Pfam_Meff > 200 & dat$Pfam_Meff <= 500 & dat$Disorder>=0.5))
 covorder[10]=length(which(dat$Pfam_Meff > 200 & dat$Pfam_Meff <= 500 & dat$Disorder>=0.5))
 dislabels[4]=">200"
 labels[10]=">200 diso"
-colors[9]="deepink2"
+colors[10]="deepink2"
 covdisorder[3]=length(which(dat$Pfam_Meff > 100 & dat$Pfam_Meff <= 200 & dat$Disorder>=0.5))
 covorder[9]=length(which(dat$Pfam_Meff > 100 & dat$Pfam_Meff <= 200 & dat$Disorder>=0.5))
 dislabels[3]=">100"
