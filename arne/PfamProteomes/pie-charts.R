@@ -44,14 +44,16 @@ ecoliPDBSeg=NULL
 ecoliPDBNoTM=NULL
 ecoliPDBNoDiso=NULL
 ecoliPDBNoSeg=NULL
+ecoliPDBTMNoDiso=NULL
+ecoliPDBNoTMNoDiso=NULL
 labels=NULL
 loop=seq(1,6)
 
 
 
                                         # Ecoli
-ecoli$Pfam_Meff[ecoli$Pfam_Meff==-1 & ecoli$Pfam_pos != -1)] <- 0
-ecoli$Pfam_Meff[ecoli$Pfam_Meff==-1 & ecoli$Pfam_pos == -1)] <- 100
+ecoli$Pfam_Meff[ecoli$Pfam_Meff==-1 & ecoli$Pfam_pos != -1] <- 0
+ecoli$Pfam_Meff[ecoli$Pfam_Meff==-1 & ecoli$Pfam_pos == -1] <- 100
 ecoli$Pfam_Meff[is.na(ecoli$Pfam_Meff)] <- 0
 
                                         # Ja
@@ -68,7 +70,9 @@ for (i in loop){
     labels[i]=cutoffs[i]
     ecoliPDBAll[i]=length(which(ecoli$Pfam_Meff > cutoffs[i] & ecoli$Pfam_Meff <= cutoffs[i+1] & ecoli$PDB_ID == "") )
     ecoliPDBTM[i]=length(which(ecoli$Pfam_Meff > cutoffs[i] & ecoli$Pfam_Meff <= cutoffs[i+1] & ecoli$TM > 0 & ecoli$PDB_ID == ""))
-    ecoliPDBNoTM[i]=length(which(ecoli$Pfam_Meff > cutoffs[i] & ecoli$Pfam_Meff <= cutoffs[i+1] & ecoli$TM == 0  & ecoli$PDB_ID == ""))
+    ecoliPDBNoTM[i]=length(which(ecoli$Pfam_Meff > cutoffs[i] & ecoli$Pfam_Meff <= cutoffs[i+1] & ecoli$TM == 0  & ecoli$PDB_ID == "" & ecoli$Disorder<0.5 ))
+    ecoliPDBTMNoDiso[i]=length(which(ecoli$Pfam_Meff > cutoffs[i] & ecoli$Pfam_Meff <= cutoffs[i+1] & ecoli$TM > 0 & ecoli$PDB_ID == ""& ecoli$Disorder<0.5 ))
+    ecoliPDBNoTMNoDiso[i]=length(which(ecoli$Pfam_Meff > cutoffs[i] & ecoli$Pfam_Meff <= cutoffs[i+1] & ecoli$TM == 0  & ecoli$PDB_ID == ""))
     ecoliPDBDiso[i]=length(which(ecoli$Pfam_Meff > cutoffs[i] & ecoli$Pfam_Meff <= cutoffs[i+1] & ecoli$Disorder>=0.5  & ecoli$PDB_ID == ""))
     ecoliPDBNoDiso[i]=length(which(ecoli$Pfam_Meff > cutoffs[i] & ecoli$Pfam_Meff <= cutoffs[i+1] & ecoli$Disorder<0.5  & ecoli$PDB_ID == ""))
     ecoliPDBSeg[i]=length(which(ecoli$Pfam_Meff > cutoffs[i] & ecoli$Pfam_Meff <= cutoffs[i+1] & ecoli$Seg_low > 0 & ecoli$PDB_ID == ""))
@@ -77,6 +81,7 @@ for (i in loop){
 
 ecoliPDBAll[7]=length(which(ecoli$PDB_ID != "") )
 ecoliDisoAll=c(ecoliPDBNoDiso,ecoliPDBDiso,ecoliPDBAll[7])
+ecoliTMAll=c(ecoliPDBNoTMNoDiso,ecoliPDBTMNoDiso,ecoliPDBDiso,ecoliPDBAll[7])
 ecoliPDBTM[7]=length(which(ecoli$PDB_ID != "" & ecoli$TM > 0) )
 ecoliPDBNoTM[7]=length(which(ecoli$PDB_ID != "" & ecoli$TM == 0 ) )
 ecoliPDBDiso[7]=length(which(ecoli$PDB_ID != "" & ecoli$Disorder>=0.5 ) )
@@ -192,14 +197,16 @@ sacchPDBSeg=NULL
 sacchPDBNoTM=NULL
 sacchPDBNoDiso=NULL
 sacchPDBNoSeg=NULL
+sacchPDBTMNoDiso=NULL
+sacchPDBNoTMNoDiso=NULL
 labels=NULL
 loop=seq(1,6)
 
 
 
 # Sacch
-sacch$Pfam_Meff[sacch$Pfam_Meff==-1 & sacch$Pfam_pos != -1)] <- 0
-sacch$Pfam_Meff[sacch$Pfam_Meff==-1 & sacch$Pfam_pos == -1)] <- 100
+sacch$Pfam_Meff[sacch$Pfam_Meff==-1 & sacch$Pfam_pos != -1] <- 0
+sacch$Pfam_Meff[sacch$Pfam_Meff==-1 & sacch$Pfam_pos == -1] <- 100
 sacch$Pfam_Meff[is.na(sacch$Pfam_Meff)] <- 0
 
                                         # Ja
@@ -216,6 +223,8 @@ for (i in loop){
     labels[i]=cutoffs[i]
     sacchPDBAll[i]=length(which(sacch$Pfam_Meff > cutoffs[i] & sacch$Pfam_Meff <= cutoffs[i+1] & sacch$PDB_ID == "") )
     sacchPDBTM[i]=length(which(sacch$Pfam_Meff > cutoffs[i] & sacch$Pfam_Meff <= cutoffs[i+1] & sacch$TM > 0 & sacch$PDB_ID == ""))
+    sacchPDBNoTM[i]=length(which(sacch$Pfam_Meff > cutoffs[i] & sacch$Pfam_Meff <= cutoffs[i+1] & sacch$TM == 0  & sacch$PDB_ID == "" & sacch$Disorder<0.5 ))
+    sacchPDBTMNoDiso[i]=length(which(sacch$Pfam_Meff > cutoffs[i] & sacch$Pfam_Meff <= cutoffs[i+1] & sacch$TM > 0 & sacch$PDB_ID == ""& sacch$Disorder<0.5 ))
     sacchPDBNoTM[i]=length(which(sacch$Pfam_Meff > cutoffs[i] & sacch$Pfam_Meff <= cutoffs[i+1] & sacch$TM == 0  & sacch$PDB_ID == ""))
     sacchPDBDiso[i]=length(which(sacch$Pfam_Meff > cutoffs[i] & sacch$Pfam_Meff <= cutoffs[i+1] & sacch$Disorder>=0.5  & sacch$PDB_ID == ""))
     sacchPDBNoDiso[i]=length(which(sacch$Pfam_Meff > cutoffs[i] & sacch$Pfam_Meff <= cutoffs[i+1] & sacch$Disorder<0.5  & sacch$PDB_ID == ""))
@@ -224,6 +233,7 @@ for (i in loop){
 }
 sacchPDBAll[7]=length(which(sacch$PDB_ID != "") )
 sacchDisoAll=c(sacchPDBNoDiso,sacchPDBDiso,sacchPDBAll[7])
+sacchTMAll=c(sacchPDBNoTMNoDiso,sacchPDBTMNoDiso,sacchPDBDiso,sacchPDBAll[7])
 sacchPDBTM[7]=length(which(sacch$PDB_ID != "" & sacch$TM > 0) )
 sacchPDBNoTM[7]=length(which(sacch$PDB_ID != "" & sacch$TM == 0 ) )
 sacchPDBDiso[7]=length(which(sacch$PDB_ID != "" & sacch$Disorder>=0.5 ) )
@@ -340,14 +350,16 @@ homoPDBSeg=NULL
 homoPDBNoTM=NULL
 homoPDBNoDiso=NULL
 homoPDBNoSeg=NULL
+homoPDBTMNoDiso=NULL
+homoPDBNoTMNoDiso=NULL
 labels=NULL
 loop=seq(1,6)
 
 
 
 # Homo
-homo$Pfam_Meff[homo$Pfam_Meff==-1 & homo$Pfam_pos != -1)] <- 0
-homo$Pfam_Meff[homo$Pfam_Meff==-1 & homo$Pfam_pos == -1)] <- 100
+homo$Pfam_Meff[homo$Pfam_Meff==-1 & homo$Pfam_pos != -1] <- 0
+homo$Pfam_Meff[homo$Pfam_Meff==-1 & homo$Pfam_pos == -1] <- 100
 homo$Pfam_Meff[is.na(homo$Pfam_Meff)] <- 0
 
 
@@ -366,6 +378,8 @@ for (i in loop){
     homoPDBAll[i]=length(which(homo$Pfam_Meff > cutoffs[i] & homo$Pfam_Meff <= cutoffs[i+1] & homo$PDB_ID == "") )
     homoPDBTM[i]=length(which(homo$Pfam_Meff > cutoffs[i] & homo$Pfam_Meff <= cutoffs[i+1] & homo$TM > 0 & homo$PDB_ID == ""))
     homoPDBNoTM[i]=length(which(homo$Pfam_Meff > cutoffs[i] & homo$Pfam_Meff <= cutoffs[i+1] & homo$TM == 0  & homo$PDB_ID == ""))
+    homoPDBNoTMNoDiso[i]=length(which(homo$Pfam_Meff > cutoffs[i] & homo$Pfam_Meff <= cutoffs[i+1] & homo$TM == 0  & homo$PDB_ID == "" & homo$Disorder<0.5 ))
+    homoPDBTMNoDiso[i]=length(which(homo$Pfam_Meff > cutoffs[i] & homo$Pfam_Meff <= cutoffs[i+1] & homo$TM > 0 & homo$PDB_ID == ""& homo$Disorder<0.5 ))
     homoPDBDiso[i]=length(which(homo$Pfam_Meff > cutoffs[i] & homo$Pfam_Meff <= cutoffs[i+1] & homo$Disorder>=0.5  & homo$PDB_ID == ""))
     homoPDBNoDiso[i]=length(which(homo$Pfam_Meff > cutoffs[i] & homo$Pfam_Meff <= cutoffs[i+1] & homo$Disorder<0.5  & homo$PDB_ID == ""))
     homoPDBSeg[i]=length(which(homo$Pfam_Meff > cutoffs[i] & homo$Pfam_Meff <= cutoffs[i+1] & homo$Seg_low > 0 & homo$PDB_ID == ""))
@@ -373,6 +387,7 @@ for (i in loop){
 }
 homoPDBAll[7]=length(which(homo$PDB_ID != "") )
 homoDisoAll=c(homoPDBNoDiso,homoPDBDiso,homoPDBAll[7])
+homoTMAll=c(homoPDBNoTMNoDiso,homoPDBTMNoDiso,homoPDBDiso,homoPDBAll[7])
 homoPDBTM[7]=length(which(homo$PDB_ID != "" & homo$TM > 0) )
 homoPDBNoTM[7]=length(which(homo$PDB_ID != "" & homo$TM == 0 ) )
 homoPDBDiso[7]=length(which(homo$PDB_ID != "" & homo$Disorder>=0.5 ) )
@@ -516,6 +531,60 @@ png(outfile)
 pie(homoDisoAll, labels=labels,col=colors,main=genome,radius=iniR,border = NA)
 floating.pie(0,0,sacchDisoAll, col=colors,main='',radius=0.7)
 floating.pie(0,0,ecoliDisoAll, col=colors,main='',radius=0.4)
+floating.pie(0,0,c(1), radius=0.1, col=c('white'), border = NA)
+legend(-1,.0,"Homo",cex=0.4,border=NA)
+legend(-.7,.0,"Sacch",cex=0.4,border=NA)
+legend(-.4,.0,"EColi",cex=0.4,border=NA)
+dev.off()
+
+# WHat is the interesting part.
+
+
+labels[7]="TM-NoPfam"
+colors[7]="lightpink"
+labels[8]="Pfam TM"
+colors[8]="lightpink2"
+labels[9]=">100 TM"
+colors[9]="deeppink1"
+labels[10]=">200 TM"
+colors[10]="deeppink2"
+labels[11]=">500 TM"
+colors[11]="deeppink3"
+labels[12]=">1000 TM"
+colors[12]="red"
+labels[13]="TM-NoPfam"
+colors[13]="greenyellow"
+labels[14]="Pfam diso"
+colors[14]="green"
+labels[15]=">100 diso"
+colors[15]="green1"
+labels[16]=">200 diso"
+colors[16]="green3"
+labels[17]=">500 diso"
+colors[17]="green3"
+labels[18]=">1000 diso"
+colors[18]="green4"
+
+labels[19]="PDB"
+colors[19]="grey"
+
+labels=NULL
+
+labels[6]="Order"
+labels[12]="TM"
+labels[18]="Disorder"
+labels[19]="PDB"
+
+
+genome="All"
+outfile=paste(genome,"Diso-pie.png",sep="")
+pct <- round(ecoliDisoAll/sum(ecoliDisoAll)*100,digits=1)
+Names <- paste(labels,pct)
+names <- paste(names,"%",sep="")
+png(outfile)
+pie(homoTMAll, labels=labels,col=colors,main=genome,radius=iniR,border = NA)
+floating.pie(0,0,sacchTMAll, col=colors,main='',radius=0.7)
+floating.pie(0,0,ecoliTMAll, col=colors,main='',radius=0.4)
 floating.pie(0,0,c(1), radius=0.1, col=c('white'), border = NA)
 legend(-1,.0,"Homo",cex=0.4,border=NA)
 legend(-.7,.0,"Sacch",cex=0.4,border=NA)
