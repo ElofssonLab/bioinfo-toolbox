@@ -18,12 +18,12 @@ columns=NULL
 cutoffs=NULL
 
 cutoffs[1]=-2
-cutoffs[2]=2
-cutoffs[3]=100
-cutoffs[4]=200
-cutoffs[5]=500
-cutoffs[6]=1000
-cutoffs[7]=1000000000
+cutoffs[2]=0
+cutoffs[3]=99
+cutoffs[4]=199
+cutoffs[5]=499
+cutoffs[6]=999
+cutoffs[7]=100000000000
 
 
 #-----------------------  E. Coli  --------------------------------
@@ -49,7 +49,9 @@ loop=seq(1,6)
 
 
 
-# Ecoli
+                                        # Ecoli
+ecoli$Pfam_Meff[ecoli$Pfam_Meff==-1 & ecoli$Pfam_pos != -1)] <- 0
+ecoli$Pfam_Meff[ecoli$Pfam_Meff==-1 & ecoli$Pfam_pos == -1)] <- 100
 ecoli$Pfam_Meff[is.na(ecoli$Pfam_Meff)] <- 0
 
                                         # Ja
@@ -196,6 +198,8 @@ loop=seq(1,6)
 
 
 # Sacch
+sacch$Pfam_Meff[sacch$Pfam_Meff==-1 & sacch$Pfam_pos != -1)] <- 0
+sacch$Pfam_Meff[sacch$Pfam_Meff==-1 & sacch$Pfam_pos == -1)] <- 100
 sacch$Pfam_Meff[is.na(sacch$Pfam_Meff)] <- 0
 
                                         # Ja
@@ -342,7 +346,10 @@ loop=seq(1,6)
 
 
 # Homo
+homo$Pfam_Meff[homo$Pfam_Meff==-1 & homo$Pfam_pos != -1)] <- 0
+homo$Pfam_Meff[homo$Pfam_Meff==-1 & homo$Pfam_pos == -1)] <- 100
 homo$Pfam_Meff[is.na(homo$Pfam_Meff)] <- 0
+
 
                                         # Ja
 for (i in loop){

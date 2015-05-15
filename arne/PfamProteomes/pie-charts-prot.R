@@ -17,8 +17,8 @@ homo<-read.table(file, sep='\t', header=T)
 columns=NULL
 cutoffs=NULL
 
-cutoffs[1]=-2
-cutoffs[2]=2
+cutoffs[1]=-1
+cutoffs[2]=0
 cutoffs[3]=100
 cutoffs[4]=200
 cutoffs[5]=500
@@ -477,6 +477,9 @@ legend(-.7,.0,"Diso",cex=0.4,border=NA)
 legend(-.4,.0,"NoDiso",cex=0.4,border=NA)
 dev.off()
 
+ecoliPDBAll[ecoliPDBAll==0]<-0.001
+sacchPDBAll[sacchPDBAll==0]<-0.001
+homoPDBAll[homoPDBAll==0]<-0.001
 
 
                                         #Summary of all
