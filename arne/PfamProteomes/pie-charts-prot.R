@@ -629,3 +629,53 @@ legend(-1,.0,"Homo",cex=0.4,border=NA)
 legend(-.7,.0,"Sacch",cex=0.4,border=NA)
 legend(-.4,.0,"EColi",cex=0.4,border=NA)
 dev.off()
+
+
+proteins=NULL
+proteins$count=NULL
+proteins$count[1]=1000
+proteins$count[2]=500
+proteins$count[3]=200
+proteins$count[4]=100
+proteins$ecoli=NULL
+proteins$ecoliTM[1]=length(which(ecoli$PDB_count == 0 & ecoli$Pfam_Meff1000>0 & ecoli$TM==1))
+proteins$ecoliTM[2]=length(which(ecoli$PDB_count == 0 & ecoli$Pfam_Meff500>0 & ecoli$TM==1))
+proteins$ecoliTM[3]=length(which(ecoli$PDB_count == 0 & ecoli$Pfam_Meff200>0 & ecoli$TM==1))
+proteins$ecoliTM[4]=length(which(ecoli$PDB_count == 0 & ecoli$Pfam_Meff100>0 & ecoli$TM==1))
+proteins$ecoliNoTM[1]=length(which(ecoli$PDB_count == 0 & ecoli$Pfam_Meff1000>0 & ecoli$TM==0))
+proteins$ecoliNoTM[2]=length(which(ecoli$PDB_count == 0 & ecoli$Pfam_Meff500>0 & ecoli$TM==0))
+proteins$ecoliNoTM[3]=length(which(ecoli$PDB_count == 0 & ecoli$Pfam_Meff200>0 & ecoli$TM==0))
+proteins$ecoli[4]=length(which(ecoli$PDB_count == 0 & ecoli$Pfam_Meff100>0 & ecoli$TM==0))
+pr=NULL
+pr$Meff1000[1]=length(which(ecoli$PDB_count == 0 & ecoli$Pfam_Meff1000>0))
+pr$Meff500[1]=length(which(ecoli$PDB_count == 0 & ecoli$Pfam_Meff500>0 ))
+pr$Meff200[1]=length(which(ecoli$PDB_count == 0 & ecoli$Pfam_Meff200>0 ))
+pr$Meff100[1]=length(which(ecoli$PDB_count == 0 & ecoli$Pfam_Meff100>0 ))
+pr$Meff1000[2]=length(which(sacch$PDB_count == 0 & sacch$Pfam_Meff1000>0))
+pr$Meff500[2]=length(which(sacch$PDB_count == 0 & sacch$Pfam_Meff500>0 ))
+pr$Meff200[2]=length(which(sacch$PDB_count == 0 & sacch$Pfam_Meff200>0 ))
+pr$Meff100[2]=length(which(sacch$PDB_count == 0 & sacch$Pfam_Meff100>0 ))
+pr$Meff1000[3]=length(which(homo$PDB_count == 0 & homo$Pfam_Meff1000>0))
+pr$Meff500[3]=length(which(homo$PDB_count == 0 & homo$Pfam_Meff500>0 ))
+pr$Meff200[3]=length(which(homo$PDB_count == 0 & homo$Pfam_Meff200>0 ))
+pr$Meff100[3]=length(which(homo$PDB_count == 0 & homo$Pfam_Meff100>0 ))
+
+proteins$ecoli[1]=length(which(ecoli$PDB_count == 0 & ecoli$Pfam_Meff1000>0))
+proteins$ecoli[2]=length(which(ecoli$PDB_count == 0 & ecoli$Pfam_Meff500>0 ))
+proteins$ecoli[3]=length(which(ecoli$PDB_count == 0 & ecoli$Pfam_Meff200>0 ))
+proteins$ecoli[4]=length(which(ecoli$PDB_count == 0 & ecoli$Pfam_Meff100>0 ))
+proteins$sacch[1]=length(which(sacch$PDB_count == 0 & sacch$Pfam_Meff1000>0))
+proteins$sacch[2]=length(which(sacch$PDB_count == 0 & sacch$Pfam_Meff500>0 ))
+proteins$sacch[3]=length(which(sacch$PDB_count == 0 & sacch$Pfam_Meff200>0 ))
+proteins$sacch[4]=length(which(sacch$PDB_count == 0 & sacch$Pfam_Meff100>0 ))
+proteins$homo[1]=length(which(homo$PDB_count == 0 & homo$Pfam_Meff1000>0))
+proteins$homo[2]=length(which(homo$PDB_count == 0 & homo$Pfam_Meff500>0 ))
+proteins$homo[3]=length(which(homo$PDB_count == 0 & homo$Pfam_Meff200>0 ))
+proteins$homo[4]=length(which(homo$PDB_count == 0 & homo$Pfam_Meff100>0 ))
+
+genome="Pred-proteins"
+outfile=paste(genome,"-PDB-pie.png",sep="")
+png(outfile,width=1280,height=1280)
+barplot(c(proteins$ecoli,proteins$sacch,proteins$homo),names.arg=c(proteins$count,proteins$count,proteins$count),main="Ecoli   Yeast   Homo",xlab="Meff",ylab="Num",col=c("darkblue","darkblue","darkblue","darkblue","red","red","red","red","green","green","green","green"))
+dev.off()
+
