@@ -218,7 +218,17 @@ def get_ali_coverage(filename):
     return coverage_lst
 
 
-def plot_map(fasta_filename, c_filename, factor=1.0, th=0.5, c2_filename='', psipred_horiz_fname='', psipred_vert_fname='', pdb_filename='', is_heavy=False, chain='', sep=',', outfilename='', ali_filename=''):  
+def get_meff_coverage(meff_file):
+    meff_lst = []
+    with open(meff_file) as f:
+        for l in f:
+            if 'MeffPerPos' in l:
+                meff_lst = l.split()[-1].strip('[]').split(',')
+                meff_lst = map(float, meff_lst)
+    return meff_lst
+
+
+def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psipred_horiz_fname='', psipred_vert_fname='', pdb_filename='', is_heavy=False, chain='', sep=',', outfilename='', ali_filename='', meff_filename=''):  
    
     #acc = c_filename.split('.')[0]
     #acc = fasta_filename.split('.')[0][:4]
@@ -255,6 +265,8 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=0.5, c2_filename='', psi
            
         if count >= ref_len * factor:
         #if score < th:
+            if th == -1:
+                th = score
             break
  
 
@@ -267,7 +279,7 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=0.5, c2_filename='', psi
     ax.set_ylim([-unit,ref_len])
     
     ### plot alignment coverage if alignemnt given
-    if ali_filename:
+    if ali_filename or meff_filename:
         # adjust overall canvas  
         ax = plt.subplot2grid((8,8), (1, 1), colspan=7, rowspan=7)#, aspect='auto')
         #ax.set_adjustable('box-forced')
@@ -277,8 +289,12 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=0.5, c2_filename='', psi
         ax.set_xlim([-unit,ref_len])
         ax.set_ylim([-unit,ref_len])
 
-        coverage_lst = get_ali_coverage(ali_filename)
+        if ali_filename:
+            coverage_lst = get_ali_coverage(ali_filename)
+        elif meff_filename:
+            coverage_lst = get_meff_coverage(meff_filename)
         max_cover = max(coverage_lst)
+
         #lt = pow(10, max(1,floor(log10(max_cover)) - 1))
         #upper = int(ceil(max_cover/float(lt)) * lt)
         ax2 = plt.subplot2grid((8,8), (1,0), rowspan=7, sharey=ax)
@@ -536,7 +552,7 @@ if __name__ == "__main__":
     p.add_argument('contact_file')#, required=True)
     p.add_argument('-o', '--outfile', default='')
     p.add_argument('-f', '--factor', default=1.0, type=float)
-    p.add_argument('-t', '--threshold', default=0.5, type=float)
+    p.add_argument('-t', '--threshold', default=-1, type=float)
     p.add_argument('--c2', default='')
     p.add_argument('--psipred_horiz', default='')
     p.add_argument('--psipred_vert', default='')
@@ -544,6 +560,7 @@ if __name__ == "__main__":
     p.add_argument('--heavy', action='store_true')
     p.add_argument('--chain', default='')
     p.add_argument('--alignment', default='')
+    p.add_argument('--meff', default='')
 
     args = vars(p.parse_args(sys.argv[1:]))
 
@@ -560,5 +577,5 @@ if __name__ == "__main__":
     else:
         sep = '\t'
     
-    plot_map(args['fasta_file'], args['contact_file'], factor=args['factor'], th=args['threshold'], c2_filename=args['c2'], psipred_horiz_fname=args['psipred_horiz'], psipred_vert_fname=args['psipred_vert'], pdb_filename=args['pdb'], is_heavy=args['heavy'], chain=args['chain'], sep=sep, outfilename=args['outfile'], ali_filename=args['alignment'])
+    plot_map(args['fasta_file'], args['contact_file'], factor=args['factor'], th=args['threshold'], c2_filename=args['c2'], psipred_horiz_fname=args['psipred_horiz'], psipred_vert_fname=args['psipred_vert'], pdb_filename=args['pdb'], is_heavy=args['heavy'], chain=args['chain'], sep=sep, outfilename=args['outfile'], ali_filename=args['alignment'], meff_filename=args['meff'])
 
