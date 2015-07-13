@@ -232,13 +232,8 @@ def get_meff_coverage(meff_file):
     return meff_lst
 
 
-<<<<<<< HEAD
-def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psipred_horiz_fname='', psipred_vert_fname='', pdb_filename='', is_heavy=False, chain='', sep=',', outfilename='', ali_filename='', meff_filename=''):  
-   
-=======
 def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psipred_horiz_fname='', psipred_vert_fname='', pdb_filename='', is_heavy=False, chain='', sep=',', outfilename='', ali_filename='',  meff_filename='', name='', start=0, end=-1):  
   
->>>>>>> 1dca8da4493d1d5b8ce3a9a7e3a46e3603333533
     #acc = c_filename.split('.')[0]
     #acc = fasta_filename.split('.')[0][:4]
     if name == '': 
