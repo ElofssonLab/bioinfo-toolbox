@@ -65,7 +65,7 @@ for entry in SeqRecord:
 #   print entry.id
 
 
-print RECORD["sp|P0ACS2|SOXR_ECOLI"]
-#print RECORD
+#print RECORD["sp|P0ACS2|SOXR_ECOLI"]
+print RECORD
 
 

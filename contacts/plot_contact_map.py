@@ -5,7 +5,6 @@ from math import *
 # on UPPMAX only
 sys.path.append('/sw/apps/bioinfo/biopython/1.59/tintin/lib/python')
 
-import Bio.PDB
 from Bio import pairwise2
 
 import numpy as np
@@ -163,25 +162,30 @@ def get_colors(contacts_np, ref_contact_map=[], atom_seq_ali=[], th=0.5):
                 assert N == ref_contact_map.shape[0]
                 # FN
                 if sc <= th and ref_contact_map[i,j] < 8:
-                    img[i,j] = [0.5,0.5,1,1]
+                    #img[i,j] = [0.5,0.5,1,1]
+                    img[i,j] = [0.5,0.5,0.5,1]
+                    img[j,i] = [0.5,0.5,0.5,1]
                 # TP
                 elif sc > th and ref_contact_map[i,j] < 8:
                     img[i,j] = [0,1,0,1]
-                    img[j,i] = [1-sc,1-sc,1-sc,1]
+                    img[j,i] = [0,1,0,1]
+                    #img[j,i] = [1-sc,1-sc,1-sc,1]
                 # FP
                 #elif contacts_np[i,j] > th and ref_contact_map[i,j] >= 8:
                 elif sc > th and ref_contact_map[i,j] >= 12:
                     img[i,j] = [1,0,0,1]
-                    img[j,i] = [1-sc,1-sc,1-sc,1]
+                    img[j,i] = [1,0,0,1]
+                    #img[j,i] = [1-sc,1-sc,1-sc,1]
                 # grey zone between 8 and 12 Angstroem
                 elif sc > th and (ref_contact_map[i,j] < 12 or ref_contact_map[i,j] >= 8):
                     val = (ref_contact_map[i,j] - 8)/(12 - 8)
-                    img[i,j] = [0,1-val/2,0.5+val/2,1]
-                    img[j,i] = [1-sc,1-sc,1-sc,1]
+                    img[i,j] = [0.5+val/2,1-val/2,0,1]
+                    img[j,i] = [0.5+val/2,1-val/2,0,1]
+                    #img[j,i] = [1-sc,1-sc,1-sc,1]
             else:
                 if sc > th:
-                    img[i,j] = [1-sc,1-sc,1-sc,1]
-                    img[j,i] = [1-sc,1-sc,1-sc,1]
+                    img[i,j] = [0.5-sc/2,0.5-sc/2,1,1]
+                    img[j,i] = [0.5-sc/2,0.5-sc/2,1,1]
 
     return img
 
@@ -228,20 +232,37 @@ def get_meff_coverage(meff_file):
     return meff_lst
 
 
+<<<<<<< HEAD
 def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psipred_horiz_fname='', psipred_vert_fname='', pdb_filename='', is_heavy=False, chain='', sep=',', outfilename='', ali_filename='', meff_filename=''):  
    
+=======
+def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psipred_horiz_fname='', psipred_vert_fname='', pdb_filename='', is_heavy=False, chain='', sep=',', outfilename='', ali_filename='',  meff_filename='', name='', start=0, end=-1):  
+  
+>>>>>>> 1dca8da4493d1d5b8ce3a9a7e3a46e3603333533
     #acc = c_filename.split('.')[0]
     #acc = fasta_filename.split('.')[0][:4]
-    acc = '.'.join(os.path.basename(fasta_filename).split('.')[:-1])
+    if name == '': 
+        acc = '.'.join(os.path.basename(fasta_filename).split('.')[:-1])
+    else:
+        acc = name
 
     ### get sequence
     seq = parse_fasta.read_fasta(open(fasta_filename, 'r')).values()[0][0]
     ref_len = len(seq)
+
+    ### trim sequence according to given positions
+    ### default: take full sequence
+    if end == -1:
+        end = ref_len
+    seq = seq[start:end]
+    ref_len = len(seq)
     unit = (ref_len/50.0)
+
 
     ### get top "factor" * "ref_len" predicted contacts
     contacts = parse_contacts.parse(open(c_filename, 'r'), sep)
     contacts_np = parse_contacts.get_numpy_cmap(contacts)
+    contacts_np = contacts_np[start:end,start:end]
 
     contacts_x = []
     contacts_y = []
@@ -253,13 +274,20 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
         score = contacts[i][0]
         c_x = contacts[i][1] - 1
         c_y = contacts[i][2] - 1
-
+        
+        # only look at contacts within given range
+        # default: take full sequence range into account
+        if c_x < start or c_x >= end:
+            continue
+        if c_y < start or c_y >= end:
+            continue
+        
         pos_diff = abs(c_x - c_y)
         too_close = pos_diff < 5
 
         if not too_close:
-            contacts_x.append(c_x)
-            contacts_y.append(c_y)
+            contacts_x.append(c_x - start)
+            contacts_y.append(c_y - start)
             scores.append(score)
             count += 1
            
@@ -347,6 +375,7 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
         else:
             ss = parse_psipred.vertical(open(psipred_vert_fname, 'r'))
 
+        ss = ss[start:end]
         assert len(ss) == ref_len
  
         ax.axhline(y=0, lw=1, c='black')
@@ -417,7 +446,7 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
         img = get_colors(contacts_np, ref_contact_map=dist_mat, atom_seq_ali=atom_seq_ali, th=th)
         sc = ax.imshow(img, interpolation='none')
    
-        print '%s %s %s %s' % (pdb_filename, PPVs[-1], TPs[-1], FPs[-1])
+        print '%s %s %s %s' % (acc, PPVs[-1], TPs[-1], FPs[-1])
       
         cmap = cm.get_cmap("binary")
         cmap.set_bad([1,1,1,0])
@@ -467,7 +496,7 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
         if pdb_filename:
             PPVs2, TPs2, FPs2 = get_ppvs(contacts2_x, contacts2_y, ref_contact_map, atom_seq_ali, ref_len, factor)
             tp2_colors = get_tp_colors(contacts2_x, contacts2_y, ref_contact_map, atom_seq_ali)
-            print '%s %s %s %s' % (pdb_filename, PPVs2[-1], TPs2[-1], FPs2[-1])
+            print '%s %s %s %s' % (acc, PPVs2[-1], TPs2[-1], FPs2[-1])
             fig.suptitle('%s\nPPV (upper left) = %.2f | PPV (lower right) = %.2f' % (acc, PPVs[-1], PPVs2[-1]))
             sc = ax.scatter(contacts2_y[::-1], contacts2_x[::-1], marker='o', c=tp2_colors[::-1], s=6, alpha=0.75, lw=0)
             sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c=tp_colors[::-1], s=6, alpha=0.75, lw=0)
@@ -561,6 +590,9 @@ if __name__ == "__main__":
     p.add_argument('--chain', default='')
     p.add_argument('--alignment', default='')
     p.add_argument('--meff', default='')
+    p.add_argument('--name', default='')
+    p.add_argument('--start', default=0, type=int)
+    p.add_argument('--end', default=-1, type=int)
 
     args = vars(p.parse_args(sys.argv[1:]))
 
@@ -577,5 +609,5 @@ if __name__ == "__main__":
     else:
         sep = '\t'
     
-    plot_map(args['fasta_file'], args['contact_file'], factor=args['factor'], th=args['threshold'], c2_filename=args['c2'], psipred_horiz_fname=args['psipred_horiz'], psipred_vert_fname=args['psipred_vert'], pdb_filename=args['pdb'], is_heavy=args['heavy'], chain=args['chain'], sep=sep, outfilename=args['outfile'], ali_filename=args['alignment'], meff_filename=args['meff'])
+    plot_map(args['fasta_file'], args['contact_file'], factor=args['factor'], th=args['threshold'], c2_filename=args['c2'], psipred_horiz_fname=args['psipred_horiz'], psipred_vert_fname=args['psipred_vert'], pdb_filename=args['pdb'], is_heavy=args['heavy'], chain=args['chain'], sep=sep, outfilename=args['outfile'], ali_filename=args['alignment'], meff_filename=args['meff'], name=args['name'], start=args['start'], end=args['end'])
 

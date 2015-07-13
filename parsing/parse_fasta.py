@@ -105,6 +105,18 @@ def read_fasta_pfam(afile):
     return result_dict
 
 
+def get_residue_dict(afile):
+    seq_dict = read_fasta(afile)
+    result_dict = {}
+    # header: >tr|UniprotID|UniprotName
+    for header, seq_lst in seq_dict.iteritems():
+        new_header = header.split('|')[1] # UniprotID
+        res_lst = list(seq_lst[0])
+        result_dict[new_header] = res_lst
+    return result_dict
+
+
+
 if __name__ == "__main__":
 
     afile = open(sys.argv[1], 'r')
