@@ -101,7 +101,7 @@ def read_fasta_pfam(afile):
     for header, seq_lst in seq_dict.iteritems():
         new_header = header.strip('>')
         new_seq = seq_lst[0].translate(None, '.')
-        result_dict[new_header] = [new_seq]
+        result_dict[new_header] = [new_seq.upper()]
     return result_dict
 
 
