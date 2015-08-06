@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys, getopt
+import sys, getopt,re
 
 from Bio import SeqIO
 from Bio.Seq import Seq
@@ -21,7 +21,8 @@ for record in SeqIO.parse(handle, 'fasta') :
    print record.name
    # Grab the entire sequence
 #   seq = str(record.seq)
-   name= str(record.name)
+   name= re.sub(r'\|','-',str(record.name))
+
 #   record.id=str(record.name)
    # Look at all features for this record
    #   for feature in record.features:
