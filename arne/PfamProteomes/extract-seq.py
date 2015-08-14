@@ -12,6 +12,9 @@ from Bio.SeqRecord import SeqRecord
 file=sys.argv[1]
 dir=sys.argv[2]
 
+# Avoid having too many sequences in a single dir..
+#subdir=
+
 # Open GenBank file
 handle = open(file, 'rU')
 
