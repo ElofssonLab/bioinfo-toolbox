@@ -18,10 +18,10 @@ dir=sys.argv[2]
 # Open GenBank file
 handle = open(file, 'rU')
 
-print "opening "+ file +"\n"
+#print "opening "+ file +"\n"
 # For each record (mitochrodrial genome, in this case)...
 for record in SeqIO.parse(handle, 'fasta') :
-#   print record.name
+   print record.name
    # Grab the entire sequence
 #   seq = str(record.seq)
    name= re.sub(r'\|','-',str(record.name))
@@ -29,12 +29,20 @@ for record in SeqIO.parse(handle, 'fasta') :
 #   record.id=str(record.name)
    # Look at all features for this record
    #   for feature in record.features:
-   subdir=re.sub(r'.*\_','',name)[:3]
-#   print subdir
+   subdirA=re.sub(r'.*\_','',name)[:2]
+   subdirB=re.sub(r'.*\_','',name)[2:4]
+   subdirC=re.sub(r'.*\_','',name)[4:8]
+#   print subdirA,subdirB,subdirC
 
+   subdir = subdirA+"/"+subdirB+"/"+subdirC
    if (not os.path.isdir(dir + "/" +subdir)): 
-      os.mkdir(dir + "/" +subdir)
-   OutFile = open(dir + "/" + subdir + "/" + name +  '.fa', 'w')
-#   print "FILE: " + name + "\n"
-   SeqIO.write(record, OutFile, "fasta")
-   exit 
+      os.makedirs(dir + "/" +subdir)
+   if (not os.path.isfile(dir + "/" + subdir + "/" + name +  '.fa')): 
+      try:
+         OutFile = open(dir + "/" + subdir + "/" + name +  '.fa', 'w')
+#      print "FILE: " + name + "\n"
+         SeqIO.write(record, OutFile, "fasta")
+      except:
+         print "error" + dir + "/" + subdir + "/" + name +  '.fa'
+#   else:
+#      print "skipping: " + name + "\n"
