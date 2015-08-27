@@ -30,9 +30,10 @@ for record in SeqIO.parse(handle, 'fasta') :
    # Look at all features for this record
    #   for feature in record.features:
    subdirA=re.sub(r'.*\_','',name)[:2]
-   subdirB=re.sub(r'.*\_','',name)[2:4]
-   subdirC=re.sub(r'.*\_','',name)[4:8]
-#   print subdirA,subdirB,subdirC
+   subdirB=re.sub(r'.*\_','',name)[2:5]
+   subdirC=re.sub(r'.*\_','',name)[5:8]
+
+   print subdirA,subdirB,subdirC
 
    subdir = subdirA+"/"+subdirB+"/"+subdirC
    if (not os.path.isdir(dir + "/" +subdir)): 
