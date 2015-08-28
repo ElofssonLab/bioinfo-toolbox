@@ -17,11 +17,11 @@ dir=sys.argv[2]
 
 # Open GenBank file
 handle = open(file, 'rU')
-
+count=0
 #print "opening "+ file +"\n"
 # For each record (mitochrodrial genome, in this case)...
 for record in SeqIO.parse(handle, 'fasta') :
-   print record.name
+#   print record.name
    # Grab the entire sequence
 #   seq = str(record.seq)
    name= re.sub(r'\|','-',str(record.name))
@@ -33,7 +33,7 @@ for record in SeqIO.parse(handle, 'fasta') :
    subdirB=re.sub(r'.*\_','',name)[2:5]
    subdirC=re.sub(r'.*\_','',name)[5:8]
 
-   print subdirA,subdirB,subdirC
+#   print subdirA,subdirB,subdirC
 
    subdir = subdirA+"/"+subdirB+"/"+subdirC
    if (not os.path.isdir(dir + "/" +subdir)): 
@@ -43,7 +43,9 @@ for record in SeqIO.parse(handle, 'fasta') :
          OutFile = open(dir + "/" + subdir + "/" + name +  '.fa', 'w')
 #      print "FILE: " + name + "\n"
          SeqIO.write(record, OutFile, "fasta")
+         count=count+1
       except:
          print "error" + dir + "/" + subdir + "/" + name +  '.fa'
 #   else:
 #      print "skipping: " + name + "\n"
+print "Wote number of files: ",file,count
