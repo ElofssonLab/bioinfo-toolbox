@@ -424,10 +424,10 @@ homoPDBNoDiso[7]=length(which(homo$PDB_ID != ""  & homo$Disorder<0.5 ) )
 homoPDBSeg[7]=length(which(homo$PDB_ID != "" & homo$Seg_low > 0) )
 homoPDBNoSeg[7]=length(which(homo$PDB_ID != ""  & homo$Seg_low == 0) )
 
-ecoliAll[ecoliAll==0]<-0.001
-ecoliPDBAll[ecoliPDBAll==0]<-0.001
-ecoliDisoAll[ecoliDisoAll==0]<-0.001
-ecoliTMAll[ecoliTMAll==0]<-0.001
+homoAll[homoAll==0]<-0.001
+homoPDBAll[homoPDBAll==0]<-0.001
+homoDisoAll[homoDisoAll==0]<-0.001
+homoTMAll[homoTMAll==0]<-0.001
 
 labels=NULL
 colors=NULL
