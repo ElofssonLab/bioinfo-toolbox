@@ -1552,7 +1552,7 @@ colors[10]="deeppink2"
 labels[11]=">500 diso"
 colors[11]="deeppink3"
 labels[12]=">1000 diso"
-colors[12]="red"
+colors[12]="deeppink4"
 labels[13]="PDB"
 colors[13]="green"
 
@@ -1591,7 +1591,7 @@ colors[10]="deeppink2"
 labels[11]=">500 TM"
 colors[11]="deeppink3"
 labels[12]=">1000 TM"
-colors[12]="red"
+colors[12]="deeppink4"
 labels[13]="TM-NoPfam"
 colors[13]="greenyellow"
 labels[14]="Pfam diso"
@@ -1872,8 +1872,8 @@ dev.off()
 
 outfile=paste(genome,"-Detailed-bar.png",sep="")
 png(outfile,width=1280,height=1280)
-test=matrix(c(ecoliATMAll,ecoliBTMAll,ecoliCTMAll),nrow=24,ncol=3)
-barplot(test,col=colors,legend=labels,xlim=c(0,5),xlab="Year",names=years)
+test=matrix(c(rev(ecoliATMAll),rev(ecoliBTMAll),rev(ecoliCTMAll)),nrow=24,ncol=3)
+barplot(test,col=rev(colors),main="E. Coli",legend=rev(labels),xlim=c(0,4.5),xlab="Year",ylab="Number or proteins",names=years,cex.names=2,cex.axis=2.,cex=2)
 dev.off()
 
 genome="Yeast-prot-by-year"
@@ -1893,8 +1893,8 @@ dev.off()
 
 outfile=paste(genome,"-Detailed-bar.png",sep="")
 png(outfile,width=1280,height=1280)
-test=matrix(c(sacchATMAll,sacchBTMAll,sacchCTMAll),nrow=24,ncol=3)
-barplot(test,col=colors,legend=labels,xlim=c(0,5),xlab="Year",names=years)
+test=matrix(c(rev(sacchATMAll),rev(sacchBTMAll),rev(sacchCTMAll)),nrow=24,ncol=3)
+barplot(test,col=rev(colors),main="Yeast",legend=rev(labels),xlim=c(0,4.5),xlab="Year",ylab="Number or proteins",names=years,cex.names=2,cex.axis=2.,cex=2)
 dev.off()
 
 genome="Homo-prot-by-year"
@@ -1914,6 +1914,6 @@ dev.off()
 
 outfile=paste(genome,"-Detailed-bar.png",sep="")
 png(outfile,width=1280,height=1280)
-test=matrix(c(homoATMAll,homoBTMAll,homoCTMAll),nrow=24,ncol=3,cex=2)
-barplot(test,col=colors,legend=labels,xlim=c(0,5),xlab="Year",names=years)
+test=matrix(c(rev(homoATMAll),rev(homoBTMAll),rev(homoCTMAll)),nrow=24,ncol=3)
+barplot(test,col=rev(colors),main="Homo Sapiens",legend=rev(labels),xlim=c(0,4.5),xlab="Year",ylab="Number or proteins",names=years,cex.names=2,cex.axis=2.,cex=2)
 dev.off()
