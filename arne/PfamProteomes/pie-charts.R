@@ -594,18 +594,18 @@ colors[22]="grey30"
 colors[23]="grey20"
 colors[24]="black"
 
-labels=NULL
+Labels=NULL
 
-labels[1]="Globular"
-labels[7]="TM"
-labels[13]="Disorder"
-labels[19]="PDB"
+Labels[1]="Globular"
+Labels[7]="TM"
+Labels[13]="Disorder"
+Labels[19]="PDB"
 
 
 genome="All"
 outfile=paste(genome,"Diso-pie.png",sep="")
 pct <- round(ecoliDisoAll/sum(ecoliDisoAll)*100,digits=1)
-Names <- paste(labels,pct)
+Names <- paste(Labels,pct)
 names <- paste(names,"%",sep="")
 png(outfile,width=1280,height=1280)
 pie(homoTMAll, labels=labels,col=colors,main=genome,radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
@@ -619,6 +619,13 @@ dev.off()
 
 outfile=paste(genome,"-bar.png",sep="")
 png(outfile,width=1280,height=1280)
-test=matrix(c(rev(homoTMAll),rev(sacchTMAll),rev(ecoliTMAll)),nrow=24,ncol=3)
-barplot(test,col=rev(colors),main="Fraction of residues",legend=rev(labels),xlim=c(0,4.5),xlab="Year",ylab="Number or proteins",names=years,cex.names=2,cex.axis=2.,cex=2)
+homofrac<-homoTMAll/sum(homoTMAll)
+sacchfrac<-sacchTMAll/sum(sacchTMAll)
+ecolifrac<-ecoliTMAll/sum(ecoliTMAll)
+genomes=NULL
+genome[1]="Homo sapiens"
+genome[1]="Yeast"
+genome[1]="E. Coli."
+test=matrix(c(rev(homofrac),rev(sacchfrac),rev(ecolifrac)),nrow=24,ncol=3)
+barplot(test,col=rev(colors),main="Fraction of residues",legend=rev(labels),xlim=c(0,4.5),xlab="Genome",ylab="Fraction of residues",names=genomes,cex.names=2,cex.axis=2.,cex=2)
 dev.off()
