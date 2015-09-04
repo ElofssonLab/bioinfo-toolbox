@@ -1855,6 +1855,140 @@ proteinsC$homo[4]=length(which(homoC$PDB_count == 0 & homoC$Pfam_Meff100>0 ))
 
 
 
+                                        # Calculate fractions
+# PDB
+EcoliANoModel=sum(ecoliATMAll[1:2],ecoliATMAll[7:8],ecoliATMAll[13:14])/sum(ecoliATMAll)*100
+EcoliAPDB=sum(ecoliATMAll[19:24])/sum(ecoliATMAll)*100
+EcoliAGLOB=sum(ecoliATMAll[3:6])/sum(ecoliATMAll)*100
+EcoliATM=sum(ecoliATMAll[9:12])/sum(ecoliATMAll)*100
+EcoliATMall=sum(ecoliATMAll[7:12])/sum(ecoliATMAll)*100
+EcoliADISO=sum(ecoliATMAll[15:18])/sum(ecoliATMAll)*100
+EcoliADISOall=sum(ecoliATMAll[13:18])/sum(ecoliATMAll)*100
+EcoliAHundred=sum(ecoliATMAll[3:6],ecoliATMAll[9:12],ecoliATMAll[15:18])/sum(ecoliATMAll)*100
+EcoliAThousand=sum(ecoliATMAll[6],ecoliATMAll[12],ecoliATMAll[18])/sum(ecoliATMAll)*100
+EcoliAPDB
+EcoliAHundred
+EcoliAPDB+EcoliAHundred
+
+                                        # PDB
+SacchANoModel=sum(sacchATMAll[1:2],sacchATMAll[7:8],sacchATMAll[13:14])/sum(sacchATMAll)*100
+SacchAPDB=sum(sacchATMAll[19:24])/sum(sacchATMAll)*100
+SacchAGLOB=sum(sacchATMAll[3:6])/sum(sacchATMAll)*100
+SacchATM=sum(sacchATMAll[9:12])/sum(sacchATMAll)*100
+SacchATMall=sum(sacchATMAll[7:12])/sum(sacchATMAll)*100
+SacchADISO=sum(sacchATMAll[15:18])/sum(sacchATMAll)*100
+SacchADISOall=sum(sacchATMAll[13:18])/sum(sacchATMAll)*100
+SacchAHundred=sum(sacchATMAll[3:6],sacchATMAll[9:12],sacchATMAll[15:18])/sum(sacchATMAll)*100
+SacchAThousand=sum(sacchATMAll[6],sacchATMAll[12],sacchATMAll[18])/sum(sacchATMAll)*100
+SacchAPDB
+SacchAHundred
+SacchAPDB+SacchAHundred
+                                        # PDB
+HomoANoModel=sum(homoATMAll[1:2],homoATMAll[7:8],homoATMAll[13:14])/sum(homoATMAll)*100
+HomoAPDB=sum(homoATMAll[19:24])/sum(homoATMAll)*100
+HomoAGLOB=sum(homoATMAll[3:6])/sum(homoATMAll)*100
+HomoATM=sum(homoATMAll[9:12])/sum(homoATMAll)*100
+HomoATMall=sum(homoATMAll[7:12])/sum(homoATMAll)*100
+HomoADISO=sum(homoATMAll[15:18])/sum(homoATMAll)*100
+HomoADISOall=sum(homoATMAll[13:18])/sum(homoATMAll)*100
+HomoAHundred=sum(homoATMAll[3:6],homoATMAll[9:12],homoATMAll[15:18])/sum(homoATMAll)*100
+HomoAThousand=sum(homoATMAll[6],homoATMAll[12],homoATMAll[18])/sum(homoATMAll)*100
+HomoAPDB
+HomoAHundred
+HomoAPDB+HomoAHundred
+
+
+
+                                        # Calculate fractions
+# PDB
+EcoliBNoModel=sum(ecoliBTMAll[1:2],ecoliBTMAll[7:8],ecoliBTMAll[13:14])/sum(ecoliBTMAll)*100
+EcoliBPDB=sum(ecoliBTMAll[19:24])/sum(ecoliBTMAll)*100
+EcoliBGLOB=sum(ecoliBTMAll[3:6])/sum(ecoliBTMAll)*100
+EcoliBTM=sum(ecoliBTMAll[9:12])/sum(ecoliBTMAll)*100
+EcoliBTMall=sum(ecoliBTMAll[7:12])/sum(ecoliBTMAll)*100
+EcoliBDISO=sum(ecoliBTMAll[15:18])/sum(ecoliBTMAll)*100
+EcoliBDISOall=sum(ecoliBTMAll[13:18])/sum(ecoliBTMAll)*100
+EcoliBHundred=sum(ecoliBTMAll[3:6],ecoliBTMAll[9:12],ecoliBTMAll[15:18])/sum(ecoliBTMAll)*100
+EcoliBThousand=sum(ecoliBTMAll[6],ecoliBTMAll[12],ecoliBTMAll[18])/sum(ecoliBTMAll)*100
+EcoliBPDB
+EcoliBHundred
+EcoliBPDB+EcoliBHundred
+
+                                        # PDB
+SacchBNoModel=sum(sacchBTMAll[1:2],sacchBTMAll[7:8],sacchBTMAll[13:14])/sum(sacchBTMAll)*100
+SacchBPDB=sum(sacchBTMAll[19:24])/sum(sacchBTMAll)*100
+SacchBGLOB=sum(sacchBTMAll[3:6])/sum(sacchBTMAll)*100
+SacchBTM=sum(sacchBTMAll[9:12])/sum(sacchBTMAll)*100
+SacchBTMall=sum(sacchBTMAll[7:12])/sum(sacchBTMAll)*100
+SacchBDISO=sum(sacchBTMAll[15:18])/sum(sacchBTMAll)*100
+SacchBDISOall=sum(sacchBTMAll[13:18])/sum(sacchBTMAll)*100
+SacchBHundred=sum(sacchBTMAll[3:6],sacchBTMAll[9:12],sacchBTMAll[15:18])/sum(sacchBTMAll)*100
+SacchBThousand=sum(sacchBTMAll[6],sacchBTMAll[12],sacchBTMAll[18])/sum(sacchBTMAll)*100
+SacchBPDB
+SacchBHundred
+SacchBPDB+SacchBHundred
+                                        # PDB
+HomoBNoModel=sum(homoBTMAll[1:2],homoBTMAll[7:8],homoBTMAll[13:14])/sum(homoBTMAll)*100
+HomoBPDB=sum(homoBTMAll[19:24])/sum(homoBTMAll)*100
+HomoBGLOB=sum(homoBTMAll[3:6])/sum(homoBTMAll)*100
+HomoBTM=sum(homoBTMAll[9:12])/sum(homoBTMAll)*100
+HomoBTMall=sum(homoBTMAll[7:12])/sum(homoBTMAll)*100
+HomoBDISO=sum(homoBTMAll[15:18])/sum(homoBTMAll)*100
+HomoBDISOall=sum(homoBTMAll[13:18])/sum(homoBTMAll)*100
+HomoBHundred=sum(homoBTMAll[3:6],homoBTMAll[9:12],homoBTMAll[15:18])/sum(homoBTMAll)*100
+HomoBThousand=sum(homoBTMAll[6],homoBTMAll[12],homoBTMAll[18])/sum(homoBTMAll)*100
+HomoBPDB
+HomoBHundred
+HomoBPDB+HomoBHundred
+
+
+                                        # Calculate fractions
+# PDB
+EcoliCNoModel=sum(ecoliCTMAll[1:2],ecoliCTMAll[7:8],ecoliCTMAll[13:14])/sum(ecoliCTMAll)*100
+EcoliCPDB=sum(ecoliCTMAll[19:24])/sum(ecoliCTMAll)*100
+EcoliCGLOB=sum(ecoliCTMAll[3:6])/sum(ecoliCTMAll)*100
+EcoliCTM=sum(ecoliCTMAll[9:12])/sum(ecoliCTMAll)*100
+EcoliCTMall=sum(ecoliCTMAll[7:12])/sum(ecoliCTMAll)*100
+EcoliCDISO=sum(ecoliCTMAll[15:18])/sum(ecoliCTMAll)*100
+EcoliCDISOall=sum(ecoliCTMAll[13:18])/sum(ecoliCTMAll)*100
+EcoliCHundred=sum(ecoliCTMAll[3:6],ecoliCTMAll[9:12],ecoliCTMAll[15:18])/sum(ecoliCTMAll)*100
+EcoliCThousand=sum(ecoliCTMAll[6],ecoliCTMAll[12],ecoliCTMAll[18])/sum(ecoliCTMAll)*100
+EcoliCPDB
+EcoliCHundred
+EcoliCPDB+EcoliCHundred
+
+                                        # PDB
+SacchCNoModel=sum(sacchCTMAll[1:2],sacchCTMAll[7:8],sacchCTMAll[13:14])/sum(sacchCTMAll)*100
+SacchCPDB=sum(sacchCTMAll[19:24])/sum(sacchCTMAll)*100
+SacchCGLOB=sum(sacchCTMAll[3:6])/sum(sacchCTMAll)*100
+SacchCTM=sum(sacchCTMAll[9:12])/sum(sacchCTMAll)*100
+SacchCTMall=sum(sacchCTMAll[7:12])/sum(sacchCTMAll)*100
+SacchCDISO=sum(sacchCTMAll[15:18])/sum(sacchCTMAll)*100
+SacchCDISOall=sum(sacchCTMAll[13:18])/sum(sacchCTMAll)*100
+SacchCHundred=sum(sacchCTMAll[3:6],sacchCTMAll[9:12],sacchCTMAll[15:18])/sum(sacchCTMAll)*100
+SacchCThousand=sum(sacchCTMAll[6],sacchCTMAll[12],sacchCTMAll[18])/sum(sacchCTMAll)*100
+SacchCPDB
+SacchCHundred
+SacchCPDB+SacchCHundred
+                                        # PDB
+HomoCNoModel=sum(homoCTMAll[1:2],homoCTMAll[7:8],homoCTMAll[13:14])/sum(homoCTMAll)*100
+HomoCPDB=sum(homoCTMAll[19:24])/sum(homoCTMAll)*100
+HomoCGLOB=sum(homoCTMAll[3:6])/sum(homoCTMAll)*100
+HomoCTM=sum(homoCTMAll[9:12])/sum(homoCTMAll)*100
+HomoCTMall=sum(homoCTMAll[7:12])/sum(homoCTMAll)*100
+HomoCDISO=sum(homoCTMAll[15:18])/sum(homoCTMAll)*100
+HomoCDISOall=sum(homoCTMAll[13:18])/sum(homoCTMAll)*100
+HomoCHundred=sum(homoCTMAll[3:6],homoCTMAll[9:12],homoCTMAll[15:18])/sum(homoCTMAll)*100
+HomoCThousand=sum(homoCTMAll[6],homoCTMAll[12],homoCTMAll[18])/sum(homoCTMAll)*100
+HomoCPDB
+HomoCHundred
+HomoCPDB+HomoCHundred
+
+
+
+
+
+
 
 genome="Ecoli-prot-by-year"
 outfile=paste("figures/",genome,"-Detailed-pie.png",sep="")
@@ -1924,97 +2058,56 @@ genome="All"
 outfile=paste("figures/",genome,"-2015-Detailed-bar.png",sep="")
 png(outfile,width=1280,height=1280)
 genlabels=NULL
-genlabels[1]="E.coli"
+genlabels[1]="Homo Sapiens"
 genlabels[2]="Yeast"
-genlabels[3]="Homo Sapiens"
+genlabels[3]="E.coli"
 ecoliCTMAllNorm <- ecoliCTMAll/sum(ecoliCTMAll)
 sacchCTMAllNorm <- sacchCTMAll/sum(sacchCTMAll)
 homoCTMAllNorm <- homoCTMAll/sum(homoCTMAll)
-test=matrix(c(rev(ecoliCTMAllNorm),rev(sacchCTMAllNorm),rev(homoCTMAllNorm)),nrow=24,ncol=3)
-barplot(test,col=rev(colors),main="Genomes 2015",legend=rev(labels),xlim=c(0,4.5),xlab="Year",ylab="Number or proteins",names=genlabels,cex.names=2,cex.axis=2.,cex=2)
+test=matrix(c(rev(homoCTMAllNorm),rev(sacchCTMAllNorm),rev(ecoliCTMAllNorm)),nrow=24,ncol=3)
+bp<-barplot(test,col=rev(colors),main="Genomes 2015",legend=rev(labels),xlim=c(0,4.5),xlab="Year",ylab="Number or proteins",names=genlabels,cex.names=2,cex.axis=2.,cex=2)
+
+ 
+
+fractionCPDB=NULL
+fractionCPDB[1]=round(HomoCPDB,0)
+fractionCPDB[2]=round(SacchCPDB,0)
+fractionCPDB[3]=round(EcoliCPDB,0)
+labelCPDB <- paste(fractionCPDB,"%",sep="")
+text(bp, 0, labelCPDB,cex=2,pos=3,col="white") 
+
+
+
+fractionCDISO=NULL
+fractionCDISOall=NULL
+fractionCDISO[1]=round(HomoCDISO,1)
+fractionCDISO[2]=round(SacchCDISO,1)
+fractionCDISO[3]=round(EcoliCDISO,1)
+fractionCDISOall[1]=round(HomoCDISOall,1)
+fractionCDISOall[2]=round(SacchCDISOall,1)
+fractionCDISOall[3]=round(EcoliCDISOall,1)
+labelCDISO <- paste(fractionCDISO,"%",sep="")
+text(bp, fractionCPDB/100 , labelCDISO,cex=2,pos=3,col="black") 
+
+
+fractionCTM=NULL
+fractionCTMall=NULL
+fractionCTM[1]=round(HomoCTM,0)
+fractionCTM[2]=round(SacchCTM,0)
+fractionCTM[3]=round(EcoliCTM,0)
+fractionCTMall[1]=round(HomoCTMall,1)
+fractionCTMall[2]=round(SacchCTMall,1)
+fractionCTMall[3]=round(EcoliCTMall,1)
+labelCTM <- paste(fractionCTM,"%",sep="")
+text(bp, (fractionCPDB+fractionCDISOall )/100, labelCTM,cex=2,pos=3,col="yellow") 
+
+fractionCGLOB=NULL
+fractionCGLOBall=NULL
+fractionCGLOB[1]=round(HomoCGLOB,0)
+fractionCGLOB[2]=round(SacchCGLOB,0)
+fractionCGLOB[3]=round(EcoliCGLOB,0)
+labelCGLOB <- paste(fractionCGLOB,"%",sep="")
+text(bp, ( fractionCPDB+fractionCDISOall+fractionCTMall )/100,labelCGLOB,cex=2,pos=3,col="red") 
+
+
 dev.off()
-
-
-                                        # Calculate fractions
-# PDB
-EcoliANoModel=sum(ecoliATMAll[1:2],ecoliATMAll[7:8],ecoliATMAll[13:14])/sum(ecoliATMAll)*100
-EcoliAPDB=sum(ecoliATMAll[19:24])/sum(ecoliATMAll)*100
-EcoliAHundred=sum(ecoliATMAll[3:6],ecoliATMAll[9:12],ecoliATMAll[15:18])/sum(ecoliATMAll)*100
-EcoliAThousand=sum(ecoliATMAll[6],ecoliATMAll[12],ecoliATMAll[18])/sum(ecoliATMAll)*100
-EcoliAPDB
-EcoliAHundred
-EcoliAPDB+EcoliAHundred
-
-                                        # PDB
-SacchANoModel=sum(sacchATMAll[1:2],sacchATMAll[7:8],sacchATMAll[13:14])/sum(sacchATMAll)*100
-SacchAPDB=sum(sacchATMAll[19:24])/sum(sacchATMAll)*100
-SacchAHundred=sum(sacchATMAll[3:6],sacchATMAll[9:12],sacchATMAll[15:18])/sum(sacchATMAll)*100
-SacchAThousand=sum(sacchATMAll[6],sacchATMAll[12],sacchATMAll[18])/sum(sacchATMAll)*100
-SacchAPDB
-SacchAHundred
-SacchAPDB+SacchAHundred
-                                        # PDB
-HomoANoModel=sum(homoATMAll[1:2],homoATMAll[7:8],homoATMAll[13:14])/sum(homoATMAll)*100
-HomoAPDB=sum(homoATMAll[19:24])/sum(homoATMAll)*100
-HomoAHundred=sum(homoATMAll[3:6],homoATMAll[9:12],homoATMAll[15:18])/sum(homoATMAll)*100
-HomoAThousand=sum(homoATMAll[6],homoATMAll[12],homoATMAll[18])/sum(homoATMAll)*100
-HomoAPDB
-HomoAHundred
-HomoAPDB+HomoAHundred
-
-
-
-                                        # Calculate fractions
-# PDB
-EcoliBNoModel=sum(ecoliBTMAll[1:2],ecoliBTMAll[7:8],ecoliBTMAll[13:14])/sum(ecoliBTMAll)*100
-EcoliBPDB=sum(ecoliBTMAll[19:24])/sum(ecoliBTMAll)*100
-EcoliBHundred=sum(ecoliBTMAll[3:6],ecoliBTMAll[9:12],ecoliBTMAll[15:18])/sum(ecoliBTMAll)*100
-EcoliBThousand=sum(ecoliBTMAll[6],ecoliBTMAll[12],ecoliBTMAll[18])/sum(ecoliBTMAll)*100
-EcoliBPDB
-EcoliBHundred
-EcoliBPDB+EcoliBHundred
-
-                                        # PDB
-SacchBNoModel=sum(sacchBTMAll[1:2],sacchBTMAll[7:8],sacchBTMAll[13:14])/sum(sacchBTMAll)*100
-SacchBPDB=sum(sacchBTMAll[19:24])/sum(sacchBTMAll)*100
-SacchBHundred=sum(sacchBTMAll[3:6],sacchBTMAll[9:12],sacchBTMAll[15:18])/sum(sacchBTMAll)*100
-SacchBThousand=sum(sacchBTMAll[6],sacchBTMAll[12],sacchBTMAll[18])/sum(sacchBTMAll)*100
-SacchBPDB
-SacchBHundred
-SacchBPDB+SacchBHundred
-                                        # PDB
-HomoBNoModel=sum(homoBTMAll[1:2],homoBTMAll[7:8],homoBTMAll[13:14])/sum(homoBTMAll)*100
-HomoBPDB=sum(homoBTMAll[19:24])/sum(homoBTMAll)*100
-HomoBHundred=sum(homoBTMAll[3:6],homoBTMAll[9:12],homoBTMAll[15:18])/sum(homoBTMAll)*100
-HomoBThousand=sum(homoBTMAll[6],homoBTMAll[12],homoBTMAll[18])/sum(homoBTMAll)*100
-HomoBPDB
-HomoBHundred
-HomoBPDB+HomoBHundred
-
-
-                                        # Calculate fractions
-# PDB
-EcoliCNoModel=sum(ecoliCTMAll[1:2],ecoliCTMAll[7:8],ecoliCTMAll[13:14])/sum(ecoliCTMAll)*100
-EcoliCPDB=sum(ecoliCTMAll[19:24])/sum(ecoliCTMAll)*100
-EcoliCHundred=sum(ecoliCTMAll[3:6],ecoliCTMAll[9:12],ecoliCTMAll[15:18])/sum(ecoliCTMAll)*100
-EcoliCThousand=sum(ecoliCTMAll[6],ecoliCTMAll[12],ecoliCTMAll[18])/sum(ecoliCTMAll)*100
-EcoliCPDB
-EcoliCHundred
-EcoliCPDB+EcoliCHundred
-
-                                        # PDB
-SacchCNoModel=sum(sacchCTMAll[1:2],sacchCTMAll[7:8],sacchCTMAll[13:14])/sum(sacchCTMAll)*100
-SacchCPDB=sum(sacchCTMAll[19:24])/sum(sacchCTMAll)*100
-SacchCHundred=sum(sacchCTMAll[3:6],sacchCTMAll[9:12],sacchCTMAll[15:18])/sum(sacchCTMAll)*100
-SacchCThousand=sum(sacchCTMAll[6],sacchCTMAll[12],sacchCTMAll[18])/sum(sacchCTMAll)*100
-SacchCPDB
-SacchCHundred
-SacchCPDB+SacchCHundred
-                                        # PDB
-HomoCNoModel=sum(homoCTMAll[1:2],homoCTMAll[7:8],homoCTMAll[13:14])/sum(homoCTMAll)*100
-HomoCPDB=sum(homoCTMAll[19:24])/sum(homoCTMAll)*100
-HomoCHundred=sum(homoCTMAll[3:6],homoCTMAll[9:12],homoCTMAll[15:18])/sum(homoCTMAll)*100
-HomoCThousand=sum(homoCTMAll[6],homoCTMAll[12],homoCTMAll[18])/sum(homoCTMAll)*100
-HomoCPDB
-HomoCHundred
-HomoCPDB+HomoCHundred

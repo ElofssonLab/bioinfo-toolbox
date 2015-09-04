@@ -522,20 +522,30 @@ legend(-.4,.0,"EColi",cex=2.0,border=NA)
 dev.off()
 
 
-labels[7]="Diso-NoPfam"
+labels[7]="TM-NoPfam"
 colors[7]="lightpink"
-labels[8]="Pfam diso"
+labels[8]="Pfam TM"
 colors[8]="lightpink2"
-labels[9]=">100 diso"
+labels[9]=">100 TM"
 colors[9]="deeppink1"
-labels[10]=">200 diso"
+labels[10]=">200 TM"
 colors[10]="deeppink2"
-labels[11]=">500 diso"
+labels[11]=">500 TM"
 colors[11]="deeppink3"
-labels[12]=">1000 diso"
-colors[12]="red"
-labels[13]="PDB"
-colors[13]="green"
+labels[12]=">1000 TM"
+colors[12]="deeppink4"
+labels[13]="TM-NoPfam"
+colors[13]="greenyellow"
+labels[14]="Pfam diso"
+colors[14]="green"
+labels[15]=">100 diso"
+colors[15]="green1"
+labels[16]=">200 diso"
+colors[16]="green3"
+labels[17]=">500 diso"
+colors[17]="green3"
+labels[18]=">1000 diso"
+colors[18]="green4"
 
 #ecoliDisoAll=c(ecoliPDBNoDiso,ecoliPDBDiso,ecoliPDBAll[7])
 #sacchDisoAll=c(sacchPDBNoDiso,sacchPDBDiso,sacchPDBAll[7])
@@ -546,7 +556,7 @@ outfile=paste("figures/",genome,"Diso-pie.png",sep="")
 
 pct <- round(ecoliDisoAll/sum(ecoliDisoAll)*100,digits=1)
 Names <- paste(labels,pct)
-names <- paste(names,"%",sep="")
+names <- paste(Names,"%",sep="")
 png(outfile,width=1280,height=1280)
 
 pie(homoDisoAll, labels=labels,col=colors,main=genome,radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
@@ -585,14 +595,19 @@ labels[17]=">500 diso"
 colors[17]="green3"
 labels[18]=">1000 diso"
 colors[18]="green4"
-
-labels[19]="PDB"
+labels[19]="PDB NoPfam"
 colors[19]="grey90"
+labels[20]="PDB Pfam"
 colors[20]="grey80"
+labels[21]="PDB >100 "
 colors[21]="grey40"
 colors[22]="grey30"
+labels[22]="PDB >200"
 colors[23]="grey20"
+labels[23]="PDB >500"
 colors[24]="black"
+labels[24]="PDB >1000"
+
 
 Labels=NULL
 
@@ -604,9 +619,9 @@ Labels[19]="PDB"
 
 genome="All"
 outfile=paste("figures/",genome,"Diso-pie.png",sep="")
-pct <- round(ecoliDisoAll/sum(ecoliDisoAll)*100,digits=1)
-Names <- paste(Labels,pct)
-names <- paste(names,"%",sep="")
+pct <- round(ecoliTMAll/sum(ecoliTMAll)*100,digits=1)
+Names <- paste(labels,pct)
+names <- paste(Names,"%",sep="")
 png(outfile,width=1280,height=1280)
 pie(homoTMAll, labels=labels,col=colors,main=genome,radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
 floating.pie(0,0,sacchTMAll, col=colors,main='',radius=0.7)
@@ -623,17 +638,21 @@ homofrac<-homoTMAll/sum(homoTMAll)
 sacchfrac<-sacchTMAll/sum(sacchTMAll)
 ecolifrac<-ecoliTMAll/sum(ecoliTMAll)
 genomes=NULL
-genome[1]="Homo sapiens"
-genome[1]="Yeast"
-genome[1]="E. Coli"
+genomes[1]="Homo sapiens"
+genomes[2]="Yeast"
+genomes[3]="E. Coli"
 test=matrix(c(rev(homofrac),rev(sacchfrac),rev(ecolifrac)),nrow=24,ncol=3)
-barplot(test,col=rev(colors),main="Fraction of residues",legend=rev(labels),xlim=c(0,4.5),xlab="Genome",ylab="Fraction of residues",names=genomes,cex.names=2,cex.axis=2.,cex=2)
-dev.off()
+bp <-barplot(test,col=rev(colors),main="Fraction of residues",legend=rev(names),xlim=c(0,4.5),xlab="",ylab="Fraction of residues",names=genomes,cex.names=3,cex.axis=3.,cex=3)
 
 
                                         # Calculate fractions
 EcoliNoModel=sum(ecoliTMAll[1:2],ecoliTMAll[7:8],ecoliTMAll[13:14])/sum(ecoliTMAll)*100
 EcoliPDB=sum(ecoliTMAll[19:24])/sum(ecoliTMAll)*100
+EcoliGLOB=sum(ecoliTMAll[3:6])/sum(ecoliTMAll)*100
+EcoliTM=sum(ecoliTMAll[9:12])/sum(ecoliTMAll)*100
+EcoliTMall=sum(ecoliTMAll[7:12])/sum(ecoliTMAll)*100
+EcoliDISO=sum(ecoliTMAll[15:18])/sum(ecoliTMAll)*100
+EcoliDISOall=sum(ecoliTMAll[13:18])/sum(ecoliTMAll)*100
 EcoliHundred=sum(ecoliTMAll[3:6],ecoliTMAll[9:12],ecoliTMAll[15:18])/sum(ecoliTMAll)*100
 EcoliThousand=sum(ecoliTMAll[6],ecoliTMAll[12],ecoliTMAll[18])/sum(ecoliTMAll)*100
 EcoliPDB
@@ -642,6 +661,11 @@ EcoliPDB+EcoliHundred
                                         # Calculate fractions
 SacchNoModel=sum(sacchTMAll[1:2],sacchTMAll[7:8],sacchTMAll[13:14])/sum(sacchTMAll)*100
 SacchPDB=sum(sacchTMAll[19:24])/sum(sacchTMAll)*100
+SacchGLOB=sum(sacchTMAll[3:6])/sum(sacchTMAll)*100
+SacchTM=sum(sacchTMAll[9:12])/sum(sacchTMAll)*100
+SacchTMall=sum(sacchTMAll[7:12])/sum(sacchTMAll)*100
+SacchDISO=sum(sacchTMAll[15:18])/sum(sacchTMAll)*100
+SacchDISOall=sum(sacchTMAll[12:18])/sum(sacchTMAll)*100
 SacchHundred=sum(sacchTMAll[3:6],sacchTMAll[9:12],sacchTMAll[15:18])/sum(sacchTMAll)*100
 SacchThousand=sum(sacchTMAll[6],sacchTMAll[12],sacchTMAll[18])/sum(sacchTMAll)*100
 SacchPDB
@@ -650,8 +674,55 @@ SacchPDB+SacchHundred
                                         # Calculate fractions
 HomoNoModel=sum(homoTMAll[1:2],homoTMAll[7:8],homoTMAll[13:14])/sum(homoTMAll)*100
 HomoPDB=sum(homoTMAll[19:24])/sum(homoTMAll)*100
+HomoGLOB=sum(homoTMAll[3:6])/sum(homoTMAll)*100
+HomoTM=sum(homoTMAll[9:12])/sum(homoTMAll)*100
+HomoTMall=sum(homoTMAll[7:12])/sum(homoTMAll)*100
+HomoDISO=sum(homoTMAll[15:18])/sum(homoTMAll)*100
+HomoDISOall=sum(homoTMAll[13:18])/sum(homoTMAll)*100
 HomoHundred=sum(homoTMAll[3:6],homoTMAll[9:12],homoTMAll[15:18])/sum(homoTMAll)*100
 HomoThousand=sum(homoTMAll[6],homoTMAll[12],homoTMAll[18])/sum(homoTMAll)*100
 HomoPDB
 HomoHundred
 HomoPDB+HomoHundred
+
+fractionPDB=NULL
+fractionPDB[1]=round(HomoPDB,0)
+fractionPDB[2]=round(SacchPDB,0)
+fractionPDB[3]=round(EcoliPDB,0)
+labelPDB <- paste(fractionPDB,"%",sep="")
+text(bp, 0, labelPDB,cex=2,pos=3,col="white") 
+
+
+
+fractionDISO=NULL
+fractionDISOall=NULL
+fractionDISO[1]=round(HomoDISO,1)
+fractionDISO[2]=round(SacchDISO,1)
+fractionDISO[3]=round(EcoliDISO,1)
+fractionDISOall[1]=round(HomoDISOall,1)
+fractionDISOall[2]=round(SacchDISOall,1)
+fractionDISOall[3]=round(EcoliDISOall,1)
+labelDISO <- paste(fractionDISO,"%",sep="")
+text(bp, fractionPDB/100 , labelDISO,cex=2,pos=3,col="black") 
+
+
+fractionTM=NULL
+fractionTMall=NULL
+fractionTM[1]=round(HomoTM,0)
+fractionTM[2]=round(SacchTM,0)
+fractionTM[3]=round(EcoliTM,0)
+fractionTMall[1]=round(HomoTMall,1)
+fractionTMall[2]=round(SacchTMall,1)
+fractionTMall[3]=round(EcoliTMall,1)
+labelTM <- paste(fractionTM,"%",sep="")
+text(bp, (fractionPDB+fractionDISOall )/100, labelTM,cex=2,pos=3,col="black") 
+
+fractionGLOB=NULL
+fractionGLOBall=NULL
+fractionGLOB[1]=round(HomoGLOB,0)
+fractionGLOB[2]=round(SacchGLOB,0)
+fractionGLOB[3]=round(EcoliGLOB,0)
+labelGLOB <- paste(fractionGLOB,"%",sep="")
+text(bp, ( fractionPDB+fractionDISOall+fractionTMall )/100,labelGLOB,cex=2,pos=3,col="red") 
+
+dev.off()
