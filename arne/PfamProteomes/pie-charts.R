@@ -629,3 +629,29 @@ genome[1]="E. Coli"
 test=matrix(c(rev(homofrac),rev(sacchfrac),rev(ecolifrac)),nrow=24,ncol=3)
 barplot(test,col=rev(colors),main="Fraction of residues",legend=rev(labels),xlim=c(0,4.5),xlab="Genome",ylab="Fraction of residues",names=genomes,cex.names=2,cex.axis=2.,cex=2)
 dev.off()
+
+
+                                        # Calculate fractions
+EcoliNoModel=sum(ecoliTMAll[1:2],ecoliTMAll[7:8],ecoliTMAll[13:14])/sum(ecoliTMAll)*100
+EcoliPDB=sum(ecoliTMAll[19:24])/sum(ecoliTMAll)*100
+EcoliHundred=sum(ecoliTMAll[3:6],ecoliTMAll[9:12],ecoliTMAll[15:18])/sum(ecoliTMAll)*100
+EcoliThousand=sum(ecoliTMAll[6],ecoliTMAll[12],ecoliTMAll[18])/sum(ecoliTMAll)*100
+EcoliPDB
+EcoliHundred
+EcoliPDB+EcoliHundred
+                                        # Calculate fractions
+SacchNoModel=sum(sacchTMAll[1:2],sacchTMAll[7:8],sacchTMAll[13:14])/sum(sacchTMAll)*100
+SacchPDB=sum(sacchTMAll[19:24])/sum(sacchTMAll)*100
+SacchHundred=sum(sacchTMAll[3:6],sacchTMAll[9:12],sacchTMAll[15:18])/sum(sacchTMAll)*100
+SacchThousand=sum(sacchTMAll[6],sacchTMAll[12],sacchTMAll[18])/sum(sacchTMAll)*100
+SacchPDB
+SacchHundred
+SacchPDB+SacchHundred
+                                        # Calculate fractions
+HomoNoModel=sum(homoTMAll[1:2],homoTMAll[7:8],homoTMAll[13:14])/sum(homoTMAll)*100
+HomoPDB=sum(homoTMAll[19:24])/sum(homoTMAll)*100
+HomoHundred=sum(homoTMAll[3:6],homoTMAll[9:12],homoTMAll[15:18])/sum(homoTMAll)*100
+HomoThousand=sum(homoTMAll[6],homoTMAll[12],homoTMAll[18])/sum(homoTMAll)*100
+HomoPDB
+HomoHundred
+HomoPDB+HomoHundred
