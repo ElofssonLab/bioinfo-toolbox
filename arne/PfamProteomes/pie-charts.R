@@ -128,7 +128,7 @@ names <- paste(labels,pct)
 names <- paste(names,"%",sep="")
 iniR=1
 genome="ecoli"
-outfile=paste(genome,"-PDB-pie.png",sep="")
+outfile=paste("figures/",genome,"-PDB-pie.png",sep="")
 png(outfile,width=1280,height=1280)
 fraction=(sum(ecoliPDB)/(sum(ecoliNoPDB)+sum(ecoliPDB)))**2
 pie(ecoliAll, labels=names,col=colors,main=genome,sub="PDB",radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
@@ -140,7 +140,7 @@ legend(-.7,.0,"PDB",cex=2.0,border=NA)
 legend(-.4,.0,"NoPDB",cex=2.0,border=NA)
 dev.off()
 
-outfile=paste(genome,"-TM-pie.png",sep="")
+outfile=paste("figures/",genome,"-TM-pie.png",sep="")
 png(outfile,width=1280,height=1280)
 pie(ecoliAll, labels=names,col=colors,main=genome,sub="TM",radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
 floating.pie(0,0,ecoliTM, col=colors,main='',radius=0.7)
@@ -152,7 +152,7 @@ legend(-.7,.0,"TM",cex=2.0,border=NA)
 legend(-.4,.0,"NoTM",cex=2.0,border=NA)
 dev.off()
 
-outfile=paste(genome,"-Diso-pie.png",sep="")
+outfile=paste("figures/",genome,"-Diso-pie.png",sep="")
 png(outfile,width=1280,height=1280)
 pie(ecoliAll, labels=names,col=colors,main=genome,sub="Diso",radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
 floating.pie(0,0,ecoliDiso, col=colors,main='',radius=0.7)
@@ -172,7 +172,7 @@ pct <- round(ecoliPDBAll/sum(ecoliAll)*100,digits=1)
 names <- paste(labels,pct)
 names <- paste(names,"%",sep="")
 
-outfile=paste(genome,"-TM-pie.png",sep="")
+outfile=paste("figures/",genome,"-TM-pie.png",sep="")
 png(outfile,width=1280,height=1280)
 pie(ecoliPDBAll, labels=names,col=colors,main=genome,sub="TM",radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
 floating.pie(0,0,ecoliPDBTM, col=colors,main='',radius=0.7)
@@ -184,7 +184,7 @@ legend(-.7,.0,"TM",cex=2.0,border=NA)
 legend(-.4,.0,"NoTM",cex=2.0,border=NA)
 dev.off()
 
-outfile=paste(genome,"-Diso-pie.png",sep="")
+outfile=paste("figures/",genome,"-Diso-pie.png",sep="")
 png(outfile,width=1280,height=1280)
 pie(ecoliPDBAll, labels=names,col=colors,main=genome,sub="Diso",radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
 floating.pie(0,0,ecoliPDBDiso, col=colors,main='',radius=0.7)
@@ -282,7 +282,7 @@ names <- paste(labels,pct)
 names <- paste(names,"%",sep="")
 iniR=1
 genome="sacch"
-outfile=paste(genome,"-PDB-pie.png",sep="")
+outfile=paste("figures/",genome,"-PDB-pie.png",sep="")
 png(outfile,width=1280,height=1280)
 fraction=(sum(sacchPDB)/(sum(sacchNoPDB)+sum(sacchPDB)))**2
 pie(sacchAll, labels=names,col=colors,main=genome,sub="PDB",radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
@@ -294,7 +294,7 @@ legend(-.7,.0,"PDB",cex=2.0,border=NA)
 legend(-.4,.0,"NoPDB",cex=2.0,border=NA)
 dev.off()
 
-outfile=paste(genome,"-TM-pie.png",sep="")
+outfile=paste("figures/",genome,"-TM-pie.png",sep="")
 png(outfile,width=1280,height=1280)
 pie(sacchAll, labels=names,col=colors,main=genome,sub="TM",radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
 floating.pie(0,0,sacchTM, col=colors,main='',radius=0.7)
@@ -306,7 +306,7 @@ legend(-.7,.0,"TM",cex=2.0,border=NA)
 legend(-.4,.0,"NoTM",cex=2.0,border=NA)
 dev.off()
 
-outfile=paste(genome,"-Diso-pie.png",sep="")
+outfile=paste("figures/",genome,"-Diso-pie.png",sep="")
 png(outfile,width=1280,height=1280)
 pie(sacchAll, labels=names,col=colors,main=genome,sub="Diso",radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
 floating.pie(0,0,sacchDiso, col=colors,main='',radius=0.7)
@@ -326,7 +326,7 @@ pct <- round(sacchAll/sum(sacchPDBAll)*100,digits=1)
 names <- paste(labels,pct)
 names <- paste(names,"%",sep="")
 
-outfile=paste(genome,"-TM-pie.png",sep="")
+outfile=paste("figures/",genome,"-TM-pie.png",sep="")
 png(outfile,width=1280,height=1280)
 pie(sacchPDBAll, labels=names,col=colors,main=genome,sub="TM",radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
 floating.pie(0,0,sacchPDBTM, col=colors,main='',radius=0.7)
@@ -338,7 +338,7 @@ legend(-.7,.0,"TM",cex=2.0,border=NA)
 legend(-.4,.0,"NoTM",cex=2.0,border=NA)
 dev.off()
 
-outfile=paste(genome,"-Diso-pie.png",sep="")
+outfile=paste("figures/",genome,"-Diso-pie.png",sep="")
 png(outfile,width=1280,height=1280)
 pie(sacchPDBAll, labels=names,col=colors,main=genome,sub="Diso",radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
 floating.pie(0,0,sacchPDBDiso, col=colors,main='',radius=0.7)
@@ -437,7 +437,7 @@ names <- paste(labels,pct)
 names <- paste(names,"%",sep="")
 iniR=1
 genome="homo"
-outfile=paste(genome,"-PDB-pie.png",sep="")
+outfile=paste("figures/",genome,"-PDB-pie.png",sep="")
 png(outfile,width=1280,height=1280)
 fraction=(sum(homoPDB)/(sum(homoNoPDB)+sum(homoPDB)))**2
 pie(homoAll, labels=names,col=colors,main=genome,sub="PDB",radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
@@ -449,7 +449,7 @@ legend(-.7,.0,"PDB",cex=2.0,border=NA)
 legend(-.4,.0,"NoPDB",cex=2.0,border=NA)
 dev.off()
 
-outfile=paste(genome,"-TM-pie.png",sep="")
+outfile=paste("figures/",genome,"-TM-pie.png",sep="")
 png(outfile,width=1280,height=1280)
 pie(homoAll, labels=names,col=colors,main=genome,sub="TM",radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
 floating.pie(0,0,homoTM, col=colors,main='',radius=0.7)
@@ -461,7 +461,7 @@ legend(-.7,.0,"TM",cex=2.0,border=NA)
 legend(-.4,.0,"NoTM",cex=2.0,border=NA)
 dev.off()
 
-outfile=paste(genome,"-Diso-pie.png",sep="")
+outfile=paste("figures/",genome,"-Diso-pie.png",sep="")
 png(outfile,width=1280,height=1280)
 pie(homoAll, labels=names,col=colors,main=genome,sub="Diso",radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
 floating.pie(0,0,homoDiso, col=colors,main='',radius=0.7)
@@ -481,7 +481,7 @@ pct <- round(homoAll/sum(homoPDBAll)*100,digits=1)
 names <- paste(labels,pct)
 names <- paste(names,"%",sep="")
 
-outfile=paste(genome,"-TM-pie.png",sep="")
+outfile=paste("figures/",genome,"-TM-pie.png",sep="")
 png(outfile,width=1280,height=1280)
 pie(homoPDBAll, labels=names,col=colors,main=genome,sub="TM",radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
 floating.pie(0,0,homoPDBTM, col=colors,main='',radius=0.7)
@@ -493,7 +493,7 @@ legend(-.7,.0,"TM",cex=2.0,border=NA)
 legend(-.4,.0,"NoTM",cex=2.0,border=NA)
 dev.off()
 
-outfile=paste(genome,"-Diso-pie.png",sep="")
+outfile=paste("figures/",genome,"-Diso-pie.png",sep="")
 png(outfile,width=1280,height=1280)
 pie(homoPDBAll, labels=names,col=colors,main=genome,sub="Diso",radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
 floating.pie(0,0,homoPDBDiso, col=colors,main='',radius=0.7)
@@ -509,7 +509,7 @@ dev.off()
 
                                         #Summary of all
 genome="All"
-outfile=paste(genome,"-pie.png",sep="")
+outfile=paste("figures/",genome,"-pie.png",sep="")
 png(outfile,width=1280,height=1280)
 
 pie(homoPDBAll, labels=labels,col=colors,main=genome,radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
@@ -542,7 +542,7 @@ colors[13]="green"
 #homoDisoAll=c(homoPDBNoDiso,homoPDBDiso,homoPDBAll[7])
 
 genome="All"
-outfile=paste(genome,"Diso-pie.png",sep="")
+outfile=paste("figures/",genome,"Diso-pie.png",sep="")
 
 pct <- round(ecoliDisoAll/sum(ecoliDisoAll)*100,digits=1)
 Names <- paste(labels,pct)
@@ -603,7 +603,7 @@ Labels[19]="PDB"
 
 
 genome="All"
-outfile=paste(genome,"Diso-pie.png",sep="")
+outfile=paste("figures/",genome,"Diso-pie.png",sep="")
 pct <- round(ecoliDisoAll/sum(ecoliDisoAll)*100,digits=1)
 Names <- paste(Labels,pct)
 names <- paste(names,"%",sep="")
@@ -617,7 +617,7 @@ legend(-.7,.0,"Sacch",cex=2.0,border=NA)
 legend(-.4,.0,"EColi",cex=2.0,border=NA)
 dev.off()
 
-outfile=paste(genome,"-bar.png",sep="")
+outfile=paste("figures/",genome,"-bar.png",sep="")
 png(outfile,width=1280,height=1280)
 homofrac<-homoTMAll/sum(homoTMAll)
 sacchfrac<-sacchTMAll/sum(sacchTMAll)
@@ -625,7 +625,7 @@ ecolifrac<-ecoliTMAll/sum(ecoliTMAll)
 genomes=NULL
 genome[1]="Homo sapiens"
 genome[1]="Yeast"
-genome[1]="E. Coli."
+genome[1]="E. Coli"
 test=matrix(c(rev(homofrac),rev(sacchfrac),rev(ecolifrac)),nrow=24,ncol=3)
 barplot(test,col=rev(colors),main="Fraction of residues",legend=rev(labels),xlim=c(0,4.5),xlab="Genome",ylab="Fraction of residues",names=genomes,cex.names=2,cex.axis=2.,cex=2)
 dev.off()
