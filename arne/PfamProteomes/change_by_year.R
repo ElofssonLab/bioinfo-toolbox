@@ -45,6 +45,16 @@ cutoffs[5]=500
 cutoffs[6]=1000
 cutoffs[7]=1000000000
 
+
+PDBcutoffs=NULL
+PDBcutoffs[1]=99999
+PDBcutoffs[2]=1.e-100
+PDBcutoffs[3]=1.e-40
+PDBcutoffs[4]=1.e-10
+PDBcutoffs[5]=1.e-4
+PDBcutoffs[6]=1.e-2
+PDBcutoffs[7]=-99999
+
                                         # ----- Pre processing ---
 
 ecoliA$Pfam_Meff=ecoliA$Pfam_Meff100
@@ -154,7 +164,9 @@ labels=NULL
 loop=seq(1,6)
 
 
-
+#for (i in loop){
+#    ecoliAPDB[i]=length(which(ecoliA$PDB_E-value < cutoffs[i] & ecoliA$PDB_E-value >= PDBcutoffs[i+1] & ecoliA$PDB_ID != ""))
+#}
 
                                         # Ja
 for (i in loop){
@@ -1985,8 +1997,112 @@ HomoCHundred
 HomoCPDB+HomoCHundred
 
 
+labelssort=NULL
+labelssort<-append(labelssort,labels[1:2])
+labelssort<-append(labelssort,labels[7:8])
+labelssort<-append(labelssort,labels[13:14])
+labelssort<-append(labelssort,labels[3:6])
+labelssort<-append(labelssort,labels[9:12])
+labelssort<-append(labelssort,labels[15:18])
+labelssort<-append(labelssort,labels[19:24])
+
+colorssort=NULL
+colorssort<-append(colorssort,colors[1:2])
+colorssort<-append(colorssort,colors[7:8])
+colorssort<-append(colorssort,colors[13:14])
+colorssort<-append(colorssort,colors[3:6])
+colorssort<-append(colorssort,colors[9:12])
+colorssort<-append(colorssort,colors[15:18])
+colorssort<-append(colorssort,colors[19:24])
 
 
+ecoliAsort=NULL
+ecoliAsort<-append(ecoliAsort,ecoliATMAll[1:2])
+ecoliAsort<-append(ecoliAsort,ecoliATMAll[7:8])
+ecoliAsort<-append(ecoliAsort,ecoliATMAll[13:14])
+ecoliAsort<-append(ecoliAsort,ecoliATMAll[3:6])
+ecoliAsort<-append(ecoliAsort,ecoliATMAll[9:12])
+ecoliAsort<-append(ecoliAsort,ecoliATMAll[15:18])
+ecoliAsort<-append(ecoliAsort,ecoliATMAll[19:24])
+
+ecoliBsort=NULL
+ecoliBsort<-append(ecoliBsort,ecoliBTMAll[1:2])
+ecoliBsort<-append(ecoliBsort,ecoliBTMAll[7:8])
+ecoliBsort<-append(ecoliBsort,ecoliBTMAll[13:14])
+ecoliBsort<-append(ecoliBsort,ecoliBTMAll[3:6])
+ecoliBsort<-append(ecoliBsort,ecoliBTMAll[9:12])
+ecoliBsort<-append(ecoliBsort,ecoliBTMAll[15:18])
+ecoliBsort<-append(ecoliBsort,ecoliBTMAll[19:24])
+
+
+ecoliCsort=NULL
+ecoliCsort<-append(ecoliCsort,ecoliCTMAll[1:2])
+ecoliCsort<-append(ecoliCsort,ecoliCTMAll[7:8])
+ecoliCsort<-append(ecoliCsort,ecoliCTMAll[13:14])
+ecoliCsort<-append(ecoliCsort,ecoliCTMAll[3:6])
+ecoliCsort<-append(ecoliCsort,ecoliCTMAll[9:12])
+ecoliCsort<-append(ecoliCsort,ecoliCTMAll[15:18])
+ecoliCsort<-append(ecoliCsort,ecoliCTMAll[19:24])
+
+
+
+sacchAsort=NULL
+sacchAsort<-append(sacchAsort,sacchATMAll[1:2])
+sacchAsort<-append(sacchAsort,sacchATMAll[7:8])
+sacchAsort<-append(sacchAsort,sacchATMAll[13:14])
+sacchAsort<-append(sacchAsort,sacchATMAll[3:6])
+sacchAsort<-append(sacchAsort,sacchATMAll[9:12])
+sacchAsort<-append(sacchAsort,sacchATMAll[15:18])
+sacchAsort<-append(sacchAsort,sacchATMAll[19:24])
+
+sacchBsort=NULL
+sacchBsort<-append(sacchBsort,sacchBTMAll[1:2])
+sacchBsort<-append(sacchBsort,sacchBTMAll[7:8])
+sacchBsort<-append(sacchBsort,sacchBTMAll[13:14])
+sacchBsort<-append(sacchBsort,sacchBTMAll[3:6])
+sacchBsort<-append(sacchBsort,sacchBTMAll[9:12])
+sacchBsort<-append(sacchBsort,sacchBTMAll[15:18])
+sacchBsort<-append(sacchBsort,sacchBTMAll[19:24])
+
+
+sacchCsort=NULL
+sacchCsort<-append(sacchCsort,sacchCTMAll[1:2])
+sacchCsort<-append(sacchCsort,sacchCTMAll[7:8])
+sacchCsort<-append(sacchCsort,sacchCTMAll[13:14])
+sacchCsort<-append(sacchCsort,sacchCTMAll[3:6])
+sacchCsort<-append(sacchCsort,sacchCTMAll[9:12])
+sacchCsort<-append(sacchCsort,sacchCTMAll[15:18])
+sacchCsort<-append(sacchCsort,sacchCTMAll[19:24])
+
+
+
+homoAsort=NULL
+homoAsort<-append(homoAsort,homoATMAll[1:2])
+homoAsort<-append(homoAsort,homoATMAll[7:8])
+homoAsort<-append(homoAsort,homoATMAll[13:14])
+homoAsort<-append(homoAsort,homoATMAll[3:6])
+homoAsort<-append(homoAsort,homoATMAll[9:12])
+homoAsort<-append(homoAsort,homoATMAll[15:18])
+homoAsort<-append(homoAsort,homoATMAll[19:24])
+
+homoBsort=NULL
+homoBsort<-append(homoBsort,homoBTMAll[1:2])
+homoBsort<-append(homoBsort,homoBTMAll[7:8])
+homoBsort<-append(homoBsort,homoBTMAll[13:14])
+homoBsort<-append(homoBsort,homoBTMAll[3:6])
+homoBsort<-append(homoBsort,homoBTMAll[9:12])
+homoBsort<-append(homoBsort,homoBTMAll[15:18])
+homoBsort<-append(homoBsort,homoBTMAll[19:24])
+
+
+homoCsort=NULL
+homoCsort<-append(homoCsort,homoCTMAll[1:2])
+homoCsort<-append(homoCsort,homoCTMAll[7:8])
+homoCsort<-append(homoCsort,homoCTMAll[13:14])
+homoCsort<-append(homoCsort,homoCTMAll[3:6])
+homoCsort<-append(homoCsort,homoCTMAll[9:12])
+homoCsort<-append(homoCsort,homoCTMAll[15:18])
+homoCsort<-append(homoCsort,homoCTMAll[19:24])
 
 
 
@@ -1994,12 +2110,12 @@ genome="Ecoli-prot-by-year"
 outfile=paste("figures/",genome,"-Detailed-pie.png",sep="")
 pct <- round(ecoliCTMAll/sum(ecoliCTMAll)*100,digits=1)
 pct <- round(sacchCDisoAll/sum(sacchCDisoAll)*100,digits=1)
-Names <- paste(labels,pct)
+Names <- paste(labelssort,pct)
 names <- paste(Names,"%",sep="")
 png(outfile,width=1280,height=1280)
-pie(ecoliCTMAll, labels=names,col=colors,sub="Fraction of proteins",main="E Coli",radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0,cex.lab=0.4)
-floating.pie(0,0,ecoliBTMAll, col=colors,main='',radius=0.7)
-floating.pie(0,0,ecoliATMAll, col=colors,main='',radius=0.4)
+pie(ecoliCsort, labels=names,col=colorssort,sub="Fraction of proteins",main="E Coli",radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0,cex.lab=0.4)
+floating.pie(0,0,ecoliBsort, col=colorssort,main='',radius=0.7)
+floating.pie(0,0,ecoliAsort, col=colorssort,main='',radius=0.4)
 floating.pie(0,0,c(1), radius=0.1, col=c('white'), border = NA)
 legend(-1,.0,"2015",cex=2.0,border=NA)
 legend(-.7,.0,"2010",cex=2.0,border=NA)
@@ -2008,19 +2124,19 @@ dev.off()
 
 outfile=paste("figures/",genome,"-Detailed-bar.png",sep="")
 png(outfile,width=1280,height=1280)
-test=matrix(c(rev(ecoliATMAll),rev(ecoliBTMAll),rev(ecoliCTMAll)),nrow=24,ncol=3)
-barplot(test,col=rev(colors),main="E. Coli",legend=rev(names),xlim=c(0,4.5),xlab="Year",ylab="Number or proteins",names=years,cex.names=2,cex.axis=2.,cex=2)
+test=matrix(c(rev(ecoliAsort),rev(ecoliBsort),rev(ecoliCsort)),nrow=24,ncol=3)
+barplot(test,col=rev(colorssort),main="E. Coli",legend=rev(names),xlim=c(0,4.5),xlab="Year",ylab="Number or proteins",names=years,cex.names=2,cex.axis=2.,cex=2)
 dev.off()
 
 genome="Yeast-prot-by-year"
 outfile=paste("figures/",genome,"-Detailed-pie.png",sep="")
 pct <- round(sacchCDisoAll/sum(sacchCDisoAll)*100,digits=1)
-Names <- paste(labels,pct)
+Names <- paste(labelssort,pct)
 names <- paste(Names,"%",sep="")
 png(outfile,width=1280,height=1280)
-pie(sacchCTMAll, labels=labels,col=colors,sub="Fraction of proteins",main="Yeast",radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
-floating.pie(0,0,sacchBTMAll, col=colors,main='',radius=0.7)
-floating.pie(0,0,sacchATMAll, col=colors,main='',radius=0.4)
+pie(sacchCsort, labels=labelssort,col=colorssort,sub="Fraction of proteins",main="Yeast",radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
+floating.pie(0,0,sacchBsort, col=colorssort,main='',radius=0.7)
+floating.pie(0,0,sacchAsort, col=colorssort,main='',radius=0.4)
 floating.pie(0,0,c(1), radius=0.1, col=c('white'), border = NA)
 legend(-1,.0,"2015",cex=2.0,border=NA)
 legend(-.7,.0,"2010",cex=2.0,border=NA)
@@ -2029,19 +2145,19 @@ dev.off()
 
 outfile=paste("figures/",genome,"-Detailed-bar.png",sep="")
 png(outfile,width=1280,height=1280)
-test=matrix(c(rev(sacchATMAll),rev(sacchBTMAll),rev(sacchCTMAll)),nrow=24,ncol=3)
-barplot(test,col=rev(colors),main="Yeast",legend=rev(names),xlim=c(0,4.5),xlab="Year",ylab="Number or proteins",names=years,cex.names=2,cex.axis=2.,cex=2)
+test=matrix(c(rev(sacchAsort),rev(sacchBsort),rev(sacchCsort)),nrow=24,ncol=3)
+barplot(test,col=rev(colorssort),main="Yeast",legend=rev(names),xlim=c(0,4.5),xlab="Year",ylab="Number or proteins",names=years,cex.names=2,cex.axis=2.,cex=2)
 dev.off()
 
 genome="Homo-prot-by-year"
 outfile=paste("figures/",genome,"-Detailed-pie.png",sep="")
-pct <- round(homoCTMAll/sum(homoCTMAll)*100,digits=1)
-Names <- paste(labels,pct)
+pct <- round(homoCsort/sum(homoCsort)*100,digits=1)
+Names <- paste(labelssort,pct)
 names <- paste(Names,"%",sep="")
 png(outfile,width=1280,height=1280)
-pie(homoCTMAll, labels=names,col=colors,sub="Fraction of proteins",main="Homo Sapiens",radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
-floating.pie(0,0,homoBTMAll, col=colors,main='',radius=0.7)
-floating.pie(0,0,homoATMAll, col=colors,main='',radius=0.4)
+pie(homoCsort, labels=names,col=colorssort,sub="Fraction of proteins",main="Homo Sapiens",radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
+floating.pie(0,0,homoBsort, col=colorssort,main='',radius=0.7)
+floating.pie(0,0,homoAsort, col=colorssort,main='',radius=0.4)
 floating.pie(0,0,c(1), radius=0.1, col=c('white'), border = NA)
 legend(-1,.0,"2015",cex=2.0,border=NA)
 legend(-.7,.0,"2010",cex=2.0,border=NA)
@@ -2050,9 +2166,10 @@ dev.off()
 
 outfile=paste("figures/",genome,"-Detailed-bar.png",sep="")
 png(outfile,width=1280,height=1280)
-test=matrix(c(rev(homoATMAll),rev(homoBTMAll),rev(homoCTMAll)),nrow=24,ncol=3)
-barplot(test,col=rev(colors),main="Homo Sapiens",legend=rev(names),xlim=c(0,4.5),xlab="Year",ylab="Number or proteins",names=years,cex.names=2,cex.axis=2.,cex=2)
+test=matrix(c(rev(homoAsort),rev(homoBsort),rev(homoCsort)),nrow=24,ncol=3)
+barplot(test,col=rev(colorssort),main="Homo Sapiens",legend=rev(names),xlim=c(0,4.5),xlab="Year",ylab="Number or proteins",names=years,cex.names=2,cex.axis=2.,cex=2)
 dev.off()
+
 
 genome="All"
 outfile=paste("figures/",genome,"-2015-Detailed-bar.png",sep="")
@@ -2061,11 +2178,11 @@ genlabels=NULL
 genlabels[1]="Homo Sapiens"
 genlabels[2]="Yeast"
 genlabels[3]="E.coli"
-ecoliCTMAllNorm <- ecoliCTMAll/sum(ecoliCTMAll)
-sacchCTMAllNorm <- sacchCTMAll/sum(sacchCTMAll)
-homoCTMAllNorm <- homoCTMAll/sum(homoCTMAll)
-test=matrix(c(rev(homoCTMAllNorm),rev(sacchCTMAllNorm),rev(ecoliCTMAllNorm)),nrow=24,ncol=3)
-bp<-barplot(test,col=rev(colors),main="Genomes 2015",legend=rev(labels),xlim=c(0,4.5),xlab="Year",ylab="Number or proteins",names=genlabels,cex.names=2,cex.axis=2.,cex=2)
+ecoliCsortNorm <- ecoliCsort/sum(ecoliCsort)
+sacchCsortNorm <- sacchCsort/sum(sacchCsort)
+homoCsortNorm <- homoCsort/sum(homoCsort)
+test=matrix(c(rev(homoCsortNorm),rev(sacchCsortNorm),rev(ecoliCsortNorm)),nrow=24,ncol=3)
+bp<-barplot(test,col=rev(colorssort),main="Genomes 2015",legend=rev(labelssort),xlim=c(0,4.5),xlab="Year",ylab="Number or proteins",names=genlabels,cex.names=2,cex.axis=2.,cex=2)
 
  
 
@@ -2099,7 +2216,7 @@ fractionCTMall[1]=round(HomoCTMall,1)
 fractionCTMall[2]=round(SacchCTMall,1)
 fractionCTMall[3]=round(EcoliCTMall,1)
 labelCTM <- paste(fractionCTM,"%",sep="")
-text(bp, (fractionCPDB+fractionCDISOall )/100, labelCTM,cex=2,pos=3,col="yellow") 
+text(bp, (fractionCPDB+fractionCDISO )/100, labelCTM,cex=2,pos=3,col="yellow") 
 
 fractionCGLOB=NULL
 fractionCGLOBall=NULL
@@ -2107,7 +2224,7 @@ fractionCGLOB[1]=round(HomoCGLOB,0)
 fractionCGLOB[2]=round(SacchCGLOB,0)
 fractionCGLOB[3]=round(EcoliCGLOB,0)
 labelCGLOB <- paste(fractionCGLOB,"%",sep="")
-text(bp, ( fractionCPDB+fractionCDISOall+fractionCTMall )/100,labelCGLOB,cex=2,pos=3,col="red") 
-
+text(bp, ( fractionCPDB+fractionCDISO+fractionCTM )/100,labelCGLOB,cex=2,pos=3,col="red") 
 
 dev.off()
+                                        #---------New start

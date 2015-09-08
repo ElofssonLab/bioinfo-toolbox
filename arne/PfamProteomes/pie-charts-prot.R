@@ -25,6 +25,15 @@ cutoffs[5]=500
 cutoffs[6]=1000
 cutoffs[7]=1000000000
 
+PDBcutoffs=NULL
+PDBcutoffs[1]=99999
+PDBcutoffs[2]=1.e-100
+PDBcutoffs[3]=1.e-40
+PDBcutoffs[4]=1.e-10
+PDBcutoffs[5]=1.e-4
+PDBcutoffs[6]=1.e-2
+PDBcutoffs[7]=-99999
+
 # ----- Pre processing ---
 
 ecoli$Pfam_Meff=ecoli$Pfam_Meff100

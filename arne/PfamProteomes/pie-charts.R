@@ -25,6 +25,15 @@ cutoffs[5]=499
 cutoffs[6]=999
 cutoffs[7]=100000000000
 
+PDBcutoffs=NULL
+PDBcutoffs[1]=99999
+PDBcutoffs[2]=1.e-100
+PDBcutoffs[3]=1.e-40
+PDBcutoffs[4]=1.e-10
+PDBcutoffs[5]=1.e-4
+PDBcutoffs[6]=1.e-2
+PDBcutoffs[7]=-99999
+
 # --- Preprocessing --
                                         # Ecoli
 ecoli$Pfam_Meff[ecoli$Pfam_Meff==-1 & ecoli$Pfam_pos != -1] <- 0
@@ -66,8 +75,9 @@ labels=NULL
 loop=seq(1,6)
 
 
-
-
+#for (i in loop){
+#    ecoliPDB[i]=length(which(ecoli$PDB_E-value < cutoffs[i] & ecoli$PDB_E-value >= PDBcutoffs[i+1] & ecoli$PDB_ID != ""))
+#}
                                         # Ja
 for (i in loop){
     ecoliAll[i]=length(which(ecoli$Pfam_Meff > cutoffs[i] & ecoli$Pfam_Meff <= cutoffs[i+1]))
@@ -620,8 +630,6 @@ Labels[19]="PDB"
 genome="All"
 outfile=paste("figures/",genome,"Diso-pie.png",sep="")
 pct <- round(ecoliTMAll/sum(ecoliTMAll)*100,digits=1)
-Names <- paste(labels,pct)
-names <- paste(Names,"%",sep="")
 png(outfile,width=1280,height=1280)
 pie(homoTMAll, labels=labels,col=colors,main=genome,radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
 floating.pie(0,0,sacchTMAll, col=colors,main='',radius=0.7)
@@ -641,8 +649,6 @@ genomes=NULL
 genomes[1]="Homo sapiens"
 genomes[2]="Yeast"
 genomes[3]="E. Coli"
-test=matrix(c(rev(homofrac),rev(sacchfrac),rev(ecolifrac)),nrow=24,ncol=3)
-bp <-barplot(test,col=rev(colors),main="Fraction of residues",legend=rev(names),xlim=c(0,4.5),xlab="",ylab="Fraction of residues",names=genomes,cex.names=3,cex.axis=3.,cex=3)
 
 
                                         # Calculate fractions
@@ -685,6 +691,66 @@ HomoPDB
 HomoHundred
 HomoPDB+HomoHundred
 
+
+
+
+labelssort=NULL
+labelssort<-append(labelssort,labels[1:2])
+labelssort<-append(labelssort,labels[7:8])
+labelssort<-append(labelssort,labels[13:14])
+labelssort<-append(labelssort,labels[3:6])
+labelssort<-append(labelssort,labels[9:12])
+labelssort<-append(labelssort,labels[15:18])
+labelssort<-append(labelssort,labels[19:24])
+
+colorssort=NULL
+colorssort<-append(colorssort,colors[1:2])
+colorssort<-append(colorssort,colors[7:8])
+colorssort<-append(colorssort,colors[13:14])
+colorssort<-append(colorssort,colors[3:6])
+colorssort<-append(colorssort,colors[9:12])
+colorssort<-append(colorssort,colors[15:18])
+colorssort<-append(colorssort,colors[19:24])
+
+
+ecolisort=NULL
+ecolisort<-append(ecolisort,ecolifrac[1:2])
+ecolisort<-append(ecolisort,ecolifrac[7:8])
+ecolisort<-append(ecolisort,ecolifrac[13:14])
+ecolisort<-append(ecolisort,ecolifrac[3:6])
+ecolisort<-append(ecolisort,ecolifrac[9:12])
+ecolisort<-append(ecolisort,ecolifrac[15:18])
+ecolisort<-append(ecolisort,ecolifrac[19:24])
+
+
+sacchsort=NULL
+sacchsort<-append(sacchsort,sacchfrac[1:2])
+sacchsort<-append(sacchsort,sacchfrac[7:8])
+sacchsort<-append(sacchsort,sacchfrac[13:14])
+sacchsort<-append(sacchsort,sacchfrac[3:6])
+sacchsort<-append(sacchsort,sacchfrac[9:12])
+sacchsort<-append(sacchsort,sacchfrac[15:18])
+sacchsort<-append(sacchsort,sacchfrac[19:24])
+
+
+homosort=NULL
+homosort<-append(homosort,homofrac[1:2])
+homosort<-append(homosort,homofrac[7:8])
+homosort<-append(homosort,homofrac[13:14])
+homosort<-append(homosort,homofrac[3:6])
+homosort<-append(homosort,homofrac[9:12])
+homosort<-append(homosort,homofrac[15:18])
+homosort<-append(homosort,homofrac[19:24])
+
+
+Names <- paste(labelssort,pct)
+names <- paste(Names,"%",sep="")
+
+
+test=matrix(c(rev(homosort),rev(sacchsort),rev(ecolisort)),nrow=24,ncol=3)
+bp <-barplot(test,col=rev(colorssort),main="Fraction of residues",legend=rev(names),xlim=c(0,4.5),xlab="",ylab="Fraction of residues",names=genomes,cex.names=3,cex.axis=3.,cex=3)
+
+
 fractionPDB=NULL
 fractionPDB[1]=round(HomoPDB,0)
 fractionPDB[2]=round(SacchPDB,0)
@@ -715,7 +781,7 @@ fractionTMall[1]=round(HomoTMall,1)
 fractionTMall[2]=round(SacchTMall,1)
 fractionTMall[3]=round(EcoliTMall,1)
 labelTM <- paste(fractionTM,"%",sep="")
-text(bp, (fractionPDB+fractionDISOall )/100, labelTM,cex=2,pos=3,col="black") 
+text(bp, (fractionPDB+fractionDISO )/100, labelTM,cex=2,pos=3,col="black") 
 
 fractionGLOB=NULL
 fractionGLOBall=NULL
@@ -723,6 +789,6 @@ fractionGLOB[1]=round(HomoGLOB,0)
 fractionGLOB[2]=round(SacchGLOB,0)
 fractionGLOB[3]=round(EcoliGLOB,0)
 labelGLOB <- paste(fractionGLOB,"%",sep="")
-text(bp, ( fractionPDB+fractionDISOall+fractionTMall )/100,labelGLOB,cex=2,pos=3,col="red") 
+text(bp, ( fractionPDB+fractionDISO+fractionTM )/100,labelGLOB,cex=2,pos=3,col="red") 
 
 dev.off()
