@@ -146,40 +146,40 @@ for (year in years){
     names <- paste(names,"%",sep="")
     iniR=1
     genome="ecoli-prot"
-    outfile=paste(genome,".",year,"-PDB-pie.png",sep="")
+    outfile=paste("figures/",genome,".",year,"-PDB-pie.png",sep="")
     png(outfile,width=1280,height=1280)
     fraction=(sum(ecoliPDB)/(sum(ecoliNoPDB)+sum(ecoliPDB)))**2
     pie(ecoliAll, labels=names,col=colors,main=genome,sub="PDB",radius=iniR,border = NA)
     floating.pie(0,0,ecoliPDB, col=colors,main='',radius=0.7)
     floating.pie(0,0,ecoliNoPDB, col=colors,main='',radius=0.4)
     floating.pie(0,0,c(1), radius=0.1, col=c('white'), border = NA)
-    legend(-1,.0,"all",cex=0.4,border=NA)
-    legend(-.7,.0,"PDB",cex=0.4,border=NA)
-    legend(-.4,.0,"NoPDB",cex=0.4,border=NA)
+    legend(-1,.0,"all",cex=2.0,border=NA)
+    legend(-.7,.0,"PDB",cex=2.0,border=NA)
+    legend(-.4,.0,"NoPDB",cex=2.0,border=NA)
     dev.off()
     
-    outfile=paste(genome,".",year,"-TM-pie.png",sep="")
+    outfile=paste("figures/",genome,".",year,"-TM-pie.png",sep="")
     png(outfile,width=1280,height=1280)
     pie(ecoliAll, labels=names,col=colors,main=genome,sub="TM",radius=iniR,border = NA)
     floating.pie(0,0,ecoliTM, col=colors,main='',radius=0.7)
     floating.pie(0,0,ecoliNoTM, col=colors,main='',radius=0.4)
     floating.pie(0,0,c(1), radius=0.1, col=c('white'), border = NA)
                                         #legend(0, 0, gsub("_"," ",names(colors)[-1]), col=as.character(colors[-1]), pch=19,bty='n', ncol=2)
-    legend(-1,.0,"all",cex=0.4,border=NA)
-    legend(-.7,.0,"TM",cex=0.4,border=NA)
-    legend(-.4,.0,"NoTM",cex=0.4,border=NA)
+    legend(-1,.0,"all",cex=2.0,border=NA)
+    legend(-.7,.0,"TM",cex=2.0,border=NA)
+    legend(-.4,.0,"NoTM",cex=2.0,border=NA)
     dev.off()
     
-    outfile=paste(genome,".",year,"-Diso-pie.png",sep="")
+    outfile=paste("figures/",genome,".",year,"-Diso1-pie.png",sep="")
     png(outfile,width=1280,height=1280)
     pie(ecoliAll, labels=names,col=colors,main=genome,sub="Diso",radius=iniR,border = NA)
     floating.pie(0,0,ecoliDiso, col=colors,main='',radius=0.7)
     floating.pie(0,0,ecoliNoDiso, col=colors,main='',radius=0.4)
     floating.pie(0,0,c(1), radius=0.1, col=c('white'), border = NA)
                                         #legend(0, 0, gsub("_"," ",names(colors)[-1]), col=as.character(colors[-1]), pch=19,bty='n', ncol=2)
-    legend(-1,.0,"all",cex=0.4,border=NA)
-    legend(-.7,.0,"Diso",cex=0.4,border=NA)
-    legend(-.4,.0,"NoDiso",cex=0.4,border=NA)
+    legend(-1,.0,"all",cex=2.0,border=NA)
+    legend(-.7,.0,"Diso",cex=2.0,border=NA)
+    legend(-.4,.0,"NoDiso",cex=2.0,border=NA)
     dev.off()
     
     labels[7]="PDB"
@@ -190,28 +190,28 @@ for (year in years){
     names <- paste(labels,pct)
     names <- paste(names,"%",sep="")
     
-    outfile=paste(genome,".",year,"-TM-pie.png",sep="")
+    outfile=paste("figures/",genome,".",year,"-TM-pie.png",sep="")
     png(outfile,width=1280,height=1280)
     pie(ecoliPDBAll, labels=names,col=colors,main=genome,sub="TM",radius=iniR,border = NA)
     floating.pie(0,0,ecoliPDBTM, col=colors,main='',radius=0.7)
     floating.pie(0,0,ecoliPDBNoTM, col=colors,main='',radius=0.4)
     floating.pie(0,0,c(1), radius=0.1, col=c('white'), border = NA)
                                         #legend(0, 0, gsub("_"," ",names(colors)[-1]), col=as.character(colors[-1]), pch=19,bty='n', ncol=2)
-    legend(-1,.0,"all",cex=0.4,border=NA)
-    legend(-.7,.0,"TM",cex=0.4,border=NA)
-    legend(-.4,.0,"NoTM",cex=0.4,border=NA)
+    legend(-1,.0,"all",cex=2.0,border=NA)
+    legend(-.7,.0,"TM",cex=2.0,border=NA)
+    legend(-.4,.0,"NoTM",cex=2.0,border=NA)
     dev.off()
     
-    outfile=paste(genome,".",year,"-Diso-pie.png",sep="")
+    outfile=paste("figures/",genome,".",year,"-Diso2-pie.png",sep="")
     png(outfile,width=1280,height=1280)
     pie(ecoliPDBAll, labels=names,col=colors,main=genome,sub="Diso",radius=iniR,border = NA)
     floating.pie(0,0,ecoliPDBDiso, col=colors,main='',radius=0.7)
     floating.pie(0,0,ecoliPDBNoDiso, col=colors,main='',radius=0.4)
     floating.pie(0,0,c(1), radius=0.1, col=c('white'), border = NA)
                                         #legend(0, 0, gsub("_"," ",names(colors)[-1]), col=as.character(colors[-1]), pch=19,bty='n', ncol=2)
-    legend(-1,.0,"all",cex=0.4,border=NA)
-    legend(-.7,.0,"Diso",cex=0.4,border=NA)
-    legend(-.4,.0,"NoDiso",cex=0.4,border=NA)
+    legend(-1,.0,"all",cex=2.0,border=NA)
+    legend(-.7,.0,"Diso",cex=2.0,border=NA)
+    legend(-.4,.0,"NoDiso",cex=2.0,border=NA)
     dev.off()
     
     
@@ -300,40 +300,40 @@ for (year in years){
     names <- paste(names,"%",sep="")
     iniR=1
     genome="sacch-prot"
-    outfile=paste(genome,".",year,"-PDB.png",sep="")
+    outfile=paste("figures/",genome,".",year,"-PDB.png",sep="")
     png(outfile,width=1280,height=1280)
     fraction=(sum(sacchPDB)/(sum(sacchNoPDB)+sum(sacchPDB)))**2
     pie(sacchAll, labels=names,col=colors,main=genome,sub="PDB",radius=iniR,border = NA)
     floating.pie(0,0,sacchPDB, col=colors,main='',radius=0.7)
     floating.pie(0,0,sacchNoPDB, col=colors,main='',radius=0.4)
     floating.pie(0,0,c(1), radius=0.1, col=c('white'), border = NA)
-    legend(-1,.0,"all",cex=0.4,border=NA)
-    legend(-.7,.0,"PDB",cex=0.4,border=NA)
-    legend(-.4,.0,"NoPDB",cex=0.4,border=NA)
+    legend(-1,.0,"all",cex=2.0,border=NA)
+    legend(-.7,.0,"PDB",cex=2.0,border=NA)
+    legend(-.4,.0,"NoPDB",cex=2.0,border=NA)
     dev.off()
     
-    outfile=paste(genome,".",year,"-TM-pie.png",sep="")
+    outfile=paste("figures/",genome,".",year,"-TM-pie.png",sep="")
     png(outfile,width=1280,height=1280)
     pie(sacchAll, labels=names,col=colors,main=genome,sub="TM",radius=iniR,border = NA)
     floating.pie(0,0,sacchTM, col=colors,main='',radius=0.7)
     floating.pie(0,0,sacchNoTM, col=colors,main='',radius=0.4)
     floating.pie(0,0,c(1), radius=0.1, col=c('white'), border = NA)
                                         #legend(0, 0, gsub("_"," ",names(colors)[-1]), col=as.character(colors[-1]), pch=19,bty='n', ncol=2)
-    legend(-1,.0,"all",cex=0.4,border=NA)
-    legend(-.7,.0,"TM",cex=0.4,border=NA)
-    legend(-.4,.0,"NoTM",cex=0.4,border=NA)
+    legend(-1,.0,"all",cex=2.0,border=NA)
+    legend(-.7,.0,"TM",cex=2.0,border=NA)
+    legend(-.4,.0,"NoTM",cex=2.0,border=NA)
     dev.off()
     
-    outfile=paste(genome,".",year,"-Diso-pie.png",sep="")
+    outfile=paste("figures/",genome,".",year,"-Diso1-pie.png",sep="")
     png(outfile,width=1280,height=1280)
     pie(sacchAll, labels=names,col=colors,main=genome,sub="Diso",radius=iniR,border = NA)
     floating.pie(0,0,sacchDiso, col=colors,main='',radius=0.7)
     floating.pie(0,0,sacchNoDiso, col=colors,main='',radius=0.4)
     floating.pie(0,0,c(1), radius=0.1, col=c('white'), border = NA)
                                         #legend(0, 0, gsub("_"," ",names(colors)[-1]), col=as.character(colors[-1]), pch=19,bty='n', ncol=2)
-    legend(-1,.0,"all",cex=0.4,border=NA)
-    legend(-.7,.0,"Diso",cex=0.4,border=NA)
-    legend(-.4,.0,"NoDiso",cex=0.4,border=NA)
+    legend(-1,.0,"all",cex=2.0,border=NA)
+    legend(-.7,.0,"Diso",cex=2.0,border=NA)
+    legend(-.4,.0,"NoDiso",cex=2.0,border=NA)
     dev.off()
     
     labels[7]="PDB"
@@ -344,28 +344,28 @@ for (year in years){
     names <- paste(labels,pct)
     names <- paste(names,"%",sep="")
     
-    outfile=paste(genome,".",year,"-TM-pie.png",sep="")
+    outfile=paste("figures/",genome,".",year,"-TM-pie.png",sep="")
     png(outfile,width=1280,height=1280)
     pie(sacchPDBAll, labels=names,col=colors,main=genome,sub="TM",radius=iniR,border = NA)
     floating.pie(0,0,sacchPDBTM, col=colors,main='',radius=0.7)
     floating.pie(0,0,sacchPDBNoTM, col=colors,main='',radius=0.4)
     floating.pie(0,0,c(1), radius=0.1, col=c('white'), border = NA)
                                         #legend(0, 0, gsub("_"," ",names(colors)[-1]), col=as.character(colors[-1]), pch=19,bty='n', ncol=2)
-    legend(-1,.0,"all",cex=0.4,border=NA)
-    legend(-.7,.0,"TM",cex=0.4,border=NA)
-    legend(-.4,.0,"NoTM",cex=0.4,border=NA)
+    legend(-1,.0,"all",cex=2.0,border=NA)
+    legend(-.7,.0,"TM",cex=2.0,border=NA)
+    legend(-.4,.0,"NoTM",cex=2.0,border=NA)
     dev.off()
     
-    outfile=paste(genome,".",year,"-Diso-pie.png",sep="")
+    outfile=paste("figures/",genome,".",year,"-Diso2-pie.png",sep="")
     png(outfile,width=1280,height=1280)
     pie(sacchPDBAll, labels=names,col=colors,main=genome,sub="Diso",radius=iniR,border = NA)
     floating.pie(0,0,sacchPDBDiso, col=colors,main='',radius=0.7)
     floating.pie(0,0,sacchPDBNoDiso, col=colors,main='',radius=0.4)
     floating.pie(0,0,c(1), radius=0.1, col=c('white'), border = NA)
                                         #legend(0, 0, gsub("_"," ",names(colors)[-1]), col=as.character(colors[-1]), pch=19,bty='n', ncol=2)
-    legend(-1,.0,"all",cex=0.4,border=NA)
-    legend(-.7,.0,"Diso",cex=0.4,border=NA)
-    legend(-.4,.0,"NoDiso",cex=0.4,border=NA)
+    legend(-1,.0,"all",cex=2.0,border=NA)
+    legend(-.7,.0,"Diso",cex=2.0,border=NA)
+    legend(-.4,.0,"NoDiso",cex=2.0,border=NA)
     dev.off()
     
     
@@ -429,10 +429,10 @@ for (year in years){
     homoPDBSeg[7]=length(which(homo$PDB_ID != "" & homo$Seg_low > 0) )
     homoPDBNoSeg[7]=length(which(homo$PDB_ID != ""  & homo$Seg_low == 0) )
     
-    ecoliAll[ecoliAll==0]<-0.001
-    ecoliPDBAll[ecoliPDBAll==0]<-0.001
-    ecoliDisoAll[ecoliDisoAll==0]<-0.001
-    ecoliTMAll[ecoliTMAll==0]<-0.001
+    homoAll[homoAll==0]<-0.001
+    homoPDBAll[homoPDBAll==0]<-0.001
+    homoDisoAll[homoDisoAll==0]<-0.001
+    homoTMAll[homoTMAll==0]<-0.001
     
     labels=NULL
     colors=NULL
@@ -455,40 +455,40 @@ for (year in years){
     names <- paste(names,"%",sep="")
     iniR=1
     genome="homo-prot"
-    outfile=paste(genome,".",year,"-PDB.png",sep="")
+    outfile=paste("figures/",genome,".",year,"-PDB.png",sep="")
     png(outfile,width=1280,height=1280)
     fraction=(sum(homoPDB)/(sum(homoNoPDB)+sum(homoPDB)))**2
     pie(homoAll, labels=names,col=colors,main=genome,sub="PDB",radius=iniR,border = NA)
     floating.pie(0,0,homoPDB, col=colors,main='',radius=0.7)
     floating.pie(0,0,homoNoPDB, col=colors,main='',radius=0.4)
     floating.pie(0,0,c(1), radius=0.1, col=c('white'), border = NA)
-    legend(-1,.0,"all",cex=0.4,border=NA)
-    legend(-.7,.0,"PDB",cex=0.4,border=NA)
-    legend(-.4,.0,"NoPDB",cex=0.4,border=NA)
+    legend(-1,.0,"all",cex=2.0,border=NA)
+    legend(-.7,.0,"PDB",cex=2.0,border=NA)
+    legend(-.4,.0,"NoPDB",cex=2.0,border=NA)
     dev.off()
     
-    outfile=paste(genome,".",year,"-TM-pie.png",sep="")
+    outfile=paste("figures/",genome,".",year,"-TM-pie.png",sep="")
     png(outfile,width=1280,height=1280)
     pie(homoAll, labels=names,col=colors,main=genome,sub="TM",radius=iniR,border = NA)
     floating.pie(0,0,homoTM, col=colors,main='',radius=0.7)
     floating.pie(0,0,homoNoTM, col=colors,main='',radius=0.4)
     floating.pie(0,0,c(1), radius=0.1, col=c('white'), border = NA)
                                         #legend(0, 0, gsub("_"," ",names(colors)[-1]), col=as.character(colors[-1]), pch=19,bty='n', ncol=2)
-    legend(-1,.0,"all",cex=0.4,border=NA)
-    legend(-.7,.0,"TM",cex=0.4,border=NA)
-    legend(-.4,.0,"NoTM",cex=0.4,border=NA)
+    legend(-1,.0,"all",cex=2.0,border=NA)
+    legend(-.7,.0,"TM",cex=2.0,border=NA)
+    legend(-.4,.0,"NoTM",cex=2.0,border=NA)
     dev.off()
     
-    outfile=paste(genome,".",year,"-Diso-pie.png",sep="")
+    outfile=paste("figures/",genome,".",year,"-Diso1-pie.png",sep="")
     png(outfile,width=1280,height=1280)
     pie(homoAll, labels=names,col=colors,main=genome,sub="Diso",radius=iniR,border = NA)
     floating.pie(0,0,homoDiso, col=colors,main='',radius=0.7)
     floating.pie(0,0,homoNoDiso, col=colors,main='',radius=0.4)
     floating.pie(0,0,c(1), radius=0.1, col=c('white'), border = NA)
                                         #legend(0, 0, gsub("_"," ",names(colors)[-1]), col=as.character(colors[-1]), pch=19,bty='n', ncol=2)
-    legend(-1,.0,"all",cex=0.4,border=NA)
-    legend(-.7,.0,"Diso",cex=0.4,border=NA)
-    legend(-.4,.0,"NoDiso",cex=0.4,border=NA)
+    legend(-1,.0,"all",cex=2.0,border=NA)
+    legend(-.7,.0,"Diso",cex=2.0,border=NA)
+    legend(-.4,.0,"NoDiso",cex=2.0,border=NA)
     dev.off()
     
     labels[7]="PDB"
@@ -499,44 +499,44 @@ for (year in years){
     names <- paste(labels,pct)
     names <- paste(names,"%",sep="")
     
-    outfile=paste(genome,".",year,"-TM-pie.png",sep="")
+    outfile=paste("figures/",genome,".",year,"-TM-pie.png",sep="")
     png(outfile,width=1280,height=1280)
     pie(homoPDBAll, labels=names,col=colors,main=genome,sub="TM",radius=iniR,border = NA)
     floating.pie(0,0,homoPDBTM, col=colors,main='',radius=0.7)
     floating.pie(0,0,homoPDBNoTM, col=colors,main='',radius=0.4)
     floating.pie(0,0,c(1), radius=0.1, col=c('white'), border = NA)
                                         #legend(0, 0, gsub("_"," ",names(colors)[-1]), col=as.character(colors[-1]), pch=19,bty='n', ncol=2)
-    legend(-1,.0,"all",cex=0.4,border=NA)
-    legend(-.7,.0,"TM",cex=0.4,border=NA)
-    legend(-.4,.0,"NoTM",cex=0.4,border=NA)
+    legend(-1,.0,"all",cex=2.0,border=NA)
+    legend(-.7,.0,"TM",cex=2.0,border=NA)
+    legend(-.4,.0,"NoTM",cex=2.0,border=NA)
     dev.off()
     
-    outfile=paste(genome,".",year,"-Diso-pie.png",sep="")
+    outfile=paste("figures/",genome,".",year,"-Diso2-pie.png",sep="")
     png(outfile,width=1280,height=1280)
     pie(homoPDBAll, labels=names,col=colors,main=genome,sub="Diso",radius=iniR,border = NA)
     floating.pie(0,0,homoPDBDiso, col=colors,main='',radius=0.7)
     floating.pie(0,0,homoPDBNoDiso, col=colors,main='',radius=0.4)
     floating.pie(0,0,c(1), radius=0.1, col=c('white'), border = NA)
                                         #legend(0, 0, gsub("_"," ",names(colors)[-1]), col=as.character(colors[-1]), pch=19,bty='n', ncol=2)
-    legend(-1,.0,"all",cex=0.4,border=NA)
-    legend(-.7,.0,"Diso",cex=0.4,border=NA)
-    legend(-.4,.0,"NoDiso",cex=0.4,border=NA)
+    legend(-1,.0,"all",cex=2.0,border=NA)
+    legend(-.7,.0,"Diso",cex=2.0,border=NA)
+    legend(-.4,.0,"NoDiso",cex=2.0,border=NA)
     dev.off()
     
     
     
                                         #Summary of all
     genome="All-prot"
-    outfile=paste(genome,".",year,"-pie.png",sep="")
+    outfile=paste("figures/",genome,".",year,"-summary-pie.png",sep="")
     png(outfile,width=1280,height=1280)
     
-    pie(homoPDBAll, labels=labels,col=colors,main=genome,radius=iniR,border = NA)
+    pie(homoPDBAll, labels=labels,col=colors,sub="Genome Classification",main=year,radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
     floating.pie(0,0,sacchPDBAll, col=colors,main='',radius=0.7)
     floating.pie(0,0,ecoliPDBAll, col=colors,main='',radius=0.4)
     floating.pie(0,0,c(1), radius=0.1, col=c('white'), border = NA)
-    legend(-1,.0,"Homo",cex=0.4,border=NA)
-    legend(-.7,.0,"Sacc",cex=0.4,border=NA)
-    legend(-.4,.0,"EColi",cex=0.4,border=NA)
+    legend(-1,.0,"Homo",cex=2.0,border=NA)
+    legend(-.7,.0,"Sacc",cex=2.0,border=NA)
+    legend(-.4,.0,"EColi",cex=2.0,border=NA)
     dev.off()
     
     
@@ -560,20 +560,20 @@ for (year in years){
                                         #homoDisoAll=c(homoPDBNoDiso,homoPDBDiso,homoPDBAll[7])
     
     genome="All-prot"
-    outfile=paste(genome,".",year,"-Diso-pie.png",sep="")
+    outfile=paste("figures/",genome,".",year,"-Detailed1-pie.png",sep="")
     
     pct <- round(ecoliDisoAll/sum(ecoliDisoAll)*100,digits=1)
     Names <- paste(labels,pct)
     names <- paste(names,"%",sep="")
     png(outfile,width=1280,height=1280)
     
-    pie(homoDisoAll, labels=labels,col=colors,main=genome,radius=iniR,border = NA)
+    pie(homoDisoAll, labels=labels,col=colors,sub="Detailed Genome Classification",main=year,radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
     floating.pie(0,0,sacchDisoAll, col=colors,main='',radius=0.7)
     floating.pie(0,0,ecoliDisoAll, col=colors,main='',radius=0.4)
     floating.pie(0,0,c(1), radius=0.1, col=c('white'), border = NA)
-    legend(-1,.0,"Homo",cex=0.4,border=NA)
-    legend(-.7,.0,"Sacch",cex=0.4,border=NA)
-    legend(-.4,.0,"EColi",cex=0.4,border=NA)
+    legend(-1,.0,"Homo",cex=2.0,border=NA)
+    legend(-.7,.0,"Sacch",cex=2.0,border=NA)
+    legend(-.4,.0,"EColi",cex=2.0,border=NA)
     dev.off()
     
                                         # WHat is the interesting part.
@@ -621,18 +621,18 @@ for (year in years){
     
     
     genome="All-prot"
-    outfile=paste(genome,".",year,"Diso-pie.png",sep="")
+    outfile=paste("figures/",genome,".",year,"-Detailed2-pie.png",sep="")
     pct <- round(ecoliDisoAll/sum(ecoliDisoAll)*100,digits=1)
     Names <- paste(labels,pct)
     names <- paste(names,"%",sep="")
     png(outfile,width=1280,height=1280)
-    pie(homoTMAll, labels=labels,col=colors,main=genome,radius=iniR,border = NA)
+    pie(homoTMAll, labels=labels,col=colors,sub="Genome Classification",main=year,radius=iniR,border = NA,cex=2.0,cex.main=3.0,cex.sub=2.0)
     floating.pie(0,0,sacchTMAll, col=colors,main='',radius=0.7)
     floating.pie(0,0,ecoliTMAll, col=colors,main='',radius=0.4)
     floating.pie(0,0,c(1), radius=0.1, col=c('white'), border = NA)
-    legend(-1,.0,"Homo",cex=0.4,border=NA)
-    legend(-.7,.0,"Sacch",cex=0.4,border=NA)
-    legend(-.4,.0,"EColi",cex=0.4,border=NA)
+    legend(-1,.0,"Homo",cex=2.0,border=NA)
+    legend(-.7,.0,"Sacch",cex=2.0,border=NA)
+    legend(-.4,.0,"EColi",cex=2.0,border=NA)
     dev.off()
     
     
@@ -679,9 +679,9 @@ for (year in years){
     proteins$homo[4]=length(which(homo$PDB_count == 0 & homo$Pfam_Meff100>0 ))
     
     genome="Pred-proteins"
-    outfile=paste(genome,".",year,"-PDB.png",sep="")
+    outfile=paste("figures/",genome,".",year,"-PDB.png",sep="")
     png(outfile,width=1280,height=1280)
-    barplot(c(proteins$ecoli,proteins$sacch,proteins$homo),names.arg=c(proteins$count,proteins$count,proteins$count),main="Ecoli   Yeast   Homo",xlab="Meff",ylab="Num",col=c("darkblue","darkblue","darkblue","darkblue","red","red","red","red","green","green","green","green"))
+    barplot(c(proteins$ecoli,proteins$sacch,proteins$homo),names.arg=c(proteins$count,proteins$count,proteins$count),sub="Number of proteins that can be predicted for HS, Yeast and E.Coli",main=year,xlab="Meff",ylab="Number or proteins",col=c("darkblue","darkblue","darkblue","darkblue","red","red","red","red","green","green","green","green"),cex.names=2.0,cex.axis=3.0,cex.main=3.0,cex.sub=2.0,ylim=c(0,5000))
     dev.off()
 }
     
