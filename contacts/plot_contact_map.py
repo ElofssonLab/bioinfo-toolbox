@@ -18,12 +18,12 @@ import matplotlib.cm as cm
 
 from os.path import expanduser
 home = expanduser("~")
-sys.path.append(home + '/bioinfo-toolbox')
+sys.path.append(home + '/bioinfo-toolbox/parsing')
 
-from parsing import parse_contacts
-from parsing import parse_psipred
-from parsing import parse_fasta
-from parsing import parse_pdb
+import parse_contacts
+import parse_psipred
+import parse_fasta
+import parse_pdb
 
 
 def s_score(d, d0):
