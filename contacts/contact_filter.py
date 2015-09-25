@@ -13,13 +13,19 @@ or set to one in case of:
 
 import sys
 
-sys.path.append('/home/x_mirmi/bioinfo-toolbox') 
-sys.path.append('/home/mircomic/bioinfo-toolbox') 
+
+#For some reason relative paths did not work on my mac /AE
+from os.path import expanduser
+home = expanduser("~")
+sys.path.append(home + '/bioinfo-toolbox/parsing')
+sys.path.append(home + '/git/bioinfo-toolbox/parsing')
+sys.path.append(home + '/bioinfo-toolbox/contacts')
+sys.path.append(home + '/git/bioinfo-toolbox/contacts')
  
-from parsing import parse_contacts 
-from parsing import parse_psipred 
-from parsing import parse_fasta 
-from contacts import plot_contact_map
+import parse_contacts 
+import parse_psipred 
+import parse_fasta 
+import plot_contact_map
 
 
 def get_ss_pos(ss_seq):

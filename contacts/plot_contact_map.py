@@ -19,6 +19,7 @@ import matplotlib.cm as cm
 from os.path import expanduser
 home = expanduser("~")
 sys.path.append(home + '/bioinfo-toolbox/parsing')
+sys.path.append(home + '/git/bioinfo-toolbox/parsing')
 
 import parse_contacts
 import parse_psipred
@@ -496,7 +497,7 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
             sc = ax.scatter(contacts2_y[::-1], contacts2_x[::-1], marker='o', c=tp2_colors[::-1], s=6, alpha=0.75, lw=0)
             sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c=tp_colors[::-1], s=6, alpha=0.75, lw=0)
         else:
-            sc = ax.scatter(contacts2_y[::-1], contacts2_x[::-1], marker='o', c='#D70909', edgecolor='#D70909', s=6, linewidths=0.5)
+            sc = ax.scatter(contacts2_y[::-1], contacts2_x[::-1], marker='0', c='#D70909', edgecolor='#D70909', s=6, linewidths=0.5)
             sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c='#004F9D', edgecolor='#004F9D', s=6, linewidths=0.5)
 
 
