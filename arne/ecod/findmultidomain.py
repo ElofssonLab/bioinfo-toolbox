@@ -23,9 +23,12 @@ for p in set(data['pdb']):
 #    check if any fold has been used before
             for d in set(chain['ecod_domain_id']):
                 domain=chain[chain['ecod_domain_id'] == d ]
+#                print domain
                 for f in set(domain['f_id']):
-                    (A,X,H,T)=re.split('\.',f)
-                    FOLD=A+"."+X+"."+T
+                    ecod=re.split('\.',f)
+                    FOLD=ecod[0]+"."+ecod[1]+"."+ecod[2]
+#                    (A,X,H,T)=re.split('\.',f)
+#                    FOLD=A+"."+X+"."+T
 #                    print FOLD
                     if FOLD in fold.keys():
                         new=False
