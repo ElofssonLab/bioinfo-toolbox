@@ -39,5 +39,5 @@ for p in set(data['pdb']):
             for f in newfolds:
                 fold[f]=f
             if (new):
-                print "Domain: ",p,c,numchain,numdom,newfolds
+                print "Domain: ",p,c,numchain,numdom,newrange
                 
