@@ -20,6 +20,7 @@ for p in set(data['pdb']):
         if (numchain == 1 and numdom > 1):
             new=True
             newfolds=[]
+            newrange=[]
 #    check if any fold has been used before
             for d in set(chain['ecod_domain_id']):
                 domain=chain[chain['ecod_domain_id'] == d ]
@@ -33,6 +34,8 @@ for p in set(data['pdb']):
                     if FOLD in fold.keys():
                         new=False
                     newfolds.append(FOLD)
+                    RANGE=
+                    newrange.append(RANGE)
             for f in newfolds:
                 fold[f]=f
             if (new):
