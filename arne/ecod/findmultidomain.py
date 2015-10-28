@@ -17,7 +17,7 @@ for p in set(data['pdb']):
         chain=pdb[pdb['chain'] == c]
         numdom=len(set(chain['ecod_domain_id']))
 # we only want entries with a single chain and multiple domains
-        if (numchain == 1 and numdom > 1):
+        if (numchain == 1 and numdom > 1 and c != '.'):
             new=True
             newfolds=[]
             newrange=[]
@@ -31,13 +31,13 @@ for p in set(data['pdb']):
 #                    (A,X,H,T)=re.split('\.',f)
 #                    FOLD=A+"."+X+"."+T
 #                    print FOLD
+#                    RANGE=set(domain['f_id']):
                     if FOLD in fold.keys():
                         new=False
                     newfolds.append(FOLD)
-                    RANGE=
-                    newrange.append(RANGE)
+#                    newrange.append(RANGE)
             for f in newfolds:
                 fold[f]=f
             if (new):
-                print "Domain: ",p,c,numchain,numdom,newrange
+                print "Domain: ",p,c,numchain,numdom,newfolds
                 
