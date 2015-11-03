@@ -42,7 +42,7 @@ def read(pdbfile, chain='', model=1):
             header += line
         elif in_model and line.startswith('TER'):
             atm_record = parse_atm_record(atm_lst[-1])
-            if chain and not chain == atm_record['chain']:
+            if chain and not chain == atm_record['chain'] and chain != '*':
                 continue
             seen_atoms = True
             #print "seen_atoms model"
@@ -56,7 +56,7 @@ def read(pdbfile, chain='', model=1):
             continue
         elif not in_model and line.startswith('TER'):
             atm_record = parse_atm_record(atm_lst[-1])
-            if chain and not chain == atm_record['chain']:
+            if chain and not chain == atm_record['chain']  and chain != '*':
                 continue
             seen_atoms = True
             #in_atoms = False
@@ -71,7 +71,7 @@ def read(pdbfile, chain='', model=1):
             tail += line
         elif in_model or ((not seen_atoms) and (not in_model)):
             atm_record = parse_atm_record(line)
-            if chain and not chain == atm_record['chain']:
+            if chain and not chain == atm_record['chain']  and chain != '*':
                 atm_lst = [line]
                 continue
             if not in_atoms:
@@ -156,7 +156,7 @@ def get_coordinates(pdbfile, chain):
         if not line.startswith('ATOM'):
             continue
         atm_record = parse_atm_record(line)
-        if atm_record['chain'] != ' ' and atm_record['chain'] != chain:
+        if atm_record['chain'] != ' ' and atm_record['chain'] != chain  and chain != '*':
             continue
 
         res_i = atm_record['res_no']
@@ -214,7 +214,7 @@ def get_res_dict(pdbfile, chain):
 
         atm_record = parse_atm_record(line)
 
-        if atm_record['chain'] != ' ' and atm_record['chain'] != chain:
+        if atm_record['chain'] != ' ' and atm_record['chain'] != chain  and chain != '*':
             continue
 
         res_i = atm_record['res_no']
@@ -277,17 +277,19 @@ def get_atom_seq(pdbfile, chain='', model=1):
     res_dict = {}
     
     in_model = False
- 
+
     if not chain:
         chain = get_first_chain(pdbfile)
         pdbfile.seek(0)
+
+    print "Using Chain:", chain
 
     res_name = ''
     for line in pdbfile:
         if not line.startswith('ATOM'):
             continue
         atm_record = parse_atm_record(line)
-        if atm_record['chain'] != ' ' and atm_record['chain'] != chain:
+        if atm_record['chain'] != ' ' and atm_record['chain'] != chain and chain != '*':
             continue
         if atm_record['atm_name'] != 'CA':
             continue
