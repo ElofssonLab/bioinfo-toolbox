@@ -24,8 +24,8 @@ for record in SeqIO.parse(handle, 'fasta') :
    print record.name
    # Grab the entire sequence
 #   seq = str(record.seq)
-   name= re.sub(r'\|','-',str(record.name))
-
+   name= re.sub(r'[\<\>\/\\\|]','-',str(record.name))
+   print record.name,name
 #   record.id=str(record.name)
    # Look at all features for this record
    #   for feature in record.features:
