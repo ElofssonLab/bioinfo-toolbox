@@ -5,7 +5,7 @@ import numpy as np
 
 def parse(afile, sep=' ', min_dist=5):
     
-    """Parse contact file (PcosnCX, plmDCA, PSICOV, PhyCMAP).
+    """Parse contact file (PconsCX, plmDCA, PSICOV, PhyCMAP).
     @param  afile   contact file
     @param  sep     separator of contact file (default=' ')
     Ensures: Output is sorted by confidence score.
