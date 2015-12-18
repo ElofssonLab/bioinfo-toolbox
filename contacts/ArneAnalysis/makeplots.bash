@@ -17,10 +17,10 @@ do
     fi
     if [ -e $l.pdb ]
     then
-    ~/git/PconsC3/extra/arne/MSA/plot_contact_map.py --cutoff 0.3 --meff $j.gneff --alignment $j.trimmed  --iupred $k-iupred-long.txt  --psipred_vert $j.ss2 --pdb $l.pdb  $k.$e $j.$f
-    ~/git/PconsC3/extra/arne/MSA/analyse_predictions.py --cutoff 0.3 --meff $j.gneff --alignment $j.trimmed  --iupred $k-iupred-long.txt  --psipred_vert $j.ss2  --pdb $l.pdb $k.$e $j.$f
+    ~/git/bioinfo-toolbox/contacts/ArneAnalysis/plot_contact_map.py --cutoff 0.3 --meff $j.gneff --alignment $j.trimmed  --iupred $k-iupred-long.txt  --psipred_vert $j.ss2 --pdb $l.pdb  $k.$e $j.$f
+    ~/git/bioinfo-toolbox/contacts/ArneAnalysis/analyse_predictions.py --cutoff 0.3 --meff $j.gneff --alignment $j.trimmed  --iupred $k-iupred-long.txt  --psipred_vert $j.ss2  --pdb $l.pdb $k.$e $j.$f
     else
-    ~/git/PconsC3/extra/arne/MSA/plot_contact_map.py --cutoff 0.3 --meff $j.gneff --alignment $j.trimmed  --iupred $k-iupred-long.txt  --psipred_vert $j.ss2  $k.$e $j.$f
-    ~/git/PconsC3/extra/arne/MSA/analyse_predictions.py --cutoff 0.3 --meff $j.gneff --alignment $j.trimmed  --iupred $k-iupred-long.txt  --psipred_vert $j.ss2 $k.$e $j.$f
+    ~/git/bioinfo-toolbox/contacts/ArneAnalysis/plot_contact_map.py --cutoff 0.3 --meff $j.gneff --alignment $j.trimmed  --iupred $k-iupred-long.txt  --psipred_vert $j.ss2  $k.$e $j.$f
+    ~/git/bioinfo-toolbox/contacts/ArneAnalysis/analyse_predictions.py --cutoff 0.3 --meff $j.gneff --alignment $j.trimmed  --iupred $k-iupred-long.txt  --psipred_vert $j.ss2 $k.$e $j.$f
     fi
 done

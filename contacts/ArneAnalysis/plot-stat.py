@@ -38,10 +38,27 @@ if __name__ == "__main__":
     pylab.ylabel("Score")
     pylab.savefig(outfile+"-score.eps")
     pylab.clf()
-    
+
+    diso=data['Diso']
+    mix=data['FractionMix']
+    diso=data['FractionDiso']
+    fig = pylab.figure( figsize=(10,6))
+    ax = pylab.subplot2grid((1,1),(0,0))
+    plot=ax.violinplot(diso,[1], points=20, widths=0.5,showmeans=True, showextrema=False, showmedians=False)
+    plot=ax.violinplot(mix,[2], points=20, widths=0.5,showmeans=True, showextrema=False, showmedians=False)
+    plot=ax.violinplot(diso,[3], points=20, widths=0.5,showmeans=True, showextrema=False, showmedians=False)
+    xticklabels = ["Disorder","Mix-Contacts","Diso-Contacts"]
+    xticks = [1,2,3]
+    ax.set_xticklabels(xticklabels)
+    ax.set_xticks(xticks)
+    pylab.title("Score for "+outfile)
+    pylab.ylabel("Fraction")
+    pylab.savefig(outfile+"-fraction.eps")
+    pylab.clf()
+ 
+        
     newdata=data.loc[data['PPV'] >0]
-    
-    foo=newdata.as_matrix(columns=['Meff','PPV'])
+    #foo=newdata.as_matrix(columns=['Meff','PPV'])
     
     
     meff=newdata['Meff']
@@ -71,3 +88,33 @@ if __name__ == "__main__":
     pylab.xlabel("Meff")
     pylab.savefig(outfile+"-PPV.eps")
     pylab.clf()
+
+    disodata=data.loc[data['Meff'] >0]
+    disomeff=disodata['Meff']
+    Score=newdata['Score']
+    N=min(25,int(len(Score)/2))
+    Scoremean=runningMeanFast(Score, N)
+    Scoremix=newdata['ScoreMix']
+    Scoremixmean=runningMeanFast(Scoremix, N)
+    Scorediso=newdata['ScoreDiso']
+    Scoredisomean=runningMeanFast(Scorediso, N)
+    fig = pylab.figure( figsize=(10,6))
+    ax = pylab.subplot2grid((1,1),(0,0))
+    #plot=ax.violinplot(Score,[1], points=20, widths=0.5,showmeans=True, showextrema=False, showmedians=False)
+    #plot=ax.violinplot(Scoremix,[2], points=20, widths=0.5,showmeans=True, showextrema=False, showmedians=False)
+    #plot=ax.violinplot(Scorediso,[3], points=20, widths=0.5,showmeans=True, showextrema=False, showmedians=False)
+    ax.plot(meff,Score,'ro',label="Score")
+    ax.plot(meff,Scoremean,'r')
+    ax.plot(meff,Scoremix,'bs',label="Scoremix")
+    ax.plot(meff,Scoremixmean,'b')
+    ax.plot(meff,Scorediso,'go',label="ScoreDiso")
+    ax.plot(meff,Scoredisomean,'g')
+    
+    ax.legend()
+    ax.set_xscale("log", nonposx='clip')
+    pylab.title("Score for "+outfile)
+    pylab.ylabel("Score")
+    pylab.xlabel("Meff")
+    pylab.savefig(outfile+"-meanscore.eps")
+    pylab.clf()
+    
