@@ -432,7 +432,7 @@ def plot_map(fasta_filename, c_filename, factor=1.0, cutoff=9999.99, th=-1, c2_f
         ax.get_yaxis().tick_left()
         ax3.grid()
         ax3.set_xlim([-unit,ref_len])
-        statline = "Highs: %.1f (%.1f%%) (%.1f%%) \t Aver: %.2f\t Meff: %.0f\t Diso: %.1f%% \t" % (count/ref_len,100*disocount/count,100*doublecount/count,average,max_cover,100*fraction_disorder)
+        statline = "Highs: %.3f  %.3f   %.3f  \t Aver: %.2f\t Meff: %.0f\t Diso: %.3f \t" % (count/ref_len,disocount/count,doublecount/count,average,max_cover,fraction_disorder)
 
 
     print "STATs: %s\t%s" % (fasta_filename,statline)
