@@ -119,6 +119,10 @@ def get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, fac
     PPVs = []
     TPs = []
     FPs = []
+
+    TP=0
+    FP=0
+
     disoPPVs = []
     disoTPs = []
     disoFPs = []
@@ -502,7 +506,7 @@ def contactanalysis(fasta_filename, c_filename, factor=1.0, cutoff=9999.99, th=-
 
     if outfilename:
         if outfilename.endswith('.pdf'):
-            pp = PdfPages(outfilename+"_statistics.pdf")
+
             pp.savefig(fig)
             pp.close()
         elif outfilename.endswith('.png'):
@@ -524,7 +528,7 @@ if __name__ == "__main__":
     p.add_argument('contact_file')#, required=True)
     p.add_argument('-o', '--outfile', default='')
     p.add_argument('-f', '--factor', default=1.0, type=float)
-    p.add_argument('-c', '--cutoff', default=0.3, type=float)
+    p.add_argument('-c', '--cutoff', default=0.4, type=float)
     p.add_argument('-t', '--threshold', default=-1, type=float)
     p.add_argument('--c2', default='')
     p.add_argument('--psipred_horiz', default='')
