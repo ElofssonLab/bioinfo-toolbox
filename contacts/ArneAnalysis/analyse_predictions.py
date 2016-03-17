@@ -496,7 +496,7 @@ def contactanalysis(fasta_filename, c_filename, factor=1.0, cutoff=9999.99, th=-
 
            
 #        ppv='PPV: %.2f %.2f %.2f' % (float(PPVs[-1]), float(TPs[-1]), float(FPs[-1]))
-        ppv='PPV: %.2f (%d)\t%.2f (%d)\t%.2f (%d) ' % (float(PPVs[-1]),len(PPVs), float(mixPPVs[-1]),len(mixPPVs), float(disoPPVs[-1]),len(disoPPVs))
+        ppv='PPV: %.2f %d\t%.2f %d\t%.2f %d ' % (float(PPVs[-1]),len(PPVs), float(mixPPVs[-1]),len(mixPPVs), float(disoPPVs[-1]),len(disoPPVs))
         print "STATs: %s \t %s\t%s\t" % (fasta_filename,statline,ppv)
     else:
         print "STATs: %s \t %s\t" % (fasta_filename,statline)
