@@ -92,7 +92,29 @@ def get_cb_contacts(gapped_cb_lst):
 
 
 
-def get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, factor):
+def print_contacts(fasta_filename,score,contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, factor,disorder):
+    #    for num_c in range(min(len(contacts_x), int(ceil(ref_len * factor))) + 1)[1:]:
+    TP = 0.0
+    FP = 0.0
+    disoTP = 0.0
+    disoFP = 0.0
+    mixTP = 0.0
+    mixFP = 0.0
+    for i in range(len(contacts_x) ):
+        c_x = contacts_x[i]
+        c_y = contacts_y[i]
+        if atom_seq_ali[c_x] == '-':
+            continue
+        if atom_seq_ali[c_y] == '-':
+            continue
+        if len(disorder)>i:
+            print "DATA: ",fasta_filename,i,scores[i],c_x,c_y,disorder[c_x],disorder[c_y]
+        else:
+            print "DATA: ",fasta_filename,i,scores[i],c_x,c_y
+
+
+
+def get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, factor,disorder):
 
     PPVs = []
     TPs = []
@@ -109,6 +131,7 @@ def get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, fac
     mixFPs = []
     disocount = 0
     mixcount = 0
+    #    for num_c in range(min(len(contacts_x), int(ceil(ref_len * factor))) + 1)[1:]:
     TP = 0.0
     FP = 0.0
     disoTP = 0.0
@@ -146,13 +169,35 @@ def get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, fac
             continue
         if atom_seq_ali[c_y] == '-':
             continue
-        if ref_contact_map[c_x, c_y] > 0:
-            TP += 1.0 / (ref_len*factor)
-        else:
-            FP += 1.0 / (ref_len*factor)
-        PPVs.append(TP / (TP + FP))
-        TPs.append(TP)
-        FPs.append(FP)
+        if (disorder[c_x] > 0.5 and disorder[c_y] > 0.5):
+            if (disocount < ref_len * factor):
+                disocount+=1
+            if ref_contact_map[c_x, c_y] > 0:
+                disoTP += 1.0 
+            else:
+                disoFP += 1.0 
+            disoPPVs.append(disoTP / (disoTP + disoFP))
+            disoTPs.append(disoTP/disocount)
+            disoFPs.append(disoFP/disocount)
+
+        elif (disorder[c_x] > 0.5 or disorder[c_y] > 0.5):
+            if (mixcount < ref_len * factor):
+                mixcount+=1
+            if ref_contact_map[c_x, c_y] > 0:
+                mixTP += 1.0 
+            else:
+                mixFP += 1.0 
+            mixPPVs.append(mixTP / (mixTP + mixFP))
+            mixTPs.append(mixTP/mixcount)
+            mixFPs.append(mixFP/mixcount)
+        if (i < ref_len * factor):
+            if ref_contact_map[c_x, c_y] > 0:
+                TP += 1.0 / (ref_len*factor)
+            else:
+                FP += 1.0 / (ref_len*factor)
+            PPVs.append(TP / (TP + FP))
+            TPs.append(TP)
+            FPs.append(FP)
 
             
 
@@ -162,8 +207,20 @@ def get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, fac
         TPs.append(0.0)
     if len(FPs) == 0:
         FPs.append(0.0)
+    if len(mixPPVs) == 0:
+        mixPPVs.append(0.0)
+    if len(mixTPs) == 0:
+        mixTPs.append(0.0)
+    if len(mixFPs) == 0:
+        mixFPs.append(0.0)
+    if len(disoPPVs) == 0:
+        disoPPVs.append(0.0)
+    if len(disoTPs) == 0:
+        disoTPs.append(0.0)
+    if len(disoFPs) == 0:
+        disoFPs.append(0.0)
 
-    return PPVs, TPs, FPs
+    return PPVs, TPs, FPs,mixPPVs, mixTPs, mixFPs,disoPPVs, disoTPs, disoFPs
 
 
 def get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali):
@@ -293,15 +350,37 @@ def plot_map(fasta_filename, c_filename, factor=1.0, cutoff=9999.99, th=-1, c2_f
     ref_len = len(seq)
     unit = (ref_len/50.0)
 
-
+    if ali_filename:
+        coverage_lst = get_ali_coverage(ali_filename)
+        max_cover = max(coverage_lst)
+    elif meff_filename:
+        coverage_lst = get_meff_coverage(meff_filename)
+        max_cover = max(coverage_lst)
+    else:
+        max_cover = 0
+    average_disorder=0.
+    fraction_disorder=0.
+    if iupred_fname:
+        disorder = parse_iupred.pred(open(iupred_fname, 'r'))
+    else:
+        disorder=np.zeros(ref_len)
+    average_disorder = np.sum(disorder)/ref_len
+    fraction_disorder = 0.0
+    for i in disorder:
+        if (i>0.5):
+            fraction_disorder +=1/ref_len
+            
     ### get top "factor" * "ref_len" predicted contacts
-    contacts = parse_contacts.parse(open(c_filename, 'r'), sep)
+    contacts = parse_contacts.parse(open(c_filename, 'r'), sep,1)
     contacts_np = parse_contacts.get_numpy_cmap(contacts)
     contacts_np = contacts_np[start:end,start:end]
 
     contacts_x = []
     contacts_y = []
     scores = []
+    mixscores = []
+    disoscores = []
+    tooclose = []    
     contact_dict = {}
     if iupred_fname:
         disorder = parse_iupred.pred(open(iupred_fname, 'r'))
@@ -309,12 +388,24 @@ def plot_map(fasta_filename, c_filename, factor=1.0, cutoff=9999.99, th=-1, c2_f
         disorder = np.zeros(ref_len)
 
     count = 0
+    mixcount = 0
+    disocount = 0
+    highscore = 0
+    numbins=20
+    sum=0.0
+    disosum=0.0
+    mixsum=0.0
+    average=0.0
+    mixaverage=0.0
+    disoaverage=0.0
+    histo=np.zeros(numbins)
     disotop=0
     doubletop=0
-    disocount=0
-    doublecount=0
-    sum=0.
-    average=0.
+    mixcount=0
+    mixtop=0
+
+
+    # We actually divide the analysis into three groups (ordered,disordered and mixed)
     for i in range(len(contacts)):
         score = contacts[i][0]
         c_x = contacts[i][1] - 1
@@ -331,17 +422,37 @@ def plot_map(fasta_filename, c_filename, factor=1.0, cutoff=9999.99, th=-1, c2_f
         too_close = pos_diff < 5
 
         if not too_close:
-            contacts_x.append(c_x - start)
-            contacts_y.append(c_y - start)
-            scores.append(score)
-            count += 1
-            sum += score
-            average=sum/count
-            if (disorder[c_x] > 0.5 or disorder[c_y] > 0.5):
-                disocount += 1
-            if (disorder[c_x] > 0.5 and disorder[c_y] > 0.5):
-                doublecount += 1            
-
+            if score > cutoff:
+                contacts_x.append(c_x - start)
+                contacts_y.append(c_y - start)
+                if (disorder[c_x] > 0.5 and disorder[c_y] > 0.5):
+                    disocount += 1
+                    disoscores.append(score)
+                    if (disocount <= ref_len * factor):
+                        disosum += score
+                        disoaverage=disosum/disocount
+                elif (disorder[c_x] > 0.5 or disorder[c_y] > 0.5):
+                    mixcount += 1
+                    mixscores.append(score)
+                    if (mixcount <= ref_len * factor):
+                        mixsum += score
+                        mixaverage=mixsum/mixcount
+                count += 1
+                scores.append(score)
+                if (count <= ref_len * factor):
+                    sum += score
+                    average=sum/count
+        else:
+            tooclose.append(score)
+        
+    statline="Highs: %.1f (%.1f%%) (%.1f%%)\t average:  %.2f (%.2f) (%.2f)\t Meff: %.0f\t Diso: %.1f%% \t" % (count/ref_len,100*mixcount/count,100*disocount/count,average,mixaverage,disoaverage,max_cover,100*fraction_disorder)
+    fig = plt.figure(figsize=(8, 8), dpi=96, facecolor='w')
+    plt.hist((tooclose,scores), numbins,range=(0,1), histtype='bar',
+             normed=(numbins,numbins), alpha=0.75,
+             label=['Too_Close','Contacts'])
+    plt.xlabel('Score')
+    plt.ylabel('Normalized count')
+    fig.suptitle('%s\n%s\n' %  (c_filename,line))
 
         if (count >= ref_len * factor) or score < cutoff:
         #if score < th:
@@ -529,7 +640,7 @@ def plot_map(fasta_filename, c_filename, factor=1.0, cutoff=9999.99, th=-1, c2_f
         ref_contacts_x = ref_contacts[0]
         ref_contacts_y = ref_contacts[1]
 
-        PPVs, TPs, FPs = get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, factor)
+        PPVs, TPs, FPs,mixPPVs, mixTPs, mixFPs,disoPPVs, disoTPs, disoFPs = get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, factor,disorder)
         tp_colors = get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali)
         img = get_colors(contacts_np, ref_contact_map=dist_mat, atom_seq_ali=atom_seq_ali, th=th)
         sc = ax.imshow(img, interpolation='none')
@@ -582,7 +693,7 @@ def plot_map(fasta_filename, c_filename, factor=1.0, cutoff=9999.99, th=-1, c2_f
 
         ### use TP/FP color coding if reference contacts given
         if pdb_filename:
-            PPVs2, TPs2, FPs2 = get_ppvs(contacts2_x, contacts2_y, ref_contact_map, atom_seq_ali, ref_len, factor)
+            PPVs, TPs, FPs,mixPPVs, mixTPs, mixFPs,disoPPVs, disoTPs, disoFPs = get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, factor,disorder)
             tp2_colors = get_tp_colors(contacts2_x, contacts2_y, ref_contact_map, atom_seq_ali)
             print '%s %s %s %s' % (acc, PPVs2[-1], TPs2[-1], FPs2[-1])
             fig.suptitle('%s\nPPV (upper left) = %.2f | PPV (lower right) = %.2f' % (acc, PPVs[-1], PPVs2[-1]))
@@ -593,8 +704,10 @@ def plot_map(fasta_filename, c_filename, factor=1.0, cutoff=9999.99, th=-1, c2_f
             sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c='#004F9D', edgecolor='#004F9D', s=10, linewidths=0.5)
 
 
-    ### plot predicted contacts from first contact map on both triangles
-    ### if no second contact map given
+           
+#        ppv='PPV: %.2f %.2f %.2f' % (float(PPVs[-1]), float(TPs[-1]), float(FPs[-1]))
+        ppv='PPV: %.2f (%d)\t%.2f (%d)\t%.2f (%d) ' % (float(PPVs[-1]),len(PPVs), float(mixPPVs[-1]),len(mixPPVs), float(disoPPVs[-1]),len(disoPPVs))
+        print "STATs: %s \t %s\t%s\t" % (fasta_filename,statline,ppv)
     else:
         if pdb_filename:
             pdb_acc = parse_pdb.get_acc(open(pdb_filename))
@@ -614,7 +727,8 @@ def plot_map(fasta_filename, c_filename, factor=1.0, cutoff=9999.99, th=-1, c2_f
             #sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c=tp_colors[::-1], s=6, alpha=0.75, linewidths=0.0)
             #sc = ax.scatter(contacts_y[::-1], contacts_x[::-1], marker='o', c=tp_colors[::-1], s=6, alpha=0.75, linewidths=0.0)
         else:
-            #if c_filename.startswith('data'):
+            print "STATs: %s \t %s\t" % (fasta_filename,statline)
+                    #if c_filename.startswith('data'):
             #    acc = c_filename.split('/')[1]
             #else:
             #    acc = c_filename.split('/')[-1]
@@ -647,12 +761,14 @@ def plot_map(fasta_filename, c_filename, factor=1.0, cutoff=9999.99, th=-1, c2_f
     if outfilename:
         if outfilename.endswith('.pdf'):
             pp = PdfPages(outfilename)
+            ppstat = PdfPages(outfilename+"_statistics.pdf")
             pp.savefig(fig)
             pp.close()
         elif outfilename.endswith('.png'):
             plt.savefig(outfilename)
         else:
             pp = PdfPages('%s.pdf' % outfilename)
+            ppstat = PdfPages(outfilename+"_statistics.pdf")
             pp.savefig(fig)
             pp.close()
     else:
