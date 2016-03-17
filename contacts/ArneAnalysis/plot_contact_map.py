@@ -100,6 +100,22 @@ def get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, fac
 
     TP=0
     FP=0
+
+    disoPPVs = []
+    disoTPs = []
+    disoFPs = []
+    mixPPVs = []
+    mixTPs = []
+    mixFPs = []
+    disocount = 0
+    mixcount = 0
+    TP = 0.0
+    FP = 0.0
+    disoTP = 0.0
+    disoFP = 0.0
+    mixTP = 0.0
+    mixFP = 0.0
+
     
 #    for num_c in range(min(len(contacts_x), int(ceil(ref_len * factor))) + 1)[1:]:
 #        TP = 0.0
@@ -408,7 +424,7 @@ def plot_map(fasta_filename, c_filename, factor=1.0, cutoff=9999.99, th=-1, c2_f
     ### plot secondary structure along axis if given
     average_disorder=0.
     fraction_disorder=0.
-    statline = "Highs: %.1f Aver: %.2f\t Meff: %.0f" % (count/ref_len,average,max_cover)
+    #statline = "Highs: %.1f Aver: %.2f\t Meff: %.0f" % (count/ref_len,average,max_cover)
     if iupred_fname:
         average_disorder = np.sum(disorder)/ref_len
         fraction_disorder = 0.0
@@ -653,7 +669,7 @@ if __name__ == "__main__":
     p.add_argument('contact_file')#, required=True)
     p.add_argument('-o', '--outfile', default='')
     p.add_argument('-f', '--factor', default=1.0, type=float)
-    p.add_argument('-c', '--cutoff', default=0.3, type=float)
+    p.add_argument('-c', '--cutoff', default=0.4, type=float)
     p.add_argument('-t', '--threshold', default=-1, type=float)
     p.add_argument('--c2', default='')
     p.add_argument('--psipred_horiz', default='')

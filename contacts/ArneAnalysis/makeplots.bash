@@ -38,6 +38,6 @@ do
     then
 	p=$p" --psipred_vert $j.ss2  "
     fi
-    ~/git/bioinfo-toolbox/contacts/ArneAnalysis/plot_contact_map.py --cutoff 0.3 $p    $k.$e $j.$f
+    ~/git/bioinfo-toolbox/contacts/ArneAnalysis/plot_contact_map.py --cutoff 0.4z $p    $k.$e $j.$f
 #    ~/git/bioinfo-toolbox/contacts/ArneAnalysis/analyse_predictions.py --cutoff 0.3 $p $k.$e $j.$f
 done
