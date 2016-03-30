@@ -282,7 +282,7 @@ def get_atom_seq(pdbfile, chain='', model=1):
         chain = get_first_chain(pdbfile)
         pdbfile.seek(0)
 
-    print "Using Chain:", chain
+    #print "Using Chain:", chain
 
     res_name = ''
     for line in pdbfile:
