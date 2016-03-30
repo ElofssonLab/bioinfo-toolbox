@@ -162,7 +162,9 @@ def get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, fac
 #            FPs.append(FP)
 
         # TEST
-    for num_c in range(min(len(contacts_x), int(ceil(ref_len * factor))) ):
+#    for num_c in range(min(len(contacts_x), int(ceil(ref_len * factor))) ):
+#    for num_c in xrange(len(atom_seq_ali)):
+    for num_c in xrange(len(contacts_x)):
         c_x = contacts_x[num_c]
         c_y = contacts_y[num_c]
         if atom_seq_ali[c_x] == '-':
@@ -190,7 +192,7 @@ def get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, fac
             mixPPVs.append(mixTP / (mixTP + mixFP))
             mixTPs.append(mixTP/mixcount)
             mixFPs.append(mixFP/mixcount)
-        if (i < ref_len * factor):
+        if (num_c < ref_len * factor):
             if ref_contact_map[c_x, c_y] > 0:
                 TP += 1.0 / (ref_len*factor)
             else:
@@ -444,21 +446,19 @@ def plot_map(fasta_filename, c_filename, factor=1.0, cutoff=9999.99, th=-1, c2_f
                     average=sum/count
         else:
             tooclose.append(score)
-        
+                
     statline="Highs: %.1f (%.1f%%) (%.1f%%)\t average:  %.2f (%.2f) (%.2f)\t Meff: %.0f\t Diso: %.1f%% \t" % (count/ref_len,100*mixcount/count,100*disocount/count,average,mixaverage,disoaverage,max_cover,100*fraction_disorder)
-    fig = plt.figure(figsize=(8, 8), dpi=96, facecolor='w')
+    statline="Highs: %.1f %.3f %.3f\t average:  %.2f %.2f %.2f\t Meff: %.0f\t Diso: %.3f \t" % (count/ref_len,mixcount/count,disocount/count,average,mixaverage,disoaverage,max_cover,fraction_disorder)
+    statline="%d\t%d\t%d\t%d\t%d\t%.3f\t%.3f\t%.3f\t%.3f\n"  % ( ref_len,max_cover,(count-mixcount-disocount),mixcount,disocount,sum,mixsum,disosum,fraction_disorder)
+    statline="%d\t%.3f\t%.3f\t%.3f\t%3f\t%.3f\t%.3f\t%.3f\t%.3f\n"  % ( max_cover,count/ref_len,(count-mixcount-disocount)/(1.e-20+ref_len*(1-fraction_disorder)),mixcount/(1.e-20+ref_len*sqrt((1-fraction_disorder)*fraction_disorder)),disocount/(1.e-20+ref_len*(fraction_disorder)),average,mixaverage,disoaverage,fraction_disorder)
+    statfig = plt.figure(figsize=(8, 8), dpi=96, facecolor='w')
     plt.hist((tooclose,scores), numbins,range=(0,1), histtype='bar',
              normed=(numbins,numbins), alpha=0.75,
              label=['Too_Close','Contacts'])
     plt.xlabel('Score')
     plt.ylabel('Normalized count')
-    fig.suptitle('%s\n%s\n' %  (c_filename,line))
+    statfig.suptitle('%s\n%s\n' %  (c_filename,line))
 
-        if (count >= ref_len * factor) or score < cutoff:
-        #if score < th:
-            if th == -1:
-                th = score
-            break
  
 
     ### start plotting
@@ -559,7 +559,7 @@ def plot_map(fasta_filename, c_filename, factor=1.0, cutoff=9999.99, th=-1, c2_f
         ax.get_yaxis().tick_left()
         ax3.grid()
         ax3.set_xlim([-unit,ref_len])
-        statline = "Highs: %.3f  %.3f   %.3f  \t Aver: %.2f\t Meff: %.0f\t Diso: %.3f \t" % (count/ref_len,disocount/count,doublecount/count,average,max_cover,fraction_disorder)
+        #statline = "Highs: %.3f  %.3f   %.3f  \t Aver: %.2f\t Meff: %.0f\t Diso: %.3f \t" % (count/ref_len,disocount/count,doublecount/count,average,max_cover,fraction_disorder)
 
 
     print "STATs: %s\t%s" % (fasta_filename,statline)
@@ -761,20 +761,27 @@ def plot_map(fasta_filename, c_filename, factor=1.0, cutoff=9999.99, th=-1, c2_f
     if outfilename:
         if outfilename.endswith('.pdf'):
             pp = PdfPages(outfilename)
-            ppstat = PdfPages(outfilename+"_statistics.pdf")
             pp.savefig(fig)
             pp.close()
+            ppstat = PdfPages(outfilename+"_statistics.pdf")
+            ppstat.savefig(statfig)
+            ppstat.close()
         elif outfilename.endswith('.png'):
             plt.savefig(outfilename)
         else:
             pp = PdfPages('%s.pdf' % outfilename)
-            ppstat = PdfPages(outfilename+"_statistics.pdf")
             pp.savefig(fig)
             pp.close()
+            ppstat = PdfPages(outfilename+"_statistics.pdf")
+            ppstat.savefig(statfig)
+            ppstat.close()
     else:
         pp = PdfPages('%s_ContactMap.pdf' % c_filename)
         pp.savefig(fig)
         pp.close()
+        ppstat = PdfPages('%s_statistics.pdf' % c_filename)
+        ppstat.savefig(statfig)
+        ppstat.close()
 
 
     
@@ -784,8 +791,8 @@ if __name__ == "__main__":
     p.add_argument('fasta_file')#, required=True)
     p.add_argument('contact_file')#, required=True)
     p.add_argument('-o', '--outfile', default='')
-    p.add_argument('-f', '--factor', default=1.0, type=float)
-    p.add_argument('-c', '--cutoff', default=0.4, type=float)
+    p.add_argument('-f', '--factor', default=-1.0, type=float)
+    p.add_argument('-c', '--cutoff', default=-1.0, type=float)
     p.add_argument('-t', '--threshold', default=-1, type=float)
     p.add_argument('--c2', default='')
     p.add_argument('--psipred_horiz', default='')
@@ -802,6 +809,7 @@ if __name__ == "__main__":
 
     args = vars(p.parse_args(sys.argv[1:]))
 
+    
     fasta_filename = args['fasta_file']
     c_filename = args['contact_file']
     psipred_filename = args['psipred_horiz']
@@ -815,5 +823,19 @@ if __name__ == "__main__":
         sep = ' '
     else:
         sep = '\t'
-    
-    plot_map(args['fasta_file'], args['contact_file'], factor=args['factor'], cutoff=args['cutoff'], th=args['threshold'], c2_filename=args['c2'], psipred_horiz_fname=args['psipred_horiz'], psipred_vert_fname=args['psipred_vert'], iupred_fname=args['iupred'], pdb_filename=args['pdb'], is_heavy=args['heavy'], chain=args['chain'], sep=sep, outfilename=args['outfile'], ali_filename=args['alignment'], meff_filename=args['meff'], name=args['name'], start=args['start'], end=args['end'])
+
+    factor=args['factor']
+    cutoff=args['cutoff']
+
+    if (factor==-1.0):
+        if (cutoff==-1.0):
+            factor=1.0
+            cutoff=0.4
+        else:
+            factor=1.0
+    else:
+        if (cutoff==-1.0):
+            cutoff=9999.
+        
+
+    plot_map(args['fasta_file'], args['contact_file'], factor, cutoff, th=args['threshold'], c2_filename=args['c2'], psipred_horiz_fname=args['psipred_horiz'], psipred_vert_fname=args['psipred_vert'], iupred_fname=args['iupred'], pdb_filename=args['pdb'], is_heavy=args['heavy'], chain=args['chain'], sep=sep, outfilename=args['outfile'], ali_filename=args['alignment'], meff_filename=args['meff'], name=args['name'], start=args['start'], end=args['end'])

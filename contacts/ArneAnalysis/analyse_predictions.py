@@ -431,7 +431,7 @@ def contactanalysis(fasta_filename, c_filename, factor=1.0, cutoff=9999.99, th=-
                 
     statline="Highs: %.1f %.3f %.3f\t average:  %.2f %.2f %.2f\t Meff: %.0f\t Diso: %.3f \t" % (count/ref_len,mixcount/count,disocount/count,average,mixaverage,disoaverage,max_cover,fraction_disorder)
     statline="%d\t%d\t%d\t%d\t%d\t%.3f\t%.3f\t%.3f\t%.3f\n"  % ( ref_len,max_cover,(count-mixcount-disocount),mixcount,disocount,sum,mixsum,disosum,fraction_disorder)
-    statline="%d\t%.3f\t%.3f\t%.3f\t%3f\t%.3f\t%.3f\t%.3f\t%.3f\n"  % ( max_cover,count/ref_len,(count-mixcount-disocount)/(1.e-20+ref_len*(1-fraction_disorder)),mixcount/(1.e-20+2*ref_len*(1-fraction_disorder)*fraction_disorder),disocount/(1.e-20+ref_len*(fraction_disorder)),average,mixaverage,disoaverage,fraction_disorder)
+    statline="%d\t%.3f\t%.3f\t%.3f\t%3f\t%.3f\t%.3f\t%.3f\t%.3f\n"  % ( max_cover,count/ref_len,(count-mixcount-disocount)/(1.e-20+ref_len*(1-fraction_disorder)),mixcount/(1.e-20+sqrt(ref_len*ref_len*(1-fraction_disorder)*fraction_disorder)),disocount/(1.e-20+ref_len*(fraction_disorder)),average,mixaverage,disoaverage,fraction_disorder)
     fig = plt.figure(figsize=(8, 8), dpi=96, facecolor='w')
     plt.hist((tooclose,scores), numbins,range=(0,1), histtype='bar',
              normed=(numbins,numbins), alpha=0.75,
