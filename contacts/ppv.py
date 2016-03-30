@@ -62,7 +62,7 @@ def get_ppv_helper(contacts_x, contacts_y, ref_contact_map, ref_len, factor, ato
 
 
 def get_ppv(fasta_filename, c_filename, pdb_filename, factor=1.0,
-        min_score=-1.0, chain='', sep=' ', outfilename='', noalign=False):  
+        min_score=-1.0, chain='', sep=' ', outfilename='', name='', noalign=False):  
     
     acc = fasta_filename.split('.')[-2][-5:-1]
 
@@ -131,8 +131,10 @@ def get_ppv(fasta_filename, c_filename, pdb_filename, factor=1.0,
         ref_contact_map = dist_mat < cb_cutoff
    
         PPV, TP, FP = get_ppv_helper(contacts_x, contacts_y, ref_contact_map, ref_len, factor, atom_seq_ali=atom_seq_ali)
-
-    print '%s %s %s %s %s' % (fasta_filename, c_filename, PPV, TP, FP)
+    if name:
+        print '%s %s %s %s' % (name, PPV, TP, FP)
+    else:
+        print '%s %s %s %s %s' % (fasta_filename, c_filename, PPV, TP, FP)
     return (pdb_filename, PPV, TP, FP)
   
     
@@ -203,6 +205,7 @@ if __name__ == "__main__":
     p.add_argument('-s', '--score', default=-1.0, type=float)
     p.add_argument('--chain', default='')
     p.add_argument('--noalign', action='store_true')
+    p.add_argument('--name', default='')
 
     args = vars(p.parse_args(sys.argv[1:]))
 
@@ -223,7 +226,7 @@ if __name__ == "__main__":
         get_ppv(args['fasta_file'], args['contact_file'], args['pdb'],
                 args['factor'], chain=args['chain'], sep=sep,
                 outfilename=args['outfile'], noalign=args['noalign'],
-                min_score=args['score'])
+                min_score=args['score'], name=args['name'])
     else:
         get_ppv_hbond(args['fasta_file'], args['contact_file'],
                 args['pdb'], args['factor'], sep=sep,
