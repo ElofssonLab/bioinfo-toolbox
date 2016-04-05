@@ -2172,7 +2172,8 @@ dev.off()
 
 
 genome="All"
-outfile=paste("figures/",genome,"-2015-Detailed-bar.png",sep="")
+#outfile=paste("figures/",genome,"-2015-Detailed-bar.png",sep="")
+outfile=paste("figures/",genome,"-2015-Detailed-bar.eps",sep="")
 png(outfile,width=1280,height=1280)
 genlabels=NULL
 genlabels[1]="Homo Sapiens"
