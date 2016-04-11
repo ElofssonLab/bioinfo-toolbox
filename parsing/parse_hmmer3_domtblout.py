@@ -10,20 +10,29 @@ def read(infile, dom_clan_dict={}, clan_name_dict={}):
     query_dom_dict = defaultdict(list)
 
     # remove first three commented lines
-    infile.readline()
-    infile.readline()
-    infile.readline()
+    #infile.readline()
+    #infile.readline()
+    #infile.readline()
 
     for line in infile:
+        if line.startswith('#'):
+            continue
         line_list = line.split()
         dom_name = line_list[0]
         dom_id = line_list[1]
+        # when parsing non-pfam searches (e.g. pdb)
+        if dom_id == '-':
+            dom_id = dom_name
         dom_id_short = dom_id.split('.')[0]
         query_id = line_list[3]
         eval = float(line_list[12])
         bitscore = float(line_list[13])
         start = int(line_list[19])
         end = int(line_list[20])
+        start_dom = int(line_list[15])
+        end_dom = int(line_list[16])
+        start_seq = int(line_list[17])
+        end_seq = int(line_list[18])
 
         # if clan dictionaries are given, translate id and name
         try:
@@ -33,7 +42,8 @@ def read(infile, dom_clan_dict={}, clan_name_dict={}):
         except KeyError:
             pass
 
-        query_dom_entry = ((start, end), eval, dom_id, bitscore)
+        query_dom_entry = ((start, end), eval, dom_id, bitscore,
+                (start_dom, end_dom), (start_seq, end_seq))
         dom_name_dict[dom_id] = dom_name
         query_dom_dict[query_id].append(query_dom_entry)
 
@@ -230,7 +240,7 @@ if __name__ == "__main__":
     infile.close()
     #print domtblout[0]
     #print domtblout[1]
-    print domtblout[2]
+    #print domtblout[2]
     print 'DONE!'
     
     if len(sys.argv) == 3:
