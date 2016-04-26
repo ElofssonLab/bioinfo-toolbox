@@ -1,6 +1,13 @@
+import sys, os
+
+ 
+# pymol environment
+moddir='/opt/pymol-svn/modules'
+sys.path.insert(0, moddir)
+os.environ['PYMOL_PATH'] = os.path.join(moddir, 'pymol/pymol_path')
+
 from pymol import cmd
 
-import sys
 
 def parse_contacts(afile, sep=' '):
     
@@ -78,7 +85,6 @@ def draw(prot_name, seqfile, pdbfile, cfile, factor):
     seq = read_fasta(open(seqfile, 'r')).values()[0][0]
     seqlen = len(seq)
     contacts = parse_contacts(open(cfile, 'r'))
-
 
     cmd.load(pdbfile)
     cmd.set('dash_gap', 0.0)
@@ -172,3 +178,5 @@ if __name__ == "__main__":
     factor = float(sys.argv[5])
 
     draw(prot_name, seqfile, pdbfile, cfile, factor)
+    #draw("1.run_6.S_00000086 1FNAA.fa", "1.run_6.S_00000086.pdb",
+    #        "1FNAA.fa.pconsc2.out", 1.0)
