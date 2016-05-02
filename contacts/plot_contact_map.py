@@ -558,6 +558,8 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
             pp = PdfPages(outfilename)
             pp.savefig(fig)
             pp.close()
+        elif outfilename.endswith('.eps'):
+            plt.savefig(outfilename, format='eps', dpi=300)
         elif outfilename.endswith('.png'):
             plt.savefig(outfilename)
         else:
