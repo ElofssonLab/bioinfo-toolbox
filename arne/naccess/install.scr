@@ -1,0 +1,33 @@
+#!/bin/csh
+#
+# Installation script for naccess
+#
+# 1. Where are we ? Get present directory
+set NACCESS_DIR = $PWD
+echo "$ naccess installation program"
+echo "$ ----------------------------"
+echo "$ installing naccess in directory $NACCESS_DIR"
+#
+# create the naccess script
+#
+echo "#\!/bin/csh "                >! naccess
+echo "set EXE_PATH = $NACCESS_DIR" >> naccess
+cat naccess.scr                    >> naccess
+echo "$ created naccess - cshell script"
+#
+# give script executable priviledge
+#
+chmod +x naccess
+#
+# compile program
+#
+echo "$ compiling accall.f"
+f77 accall.f -o accall -O 
+#
+# set alias
+#
+alias naccess '$PWD/naccess'
+#
+# report completion
+#
+echo "$ done"
