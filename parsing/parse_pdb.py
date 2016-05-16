@@ -342,8 +342,9 @@ def get_acc(pdbfile):
 if __name__ == '__main__':
 
     pdbfile = open(sys.argv[1], 'r')
-    chain = sys.argv[2]
-    #print get_atom_seq(pdbfile, chain)
+    #chain = sys.argv[2]
+    chain = get_first_chain(pdbfile)
+    print get_atom_seq(pdbfile, chain)
     pdbfile.close()
     #pdbfile = open(sys.argv[1], 'r')
     #print get_coordinates(pdbfile)
