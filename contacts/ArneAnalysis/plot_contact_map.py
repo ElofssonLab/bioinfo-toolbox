@@ -129,8 +129,8 @@ def get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, fac
     mixPPVs = []
     mixTPs = []
     mixFPs = []
-    disocount = 0
-    mixcount = 0
+    disocount = 1.e-20
+    mixcount = 1.e-20
     #    for num_c in range(min(len(contacts_x), int(ceil(ref_len * factor))) + 1)[1:]:
     TP = 0.0
     FP = 0.0
@@ -415,9 +415,9 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
     else:
         disorder = np.zeros(ref_len)
 
-    count = 0
-    mixcount = 0
-    disocount = 0
+    count = 1.e-20
+    mixcount = 1.e-20
+    disocount = 1.e-20
     highscore = 0
     numbins=20
     sum=0.0
@@ -473,9 +473,9 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
         else:
             tooclose.append(score)
                 
-    statline="Highs: %.1f (%.1f%%) (%.1f%%)  average:  %.2f (%.2f) (%.2f)  Meff: %.0f  Diso: %.1f%%  " % (count/ref_len,100*mixcount/count,100*disocount/count,average,mixaverage,disoaverage,max_cover,100*fraction_disorder)
-    statline="Highs: %.1f %.3f %.3f  average:  %.2f %.2f %.2f  Meff: %.0f  Diso: %.3f  " % (count/ref_len,mixcount/count,disocount/count,average,mixaverage,disoaverage,max_cover,fraction_disorder)
-    statline="Length: %d NumAli: %d Counts: %d %d %d %.3f %.3f %.3f %.3f\n"  % ( ref_len,max_cover,(count-mixcount-disocount),mixcount,disocount,sum,mixsum,disosum,fraction_disorder)
+#    statline="Highs: %.1f (%.1f%%) (%.1f%%)  average:  %.2f (%.2f) (%.2f)  Meff: %.0f  Diso: %.1f%%  " % (count/ref_len,100*mixcount/count,100*disocount/count,average,mixaverage,disoaverage,max_cover,100*fraction_disorder)
+#    statline="Highs: %.1f %.3f %.3f  average:  %.2f %.2f %.2f  Meff: %.0f  Diso: %.3f  " % (count/ref_len,mixcount/count,disocount/count,average,mixaverage,disoaverage,max_cover,fraction_disorder)
+#    statline="Length: %d NumAli: %d Counts: %d %d %d %.3f %.3f %.3f %.3f\n"  % ( ref_len,max_cover,(count-mixcount-disocount),mixcount,disocount,sum,mixsum,disosum,fraction_disorder)
     statline="NumAli: %d Length: %d Counts: %d %d %d Disorder: %.3f \n"  % ( max_cover,ref_len,count,mixcount,disocount,fraction_disorder)
     statfig = plt.figure(figsize=(8, 8), dpi=96, facecolor='w')
     plt.hist((tooclose,scores), numbins,range=(0,1), histtype='bar',
@@ -746,11 +746,11 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
             pdb_acc = parse_pdb.get_acc(open(pdb_filename))
             if pdb_acc:
                 if chain:
-                    fig.suptitle('%s (PDB: %s, chain %s)\nPPV = %.2f' % (acc, pdb_acc, chain, PPVs[-1]))
+                    fig.suptitle('%s (PDB: %s, chain %s)\nPPV = %.2f %s' % (acc, pdb_acc, chain, PPVs[-1],statline))
                 else:
-                    fig.suptitle('%s (PDB: %s)\nPPV = %.2f' % (acc, pdb_acc, PPVs[-1]))
+                    fig.suptitle('%s (PDB: %s)\nPPV = %.2f %s' % (acc, pdb_acc, PPVs[-1],statline))
             else:
-                fig.suptitle('%s\nPPV = %.2f' % (acc, PPVs[-1]))
+                fig.suptitle('%s\nPPV = %.2f %s' % (acc, PPVs[-1],statline))
             #cmap = cm.get_cmap("binary")
             #cmap.set_bad([1,1,1,0])
             #contacts_np_masked = np.ma.array(contacts_np, mask=np.tri(contacts_np.shape[0], k=-1))

@@ -45,6 +45,9 @@ do
     then
 	p=$p" --psipred_vert $j.ss2  "
     fi
-    ~/git/bioinfo-toolbox/contacts/ArneAnalysis/plot_contact_map.py --threshold 0.4 --factor 1.0 $p    $k.$e $i
+    if [ ! -e $i\_ContactMap\.pdf ]
+	then
+	~/git/bioinfo-toolbox/contacts/ArneAnalysis/plot_contact_map.py --threshold 0.4 --factor 1.0 $p    $k.$e $i
     #~/git/bioinfo-toolbox/contacts/ArneAnalysis/analyse_predictions.py --cutoff 0.4 $p $k.$e $j.$f
+    fi
 done
