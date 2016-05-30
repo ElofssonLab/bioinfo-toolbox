@@ -69,11 +69,13 @@ if __name__ == '__main__':
     test_fam = get_sfam_dom_dict(open(sys.argv[1], 'r'))
     test_dom = get_dom_sfam_dict(open(sys.argv[1], 'r'))
     test_pdb = get_pdb_sfam_dict(open(sys.argv[1], 'r'))
+    
+    for acc, sfam in test_pdb.iteritems():
+        print acc, sfam
+    #print len(test_fam)
+    #print len(test_dom)
+    #print len(test_pdb)
 
-    print len(test_fam)
-    print len(test_dom)
-    print len(test_pdb)
-
-    print test_fam['1.10.8.10']
-    print test_dom['3fe3A03']
-    print test_pdb['3fe3']
+    #print test_fam['1.10.8.10']
+    #print test_dom['3fe3A03']
+    #print test_pdb['3fe3']

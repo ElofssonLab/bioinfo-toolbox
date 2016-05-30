@@ -34,7 +34,7 @@ def parse(afile, sep=' ', min_dist=5):
     return contacts
 
 
-def get_numpy_cmap(contacts, seq_len=-1):
+def get_numpy_cmap(contacts, seq_len=-1, min_dist=5):
 
     """Convert contacts into numpy matrix.
     @param  contacts    contact list as obtained from "parse"
@@ -50,7 +50,8 @@ def get_numpy_cmap(contacts, seq_len=-1):
     for c in contacts:
         i = c[1] - 1
         j = c[2] - 1
-        cmap[i,j] = c[0]
+        if abs(i - j) >= min_dist:
+            cmap[i,j] = c[0]
     
     return cmap
 

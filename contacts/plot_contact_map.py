@@ -28,6 +28,7 @@ import parse_psipred
 import parse_fasta
 import parse_pdb
 import parse_hhblits_hhr
+import parse_a3m
 
 
 def s_score(d, d0):
@@ -165,6 +166,7 @@ def get_colors(contacts_np, ref_contact_map=[], th=0.5):
                 continue
             sc = contacts_np[i,j]
             if len(ref_contact_map) > 0:
+                #print N, ref_contact_map.shape[0]
                 assert N == ref_contact_map.shape[0]
                 # FN
                 if sc <= th and ref_contact_map[i,j] < 8:
@@ -238,9 +240,71 @@ def get_meff_coverage(meff_file):
     return meff_lst
 
 
-def get_pdb_alignment(filename):
+def is_gap(symbol):
+    return symbol == '-'
+
+
+def embedd_alignment(target_0, target_1, source_0, source_1):
+    """ Embedds pairwise alignment (source) in another pairwise alignment (target), 
+        where unaligned target_1 is identical to unaligned source_0.
+    """
+    #print target_1
+    #print source_0
+    assert target_1.replace('-','') == source_0.replace('-','')
+
+    result_0 = ''
+    result_1 = ''
+
+    i = 0
+    j = 0
+    #sys.stdout.write('\n')
+    while i < len(target_0):
+        t_0i = target_0[i] 
+        t_1i = target_1[i]
+        
+        if not is_gap(t_0i) and is_gap(t_1i):
+            #sys.stdout.write('%s' % t_0i)
+            #sys.stdout.write('%s' % '-')
+            result_0 += t_0i
+            result_1 += '-'
+            i += 1
+        elif not is_gap(t_0i) and not is_gap(t_1i):
+            s_0j = source_0[j]
+            s_1j = source_1[j]
+            #sys.stdout.write('%s' % s_0j)
+            #sys.stdout.write('%s' % s_1j)
+            result_0 += s_0j
+            result_1 += s_1j
+            if not is_gap(s_0j):
+                i += 1
+            j += 1
+        elif is_gap(t_0i):
+            s_0j = source_0[j]
+            s_1j = source_1[j]
+            #sys.stdout.write('%s' % '-')
+            #sys.stdout.write('%s' % s_1j)
+            result_0 += '-'
+            result_1 += s_1j 
+            if not is_gap(s_0j):
+                i += 1
+            j += 1
     
-    return atom_seq_ali, seq_ali
+    while j < len(source_0):
+        result_0 += '-'
+        result_1 += source_1[j] 
+        j += 1
+
+    #print result_0
+    #print result_1
+    #print result_1.replace('-','')
+    #print source_1.replace('-','')
+    assert result_0.replace('-','') == target_0.replace('-','')
+    assert result_1.replace('-','') == source_1.replace('-','')
+
+    return result_0, result_1
+
+
+
 
 
 def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psipred_horiz_fname='', psipred_vert_fname='', pdb_filename='', is_heavy=False, chain='', sep=',', outfilename='', ali_filename='',  meff_filename='', name='', start=0, end=-1, pdb_start=0, pdb_end=-1, noalign=False, pdb_alignment='', pdb_id=''):
@@ -296,11 +360,14 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
             scores.append(score)
             count += 1
            
-        if count >= ref_len * factor:
-        #if score < th:
-            if th == -1:
-                th = score
+        if count >= ref_len * factor and th == -1:
+            th = score
             break
+        
+        if score < th and not th == -1:
+            factor = count/float(ref_len)
+            break
+
  
 
     ### start plotting
@@ -418,8 +485,8 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
         cb_lst = cb_lst[pdb_start:pdb_end]
         atom_seq = atom_seq[pdb_start:pdb_end]
 
-        print atom_seq
-        print seq
+        #print atom_seq
+        #print seq
 
         if noalign:
             dist_mat = get_cb_contacts(cb_lst)
@@ -431,19 +498,37 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
 
         else:
             if pdb_alignment and pdb_id:
-                align = parse_hhblits_hhr.parse_alignments(pdb_alignment)[pdb_id]
-                atom_seq_ali = align[0][0]
-                seq_ali = align[0][1]
+                #align = parse_hhblits_hhr.parse_alignments(pdb_alignment)[pdb_id]
+                #atom_seq_ali = align[0][0]
+                #seq_ali = align[0][1]
+                seq_ali, atom_seq_ali = parse_a3m.get_pairwise(pdb_alignment, pdb_id)
+                seqres_seq = atom_seq_ali.replace('-', '')
+                #print seqres_seq
+                
+                #print atom_seq_ali
+                #print seq_ali
+                #print ""
+                align_seqres = pairwise2.align.globalms(atom_seq, seqres_seq, 2, -1, -0.5, -0.1)
+                atom_seq_ali0 = align_seqres[-1][0]
+                seqres_seq_ali0 = align_seqres[-1][1]
+                #print ""
+                #print atom_seq_ali0
+                #print seqres_seq_ali0
+                #print ""
+                atom_seq_ali, seq_ali = embedd_alignment(atom_seq_ali0, seqres_seq_ali0, atom_seq_ali, seq_ali)
+                #print atom_seq_ali1
+                #print seq_ali1
+                #print ""
             else:
                 matrix = matlist.blosum62
                 #align = pairwise2.align.globalms(atom_seq, seq, 2, -1, -0.5, -0.1)
                 #align = pairwise2.align.localds(atom_seq, seq, matrix, -11, -1)
-                align = pairwise2.align.globalds(atom_seq, seq, matrix, -11, -1)
+                align = pairwise2.align.globalds(atom_seq, seq, matrix, -25, -1)
                 atom_seq_ali = align[-1][0]
                 seq_ali = align[-1][1]
 
-            print atom_seq_ali
-            print seq_ali
+            #print atom_seq_ali
+            #print seq_ali
             #print len(atom_seq), len(seq), len(res_lst), len(cb_lst)
             #print len(atom_seq_ali), len(seq_ali)
 
@@ -453,6 +538,8 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
 
             for i in xrange(len(atom_seq_ali)):
                 if atom_seq_ali[i] == '-':
+                    if seq_ali[i] == '-':
+                        continue
                     gapped_res_lst.append('-')
                     gapped_cb_lst.append('-')
                 elif seq_ali[i] == '-':
