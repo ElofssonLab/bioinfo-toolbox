@@ -6,9 +6,9 @@ import matplotlib.pyplot as plt
 
 
 def s2d(s):
-    d0=5
+    d0=sqrt(5)
     d=100 # for CASP we cap the distance at 100 angstroms
-    if s>0.00249: # this is the S score for 100 angstroms
+    if s>0.0004: # this is the S score for 100 angstroms
         if s>=1:
             d=0
         else:
@@ -38,16 +38,16 @@ def parse_qa(f):
                 continue
             try:
                 float(l_arr[0])
-                if method == 'Pcons':
-                    qa_dict[acc] += map(s2d, map(float, l_arr))
-                else:
-                    qa_dict[acc] += map(float, l_arr)
+                #if method == 'Pcons':
+                #    qa_dict[acc] += map(s2d, map(float, l_arr))
+                #else:
+                qa_dict[acc] += map(float, l_arr)
             except ValueError:
                 acc = l_arr[0]
-                if method == 'Pcons':
-                    qa_dict[acc] = map(s2d, map(float, l_arr[2:]))
-                else:
-                    qa_dict[acc] = map(float, l_arr[2:])
+                #if method == 'Pcons':
+                #    qa_dict[acc] = map(s2d, map(float, l_arr[2:]))
+                #else:
+                qa_dict[acc] = map(float, l_arr[2:])
     return method, qa_dict
 
 
@@ -60,7 +60,7 @@ def plot_qa(f_lst, outf_prefix=''):
             data[acc][method] = qa_lst
 
     for acc, method_dict in data.iteritems():
-        fig = plt.figure(figsize=(10,2))
+        fig = plt.figure(figsize=(10,4))
         ax = plt.axes()
         plot_lst = []
         label_lst = []
@@ -70,9 +70,9 @@ def plot_qa(f_lst, outf_prefix=''):
             #plot_lst.append(plt.plot(x, qa_lst))
             #label_lst.append(method)
         #plt.legend(plot_lst, label_lst)
-        ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=3)
+        ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=4)
         #plt.show()
-        plt.ylim(0,50)
+        plt.ylim(0,30)
         outf = '%s%s.qa.png' % (outf_prefix, acc)
         plt.savefig(outf)
         plt.close()
