@@ -11,12 +11,16 @@ def plot(filename):
     N = 0
     L = 0
     for line in alifile:
+        if line.startswith(">"):
+            continue
         N += 1
         #tmp.write('>seq:%s\n' % N)
         #tmp.write(line)
         if L == 0:
-            for chr in line:
-                L += 1
+            L = len(line)
+        #    for chr in line:
+        #        L += 1
+    print N, L
     alifile.close()
     #tmp.close()
     aliarr = np.zeros((N, L))
@@ -24,6 +28,8 @@ def plot(filename):
     i = 0
     for line in alifile:
         j = 0
+        if line.startswith(">"):
+            continue
         for chr in line:
             if chr != '-':
                 aliarr[i,j] = 1.0
