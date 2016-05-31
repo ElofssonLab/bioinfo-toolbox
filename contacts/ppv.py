@@ -36,6 +36,27 @@ def get_cb_contacts(gapped_cb_lst):
     return dist_mat
 
 
+def print_distances(contacts_x, contacts_y, scores, dist_mat, atom_seq_ali=[], outfile=""):
+
+    num_c = len(contacts_x)
+    outstr = ""
+    for i in range(num_c):
+        c_x = contacts_x[i]
+        c_y = contacts_y[i]
+        if atom_seq_ali:
+            if atom_seq_ali[c_x] == '-':
+                continue
+            if atom_seq_ali[c_y] == '-':
+                continue
+        if outfile:
+            outstr += "%s %s %s %s\n" % (c_x, c_y, scores[i], dist_mat[c_x, c_y])
+        else:
+            print c_x, c_y, scores[i], dist_mat[c_x, c_y]
+    if outfile:
+        with open(outfile, 'w') as outf:
+            outf.write(outstr)
+
+
 def get_ppv_helper(contacts_x, contacts_y, ref_contact_map, ref_len, factor, atom_seq_ali=[]):
 
     num_c = len(contacts_x)
@@ -62,7 +83,7 @@ def get_ppv_helper(contacts_x, contacts_y, ref_contact_map, ref_len, factor, ato
 
 
 def get_ppv(fasta_filename, c_filename, pdb_filename, factor=1.0,
-        min_score=-1.0, chain='', sep=' ', outfilename='', name='', noalign=False):  
+        min_score=-1.0, chain='', sep=' ', outfilename='', name='', noalign=False, min_dist=5, print_dist=False):  
     
     acc = fasta_filename.split('.')[-2][-5:-1]
 
@@ -71,7 +92,7 @@ def get_ppv(fasta_filename, c_filename, pdb_filename, factor=1.0,
     ref_len = len(seq)
 
     ### get top ranked predicted contacts
-    contacts = parse_contacts.parse(open(c_filename, 'r'), sep)
+    contacts = parse_contacts.parse(open(c_filename, 'r'), sep, min_dist=min_dist)
 
     contacts_x = []
     contacts_y = []
@@ -85,7 +106,7 @@ def get_ppv(fasta_filename, c_filename, pdb_filename, factor=1.0,
         c_y = contacts[i][2] - 1
 
         pos_diff = abs(c_x - c_y)
-        too_close = pos_diff < 5
+        too_close = pos_diff < min_dist
 
         if not too_close:
             contacts_x.append(c_x)
@@ -127,6 +148,8 @@ def get_ppv(fasta_filename, c_filename, pdb_filename, factor=1.0,
                 j += 1
 
         dist_mat = get_cb_contacts(gapped_cb_lst)
+        if print_dist:
+            print_distances(contacts_x, contacts_y, scores, dist_mat, atom_seq_ali=atom_seq_ali, outfile=outfilename)
         cb_cutoff = 8
         ref_contact_map = dist_mat < cb_cutoff
    
@@ -206,6 +229,8 @@ if __name__ == "__main__":
     p.add_argument('--chain', default='')
     p.add_argument('--noalign', action='store_true')
     p.add_argument('--name', default='')
+    p.add_argument('--min_dist', default=5, type=int)
+    p.add_argument('--print_dist', action='store_true')
 
     args = vars(p.parse_args(sys.argv[1:]))
 
@@ -226,7 +251,7 @@ if __name__ == "__main__":
         get_ppv(args['fasta_file'], args['contact_file'], args['pdb'],
                 args['factor'], chain=args['chain'], sep=sep,
                 outfilename=args['outfile'], noalign=args['noalign'],
-                min_score=args['score'], name=args['name'])
+                min_score=args['score'], name=args['name'], min_dist=args['min_dist'], print_dist=args['print_dist'])
     else:
         get_ppv_hbond(args['fasta_file'], args['contact_file'],
                 args['pdb'], args['factor'], sep=sep,
