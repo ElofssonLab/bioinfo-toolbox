@@ -160,7 +160,12 @@ def get_coordinates(pdbfile, chain):
             continue
 
         res_i = atm_record['res_no']
-        if res_i > 1000 and len(res_dict) < 1000:
+
+        if res_dict.keys():
+            min_res_i = min(res_dict.keys())
+        else:
+            min_res_i = res_i
+        if res_i > 1000 and len(res_dict) < 1000 and min_res_i + len(res_dict) < 1000:
             continue
         atm = [atm_record['x'], atm_record['y'], atm_record['z']]
 
@@ -221,7 +226,11 @@ def get_res_dict(pdbfile, chain):
 
         res_i = atm_record['res_no']
         
-        if res_i > 1000 and len(res_dict) < 1000:
+        if res_dict.keys():
+            min_res_i = min(res_dict.keys())
+        else:
+            min_res_i = res_i
+        if res_i > 1000 and len(res_dict) < 1000 and min_res_i + len(res_dict) < 1000:
             continue
 
         if atm_record['insert'] == 'X':
@@ -301,7 +310,11 @@ def get_atom_seq(pdbfile, chain='', model=1):
 
         res_i = atm_record['res_no']
 
-        if res_i > 1000 and len(res_dict) < 1000:
+        if res_dict.keys():
+            min_res_i = min(res_dict.keys())
+        else:
+            min_res_i = res_i
+        if res_i > 1000 and len(res_dict) < 1000 and min_res_i + len(res_dict) < 1000:
             continue
 
         if atm_record['insert'] == 'X':
