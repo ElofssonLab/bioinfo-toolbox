@@ -7,6 +7,13 @@ from scipy.spatial.distance import squareform
 
 from Bio.SubsMat import MatrixInfo
 
+from os.path import expanduser
+home = expanduser("~")
+sys.path.append(home + '/bioinfo-toolbox')
+
+from parsing import parse_hmm
+
+
 """
 TODO: MSP length approximation by Karlin and Altschul
 def calc_MSP(seq):
@@ -21,13 +28,13 @@ def calc_MSP(seq):
 
 
 def calc_dot_matrix(seq):
-"""
- calculates similarity score matrix for given sequence to itself
- according to the DOTTER dot-plot program
- Reference: Erik L.L. Sonnhammer, Richard Durbin - "A dot-matrix program 
+    """
+     calculates similarity score matrix for given sequence to itself
+     according to the DOTTER dot-plot program
+     Reference: Erik L.L. Sonnhammer, Richard Durbin - "A dot-matrix program 
             with dynamic threshold control suited for genomic DNA and protein
             sequence analysis" - Gene 167 (1996) 1-10
-"""
+    """
 
     aa_list = ['A', 'R', 'N', 'D', 'C', 'E', 'Q', 'G', 'H', 'I', 'L', 'K', 'M',
            'F', 'P', 'S', 'T', 'W', 'Y', 'V'] #, '-', 'B', 'Z', 'J']
@@ -73,21 +80,21 @@ def calc_dot_matrix(seq):
                 score = newsum[j] / float(W)
                 dot_matrix[i - W/2, j - W/2] = score
      
+    plt.imshow(dot_matrix, origin='lower', cmap=cm.binary)
+    plt.show()
     return dot_matrix
-    #plt.imshow(dot_matrix, origin='lower', cmap=cm.binary)
-    #plt.show()
     #print np.max(dot_matrix)
     #print np.min(dot_matrix)
 
 
 
 def calc_dot_matrix_profile(seq, profile):
-""" calculates similarity score matrix for given profile hmm to itself
-    according to the DOTTER dot-plot program
-    Reference: Erik L.L. Sonnhammer, Richard Durbin - "A dot-matrix program 
-        with dynamic threshold control suited for genomic DNA and protein
-        sequence analysis" - Gene 167 (1996) 1-10
-"""
+    """ calculates similarity score matrix for given profile hmm to itself
+        according to the DOTTER dot-plot program
+        Reference: Erik L.L. Sonnhammer, Richard Durbin - "A dot-matrix program 
+            with dynamic threshold control suited for genomic DNA and protein
+            sequence analysis" - Gene 167 (1996) 1-10
+    """
 
     aa_list = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P',
            'Q', 'R', 'S', 'T', 'V', 'W', 'Y'] #, '-', 'B', 'Z', 'J']
@@ -147,8 +154,8 @@ def calc_dot_matrix_profile(seq, profile):
                 score = newsum[j] / float(W)
                 dot_matrix[i - W/2, j - W/2] = score
      
-    #plt.imshow(dot_matrix, origin='lower', cmap=cm.binary)
-    #plt.show()
+    plt.imshow(dot_matrix, origin='lower', cmap=cm.binary)
+    plt.show()
     #print np.max(dot_matrix)
     #print np.min(dot_matrix)
     return dot_matrix
@@ -157,8 +164,24 @@ def calc_dot_matrix_profile(seq, profile):
 
 if __name__ == '__main__':
 
-    print 'Doing nothing.'
+    #print 'Doing nothing.'
+    seqfile = sys.argv[1]
 
+    seq = ''
+    with open(seqfile) as f:
+        for l in f:
+            if l.startswith('>'):
+                continue
+            else:
+                seq += l.strip()
+
+    if len(sys.argv) == 3:
+        hmmfile = sys.argv[2]
+        with open(hmmfile) as f:
+            profile = parse_hmm.read_hmm(f)
+        calc_dot_matrix_profile(seq, profile)
+    else:
+        calc_dot_matrix(seq)
 
 
 
