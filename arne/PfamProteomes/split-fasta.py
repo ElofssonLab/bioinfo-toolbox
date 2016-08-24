@@ -18,7 +18,7 @@ file=sys.argv[1]
 handle = open(file, 'rU')
 
 j=0
-cutoff=10000
+cutoff=1
 num=0
 OutFile = open(file + ".split-" + str(cutoff) +"-"  + str(j) +".fasta", 'w')
 InfoFile = open(file + ".split-" + str(cutoff) +"-"  + str(j) +".names", 'w')
