@@ -132,6 +132,8 @@ def get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, fac
     mixPPVs = []
     mixTPs = []
     mixFPs = []
+    longcount = 1.e-20
+    count = 1.e-20
     disocount = 1.e-20
     mixcount = 1.e-20
     ordercount = 1.e-20
@@ -459,13 +461,16 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
     mixcount = 1.e-20
     disocount = 1.e-20
     ordercount =1.e-20
+    longcount = 1.e-20
     highscore = 0
     numbins=20
     sum=0.0
+    longsum=0.0
     disosum=0.0
     ordersum=0.0
     mixsum=0.0
     average=0.0
+    longaverage=0.0
     mixaverage=0.0
     disoaverage=0.0
     orderaverage=0.0
@@ -475,6 +480,7 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
     doubletop=0
     mixcount=0
     mixtop=0
+    separation = 0.0
 
 
 
@@ -494,7 +500,7 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
         
         pos_diff = abs(c_x - c_y)
         too_close = pos_diff < 5
-
+        long_dist = pos_diff > 24
         if not too_close:
             if score > th:
                 contacts_x.append(c_x - start)
@@ -522,13 +528,20 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
                 if (count <= ref_len * factor):
                     sum += score
                     average=sum/count
+                separation += pos_diff
+                if long_dist:
+                    longcount += 1
+                    if (longcount <= ref_len * factor):
+                        longsum += score
+                        longaverage=longsum/longcount
         else:
             tooclose.append(score)
                 
+
 #    statline="Highs: %.1f (%.1f%%) (%.1f%%)  average:  %.2f (%.2f) (%.2f)  Meff: %.0f  Diso: %.1f%%  " % (count/ref_len,100*mixcount/count,100*disocount/count,average,mixaverage,disoaverage,max_cover,100*fraction_disorder)
 #    statline="Highs: %.1f %.3f %.3f  average:  %.2f %.2f %.2f  Meff: %.0f  Diso: %.3f  " % (count/ref_len,mixcount/count,disocount/count,average,mixaverage,disoaverage,max_cover,fraction_disorder)
 #    statline="Length: %d NumAli: %d Counts: %d %d %d %.3f %.3f %.3f %.3f\n"  % ( ref_len,max_cover,(count-mixcount-disocount),mixcount,disocount,sum,mixsum,disosum,fraction_disorder)
-    statline="NumAli: %d %d %d Length: %d %d %d Counts: %d %d %d %d  RelContacts: %.3f %.3f %.3f Disorder: %.3f \n"  % ( max_cover,cover_order,cover_disorder,ref_len,num_order,num_disorder,count,ordercount,mixcount,disocount,count/(ref_len+1.e-20),ordercount/(1.e-20+num_order),disocount/(1.e-20+num_disorder),fraction_disorder)
+    statline="NumAli: %d %d %d Length: %d %d %d Counts: %d %d %d %d  RelContacts: %.3f %.3f %.3f Disorder: %.3f Long: %.3f %.3f %.3f \n"  % ( max_cover,cover_order,cover_disorder,ref_len,num_order,num_disorder,count,ordercount,mixcount,disocount,count/(ref_len+1.e-20),ordercount/(1.e-20+num_order),disocount/(1.e-20+num_disorder),fraction_disorder,longcount/count,longcount/(ref_len+1.e-20),separation/count)
     statfig = plt.figure(figsize=(8, 8), dpi=96, facecolor='w')
     plt.hist((tooclose,scores), numbins,range=(0,1), histtype='bar',
              normed=(numbins,numbins), alpha=0.75,
