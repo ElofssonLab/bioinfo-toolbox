@@ -661,7 +661,7 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
         #statline = "Highs: %.3f  %.3f   %.3f    Aver: %.2f  Meff: %.0f  Diso: %.3f  " % (count/ref_len,disocount/count,doublecount/count,average,max_cover,fraction_disorder)
 
 
-    print "STATs: %s %s" % (fasta_filename,statline)
+    print "STATs: %s %s" % (c_filename,statline)
     if psipred_horiz_fname or psipred_vert_fname:
         if psipred_horiz_fname:
             ss = parse_psipred.horizontal(open(psipred_horiz_fname, 'r'))
@@ -812,11 +812,11 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
             pdb_acc = parse_pdb.get_acc(open(pdb_filename))
             if pdb_acc:
                 if chain:
-                    fig.suptitle('%s (PDB: %s, chain %s)\nPPV = %.2f %s' % (acc, pdb_acc, chain, PPVs[-1],statline))
+                    fig.suptitle('%s (PDB: %s, chain %s)\nPPV = %.2f\n%s' % (c_filename , pdb_acc, chain, PPVs[-1],statline),fontsize = 8)
                 else:
-                    fig.suptitle('%s (PDB: %s)\nPPV = %.2f %s' % (acc, pdb_acc, PPVs[-1],statline))
+                    fig.suptitle('%s (PDB: %s)\nPPV = %.2f \n%s' % (c_filename, pdb_acc, PPVs[-1],statline),fontsize = 8)
             else:
-                fig.suptitle('%s\nPPV = %.2f %s' % (acc, PPVs[-1],statline))
+                fig.suptitle('%s\nPPV = %.2f\n%s' % (c_filename, PPVs[-1],statline),fontsize = 8)
             #cmap = cm.get_cmap("binary")
             #cmap.set_bad([1,1,1,0])
             #contacts_np_masked = np.ma.array(contacts_np, mask=np.tri(contacts_np.shape[0], k=-1))
@@ -830,7 +830,7 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
             #    acc = c_filename.split('/')[1]
             #else:
             #    acc = c_filename.split('/')[-1]
-            fig.suptitle('%s\n%s' % (acc,statline))
+            fig.suptitle('%s\n%s' % (c_filename,statline),fontsize = 8)
             #sc = ax.imshow(contacts_np + contacts_np.T, cmap=cm.hot_r)
             #sc = ax.imshow(contacts_np + contacts_np.T,
             #        cmap=cm.binary, vmin=th, vmax=1.0, interpolation='none')
