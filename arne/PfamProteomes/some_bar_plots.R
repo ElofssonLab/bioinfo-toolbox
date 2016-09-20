@@ -1,18 +1,22 @@
 library(vioplot)
 library('plotrix')
 
-genomes=NULL
-genomes[1]="escherichia_coli.df"
-genomes[2]="saccharomyces_cerevisae.df"
-genomes[3]="homo_sapiens.df"
-genomes[4]="escherichia_coli.df.2015.blast.29.0"
-genomes[5]="escherichia_coli_ehec.df.2015.blast.29.0"
-genomes[6]="helicobacter_pylori.df.2015.blast.29.0"
-genomes[7]="staphylococcus_aureus_mrsa.df.2015.blast.29.0"
 
+df=NULL
+dfcov=NULL
+test=NULL
+genomes=NULL
+#genomes<-append(genomes,"escherichia_coli.df")
+#genomes<-append(genomes,"saccharomyces_cerevisae.df")
+#genomes<-append(genomes,"homo_sapiens.df")
+#genomes<-append(genomes,"escherichia_coli.df.2015.blast.29.0")
+genomes<-append(genomes,"escherichia_coli_ehec.df.2015.blast.29.0")
+genomes<-append(genomes,"helicobacter_pylori.df.2015.blast.29.0")
+genomes<-append(genomes,"staphylococcus_aureus_mrsa.df.2015.blast.29.0")
+num=0
                                         #genome="escherichia_coli"
 for (genome in genomes){
-
+num=num+1
 file=paste("data/",genome,".tsv",sep="")
 
 #dat<-read.table("escherichia_coli.df.tsv", sep='\t', header=T)
@@ -147,12 +151,22 @@ coverage[4]=length(which(dat$Pfam_ID != "" & dat$Pfam_Meff <= 100 & dat$PDB_ID =
 labels[4]="<100"
 coverage[5]=length(which(dat$Pfam_ID == "" & dat$PDB_ID == "" ))
 labels[5]="NoPfam"
-pct <- round(coverage/sum(coverage)*100)
+pct <- (coverage/sum(coverage))
 outfile=paste(genome,"-coverage-PDB2.png",sep="")
 png(outfile)
 pie(coverage,labels = labels, col=rainbow(length(labels)),main=genome)
 dev.off()
 
+df = append(df,pct)
+dfcov = append(dfcov,coverage)
+
 
 }    
-#Pfam.log <- log10(dat$Pfam_Meff)
+
+                                        #Pfam.log <- log10(dat$Pfam_Meff)
+test=matrix(c(df),nrow=5,ncol=num)
+
+outfile=paste("figures/genomes-bar.png",sep="")
+png(outfile,width=1280,height=1280)
+barplot(test,main="Fraction of proteins",legend=(labels),xlim=c(0,c(num+.5)),xlab="Specie",ylab="Percentage of proteins",cex.names=.75,cex.axis=2.,cex=1,names=genomes)
+dev.off()
