@@ -141,16 +141,32 @@ dev.off()
 # Fraction of residues with Pfam-coverage and Meff coverage=NULL
 coverage=NULL
 labels=NULL
-coverage[1]=length(which(dat$PDB_ID != "" ))
-labels[1]="PDB"
-coverage[2]=length(which(dat$Pfam_Meff > 1000 & dat$PDB_ID == ""))
-labels[2]=">1000"
-coverage[3]=length(which(dat$Pfam_Meff > 100 & dat$Pfam_Meff <= 1000 & dat$PDB_ID == ""))
-labels[3]=">100"
-coverage[4]=length(which(dat$Pfam_ID != "" & dat$Pfam_Meff <= 100 & dat$PDB_ID == ""))
-labels[4]="<100"
-coverage[5]=length(which(dat$Pfam_ID == "" & dat$PDB_ID == "" ))
-labels[5]="NoPfam"
+colors=NULL
+coverage<-append(coverage,length(which(dat$PDB_ID != "" & dat$PDB_E.value == 0)))
+labels<-append(labels,"PDB")
+colors<-append(colors,"black")
+
+coverage<-append(coverage,length(which(dat$PDB_ID != "" & dat$PDB_E.value > 0 )))
+labels<-append(labels,"Homology")
+colors<-append(colors,"grey80")
+
+coverage<-append(coverage,length(which(dat$Pfam_Meff > 1000 & dat$PDB_ID == "")))
+labels<-append(labels,"Meff >1000")
+colors<-append(colors,"Red")
+
+coverage<-append(coverage,length(which(dat$Pfam_Meff > 100 & dat$Pfam_Meff <= 1000 & dat$PDB_ID == "")))
+labels<-append(labels,"Meff >100")
+colors<-append(colors,"green")
+
+coverage<-append(coverage,length(which(dat$Pfam_ID != "" & dat$Pfam_Meff <= 100 & dat$PDB_ID == "")))
+labels<-append(labels,"Meff < 100")
+colors<-append(colors,"lightblue")
+
+
+coverage<-append(coverage,length(which(dat$Pfam_ID == "" & dat$PDB_ID == "" )))
+labels<-append(labels,"NoPfam")
+colors<-append(colors,"white")
+
 pct <- (coverage/sum(coverage))
 outfile=paste(genome,"-coverage-PDB2.png",sep="")
 png(outfile)
@@ -164,9 +180,10 @@ dfcov = append(dfcov,coverage)
 }    
 
                                         #Pfam.log <- log10(dat$Pfam_Meff)
-test=matrix(c(df),nrow=5,ncol=num)
+rows=length(colors)
+test=matrix(c(df*100),nrow=rows,ncol=num)
 
 outfile=paste("figures/genomes-bar.png",sep="")
 png(outfile,width=1280,height=1280)
-barplot(test,main="Fraction of proteins",legend=(labels),xlim=c(0,c(num+.5)),xlab="Specie",ylab="Percentage of proteins",cex.names=.75,cex.axis=2.,cex=1,names=genomes)
+barplot(test,main="Precentage of Residues",col=colors,legend=(labels),xlim=c(0,c(num+.5)),xlab="Specie",ylab="Percentage of residues",cex.names=1,cex.axis=1.,cex=1,names=genomes)
 dev.off()
