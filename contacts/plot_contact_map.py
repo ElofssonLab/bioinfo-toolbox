@@ -7,6 +7,7 @@ from math import *
 sys.path.append('/sw/apps/bioinfo/biopython/1.59/tintin/lib/python')
 
 from Bio import pairwise2
+from Bio.SubsMat import MatrixInfo as matlist
 
 import numpy as np
 
@@ -26,6 +27,8 @@ import parse_contacts
 import parse_psipred
 import parse_fasta
 import parse_pdb
+import parse_hhblits_hhr
+import parse_a3m
 
 
 def s_score(d, d0):
@@ -90,7 +93,7 @@ def get_cb_contacts(gapped_cb_lst):
 
 
 
-def get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, factor):
+def get_ppvs(contacts_x, contacts_y, ref_contact_map, ref_len, factor, atom_seq_ali=[]):
 
     PPVs = []
     TPs = []
@@ -102,10 +105,11 @@ def get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, fac
         for i in range(num_c):
             c_x = contacts_x[i]
             c_y = contacts_y[i]
-            if atom_seq_ali[c_x] == '-':
-                continue
-            if atom_seq_ali[c_y] == '-':
-                continue
+            if atom_seq_ali:
+                if atom_seq_ali[c_x] == '-':
+                    continue
+                if atom_seq_ali[c_y] == '-':
+                    continue
             if ref_contact_map[c_x, c_y] > 0:
                 TP += 1.0 / (ref_len*factor)
             else:
@@ -127,21 +131,22 @@ def get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, fac
     return PPVs, TPs, FPs
 
 
-def get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali):
+def get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali=[]):
 
     tp_colors = []
 
     for i in range(len(contacts_x)):
         c_x = contacts_x[i]
         c_y = contacts_y[i]
-        if atom_seq_ali[c_x] == '-':
-            #tp_colors.append('green')
-            tp_colors.append('red')
-            continue
-        if atom_seq_ali[c_y] == '-':
-            #tp_colors.append('green')
-            tp_colors.append('red')
-            continue
+        if atom_seq_ali:
+            if atom_seq_ali[c_x] == '-':
+                #tp_colors.append('green')
+                tp_colors.append('red')
+                continue
+            if atom_seq_ali[c_y] == '-':
+                #tp_colors.append('green')
+                tp_colors.append('red')
+                continue
         if ref_contact_map[c_x, c_y] > 0:
             tp_colors.append('blue')
         else:
@@ -150,7 +155,7 @@ def get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali):
     return tp_colors
  
 
-def get_colors(contacts_np, ref_contact_map=[], atom_seq_ali=[], th=0.5):
+def get_colors(contacts_np, ref_contact_map=[], th=0.5):
 
     N = contacts_np.shape[0]
     img = np.ones((N,N,4))
@@ -161,6 +166,7 @@ def get_colors(contacts_np, ref_contact_map=[], atom_seq_ali=[], th=0.5):
                 continue
             sc = contacts_np[i,j]
             if len(ref_contact_map) > 0:
+                #print N, ref_contact_map.shape[0]
                 assert N == ref_contact_map.shape[0]
                 # FN
                 if sc <= th and ref_contact_map[i,j] < 8:
@@ -234,7 +240,74 @@ def get_meff_coverage(meff_file):
     return meff_lst
 
 
-def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psipred_horiz_fname='', psipred_vert_fname='', pdb_filename='', is_heavy=False, chain='', sep=',', outfilename='', ali_filename='',  meff_filename='', name='', start=0, end=-1):  
+def is_gap(symbol):
+    return symbol == '-'
+
+
+def embedd_alignment(target_0, target_1, source_0, source_1):
+    """ Embedds pairwise alignment (source) in another pairwise alignment (target), 
+        where unaligned target_1 is identical to unaligned source_0.
+    """
+    #print target_1
+    #print source_0
+    assert target_1.replace('-','') == source_0.replace('-','')
+
+    result_0 = ''
+    result_1 = ''
+
+    i = 0
+    j = 0
+    #sys.stdout.write('\n')
+    while i < len(target_0):
+        t_0i = target_0[i] 
+        t_1i = target_1[i]
+        
+        if not is_gap(t_0i) and is_gap(t_1i):
+            #sys.stdout.write('%s' % t_0i)
+            #sys.stdout.write('%s' % '-')
+            result_0 += t_0i
+            result_1 += '-'
+            i += 1
+        elif not is_gap(t_0i) and not is_gap(t_1i):
+            s_0j = source_0[j]
+            s_1j = source_1[j]
+            #sys.stdout.write('%s' % s_0j)
+            #sys.stdout.write('%s' % s_1j)
+            result_0 += s_0j
+            result_1 += s_1j
+            if not is_gap(s_0j):
+                i += 1
+            j += 1
+        elif is_gap(t_0i):
+            s_0j = source_0[j]
+            s_1j = source_1[j]
+            #sys.stdout.write('%s' % '-')
+            #sys.stdout.write('%s' % s_1j)
+            result_0 += '-'
+            result_1 += s_1j 
+            if not is_gap(s_0j):
+                i += 1
+            j += 1
+    
+    while j < len(source_0):
+        result_0 += '-'
+        result_1 += source_1[j] 
+        j += 1
+
+    #print result_0
+    #print result_1
+    #print result_1.replace('-','')
+    #print source_1.replace('-','')
+    assert result_0.replace('-','') == target_0.replace('-','')
+    assert result_1.replace('-','') == source_1.replace('-','')
+
+    return result_0, result_1
+
+
+
+
+
+def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psipred_horiz_fname='', psipred_vert_fname='', pdb_filename='', is_heavy=False, chain='', sep=',', outfilename='', ali_filename='',  meff_filename='', name='', start=0, end=-1, pdb_start=0, pdb_end=-1, noalign=False, pdb_alignment='', pdb_id=''):
   
     #acc = c_filename.split('.')[0]
     #acc = fasta_filename.split('.')[0][:4]
@@ -254,7 +327,6 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
     seq = seq[start:end]
     ref_len = len(seq)
     unit = (ref_len/50.0)
-
 
     ### get top "factor" * "ref_len" predicted contacts
     contacts = parse_contacts.parse(open(c_filename, 'r'), sep)
@@ -288,11 +360,14 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
             scores.append(score)
             count += 1
            
-        if count >= ref_len * factor:
-        #if score < th:
-            if th == -1:
-                th = score
+        if count >= ref_len * factor and th == -1:
+            th = score
             break
+        
+        if score < th and not th == -1:
+            factor = count/float(ref_len)
+            break
+
  
 
     ### start plotting
@@ -398,49 +473,101 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
         res_lst = parse_pdb.get_coordinates(open(pdb_filename, 'r'), chain)
         cb_lst = parse_pdb.get_cb_coordinates(open(pdb_filename, 'r'), chain)
         atom_seq = parse_pdb.get_atom_seq(open(pdb_filename, 'r'), chain)
-                
-        align = pairwise2.align.globalms(atom_seq, seq, 2, -1, -0.5, -0.1)
 
-        atom_seq_ali = align[-1][0]
-        seq_ali = align[-1][1]
+        # if not true there is some serious problem with the provided pdb file
+        assert len(res_lst) == len(cb_lst) == len(atom_seq)
 
-        #print atom_seq_ali
-        #print seq_ali
+        ### trim PDB sequence according to given positions
+        ### default: take full sequence
+        if pdb_end == -1:
+            pdb_end = len(res_lst)
+        res_lst = res_lst[pdb_start:pdb_end]
+        cb_lst = cb_lst[pdb_start:pdb_end]
+        atom_seq = atom_seq[pdb_start:pdb_end]
 
-        j = 0
-        gapped_res_lst = []
-        gapped_cb_lst = []
+        #print atom_seq
+        #print seq
 
-        for i in xrange(len(atom_seq_ali)):
-            if atom_seq_ali[i] == '-':
-                gapped_res_lst.append('-')
-                gapped_cb_lst.append('-')
-            elif seq_ali[i] == '-':
-                j += 1
-                continue
-            else:
-                gapped_res_lst.append(res_lst[j])
-                gapped_cb_lst.append(cb_lst[j])
-                j += 1
-
-        if is_heavy:
-            dist_mat = get_heavy_contacts(gapped_res_lst)
-            heavy_cutoff = 5
-            ref_contact_map = dist_mat < heavy_cutoff
-            ref_contacts = np.where(dist_mat < heavy_cutoff)
-        else:
-            dist_mat = get_cb_contacts(gapped_cb_lst)
+        if noalign:
+            dist_mat = get_cb_contacts(cb_lst)
             cb_cutoff = 8
             ref_contact_map = dist_mat < cb_cutoff
-            ref_contacts = np.where(dist_mat < cb_cutoff)
-            #ref_contacts = np.where(np.ma.array(dist_mat, mask=np.tri(dist_mat.shape[0]), fill_value=float("inf")) < cb_cutoff)
-        
-        ref_contacts_x = ref_contacts[0]
-        ref_contacts_y = ref_contacts[1]
+            PPV, TP, FP = get_ppvs(contacts_x, contacts_y, ref_contact_map, ref_len, factor)
+            tp_colors = get_tp_colors(contacts_x, contacts_y, ref_contact_map)
+            img = get_colors(contacts_np, ref_contact_map=dist_mat, th=th)
 
-        PPVs, TPs, FPs = get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, factor)
-        tp_colors = get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali)
-        img = get_colors(contacts_np, ref_contact_map=dist_mat, atom_seq_ali=atom_seq_ali, th=th)
+        else:
+            if pdb_alignment and pdb_id:
+                #align = parse_hhblits_hhr.parse_alignments(pdb_alignment)[pdb_id]
+                #atom_seq_ali = align[0][0]
+                #seq_ali = align[0][1]
+                seq_ali, atom_seq_ali = parse_a3m.get_pairwise(pdb_alignment, pdb_id)
+                seqres_seq = atom_seq_ali.replace('-', '')
+                #print seqres_seq
+                
+                #print atom_seq_ali
+                #print seq_ali
+                #print ""
+                align_seqres = pairwise2.align.globalms(atom_seq, seqres_seq, 2, -1, -0.5, -0.1)
+                atom_seq_ali0 = align_seqres[-1][0]
+                seqres_seq_ali0 = align_seqres[-1][1]
+                #print ""
+                #print atom_seq_ali0
+                #print seqres_seq_ali0
+                #print ""
+                atom_seq_ali, seq_ali = embedd_alignment(atom_seq_ali0, seqres_seq_ali0, atom_seq_ali, seq_ali)
+                #print atom_seq_ali1
+                #print seq_ali1
+                #print ""
+            else:
+                matrix = matlist.blosum62
+                #align = pairwise2.align.globalms(atom_seq, seq, 2, -1, -0.5, -0.1)
+                #align = pairwise2.align.localds(atom_seq, seq, matrix, -11, -1)
+                align = pairwise2.align.globalds(atom_seq, seq, matrix, -25, -1)
+                atom_seq_ali = align[-1][0]
+                seq_ali = align[-1][1]
+
+            #print atom_seq_ali
+            #print seq_ali
+            #print len(atom_seq), len(seq), len(res_lst), len(cb_lst)
+            #print len(atom_seq_ali), len(seq_ali)
+
+            j = 0
+            gapped_res_lst = []
+            gapped_cb_lst = []
+
+            for i in xrange(len(atom_seq_ali)):
+                if atom_seq_ali[i] == '-':
+                    if seq_ali[i] == '-':
+                        continue
+                    gapped_res_lst.append('-')
+                    gapped_cb_lst.append('-')
+                elif seq_ali[i] == '-':
+                    j += 1
+                else:
+                    gapped_res_lst.append(res_lst[j])
+                    gapped_cb_lst.append(cb_lst[j])
+                    j += 1
+
+            if is_heavy:
+                dist_mat = get_heavy_contacts(gapped_res_lst)
+                heavy_cutoff = 5
+                ref_contact_map = dist_mat < heavy_cutoff
+                ref_contacts = np.where(dist_mat < heavy_cutoff)
+            else:
+                dist_mat = get_cb_contacts(gapped_cb_lst)
+                cb_cutoff = 8
+                ref_contact_map = dist_mat < cb_cutoff
+                ref_contacts = np.where(dist_mat < cb_cutoff)
+                #ref_contacts = np.where(np.ma.array(dist_mat, mask=np.tri(dist_mat.shape[0]), fill_value=float("inf")) < cb_cutoff)
+            
+            ref_contacts_x = ref_contacts[0]
+            ref_contacts_y = ref_contacts[1]
+
+            PPVs, TPs, FPs = get_ppvs(contacts_x, contacts_y, ref_contact_map, ref_len, factor, atom_seq_ali=atom_seq_ali)
+            tp_colors = get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali=atom_seq_ali)
+            img = get_colors(contacts_np, ref_contact_map=dist_mat, th=th)
+
         sc = ax.imshow(img, interpolation='none')
    
         print '%s %s %s %s' % (acc, PPVs[-1], TPs[-1], FPs[-1])
@@ -558,6 +685,8 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
             pp = PdfPages(outfilename)
             pp.savefig(fig)
             pp.close()
+        elif outfilename.endswith('.eps'):
+            plt.savefig(outfilename, format='eps', dpi=300)
         elif outfilename.endswith('.png'):
             plt.savefig(outfilename)
         else:
@@ -590,6 +719,11 @@ if __name__ == "__main__":
     p.add_argument('--name', default='')
     p.add_argument('--start', default=0, type=int)
     p.add_argument('--end', default=-1, type=int)
+    p.add_argument('--pdb_start', default=0, type=int)
+    p.add_argument('--pdb_end', default=-1, type=int)
+    p.add_argument('--noalign', action='store_true')
+    p.add_argument('--pdb_alignment', default='')
+    p.add_argument('--pdb_id', default='')
 
     args = vars(p.parse_args(sys.argv[1:]))
 
@@ -606,5 +740,5 @@ if __name__ == "__main__":
     else:
         sep = '\t'
     
-    plot_map(args['fasta_file'], args['contact_file'], factor=args['factor'], th=args['threshold'], c2_filename=args['c2'], psipred_horiz_fname=args['psipred_horiz'], psipred_vert_fname=args['psipred_vert'], pdb_filename=args['pdb'], is_heavy=args['heavy'], chain=args['chain'], sep=sep, outfilename=args['outfile'], ali_filename=args['alignment'], meff_filename=args['meff'], name=args['name'], start=args['start'], end=args['end'])
+    plot_map(args['fasta_file'], args['contact_file'], factor=args['factor'], th=args['threshold'], c2_filename=args['c2'], psipred_horiz_fname=args['psipred_horiz'], psipred_vert_fname=args['psipred_vert'], pdb_filename=args['pdb'], is_heavy=args['heavy'], chain=args['chain'], sep=sep, outfilename=args['outfile'], ali_filename=args['alignment'], meff_filename=args['meff'], name=args['name'], start=args['start'], end=args['end'], pdb_start=args['pdb_start'], pdb_end=args['pdb_end'], noalign=args['noalign'], pdb_alignment=args['pdb_alignment'], pdb_id=args['pdb_id'])
 

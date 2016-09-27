@@ -4,10 +4,17 @@ for i in "$@"
 do
     j=`basename $i .PconsC3.l5  `
     j=`basename $j .PconsC3.l4  `
+    j=`basename $j .PconsC3.l3  `
+    j=`basename $j .pconsc3.l5  `
+    j=`basename $j .pconsc3.l4  `
+    j=`basename $j .pconsc3.l3  `
     j=`basename $j .rr`
     j=`basename $j .gdca`
     j=`basename $j .0.02.plm20`
-    f=`echo $i | sed -E "s/.*JH0.001.//"`
+#    f=`echo $i | sed -E "s/.*JH1.//"`
+#    f=`echo $f | sed -E "s/.*HH.//"`
+#    f=`echo $i | sed -E "s/.*jhE.//"`
+#    f=`echo $f | sed -E "s/.*hhE.//"`
     k=`echo $j | sed -E "s/\.fa.*//" | sed -E "s/\.fasta.*//"`
     l=`echo $k | sed -E "s/DisProt-//" | sed -E "s/\-uniprot.*//"`
     if [ -e $k.fa ]
@@ -22,10 +29,10 @@ do
 	p=$p" --iupred $k-iupred-long.txt " 
     fi
 
-    if [ -e $j.gneff ]
-    then
-	p=$p" --meff $j.gneff  "
-    fi
+#    if [ -e $j.gneff ]
+#    then#
+#	p=$p" --meff $j.gneff  "
+#    fi
     if [ -e $l.pdb ]
     then
 	p=$p" --pdb $l.pdb  "
@@ -38,6 +45,9 @@ do
     then
 	p=$p" --psipred_vert $j.ss2  "
     fi
-    ~/git/bioinfo-toolbox/contacts/ArneAnalysis/plot_contact_map.py --cutoff 0.4 $p    $k.$e $j.$f
+    if [ ! -e $i\_ContactMap\.pdf ]
+	then
+	~/git/bioinfo-toolbox/contacts/ArneAnalysis/plot_contact_map.py --threshold 0.4 --factor 1.0 $p    $k.$e $i
     #~/git/bioinfo-toolbox/contacts/ArneAnalysis/analyse_predictions.py --cutoff 0.4 $p $k.$e $j.$f
+    fi
 done

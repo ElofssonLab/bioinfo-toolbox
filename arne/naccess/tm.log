@@ -1,0 +1,67 @@
+ ACCALL - Accessibility calculations
+ MAX RESIDUES     5000
+ MAX ATOMS/RES     100
+ PDB FILE INPUT tm.pdb
+ PROBE SIZE       1.40
+ Z-SLICE WIDTH    .050
+ VDW RADII FILE vdw.radii
+ EXCL HETATOMS
+ EXCL HYDROGENS
+ EXCL WATERS
+ READVDW  32 residues input
+ NON-STANDARD atom.| CD | in residue> ILE A  48 
+ ASSUMED vdw of  CD  in ILE A  48  =  1.87 (same as ARG)
+ NON-STANDARD atom.| CD | in residue> ILE A  54 
+ ASSUMED vdw of  CD  in ILE A  54  =  1.87 (same as ARG)
+ NON-STANDARD atom.| E21| in residue> GLN A  64 
+ GUESSED vdw of  E21 in GLN A  64  =  1.80
+ NON-STANDARD atom.| E22| in residue> GLN A  64 
+ GUESSED vdw of  E22 in GLN A  64  =  1.80
+ NON-STANDARD atom.| C  | in residue> GLN A  64 
+ ASSUMED vdw of  C   in GLN A  64  =  1.76 (same as ALA)
+ NON-STANDARD atom.| CD | in residue> ILE A  75 
+ ASSUMED vdw of  CD  in ILE A  75  =  1.87 (same as ARG)
+ NON-STANDARD atom.| CD | in residue> ILE A 123 
+ ASSUMED vdw of  CD  in ILE A 123  =  1.87 (same as ARG)
+ NON-STANDARD atom.| CD | in residue> ILE A 133 
+ ASSUMED vdw of  CD  in ILE A 133  =  1.87 (same as ARG)
+ NON-STANDARD atom.| CD | in residue> ILE A 154 
+ ASSUMED vdw of  CD  in ILE A 154  =  1.87 (same as ARG)
+ NON-STANDARD atom.| CD | in residue> ILE A 205 
+ ASSUMED vdw of  CD  in ILE A 205  =  1.87 (same as ARG)
+ NON-STANDARD atom.| CD | in residue> ILE A 213 
+ ASSUMED vdw of  CD  in ILE A 213  =  1.87 (same as ARG)
+ NON-STANDARD atom.| CD | in residue> ILE A 214 
+ ASSUMED vdw of  CD  in ILE A 214  =  1.87 (same as ARG)
+ NON-STANDARD atom.| CD | in residue> ILE A 217 
+ ASSUMED vdw of  CD  in ILE A 217  =  1.87 (same as ARG)
+ NON-STANDARD atom.| CD | in residue> ILE A 219 
+ ASSUMED vdw of  CD  in ILE A 219  =  1.87 (same as ARG)
+ NON-STANDARD atom.| E21| in residue> GLN A 225 
+ GUESSED vdw of  E21 in GLN A 225  =  1.80
+ NON-STANDARD atom.| E22| in residue> GLN A 225 
+ GUESSED vdw of  E22 in GLN A 225  =  1.80
+ NON-STANDARD atom.| C  | in residue> GLN A 225 
+ ASSUMED vdw of  C   in GLN A 225  =  1.76 (same as ALA)
+ NON-STANDARD atom.| CD | in residue> ILE A 255 
+ ASSUMED vdw of  CD  in ILE A 255  =  1.87 (same as ARG)
+ NON-STANDARD atom.| CD | in residue> ILE A 256 
+ ASSUMED vdw of  CD  in ILE A 256  =  1.87 (same as ARG)
+ NON-STANDARD atom.| CD | in residue> ILE A 259 
+ ASSUMED vdw of  CD  in ILE A 259  =  1.87 (same as ARG)
+ NON-STANDARD atom.| CD | in residue> ILE A 263 
+ ASSUMED vdw of  CD  in ILE A 263  =  1.87 (same as ARG)
+ NON-STANDARD atom.| CD | in residue> ILE A 290 
+ ASSUMED vdw of  CD  in ILE A 290  =  1.87 (same as ARG)
+ NON-STANDARD atom.| CD | in residue> ILE A 305 
+ ASSUMED vdw of  CD  in ILE A 305  =  1.87 (same as ARG)
+ NON-STANDARD atom.| CD | in residue> ILE A 307 
+ ASSUMED vdw of  CD  in ILE A 307  =  1.87 (same as ARG)
+ ADDED VDW RADII
+ CHAINS       1
+ RESIDUES   171
+ ATOMS     1364
+ SOLVA: PROGRAM ENDS CORRECTLY
+ CALCULATED ATOMIC ACCESSIBILITES
+ RELATIVE (STANDARD) ACCESSIBILITIES READFOR  20 AMINO ACIDS
+ SUMMED ACCESSIBILITIES OVER RESIDUES
