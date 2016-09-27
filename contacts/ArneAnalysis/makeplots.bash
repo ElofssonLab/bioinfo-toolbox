@@ -15,15 +15,23 @@ do
 #    f=`echo $f | sed -E "s/.*HH.//"`
 #    f=`echo $i | sed -E "s/.*jhE.//"`
 #    f=`echo $f | sed -E "s/.*hhE.//"`
-    k=`echo $j | sed -E "s/\.fa.*//" | sed -E "s/\.fasta.*//"`
+    k=`echo $j | sed -E "s/\.fa.*//" | sed -E "s/\.fasta.*//" | sed -E "s/\.seq.*//"`
     l=`echo $k | sed -E "s/DisProt-//" | sed -E "s/\-uniprot.*//"`
+    
     if [ -e $k.fa ]
     then
 	e="fa"
+    elif [ -e $k.fasta ]
+    then
+	 e="fasta"
+    elif [ -e $k.seq ]
+    then
+	 e="seq"
     else
 	e="fasta"
     fi
     p=' '
+
     if [ -e $k-iupred-long.txt ]
     then
 	p=$p" --iupred $k-iupred-long.txt " 
