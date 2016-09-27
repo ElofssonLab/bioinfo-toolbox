@@ -2,13 +2,18 @@ library(vioplot)
 library('plotrix')
 
 genomes=NULL
-genomes[1]="escherichia_coli"
-genomes[2]="saccharomyces_cerevisae"
-genomes[3]="homo_sapiens"
-#genome="escherichia_coli"
+genomes[1]="escherichia_coli.df"
+#genomes[2]="saccharomyces_cerevisae.df"
+#genomes[3]="homo_sapiens.df"
+#genomes[4]="escherichia_coli.df.2015.blast.29.0"
+#genomes[5]="escherichia_coli_ehec.df.2015.blast.29.0"
+#genomes[6]="helicobacter_pylori.df.2015.blast.29.0"
+#genomes[7]="staphylococcus_aureus_mrsa.df.2015.blast.29.0"
+
+                                        #genome="escherichia_coli"
 for (genome in genomes){
 
-file=paste("data/",genome,".df.tsv",sep="")
+file=paste("data/",genome,".tsv",sep="")
 
 #dat<-read.table("escherichia_coli.df.tsv", sep='\t', header=T)
 #dat<-read.table("saccharomyces_cerevisae.df.tsv", sep='\t', header=T)
@@ -154,15 +159,15 @@ labels=NULL
 coverage[1]=length(which(dat$Pfam_ID == "" ))
 labels[1]="NoPfam"
 coverage[2]=length(which(dat$Pfam_Meff > 1000))
-labels[2]=">1000"
+labels[2]="Pfam >1000"
 coverage[3]=length(which(dat$Pfam_Meff > 500 & dat$Pfam_Meff <= 1000))
-labels[3]=">500"
+labels[3]="Pfam >500"
 coverage[4]=length(which(dat$Pfam_Meff > 200 & dat$Pfam_Meff <= 500))
-labels[4]=">200"
+labels[4]="Pfam >200"
 coverage[5]=length(which(dat$Pfam_Meff > 100 & dat$Pfam_Meff <= 200))
-labels[5]=">100"
-coverage[6]=length(which(dat$Pfam_ID != "" & dat$Pfam_Meff))
-labels[6]="Pfam"
+labels[5]="Pfam >100"
+coverage[6]=length(which(dat$Pfam_ID != "" & dat$Pfam_Meff <= 100))
+labels[6]="Pfam < 100"
 pct <- round(coverage/sum(coverage)*100)
 outfile=paste(genome,"-coverage.pdf",sep="")
 pdf(outfile)
@@ -216,12 +221,12 @@ covdisorder[5]=length(which(dat$Pfam_Meff > 500 & dat$Pfam_Meff <= 1000 & dat$Di
 covorder[11]=length(which(dat$Pfam_Meff > 500 & dat$Pfam_Meff <= 1000 & dat$Disorder>=0.5))
 dislabels[5]=">500"
 labels[11]=">500 diso"
-colors[11]="deepink3"
+colors[11]="deeppink3"
 covdisorder[4]=length(which(dat$Pfam_Meff > 200 & dat$Pfam_Meff <= 500 & dat$Disorder>=0.5))
 covorder[10]=length(which(dat$Pfam_Meff > 200 & dat$Pfam_Meff <= 500 & dat$Disorder>=0.5))
 dislabels[4]=">200"
 labels[10]=">200 diso"
-colors[10]="deepink2"
+colors[10]="deeppink2"
 covdisorder[3]=length(which(dat$Pfam_Meff > 100 & dat$Pfam_Meff <= 200 & dat$Disorder>=0.5))
 covorder[9]=length(which(dat$Pfam_Meff > 100 & dat$Pfam_Meff <= 200 & dat$Disorder>=0.5))
 dislabels[3]=">100"
@@ -248,6 +253,13 @@ outfile=paste(genome,"-pie-all.pdf",sep="")
 pdf(outfile)
 pie(covorder,labels = labels, col=colors   ,main=genome,cex=0.3)
 dev.off()
+dev.off()
+
+#outfile=paste(genome,"-bar-all.png",sep="")
+#png(outfile)
+#pie(covorder,labels = labels, col=colors   ,main=genome,cex=0.3)
+#barplot(covorder,col=colors,legend=labels,xlim=c(0,4.5),xlab="X",ylab="Number or proteins") #,names=years,cex.names=2,cex.axis=2.,cex=2)
+#dev.off()
 
 
 # FOr ordered and disordered residues
@@ -297,12 +309,12 @@ covdisorder[5]=length(which(dat$Pfam_Meff > 500 & dat$Pfam_Meff <= 1000 & dat$Di
 covorder[11]=length(which(dat$Pfam_Meff > 500 & dat$Pfam_Meff <= 1000 & dat$Disorder>=0.5 & dat$PDB_ID == ""))
 dislabels[5]=">500"
 labels[11]=">500 diso"
-colors[9]="deepink3"
+colors[9]="deeppink3"
 covdisorder[4]=length(which(dat$Pfam_Meff > 200 & dat$Pfam_Meff <= 500 & dat$Disorder>=0.5 & dat$PDB_ID == ""))
 covorder[10]=length(which(dat$Pfam_Meff > 200 & dat$Pfam_Meff <= 500 & dat$Disorder>=0.5 & dat$PDB_ID == ""))
 dislabels[4]=">200"
 labels[10]=">200 diso"
-colors[9]="deepink2"
+colors[9]="deeppink2"
 covdisorder[3]=length(which(dat$Pfam_Meff > 100 & dat$Pfam_Meff <= 200 & dat$Disorder>=0.5 & dat$PDB_ID == ""))
 covorder[9]=length(which(dat$Pfam_Meff > 100 & dat$Pfam_Meff <= 200 & dat$Disorder>=0.5 & dat$PDB_ID == ""))
 dislabels[3]=">100"
@@ -396,12 +408,12 @@ covdisorder[5]=length(which(dat$Pfam_Meff > 500 & dat$Pfam_Meff <= 1000 & dat$Di
 covorder[11]=length(which(dat$Pfam_Meff > 500 & dat$Pfam_Meff <= 1000 & dat$Disorder>=0.5 & dat$PDB_ID == ""))
 dislabels[5]=">500"
 labels[11]=">500 diso"
-colors[9]="deepink3"
+colors[9]="deeppink3"
 covdisorder[4]=length(which(dat$Pfam_Meff > 200 & dat$Pfam_Meff <= 500 & dat$Disorder>=0.5 & dat$PDB_ID == ""))
 covorder[10]=length(which(dat$Pfam_Meff > 200 & dat$Pfam_Meff <= 500 & dat$Disorder>=0.5 & dat$PDB_ID == ""))
 dislabels[4]=">200"
 labels[10]=">200 diso"
-colors[9]="deepink2"
+colors[9]="deeppink2"
 covdisorder[3]=length(which(dat$Pfam_Meff > 100 & dat$Pfam_Meff <= 200 & dat$Disorder>=0.5 & dat$PDB_ID == ""))
 covorder[9]=length(which(dat$Pfam_Meff > 100 & dat$Pfam_Meff <= 200 & dat$Disorder>=0.5 & dat$PDB_ID == ""))
 dislabels[3]=">100"
@@ -514,12 +526,12 @@ covdisorder[5]=length(which(dat$Pfam_Meff > 500 & dat$Pfam_Meff <= 1000 & dat$Di
 covorder[11]=length(which(dat$Pfam_Meff > 500 & dat$Pfam_Meff <= 1000 & dat$Disorder>=0.5 & dat$PDB_ID != ""))
 dislabels[5]=">500"
 labels[11]=">500 diso"
-colors[9]="deepink3"
+colors[9]="deeppink3"
 covdisorder[4]=length(which(dat$Pfam_Meff > 200 & dat$Pfam_Meff <= 500 & dat$Disorder>=0.5 & dat$PDB_ID != ""))
 covorder[10]=length(which(dat$Pfam_Meff > 200 & dat$Pfam_Meff <= 500 & dat$Disorder>=0.5 & dat$PDB_ID != ""))
 dislabels[4]=">200"
 labels[10]=">200 diso"
-colors[9]="deepink2"
+colors[9]="deeppink2"
 covdisorder[3]=length(which(dat$Pfam_Meff > 100 & dat$Pfam_Meff <= 200 & dat$Disorder>=0.5 & dat$PDB_ID != ""))
 covorder[9]=length(which(dat$Pfam_Meff > 100 & dat$Pfam_Meff <= 200 & dat$Disorder>=0.5 & dat$PDB_ID != ""))
 dislabels[3]=">100"
@@ -545,8 +557,10 @@ labels <- paste(labels,"%",sep="")
 outfile=paste(genome,"-pie-all-PDB.png",sep="")
 png(outfile)
 pie(covorder,labels = labels, col=colors   ,main=genome,cex=0.3)
-dev.off()
 
+
+
+#barplot(test,col=rev(colorssort),main="E. Coli",legend=rev(names),xlim=c(0,4.5),xlab="Year",ylab="Number or proteins",names=years,cex.names=2,cex.axis=2.,cex=2)
 
 }    
 #Pfam.log <- log10(dat$Pfam_Meff)
