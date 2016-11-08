@@ -155,7 +155,7 @@ def get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali=[]):
     return tp_colors
  
 
-def get_colors(contacts_np, ref_contact_map=[], th=0.5):
+def get_colors(contacts_np, ref_contact_map=[], th=0.5, binary=False):
 
     N = contacts_np.shape[0]
     img = np.ones((N,N,4))
@@ -186,10 +186,14 @@ def get_colors(contacts_np, ref_contact_map=[], th=0.5):
                     #img[j,i] = [1-sc,1-sc,1-sc,1]
                 # grey zone between 8 and 12 Angstroem
                 elif sc > th and (ref_contact_map[i,j] < 12 or ref_contact_map[i,j] >= 8):
-                    val = (ref_contact_map[i,j] - 8)/(12 - 8)
-                    img[i,j] = [0.5+val/2,1-val/2,0,1]
-                    img[j,i] = [0.5+val/2,1-val/2,0,1]
-                    #img[j,i] = [1-sc,1-sc,1-sc,1]
+                    if binary:
+                        img[i,j] = [1,0,0,1]
+                        img[j,i] = [1,0,0,1]
+                    else:
+                        val = (ref_contact_map[i,j] - 8)/(12 - 8)
+                        img[i,j] = [0.5+val/2,1-val/2,0,1]
+                        img[j,i] = [0.5+val/2,1-val/2,0,1]
+                        #img[j,i] = [1-sc,1-sc,1-sc,1]
             else:
                 if sc > th:
                     img[i,j] = [0.5-sc/2,0.5-sc/2,1,1]
@@ -328,7 +332,7 @@ def embedd_alignment(target_0, target_1, source_0, source_1):
 
 
 
-def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, f_obs=-1, c2_filename='', psipred_horiz_fname='', psipred_vert_fname='', pdb_filename='', is_heavy=False, chain='', sep=',', outfilename='', ali_filename='',  meff_filename='', name='', start=0, end=-1, pdb_start=0, pdb_end=-1, noalign=False, pdb_alignment='', pdb_id=''):
+def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, f_obs=-1, c2_filename='', psipred_horiz_fname='', psipred_vert_fname='', pdb_filename='', is_heavy=False, chain='', sep=',', outfilename='', ali_filename='',  meff_filename='', name='', start=0, end=-1, pdb_start=0, pdb_end=-1, noalign=False, pdb_alignment='', pdb_id='', binary=False):
   
     #acc = c_filename.split('.')[0]
     #acc = fasta_filename.split('.')[0][:4]
@@ -609,7 +613,7 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, f_obs=-1, c2_filenam
             tp_colors = get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali=atom_seq_ali)
 
         if not c2_filename:
-            img = get_colors(contacts_np, ref_contact_map=dist_mat, th=th_obs)
+            img = get_colors(contacts_np, ref_contact_map=dist_mat, th=th_obs, binary=binary)
             sc = ax.imshow(img, interpolation='none')
         else:
             # plot native contacts in background
@@ -783,6 +787,7 @@ if __name__ == "__main__":
     p.add_argument('--pdb_start', default=0, type=int)
     p.add_argument('--pdb_end', default=-1, type=int)
     p.add_argument('--noalign', action='store_true')
+    p.add_argument('--binary', action='store_true')
     p.add_argument('--pdb_alignment', default='')
     p.add_argument('--pdb_id', default='')
 
@@ -807,5 +812,5 @@ if __name__ == "__main__":
         else:
             sep = ' '
     
-    plot_map(args['fasta_file'], args['contact_file'], factor=args['factor'], th=args['threshold'], f_obs=args['f_obs'], c2_filename=args['c2'], psipred_horiz_fname=args['psipred_horiz'], psipred_vert_fname=args['psipred_vert'], pdb_filename=args['pdb'], is_heavy=args['heavy'], chain=args['chain'], sep=sep, outfilename=args['outfile'], ali_filename=args['alignment'], meff_filename=args['meff'], name=args['name'], start=args['start'], end=args['end'], pdb_start=args['pdb_start'], pdb_end=args['pdb_end'], noalign=args['noalign'], pdb_alignment=args['pdb_alignment'], pdb_id=args['pdb_id'])
+    plot_map(args['fasta_file'], args['contact_file'], factor=args['factor'], th=args['threshold'], f_obs=args['f_obs'], c2_filename=args['c2'], psipred_horiz_fname=args['psipred_horiz'], psipred_vert_fname=args['psipred_vert'], pdb_filename=args['pdb'], is_heavy=args['heavy'], chain=args['chain'], sep=sep, outfilename=args['outfile'], ali_filename=args['alignment'], meff_filename=args['meff'], name=args['name'], start=args['start'], end=args['end'], pdb_start=args['pdb_start'], pdb_end=args['pdb_end'], noalign=args['noalign'], pdb_alignment=args['pdb_alignment'], pdb_id=args['pdb_id'], binary=args['binary'])
 
