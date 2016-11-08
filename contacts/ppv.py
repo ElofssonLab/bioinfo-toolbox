@@ -51,7 +51,7 @@ def print_distances(contacts_x, contacts_y, scores, dist_mat, atom_seq_ali=[], o
         if outfile:
             outstr += "%s %s %s %s\n" % (c_x, c_y, scores[i], dist_mat[c_x, c_y])
         else:
-            print c_x, c_y, scores[i], dist_mat[c_x, c_y]
+            print c_x+1, c_y+1, scores[i], dist_mat[c_x, c_y]
     if outfile:
         with open(outfile, 'w') as outf:
             outf.write(outstr)
