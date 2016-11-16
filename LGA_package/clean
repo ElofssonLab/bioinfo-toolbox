@@ -1,0 +1,2 @@
+rm -rf MOL2 RESULTS TMP Summary_LGA*
+mkdir MOL2 RESULTS TMP

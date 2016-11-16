@@ -1,0 +1,483 @@
+
+#######################################################
+#                                                     #
+#                        LGA                          #
+#                  ---------------                    #
+#                                                     #
+#               Local-Global Alignment                #
+#        A Method for Finding 3-D Similarities        #
+#               in Protein Structures                 #
+#                                                     #
+#                  ------------ 09/2011               #
+#                                                     #
+#      Adam Zemla (adamz@llnl.gov)                    #
+#      Lawrence Livermore National Laboratory, CA     #
+#                                                     #
+#######################################################
+
+# Molecule1: number of CA atoms  136 ( 2092),  selected  136 , name 1euw
+# Molecule2: number of CA atoms   99 (  760),  selected    8 , name users_file
+# PARAMETERS: 1euw.users_file  -5  -sda  -o2  -d:5  -lw:1  -fit:0:2:58  -aa2:55:64  -gap2:59:60  
+# FIXED Atom-Atom correspondence
+# Structure best fit analysis (S => S-gap-S) 
+
+FIT-MODEL:   1   3    1euw.users_file_00 
+
+#      Molecule1      Molecule2  DISTANCE  RMSD(lw:1)
+LGA    M     1_A      -       -      -         -
+LGA    M     2_A      -       -      -         -
+LGA    K     3_A      -       -      -         -
+LGA    K     4_A      -       -      -         -
+LGA    I     5_A      N      55     2.007      -
+LGA    D     6_A      T      56     1.462     0.514
+LGA    V     7_A      K      57     1.907     0.261
+LGA    K     8_A      E      58     0.815     0.531
+LGA    I     9_A      -       -      -         -
+LGA    L    10_A      -       -      -         -
+LGA    D    11_A      N      61     2.727     0.705
+LGA    P    12_A      V      62     3.027     0.553
+LGA    R    13_A      E      63     0.881     0.474
+LGA    V    14_A      I      64     4.097      -
+LGA    G    15_A      -       -      -         -
+LGA    K    16_A      -       -      -         -
+LGA    E    17_A      -       -      -         -
+LGA    F    18_A      -       -      -         -
+LGA    P    19_A      -       -      -         -
+LGA    L    20_A      -       -      -         -
+LGA    P    21_A      -       -      -         -
+LGA    T    22_A      -       -      -         -
+LGA    Y    23_A      -       -      -         -
+LGA    A    24_A      -       -      -         -
+LGA    T    25_A      -       -      -         -
+LGA    S    26_A      -       -      -         -
+LGA    G    27_A      -       -      -         -
+LGA    S    28_A      -       -      -         -
+LGA    A    29_A      -       -      -         -
+LGA    G    30_A      -       -      -         -
+LGA    L    31_A      -       -      -         -
+LGA    D    32_A      -       -      -         -
+LGA    L    33_A      -       -      -         -
+LGA    R    34_A      -       -      -         -
+LGA    A    35_A      -       -      -         -
+LGA    C    36_A      -       -      -         -
+LGA    L    37_A      -       -      -         -
+LGA    N    38_A      -       -      -         -
+LGA    D    39_A      -       -      -         -
+LGA    A    40_A      -       -      -         -
+LGA    V    41_A      -       -      -         -
+LGA    E    42_A      -       -      -         -
+LGA    L    43_A      -       -      -         -
+LGA    A    44_A      -       -      -         -
+LGA    P    45_A      -       -      -         -
+LGA    G    46_A      -       -      -         -
+LGA    D    47_A      -       -      -         -
+LGA    T    48_A      -       -      -         -
+LGA    T    49_A      -       -      -         -
+LGA    L    50_A      -       -      -         -
+LGA    V    51_A      -       -      -         -
+LGA    P    52_A      -       -      -         -
+LGA    T    53_A      -       -      -         -
+LGA    G    54_A      -       -      -         -
+LGA    L    55_A      -       -      -         -
+LGA    A    56_A      -       -      -         -
+LGA    I    57_A      -       -      -         -
+LGA    H    58_A      -       -      -         -
+LGA    I    59_A      -       -      -         -
+LGA    A    60_A      -       -      -         -
+LGA    D    61_A      -       -      -         -
+LGA    P    62_A      -       -      -         -
+LGA    S    63_A      -       -      -         -
+LGA    L    64_A      -       -      -         -
+LGA    A    65_A      -       -      -         -
+LGA    A    66_A      -       -      -         -
+LGA    M    67_A      -       -      -         -
+LGA    M    68_A      -       -      -         -
+LGA    L    69_A      -       -      -         -
+LGA    P    70_A      -       -      -         -
+LGA    R    71_A      -       -      -         -
+LGA    S    72_A      -       -      -         -
+LGA    G    73_A      -       -      -         -
+LGA    L    74_A      -       -      -         -
+LGA    G    75_A      -       -      -         -
+LGA    H    76_A      -       -      -         -
+LGA    K    77_A      -       -      -         -
+LGA    H    78_A      -       -      -         -
+LGA    G    79_A      -       -      -         -
+LGA    I    80_A      -       -      -         -
+LGA    V    81_A      -       -      -         -
+LGA    L    82_A      -       -      -         -
+LGA    G    83_A      -       -      -         -
+LGA    N    84_A      -       -      -         -
+LGA    L    85_A      -       -      -         -
+LGA    V    86_A      -       -      -         -
+LGA    G    87_A      -       -      -         -
+LGA    L    88_A      -       -      -         -
+LGA    I    89_A      -       -      -         -
+LGA    D    90_A      -       -      -         -
+LGA    S    91_A      -       -      -         -
+LGA    D    92_A      -       -      -         -
+LGA    Y    93_A      -       -      -         -
+LGA    Q    94_A      -       -      -         -
+LGA    G    95_A      -       -      -         -
+LGA    Q    96_A      -       -      -         -
+LGA    L    97_A      -       -      -         -
+LGA    M    98_A      -       -      -         -
+LGA    I    99_A      -       -      -         -
+LGA    S   100_A      -       -      -         -
+LGA    V   101_A      -       -      -         -
+LGA    W   102_A      -       -      -         -
+LGA    N   103_A      -       -      -         -
+LGA    R   104_A      -       -      -         -
+LGA    G   105_A      -       -      -         -
+LGA    Q   106_A      -       -      -         -
+LGA    D   107_A      -       -      -         -
+LGA    S   108_A      -       -      -         -
+LGA    F   109_A      -       -      -         -
+LGA    T   110_A      -       -      -         -
+LGA    I   111_A      -       -      -         -
+LGA    Q   112_A      -       -      -         -
+LGA    P   113_A      -       -      -         -
+LGA    G   114_A      -       -      -         -
+LGA    E   115_A      -       -      -         -
+LGA    R   116_A      -       -      -         -
+LGA    I   117_A      -       -      -         -
+LGA    A   118_A      -       -      -         -
+LGA    Q   119_A      -       -      -         -
+LGA    M   120_A      -       -      -         -
+LGA    I   121_A      -       -      -         -
+LGA    F   122_A      -       -      -         -
+LGA    V   123_A      -       -      -         -
+LGA    P   124_A      -       -      -         -
+LGA    V   125_A      -       -      -         -
+LGA    V   126_A      -       -      -         -
+LGA    Q   127_A      -       -      -         -
+LGA    A   128_A      -       -      -         -
+LGA    E   129_A      -       -      -         -
+LGA    F   130_A      -       -      -         -
+LGA    N   131_A      -       -      -         -
+LGA    L   132_A      -       -      -         -
+LGA    V   133_A      -       -      -         -
+LGA    E   134_A      -       -      -         -
+LGA    D   135_A      -       -      -         -
+LGA    F   136_A      -       -      -         -
+
+#              N1   N2   DIST    GAP   RES_NUM   Seq_Id     RMSD     D_MAX 
+SUMMARY(FIT)  136    8    5.0      2        58     0.00     2.36      4.10
+
+Unitary ROTATION matrix and the SHIFT vector superimpose molecules  (1=>2)
+  X_new =  -0.871732 * X  +  -0.190569 * Y  +   0.451405 * Z  +  14.514359
+  Y_new =  -0.366487 * X  +   0.865076 * Y  +  -0.342536 * Z  +  21.152748
+  Z_new =  -0.325223 * X  +  -0.464034 * Y  +  -0.823956 * Z  +  34.261787 
+
+Euler angles from the ROTATION matrix. Conventions XYZ and ZXZ:
+           Phi     Theta       Psi   [DEG:       Phi     Theta       Psi ]
+XYZ: -2.743614  0.331247 -2.628688   [DEG: -157.1975   18.9791 -150.6127 ]
+ZXZ:  0.921673  2.539153 -2.530290   [DEG:   52.8080  145.4828 -144.9749 ]
+ 
+FIT-MODEL:   2   3    1euw.users_file_01 
+
+#      Molecule1      Molecule2  DISTANCE  RMSD(lw:1)
+LGA    M     1_A      -       -      -         -
+LGA    M     2_A      -       -      -         -
+LGA    K     3_A      -       -      -         -
+LGA    K     4_A      -       -      -         -
+LGA    I     5_A      -       -      -         -
+LGA    D     6_A      -       -      -         -
+LGA    V     7_A      -       -      -         -
+LGA    K     8_A      -       -      -         -
+LGA    I     9_A      -       -      -         -
+LGA    L    10_A      -       -      -         -
+LGA    D    11_A      -       -      -         -
+LGA    P    12_A      -       -      -         -
+LGA    R    13_A      -       -      -         -
+LGA    V    14_A      -       -      -         -
+LGA    G    15_A      -       -      -         -
+LGA    K    16_A      -       -      -         -
+LGA    E    17_A      -       -      -         -
+LGA    F    18_A      -       -      -         -
+LGA    P    19_A      -       -      -         -
+LGA    L    20_A      -       -      -         -
+LGA    P    21_A      -       -      -         -
+LGA    T    22_A      -       -      -         -
+LGA    Y    23_A      -       -      -         -
+LGA    A    24_A      -       -      -         -
+LGA    T    25_A      -       -      -         -
+LGA    S    26_A      -       -      -         -
+LGA    G    27_A      -       -      -         -
+LGA    S    28_A      -       -      -         -
+LGA    A    29_A      -       -      -         -
+LGA    G    30_A      -       -      -         -
+LGA    L    31_A      -       -      -         -
+LGA    D    32_A      -       -      -         -
+LGA    L    33_A      -       -      -         -
+LGA    R    34_A      -       -      -         -
+LGA    A    35_A      -       -      -         -
+LGA    C    36_A      -       -      -         -
+LGA    L    37_A      -       -      -         -
+LGA    N    38_A      -       -      -         -
+LGA    D    39_A      -       -      -         -
+LGA    A    40_A      -       -      -         -
+LGA    V    41_A      -       -      -         -
+LGA    E    42_A      -       -      -         -
+LGA    L    43_A      -       -      -         -
+LGA    A    44_A      -       -      -         -
+LGA    P    45_A      -       -      -         -
+LGA    G    46_A      -       -      -         -
+LGA    D    47_A      -       -      -         -
+LGA    T    48_A      -       -      -         -
+LGA    T    49_A      N      55     1.174      -
+LGA    L    50_A      T      56     0.582     0.606
+LGA    V    51_A      K      57     1.062     0.143
+LGA    P    52_A      E      58     0.351     1.060
+LGA    T    53_A      -       -      -         -
+LGA    G    54_A      -       -      -         -
+LGA    L    55_A      N      61     2.572     1.077
+LGA    A    56_A      V      62     1.684     0.150
+LGA    I    57_A      E      63     0.518     0.321
+LGA    H    58_A      I      64     2.244      -
+LGA    I    59_A      -       -      -         -
+LGA    A    60_A      -       -      -         -
+LGA    D    61_A      -       -      -         -
+LGA    P    62_A      -       -      -         -
+LGA    S    63_A      -       -      -         -
+LGA    L    64_A      -       -      -         -
+LGA    A    65_A      -       -      -         -
+LGA    A    66_A      -       -      -         -
+LGA    M    67_A      -       -      -         -
+LGA    M    68_A      -       -      -         -
+LGA    L    69_A      -       -      -         -
+LGA    P    70_A      -       -      -         -
+LGA    R    71_A      -       -      -         -
+LGA    S    72_A      -       -      -         -
+LGA    G    73_A      -       -      -         -
+LGA    L    74_A      -       -      -         -
+LGA    G    75_A      -       -      -         -
+LGA    H    76_A      -       -      -         -
+LGA    K    77_A      -       -      -         -
+LGA    H    78_A      -       -      -         -
+LGA    G    79_A      -       -      -         -
+LGA    I    80_A      -       -      -         -
+LGA    V    81_A      -       -      -         -
+LGA    L    82_A      -       -      -         -
+LGA    G    83_A      -       -      -         -
+LGA    N    84_A      -       -      -         -
+LGA    L    85_A      -       -      -         -
+LGA    V    86_A      -       -      -         -
+LGA    G    87_A      -       -      -         -
+LGA    L    88_A      -       -      -         -
+LGA    I    89_A      -       -      -         -
+LGA    D    90_A      -       -      -         -
+LGA    S    91_A      -       -      -         -
+LGA    D    92_A      -       -      -         -
+LGA    Y    93_A      -       -      -         -
+LGA    Q    94_A      -       -      -         -
+LGA    G    95_A      -       -      -         -
+LGA    Q    96_A      -       -      -         -
+LGA    L    97_A      -       -      -         -
+LGA    M    98_A      -       -      -         -
+LGA    I    99_A      -       -      -         -
+LGA    S   100_A      -       -      -         -
+LGA    V   101_A      -       -      -         -
+LGA    W   102_A      -       -      -         -
+LGA    N   103_A      -       -      -         -
+LGA    R   104_A      -       -      -         -
+LGA    G   105_A      -       -      -         -
+LGA    Q   106_A      -       -      -         -
+LGA    D   107_A      -       -      -         -
+LGA    S   108_A      -       -      -         -
+LGA    F   109_A      -       -      -         -
+LGA    T   110_A      -       -      -         -
+LGA    I   111_A      -       -      -         -
+LGA    Q   112_A      -       -      -         -
+LGA    P   113_A      -       -      -         -
+LGA    G   114_A      -       -      -         -
+LGA    E   115_A      -       -      -         -
+LGA    R   116_A      -       -      -         -
+LGA    I   117_A      -       -      -         -
+LGA    A   118_A      -       -      -         -
+LGA    Q   119_A      -       -      -         -
+LGA    M   120_A      -       -      -         -
+LGA    I   121_A      -       -      -         -
+LGA    F   122_A      -       -      -         -
+LGA    V   123_A      -       -      -         -
+LGA    P   124_A      -       -      -         -
+LGA    V   125_A      -       -      -         -
+LGA    V   126_A      -       -      -         -
+LGA    Q   127_A      -       -      -         -
+LGA    A   128_A      -       -      -         -
+LGA    E   129_A      -       -      -         -
+LGA    F   130_A      -       -      -         -
+LGA    N   131_A      -       -      -         -
+LGA    L   132_A      -       -      -         -
+LGA    V   133_A      -       -      -         -
+LGA    E   134_A      -       -      -         -
+LGA    D   135_A      -       -      -         -
+LGA    F   136_A      -       -      -         -
+
+#              N1   N2   DIST    GAP   RES_NUM   Seq_Id     RMSD     D_MAX 
+SUMMARY(FIT)  136    8    5.0      2        58     0.00     1.49      2.57
+
+Unitary ROTATION matrix and the SHIFT vector superimpose molecules  (1=>2)
+  X_new =  -0.763611 * X  +   0.486526 * Y  +  -0.424490 * Z  +  51.554691
+  Y_new =  -0.568127 * X  +  -0.193888 * Y  +   0.799775 * Z  + -38.128613
+  Z_new =   0.306808 * X  +   0.851880 * Y  +   0.424463 * Z  +  -9.452385 
+
+Euler angles from the ROTATION matrix. Conventions XYZ and ZXZ:
+           Phi     Theta       Psi   [DEG:       Phi     Theta       Psi ]
+XYZ: -2.501942 -0.311837  1.108537   [DEG: -143.3507  -17.8670   63.5145 ]
+ZXZ: -2.653640  1.132427  0.345692   [DEG: -152.0424   64.8833   19.8067 ]
+ 
+FIT-MODEL:   3   3    1euw.users_file_02 
+
+#      Molecule1      Molecule2  DISTANCE  RMSD(lw:1)
+LGA    M     1_A      -       -      -         -
+LGA    M     2_A      -       -      -         -
+LGA    K     3_A      -       -      -         -
+LGA    K     4_A      -       -      -         -
+LGA    I     5_A      -       -      -         -
+LGA    D     6_A      -       -      -         -
+LGA    V     7_A      -       -      -         -
+LGA    K     8_A      -       -      -         -
+LGA    I     9_A      -       -      -         -
+LGA    L    10_A      -       -      -         -
+LGA    D    11_A      -       -      -         -
+LGA    P    12_A      -       -      -         -
+LGA    R    13_A      -       -      -         -
+LGA    V    14_A      -       -      -         -
+LGA    G    15_A      -       -      -         -
+LGA    K    16_A      -       -      -         -
+LGA    E    17_A      -       -      -         -
+LGA    F    18_A      -       -      -         -
+LGA    P    19_A      -       -      -         -
+LGA    L    20_A      -       -      -         -
+LGA    P    21_A      -       -      -         -
+LGA    T    22_A      -       -      -         -
+LGA    Y    23_A      -       -      -         -
+LGA    A    24_A      -       -      -         -
+LGA    T    25_A      -       -      -         -
+LGA    S    26_A      -       -      -         -
+LGA    G    27_A      -       -      -         -
+LGA    S    28_A      -       -      -         -
+LGA    A    29_A      -       -      -         -
+LGA    G    30_A      -       -      -         -
+LGA    L    31_A      -       -      -         -
+LGA    D    32_A      -       -      -         -
+LGA    L    33_A      -       -      -         -
+LGA    R    34_A      -       -      -         -
+LGA    A    35_A      -       -      -         -
+LGA    C    36_A      -       -      -         -
+LGA    L    37_A      -       -      -         -
+LGA    N    38_A      -       -      -         -
+LGA    D    39_A      -       -      -         -
+LGA    A    40_A      -       -      -         -
+LGA    V    41_A      -       -      -         -
+LGA    E    42_A      -       -      -         -
+LGA    L    43_A      -       -      -         -
+LGA    A    44_A      -       -      -         -
+LGA    P    45_A      -       -      -         -
+LGA    G    46_A      -       -      -         -
+LGA    D    47_A      -       -      -         -
+LGA    T    48_A      -       -      -         -
+LGA    T    49_A      -       -      -         -
+LGA    L    50_A      -       -      -         -
+LGA    V    51_A      -       -      -         -
+LGA    P    52_A      -       -      -         -
+LGA    T    53_A      -       -      -         -
+LGA    G    54_A      -       -      -         -
+LGA    L    55_A      -       -      -         -
+LGA    A    56_A      -       -      -         -
+LGA    I    57_A      -       -      -         -
+LGA    H    58_A      -       -      -         -
+LGA    I    59_A      -       -      -         -
+LGA    A    60_A      -       -      -         -
+LGA    D    61_A      -       -      -         -
+LGA    P    62_A      -       -      -         -
+LGA    S    63_A      -       -      -         -
+LGA    L    64_A      -       -      -         -
+LGA    A    65_A      -       -      -         -
+LGA    A    66_A      -       -      -         -
+LGA    M    67_A      -       -      -         -
+LGA    M    68_A      -       -      -         -
+LGA    L    69_A      -       -      -         -
+LGA    P    70_A      -       -      -         -
+LGA    R    71_A      -       -      -         -
+LGA    S    72_A      -       -      -         -
+LGA    G    73_A      -       -      -         -
+LGA    L    74_A      -       -      -         -
+LGA    G    75_A      -       -      -         -
+LGA    H    76_A      -       -      -         -
+LGA    K    77_A      -       -      -         -
+LGA    H    78_A      -       -      -         -
+LGA    G    79_A      -       -      -         -
+LGA    I    80_A      -       -      -         -
+LGA    V    81_A      -       -      -         -
+LGA    L    82_A      N      55     4.662      -
+LGA    G    83_A      T      56     2.006     1.015
+LGA    N    84_A      K      57     0.894     0.516
+LGA    L    85_A      E      58     2.884     1.953
+LGA    V    86_A      -       -      -         -
+LGA    G    87_A      -       -      -         -
+LGA    L    88_A      N      61     4.696     1.664
+LGA    I    89_A      V      62     3.097     0.147
+LGA    D    90_A      E      63     0.579     0.189
+LGA    S    91_A      I      64     3.666      -
+LGA    D    92_A      -       -      -         -
+LGA    Y    93_A      -       -      -         -
+LGA    Q    94_A      -       -      -         -
+LGA    G    95_A      -       -      -         -
+LGA    Q    96_A      -       -      -         -
+LGA    L    97_A      -       -      -         -
+LGA    M    98_A      -       -      -         -
+LGA    I    99_A      -       -      -         -
+LGA    S   100_A      -       -      -         -
+LGA    V   101_A      -       -      -         -
+LGA    W   102_A      -       -      -         -
+LGA    N   103_A      -       -      -         -
+LGA    R   104_A      -       -      -         -
+LGA    G   105_A      -       -      -         -
+LGA    Q   106_A      -       -      -         -
+LGA    D   107_A      -       -      -         -
+LGA    S   108_A      -       -      -         -
+LGA    F   109_A      -       -      -         -
+LGA    T   110_A      -       -      -         -
+LGA    I   111_A      -       -      -         -
+LGA    Q   112_A      -       -      -         -
+LGA    P   113_A      -       -      -         -
+LGA    G   114_A      -       -      -         -
+LGA    E   115_A      -       -      -         -
+LGA    R   116_A      -       -      -         -
+LGA    I   117_A      -       -      -         -
+LGA    A   118_A      -       -      -         -
+LGA    Q   119_A      -       -      -         -
+LGA    M   120_A      -       -      -         -
+LGA    I   121_A      -       -      -         -
+LGA    F   122_A      -       -      -         -
+LGA    V   123_A      -       -      -         -
+LGA    P   124_A      -       -      -         -
+LGA    V   125_A      -       -      -         -
+LGA    V   126_A      -       -      -         -
+LGA    Q   127_A      -       -      -         -
+LGA    A   128_A      -       -      -         -
+LGA    E   129_A      -       -      -         -
+LGA    F   130_A      -       -      -         -
+LGA    N   131_A      -       -      -         -
+LGA    L   132_A      -       -      -         -
+LGA    V   133_A      -       -      -         -
+LGA    E   134_A      -       -      -         -
+LGA    D   135_A      -       -      -         -
+LGA    F   136_A      -       -      -         -
+
+#              N1   N2   DIST    GAP   RES_NUM   Seq_Id     RMSD     D_MAX 
+SUMMARY(FIT)  136    8    5.0      2        58     0.00     3.17      4.70
+
+Unitary ROTATION matrix and the SHIFT vector superimpose molecules  (1=>2)
+  X_new =   0.996143 * X  +  -0.025701 * Y  +   0.083895 * Z  +   4.426315
+  Y_new =  -0.076156 * X  +   0.221649 * Y  +   0.972148 * Z  + -51.387516
+  Z_new =  -0.043580 * X  +  -0.974788 * Y  +   0.218837 * Z  +  -3.694568 
+
+Euler angles from the ROTATION matrix. Conventions XYZ and ZXZ:
+           Phi     Theta       Psi   [DEG:       Phi     Theta       Psi ]
+XYZ: -0.076302  0.043594 -1.349960   [DEG:   -4.3718    2.4978  -77.3470 ]
+ZXZ:  3.055507  1.350174 -3.096915   [DEG:  175.0677   77.3592 -177.4402 ]
+ 
+# END of job
