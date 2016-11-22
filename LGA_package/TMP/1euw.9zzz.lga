@@ -1,0 +1,44 @@
+
+#      Molecule1      Molecule2  DISTANCE  RMSD(lw:3)
+LGA    M     1_A      G    40_A     3.522      -
+LGA    M     2_A      R    41_A     4.002      -
+LGA    K     3_A      R    42_A     2.964      -
+LGA    K     4_A      A    43_A     1.797     1.880
+LGA    I     5_A      L    44_A     3.709     1.744
+LGA    D     6_A      V    45_A     3.528     1.791
+LGA    V     7_A      R    46_A     2.420     1.175
+LGA    K     8_A      T    47_A     6.278     1.819
+LGA    I     9_A      G    48_A     6.962     2.493
+LGA    L    10_A      V    49_A     5.210     2.521
+LGA    D    11_A      A    50_A     4.706     3.093
+LGA    P    12_A      V    51_A     7.519     3.922
+LGA    R    13_A      A    52_A     4.470     2.942
+LGA    V    14_A      V    53_A     6.422     3.588
+LGA    G    15_A      P    54_A    10.979     3.385
+LGA    K    16_A      F    55_A     8.766     2.965
+LGA    E    17_A      G    56_A     7.814     1.889
+LGA    F    18_A      M    57_A     6.456     1.474
+LGA    P    19_A      V    58_A     6.475     1.329
+LGA    L    20_A      G    59_A     7.023     4.134
+LGA    P    21_A      L    60_A     5.135     4.513
+LGA    T    22_A      V    61_A     6.260     4.122
+LGA    Y    23_A      L    73_A    12.547     4.232
+LGA    A    24_A      S    74_A    11.348     4.886
+LGA    T    25_A      I    75_A     8.609     4.746
+LGA    S    26_A      V    76_A     4.984     2.520
+LGA    G    27_A      N    77_A     8.322     2.524
+LGA    S    28_A      S    78_A     4.837     2.958
+LGA    A    29_A      P    79_A     8.080     2.116
+LGA    G    30_A      G    80_A     7.778     2.192
+LGA    L    31_A      T    81_A     7.627     1.802
+LGA    D    32_A      I    82_A     8.201     1.360
+LGA    L    33_A      D    83_A    10.206     2.827
+LGA    R    34_A      A    84_A     8.682     3.513
+LGA    A    35_A      G    85_A    12.210     4.054
+LGA    C    36_A      Y    86_A     9.871      -
+LGA    L    37_A      R    87_A    11.602      -
+LGA    N    38_A      G    88_A    15.976      -
+
+# Standard rmsd calculations on all 38 assigned CA atoms:
+SUMMARY(RMS): N1 =  136  N2 =   38  RMSD =  7.829
+

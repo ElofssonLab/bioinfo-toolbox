@@ -1,0 +1,1605 @@
+-------------------------------------------------------------------------------
+LGA
+Author(s):  A. Zemla
+
+US Patent: 8024127
+Copyright: CP01155
+
+For licensing instructions please check: https://ipo.llnl.gov
+Business Development Executive
+Lawrence Livermore National Laboratory
+7000 East Ave., L-795
+Livermore, CA 94551
+Phone: (925) 423-9724
+Fax:   (925) 423-8988
+-------------------------------------------------------------------------------
+
+                                LGA
+
+                      (Local-Global Alignment)
+     A Method for Finding 3-D Similarities in Protein Structures
+                    ----------------------------
+                            ver. 09/2011
+                       (first ver. 10/15/1999)
+
+# Author: Adam Zemla 
+# Email: adamz@llnl.gov
+# All rights reserved. 
+#
+# The LGA program and documentation may not be distributed, sold or
+# incorporated into a commercial product, in whole or in part,
+# without written consent of Adam T. Zemla and the University
+# of California, Lawrence Livermore National Laboratory (UC LLNL).
+#
+-------------------------------------------------------------------------------
+#
+# This work was produced at the University of California, Lawrence
+# Livermore National Laboratory (UC LLNL) under contract
+# no. W-7405-ENG-48 (Contract 48) between the U.S. Department of Energy
+# (DOE) and The Regents of the University of California (University) for
+# the operation of UC LLNL. Copyright is reserved to the University for
+# purposes of controlled dissemination, commercialization through formal
+# licensing, or other disposition under terms of Contract 48; DOE
+# policies, regulations and orders; and U.S. statutes. The rights of the
+# Federal Government are reserved under Contract 48 subject to the
+# restrictions agreed upon by the DOE and University as allowed under
+# DOE Acquisition Letter 97-1.
+#
+# DISCLAIMER
+#
+# This work was prepared as an account of work sponsored by an agency of
+# the United States Government. Neither the United States Government nor
+# the University of California nor any of their employees, makes any
+# warranty, express or implied, or assumes any liability or
+# responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents
+# that its use would not infringe privately-owned rights.  Reference
+# herein to any specific commercial products, process, or service by
+# trade name, trademark, manufacturer or otherwise does not necessarily
+# constitute or imply its endorsement, recommendation, or favoring by
+# the United States Government or the University of California. The
+# views and opinions of authors expressed herein do not necessarily
+# state or reflect those of the United States Government or the
+# University of California, and shall not be used for advertising or
+# product endorsement purposes.
+#
+-------------------------------------------------------------------------------
+
+Citing LGA:
+
+Zemla A., "LGA - A Method for Finding 3-D Similarities in Protein Structures",
+Nucleic Acids Research, 2003, Vol. 31, No. 13, pp. 3370-3374.
+
+Server accessed at:
+http://as2ts.llnl.gov/
+http://proteinmodel.org/
+
+-------------------------------------------------------------------------------
+
+LGA program calculates structure superposition of two protein structures or fragments 
+of protein structures. User can select atoms on which the calculations are made.
+By default the calculations are performed on CA atoms.
+
+ Usage: lga [<options>] file_name
+
+   <options>: [ -h ]
+              [ -1 | -2 | -3 | -4 ]
+              [ -mol1:name1 | -mol2:name2 ]
+              [ -d:f | -gdc:n | -gdc_sup | -gdc_ref:n | -gdt | -lw:n ]
+              [ -sda | -sia ]
+              [ -atom:CA | -cb:f | -ah:i | -ch1:A | -ch2:B ]
+              [ -aa1:n1:n2 | -aa2:n1:n2 | -gap1:n1:n2 | -gap2:n1:n2 ] 
+              [ -er1:s1:s2 | -er2:s1:s2 ]
+              [ -gdc_set:s1:s2 | -gdc_sup:s1:s2 | -gdc_at:a1,a2 | -gdc_eat:e1:e2 | -gdc_sc]
+              [ -aa | -al | -check ]
+              [ -o0 | -o1 | -o2 | -r | -rmsd | -swap | -ie | -stral | -gdc ]
+              
+   where: -h              help information (this file)
+          -1              standard RMSD
+          -2              RMSD using ISP (Iterative Superposition Procedure)
+          -3              GDT and LCS analysis
+          -4              structure alignment analysis
+          -mol1:name1     name of the molecule1 that will be used in output 
+                            file (name1.name2). The alphanumeric characters 
+                            and '_' are allowed only for name1.
+          -mol2:name2     name of the molecule2 that will be used in output 
+                            file (name1.name2). The alphanumeric characters 
+                            and '_' are allowed only for name2.
+          -atom:CA        CA (Calpha) atoms will be used for calculations. 
+                            NOTE: to specify special character "'" use ",". 
+                            For example: use "-atom:CB" to select CB atom,
+                            use "-atom:H5,1" to select H5'1 atom.
+          -cb:f           CB (Cbeta) atom position will be calculated for each 
+                            amino-acid, and the coordinates of the point representing    
+                            amino-acid position (BMO - backbone model) for LGA processing 
+                            will be defined by the vector CA-CB: -5.0 <= f <= 5.0 , 
+                            e.g. f=0 corresponds to CA position, and f=1 represents 
+                            CB position)
+                            NOTE1: a complete set of main chain atoms (N,CA,C,O) is required
+                            for both input structures
+                            NOTE2: if "-cb:f" is combined with "-atom:CB" then all 
+                            existing CB atoms are leveraged and only missing CB atoms 
+                            are calculated
+          -ch1:A          chain A selected from molecule1
+          -ch2:B          chain B selected from molecule2
+          -ah:i           ATOM or HETATM records are used for calculations:
+                            i=0 both
+                            i=1 ATOM
+                            i=2 HETATM
+          -d:f            DIST distance cutoff (f Angstroms; default f=5.0)
+          -gdt            can be combined with "-3" option. If used then the 
+                            superposition that fits maximum number of residues under 
+                            a given distance cutoff is reported. Otherwise standard 
+                            superposition calculated using the set of identified N 
+                            residues is reported (rotated molecule1)
+          -lga_m          LGA_M score is reported in the SUMMARY line (LGA_M = maximum value
+                            of LGA_S regardless of relative mol1/mol2 sizes).
+                            NOTE: LGA_M = LGA_S when mol2 is shorter than mol1.
+          -lw:n           "Lesk window", rms calculated on residue window
+                            (length of the window = 2*n+1)
+          -sda            facilitates the selection of residues for calculation:
+                            sequence dependent analysis (residue numbering, and
+                            chain ID should be the same in both structures)
+          -sia            facilitates the selection of residues for calculation:
+                            sequence independent analysis
+                            NOTE: If you use -sia option with -1, -2, or -3, then
+                            the same number of the first residues from both
+                            structures will be taken for LGA processing.
+          -aa1:n1:n2      range of residues from the molecule1 used for calculations
+                            -9999 < n1 < n2 < 9999 
+                            NOTE: only one aa1 parameter is allowed.
+          -aa2:n1:n2      range of residues from the molecule2 used for calculations
+                            -9999 < n1 < n2 < 9999 
+                            NOTE: only one aa2 parameter is allowed.
+          -gap1:n1:n2     range of residues from the molecule1 removed from
+                            calculations -9999 < n1 < n2 < 9999 
+                            NOTE: only one gap1 parameter is allowed.
+          -gap2:n1:n2     range of residues from the molecule2 removed from
+                            calculations -9999 < n1 < n2 < 9999 
+                            NOTE: only one gap2 parameter is allowed.
+          -er1:s1:s2      exact range of residues from the molecule1 used for 
+                            calculations (s1 , s2 - strings e.g.: s1 = 13L_A <= s2 = 45_B)
+                            the si pairs (ranges beg:end) can be separated by ',':
+                              -er1:s1:s2,s3:s4,s5:s6,s7:s8,s9:s10 
+                            NOTE: single residues or chains can be separated by ','(no beg:end required):
+                              -er1:s1,s2,s3
+                            Up to 50 er1 parameters are allowed (WARNING: no overlaps)
+          -er2:s1:s2      exact range of residues from the molecule2 used for 
+                            calculations (s1 , s2 - strings e.g.: s1 = 13L_A <= s2 = 45_B)
+                            the si pairs (ranges beg:end) can be separated by ',':
+                              -er2:s1:s2,s3:s4,s5:s6,s7:s8,s9:s10 
+                            NOTE: single residues or chains can be separated by ','(no beg:end required):
+                              -er2:s1,s2,s3
+                            Up to 50 er2 parameters are allowed (WARNING: no overlaps)
+          -gdc            GDC score is calculated using all atoms from the target as a frame of 
+                            reference, but evaluating only identical atoms (this option is 
+                            equivalent to: -gdc_ref:2 -swap).
+          -gdc:n          n - number of bins used for GDC evaluation of atom pairs from the
+                            corresponding residues (1 <= n <= 20; bins: <0.5, <1.0, ... <10.0).
+                            NOTE: this option changes the default number of "bins" (n=20) for
+                            GDC calculations (GDC_all - all atoms, GDC_mc - main chain atoms, 
+                            and GDT_at - selected atoms). The default number n=20 defines bins 
+                            from 0.5 to 10.0 Angstroms.
+          -gdc_ref:n      GDC score is calculated: 0 - requesting complete set of atoms within 
+                            each residue using target as a frame of reference, 1 - using all 
+                            existing atoms from the target as a frame of reference, 2 - using 
+                            all atoms from the target as a frame of reference, but evaluating 
+                            only identical atoms (different residues are compared using 
+                            "mainchain + Cbeta" atoms only). 
+                            The default set is -gdc_ref:0.
+          -gdc_sup:s1:s2  exact range of residues from the molecule2 used for 
+                            GDC superposition calculations. This additional standard (-1) 
+                            superposition is calculated on CA atoms from the set of 
+                            amino-acid ranges (s1,s2) defined by s1 and s2 strings. 
+                            e.g. -gdc_sup:s1:s2,s3:s4,s5:s6,s7:s8,s9:s10 
+                            Format is the same as for er2 parameters.
+                            NOTE: this option is applied to the molecule2 only. Corresponding
+                            residues from molecule1 are automatically determined using main 
+                            superposition. 
+          -gdc_sup        expands an option "-rmsd". If used then the superposition which is 
+                            used for GDC calculations is reported and used to rotate molecule1.
+                            Otherwise the standard LGA superposition is reported.
+          -gdc_set:s1:s2  exact range of residues from the molecule2 for which the
+                            "Global Distance Calculations" (GDC) will be performed.
+                            e.g. -gdc_set:s1:s2,s3:s4,s5:s6,s7:s8,s9:s10 
+                            Format is the same as for er2 parameters.
+                            NOTE: this option is applied to the molecule2 only. Amino-acids
+                            from the molecule2 serve as a frame of reference for GDC evaluation
+                            (corresponding amino-acids or atoms that are missing in molecule1
+                            are counted as 0 scores in GDC calculations).
+          -gdc_at:a1,a2   amino-acid atom names (one atom per one name of amino-acid) from 
+                            the molecule2 for which the GDC calculations (distances and GDC 
+                            summary) will be calculated. 
+                            Format example (aaname.atom): -gdc_at:a1,a2,a3,a4
+                            where: a1 = V.CG1, a2 = C.SG, a3 = T.OG1, a4 = H.NE2
+                            NOTE: this option is applied to the molecule2 only. The 
+                            corresponding atoms from the molecule1 will be detected based 
+                            on the calculated alignment. Up to 20 representative atoms 
+                            (one atom per each of 20 amino-acid) can be selected for 
+                            GDC evaluation. Number of identified identical "amino-acid.atom"
+                            pairs serve as a frame of reference for GDC evaluation.
+                            Results from the GDC_at calculations are reported in Dist_at and 
+                            GDC_at columns. 
+          -gdc_at:*.at    allows a selection of one mainchain or CB atom (at: N,CA,C,O,CB)
+                            the same for all amino acids (e.g. -gdc_at:*.N).
+                            NOTE: amino-acids from the molecule2 serve as a frame of reference
+                            for GDC evaluation (corresponding amino-acids or atoms that are
+                            missing in molecule1 are counted as 0 scores in GDC calculations).
+          -gdc_eat:e1:e2  exact atom "e1" from the molecule1 and "e2" from the molecule2 for 
+                            which the GDC calculations (distances and GDC summary) will be 
+                            calculated. Format example (aanumber_chain.atom):
+                            -gdc_eat:e1:e2,e3:e4,e5:e6
+                            where: for each pair (em:en) em is a selected atom from the 
+                            molecule1, and en is an atom from the molecule2.
+                            For example: e1 = 10_A.OD2, e2 = 21_B.ND2
+          -gdc_sc         automated selection of all flags required for GDC_sc calculations: 
+                            -swap -gdc:10 -gdc_at:V.CG1,L.CD1,I.CD1,P.CG,M.CE,F.CZ,W.CH2,S.OG
+                            -gdc_at:T.OG1,C.SG,Y.OH,N.OD1,Q.OE1,D.OD2,E.OE2,K.NZ,R.NH2,H.NE2
+                            NOTE: this option changes the default number of "bins" (see the
+                            selection "-gdc:n"; n=10). All GDC calculations (GDC_all - all atoms, 
+                            GDC_mc - main chain atoms, and GDC_at - selected atoms) will be 
+                            performed using n=10 as a number of bins from 0.5 to 5.0 Angstroms.
+                            Results from the GDC_sc calculations are reported in GDC_at column. 
+          -aa             generates a list of all residues from the molecule1 and
+                            molecule2 (AAMOL* records)
+          -al             calculations will be made only on the set of residues from
+                            the attached AAMOL* or LGA records
+          -o0             no coordinates are printed out
+          -o1             only molecule 1 (rotated) is printed out into the
+                            subdirectory TMP
+          -o2             molecule 1 (rotated) and molecule 2 (target) both are
+                            printed out into the subdirectory TMP
+          -r              the residue ranges of compared structures are reported in the
+                            SUMMARY line: e.g. (1_A:214_A:7_A:196_A)
+          -rmsd           additional RMSD and GDC calculations will be performed on all
+                            aligned CA, MC and ALL atoms. 
+                            RMSD is "rmsd-based" measures: see MC and ALL colums
+                            GDC is "distance-based" measures: see Dist_max, GDC_mc, and GDC_all
+          -swap           expands an option "-rmsd". RMSD and GDC calculations will be 
+                            performed with checking for swapping atoms in amino acids: 
+                            ASP, GLU, PHE, and TYR
+          -stral          two output files in TMP directory are created: 
+                            TMP/*.stral and TMP/*.pdb 
+          -ie             ignores errors in PDB data (force calculations). 
+                            If "-ie" is not present then in case of ERROR detected in
+                            input data the calculations are terminated
+          -check          reports amino acids with missing pre-selected atoms
+
+ Suggested default set of parameters: -4 -d:4.0 -gdc
+
+ Input: <file_name>
+   Input files are located inside the subdirectory MOL2.
+   <file_name> - the file is located inside the subdirectory MOL2, and
+                 contains two structures in PDB format. 
+                 Minimum number of selected atoms in each structure for processing: 5
+                 Maximum number of selected atoms in each structure for processing: 1500
+                 Each structure for LGA analysis should begin with
+                 MOLECULE record and end with END record:
+
+              MOLECULE  name1
+              ATOM ........
+                   ........
+              ATOM ........
+              END
+              MOLECULE  name2
+              ATOM ........
+                   ........
+              ATOM ........
+              END
+
+ Output:  <file_name.pdb>, <file_name.lga>
+   Output files are written into the subdirectory TMP.
+   <file_name.pdb> - contains coordinates of two superimposed PDB 
+                     structures: 1 => 2 (check option: -o0, -o1, -o2)
+   <file_name.lga> - contains calculated residue equivalences
+   NOTE: if options: -mol1:name1 and -mol2:name2 are used 
+         then output file_name = name1.name2
+
+-------------------------------------------------------------------------------
+
+Examples of the output from the LGA program.
+
+-------------------------------------------------------------------------------
+
+Example of the output from the LGA program ("-4" - structure alignment search):
+LGA-parameters used: -4  -d:2.3  -swap 
+
+# Molecule1: number of CA atoms   99 (  760),  selected   22 , name 1sip_A
+# Molecule2: number of CA atoms   99 ( 1560),  selected   31 , name 1bve_B_5
+# PARAMETERS: 1sip_A.1bve_B_5  -4  -d:2.3  -swap  -aa1:25:46  -aa2:20:50
+# Search for Atom-Atom correspondence
+# Structure alignment analysis
+
+# Checking swapping
+#   possible swapping detected:  D    30_A      D    30_B
+
+#      Molecule1      Molecule2  DISTANCE    Mis    MC     All    Dist_max   GDC_mc  GDC_all
+LGA    -       -      K    20_B      -        -     -       -         -        -        -
+LGA    -       -      E    21_B      -        -     -       -         -        -        -
+LGA    -       -      A    22_B      -        -     -       -         -        -        -
+LGA    -       -      L    23_B      -        -     -       -         -        -        -
+LGA    -       -      L    24_B      -        -     -       -         -        -        -
+LGA    D    25_A      D    25_B     1.295     0    0.067   0.282     1.545   81.429   83.750
+LGA    T    26_A      T    26_B     1.342     0    0.076   0.813     3.538   85.952   76.122
+LGA    G    27_A      G    27_B     0.619     0    0.171   0.171     1.071   90.595   90.595
+LGA    A    28_A      A    28_B     0.415     0    0.126   0.113     0.538   97.619   98.095
+LGA    D    29_A      D    29_B     0.335     0    0.195   0.437     1.720   95.238   91.845
+LGA    D    30_A      D    30_B     0.942     0    0.086   0.767     3.322   85.952   74.643
+LGA    S    31_A      T    31_B     0.978     2    0.190   0.214     1.130   85.952   60.748
+LGA    I    32_A      V    32_B     0.885     2    0.131   0.168     1.460   88.214   62.041
+LGA    V    33_A      L    33_B     0.865     3    0.118   0.205     1.350   90.476   55.417
+LGA    T    34_A      E    34_B     1.598     4    0.088   0.081     2.505   69.048   38.783
+LGA    G    35_A      E    35_B      -        -     -       -         -        -        -
+LGA    I    36_A      M    36_B     2.065     3    0.040   0.061     2.714   71.190   44.702
+LGA    E    37_A      S    37_B     0.338     1    0.037   0.059     0.938   95.238   78.571
+LGA    L    38_A      L    38_B     0.472     0    0.704   0.627     1.912   88.452   85.060
+LGA    G    39_A      P    39_B      #        -     -       -         -        -        -
+LGA    P    40_A      G    40_B     2.563     0    0.616   0.616     5.018   51.310   51.310
+LGA    H    41_A      R    41_B     1.616     6    0.044   0.042     1.726   77.143   34.675
+LGA    Y    42_A      W    42_B     0.919     9    0.095   0.120     1.160   88.214   31.667
+LGA    T    43_A      K    43_B     1.421     4    0.136   0.140     1.477   81.429   45.238
+LGA    P    44_A      P    44_B     1.239     0    0.068   0.278     1.239   81.429   82.721
+LGA    K    45_A      K    45_B     0.583     0    0.288   1.176     2.594   84.048   77.302
+LGA    I    46_A      M    46_B     1.241     3    0.047   0.069     2.020   79.286   47.738
+LGA    -       -      I    47_B      -        -     -       -         -        -        -
+LGA    -       -      G    48_B      -        -     -       -         -        -        -
+LGA    -       -      G    49_B      -        -     -       -         -        -        -
+LGA    -       -      I    50_B      -        -     -       -         -        -        -
+
+# RMSD_GDC results:       CA      MC common percent     ALL common percent   GDC_mc  GDC_all
+NUMBER_OF_ATOMS_AA:       20      80     80  100.00     155    118   76.13                31
+SUMMARY(RMSD_GDC):     1.227          1.374                  1.450           53.813   42.291
+
+#CA            N1   N2   DIST      N    RMSD   Seq_Id      LGA_S     LGA_Q
+SUMMARY(LGA)   22   31    2.3     20    1.23    45.00     64.078     1.507
+
+Unitary ROTATION matrix and the SHIFT vector superimpose molecules  (1=>2)
+  X_new =   0.207331 * X  +   0.070492 * Y  +  -0.975728 * Z  +  21.289257
+  Y_new =   0.207127 * X  +  -0.977951 * Y  +  -0.026640 * Z  + -17.874228
+  Z_new =  -0.956092 * X  +  -0.196577 * Y  +  -0.217360 * Z  +  14.324877
+
+Euler angles from the ROTATION matrix. Conventions XYZ and ZXZ:
+           Phi     Theta       Psi   [DEG:       Phi     Theta       Psi ]
+XYZ:  0.784907  1.273364 -2.406362   [DEG:   44.9718   72.9584 -137.8744 ]
+ZXZ: -1.543500  1.789906 -1.773575   [DEG:  -88.4361  102.5540 -101.6183 ]
+
+# END of job
+
+The output (see above) from LGA calculations contains the following information:
+
+1) The residue-residue equivalences are reported in LGA lines,
+
+2) In the DISTANCE column the distances in Angstroms between corresponding residues 
+are reported when final global superposition is applied ("-" is present when 
+residues are not aligned under selected distance cutoff DIST).
+The "#" in the sequence alignment (DISTANCE column) indicates that the calculated 
+distance between corresponding residues is above selected cutoff, and potentially 
+these residues can be included to the alignment if DIST cutoff is changed.
+User may vary DIST cutoff to calculate more tight (accurate) or more relaxed 
+(to recognize overall similarity) superpositions (the default: DIST=5 Angstroms),
+
+3) The option "-rmsd" allows the calculation of RMSD values on aligned CA, MC 
+(main chain; N,CA,C,O), and ALL atoms. If the option "-swap" is chosen then 
+calculating RMSD on ALL atoms "swapping" is considered. It means that in amino 
+acids where atom names can be switched, i.e.
+       for ASP: OD1 <-> OD2
+       for GLU: OE1 <-> OE2
+       for PHE: CD1 <-> CD2
+                CE1 <-> CE2
+       for TYR: CD1 <-> CD2
+                CE1 <-> CE2
+cartesian rmsd is calculated with an option to minimize its value. Sets (CD1, CE1) and 
+(CD2, CE2) in PHE and TYR, as well as atoms OD1 and OD2 in ASP, OE1 and OE2 in GLU are 
+exchanged and more favorable contributions to rmsd are taken into account. In the above 
+example the possible swapping was detected for residue pair: D 30_A  -  D 30_B
+#   possible swapping detected:  D    30_A      D    30_B
+
+In the "Mis" column the number of missing atoms in a given amino acid is reported. It is
+calculated relative to the definition (see "-gdc_ref:0") of the amino acid from the second 
+molecule (in this example: target=1bve_B_5).
+For more options please check the flag: -gdc.
+The following atoms are expected for a given amino acid:
+  aa   1 2  3 4 5  6   7   8   9   10  11  12  13  14 
+  A:   N CA C O CB                                      : Alanine
+  V:   N CA C O CB CG1 CG2                              : Valine
+  L:   N CA C O CB CG  CD1 CD2                          : Leucine
+  I:   N CA C O CB CG1 CG2 CD1                          : Isoleucine
+  P:   N CA C O CB CG  CD                               : Proline
+  M:   N CA C O CB CG  SD  CE                           : Methionine
+  F:   N CA C O CB CG  CD1 CD2 CE1 CE2 CZ               : Phenylalanine
+  W:   N CA C O CB CG  CD1 CD2 NE1 CE2 CE3 CZ2 CZ3 CH2  : Tryptophan
+  G:   N CA C O                                         : Glycine
+  S:   N CA C O CB OG                                   : Serine
+  T:   N CA C O CB OG1 CG2                              : Threonine
+  C:   N CA C O CB SG                                   : Cysteine
+  Y:   N CA C O CB CG  CD1 CD2 CE1 CE2 CZ  OH           : Tyrosine
+  N:   N CA C O CB CG  OD1 ND2                          : Asparagine
+  Q:   N CA C O CB CG  CD  OE1 NE2                      : Glutamine
+  D:   N CA C O CB CG  OD1 OD2                          : Aspartic acid
+  E:   N CA C O CB CG  CD  OE1 OE2                      : Glutamic acid
+  K:   N CA C O CB CG  CD  CE  NZ                       : Lysine
+  R:   N CA C O CB CG  CD  NE  CZ  NH1 NH2              : Arginine
+  H:   N CA C O CB CG  ND1 CD2 CE1 NE2                  : Histidine
+  X:   N CA C O CB                                      : Nonstandard (ATOM or HETATM records)
+  #:   N CA C O                                         : Unknown (ATOM records)
+
+4) There are three "distance based" values calculated for each selected amino acid: Dist_max, 
+GDC_mc and GDC_all (GDC - Global Distance Calculation). Dist_max is a maximum distance 
+between atoms from the corresponding (superimposed, equivalent) amino acids. This measure 
+can help evaluate how far from each other the side chain ends are for a given amino acid 
+under calculated superposition. GDC_mc and GDC_all are the measures (range: 0 - 100) which 
+for each listed and aligned amino acid combine the percentages of atoms (mainchain atoms 
+and all atoms) that fit under the selected distances: 0.5, 1.0, 1.5, ..., 10.0 (a similar 
+procedure as in GDT and LGA_S measures; see below). 
+
+NOTE: when different amino-acids are superimposed then "rmsd All", "Dist_max", and 
+"GDC_all" calculations are restricted to provided coordinates of mainchain+CB atoms 
+only (i.e.: N,CA,C,O,CB). If identical amino-acids are superimposed, then all corresponding 
+atoms (if provided) are evaluated. For both cases the rmsd "MC" and "GDC_mc" measures are
+calculated on mainchain atoms only (i.e.: N,CA,C,O). 
+
+5) The SUMMARY(RMSD_GDC) line reports values of RMSD calculated on all aligned CA atoms,
+MC atoms, and ALL atoms from aligned amino acids. The GDC_mc from the SUMMARY(RMSD_GDC)
+line contains a sum of all calculated GDC_all values devided by the number of amino acids
+selected in the molecule2 (in this example: 31).
+
+NOTE: the option "-rmsd" can be combined with "-lw:n" to specify the length of 
+sliding window for calculating local RMSDs,
+
+6) In the SUMMARY(LGA) line the following information is reported:
+
+#CA            N1   N2   DIST      N     RMSD   Seq_Id     LGA_S    LGA_Q
+SUMMARY(LGA)   22   31    2.3     20     1.23    45.00    64.078    1.507
+                |    |     |       |      |        |        |        |
+where           |    |     |       |      |        |        |        |
+                |    |     |       |      |        |        |        |
+  number of residues |     |       |      |        |        |        |  
+  from mol1 (model)  |     |       |      |        |        |        |
+                     |     |       |      |        |        |        |
+  number of residues from  |       |      |        |        |        |
+  mol2 (target)            |       |      |        |        |        |
+                           |       |      |        |        |        |  
+  selected distance cutoff DIST    |      |        |        |        |  
+                                   |      |        |        |        |  
+  N number of residues superimposed under |        |        |        | 
+  distance cutoff DIST                    |        |        |        | 
+                                          |        |        |        | 
+  RMSD calculated on N residues superimposed       |        |        |
+  under the distance DIST                          |        |        |
+                                                   |        |        |
+  Sequence Identity. Percent of identical residues from     |        |
+  the total of N aligned under the distance DIST            |        |
+                                                            |        | 
+  LGA_S score (0.00 - 100.00) calculated with reference to the       |
+  number of residues in target (name2 - here 31 residues)            |
+                                                                     |
+  LGA_Q (quality) score calculated with use of the formula: Q=0.1*N/(0.1+RMSD)
+  (Q below 2.0 indicates rather weak alignment)
+
+-------------------------------------------------------------------------------
+
+Example of the output from the LGA program ("-3" - LCS and GDT analysis).
+LGA-parameters used: -3 -sda -o0 -d:4.0 
+
+# FIXED Atom-Atom correspondence
+# GDT and LCS analysis
+
+LCS - RMSD CUTOFF   5.00      length       segment         l_RMS    g_RMS
+  LONGEST_CONTINUOUS_SEGMENT:    46      26_A - 71_A        4.99     6.22
+  LONGEST_CONTINUOUS_SEGMENT:    46      27_A - 72_A        4.95     6.14
+  LCS_AVERAGE:     53.38
+
+LCS - RMSD CUTOFF   2.00      length       segment         l_RMS    g_RMS
+  LONGEST_CONTINUOUS_SEGMENT:    15      58_A - 72_A        1.56    25.45
+  LCS_AVERAGE:     13.60
+
+LCS - RMSD CUTOFF   1.00      length       segment         l_RMS    g_RMS
+  LONGEST_CONTINUOUS_SEGMENT:    14      59_A - 72_A        0.62    25.61
+  LCS_AVERAGE:     10.28
+
+LCS_GDT    MOLECULE-1    MOLECULE-2     LCS_DETAILS     GDT_DETAILS                                                    TOTAL NUMBER OF RESIDUE PAIRS:   72
+LCS_GDT     RESIDUE       RESIDUE       SEGMENT_SIZE    GLOBAL DISTANCE TEST COLUMNS: number of residues under the threshold assigned to each residue pair
+LCS_GDT   NAME NUMBER   NAME NUMBER    1.0  2.0  5.0    0.5  1.0  1.5  2.0  2.5  3.0  3.5  4.0  4.5  5.0  5.5  6.0  6.5  7.0  7.5  8.0  8.5  9.0  9.5 10.0
+LCS_GDT     M     1_A     M     1_A      3    5   21      3    3    3    6    7   10   14   20   23   33   43   53   61   69 72   72   72   72   72   72
+LCS_GDT     N     2_A     N     2_A      4    9   21      3    4    6    6    9    9   13   19   23   31   41   53   61   69 72   72   72   72   72   72
+LCS_GDT     I     3_A     I     3_A      4    9   21      3    4    6    6    9    9   13   13   18   26   34   53   60   69 72   72   72   72   72   72
+LCS_GDT     F     4_A     F     4_A      6    9   21      3    4    6    6    9    9   10   15   23   32   41   53   61   69 72   72   72   72   72   72
+LCS_GDT     E     5_A     E     5_A      6    9   21      4    5    6    8   11   11   13   21   26   33   43   53   61   69 72   72   72   72   72   72
+LCS_GDT     M     6_A     M     6_A      6    9   21      4    5    6    6    9    9   13   15   23   28   35   53   61   69 72   72   72   72   72   72
+LCS_GDT     L     7_A     L     7_A      6    9   21      4    5    6    6    9    9   10   12   18   26   35   53   61   69 72   72   72   72   72   72
+...........................................................................
+LCS_GDT     K    65_A     K    65_A     14   15   46      9   13   14   14   14   15   17   20   26   33   43   53   61   69 72   72   72   72   72   72
+LCS_GDT     L    66_A     L    66_A     14   15   46      6   13   14   14   14   14   14   17   25   33   43   53   61   69 72   72   72   72   72   72
+LCS_GDT     F    67_A     F    67_A     14   15   46      9   13   14   14   14   14   18   22   26   33   43   53   61   69 72   72   72   72   72   72
+LCS_GDT     N    68_A     N    68_A     14   15   46      9   13   14   14   14   14   18   22   26   33   43   53   61   69 72   72   72   72   72   72
+LCS_GDT     Q    69_A     Q    69_A     14   15   46      6   13   14   14   14   15   17   18   25   33   43   53   61   69 72   72   72   72   72   72
+LCS_GDT     D    70_A     D    70_A     14   15   46      9   13   14   14   14   14   14   15   16   27   41   53   61   69 72   72   72   72   72   72
+LCS_GDT     V    71_A     V    71_A     14   15   46      6   13   14   14   14   14   18   22   26   33   43   53   61   69 72   72   72   72   72   72
+LCS_GDT     D    72_A     D    72_A     14   15   46      5   10   14   14   14   15   17   21   26   33   43   53   61   69 72   72   72   72   72   72
+LCS_AVERAGE  LCS_A:  25.75  (  10.28   13.60   53.38 )
+
+GLOBAL_DISTANCE_TEST (summary information about detected largest sets of residues (represented by selected AToms) that can fit under specified thresholds)
+GDT DIST_CUTOFF  0.50   1.00   1.50   2.00   2.50   3.00   3.50   4.00   4.50   5.00   5.50   6.00   6.50   7.00   7.50   8.00   8.50   9.00   9.50  10.00
+GDT NUMBER_AT      9     13     14     14     14     15     18     22     26     33     43     53     61     69     72     72    72     72     72     72
+GDT PERCENT_AT  12.50  18.06  19.44  19.44  19.44  20.83  25.00  30.56  36.11  45.83  59.72  73.61  84.72  95.83 100.00 100.00 100.00 100.00 100.00 100.00
+GDT RMS_LOCAL    0.33   0.55   0.62   0.62   0.62   1.94   2.70   2.93   3.25   4.01   4.43   5.09   5.26   5.54   5.65   5.65   5.65   5.65   5.65   5.65
+GDT RMS_ALL_AT  26.69  25.68  25.61  25.61  25.61   7.05   7.10   7.07   7.08   6.11   6.00   5.81   5.71   5.66   5.65   5.65   5.65   5.65   5.65   5.65
+
+#      Molecule1      Molecule2  DISTANCE
+LGA    M     1_A      M     1_A     9.592
+LGA    N     2_A      N     2_A    11.124
+LGA    I     3_A      I     3_A    13.468
+LGA    F     4_A      F     4_A    11.355
+LGA    E     5_A      E     5_A     8.107
+LGA    M     6_A      M     6_A    13.142
+LGA    L     7_A      L     7_A    13.326
+LGA    R     8_A      R     8_A     8.502
+LGA    I     9_A      I     9_A     6.853
+LGA    D    10_A      D    10_A    10.670
+LGA    E    11_A      E    11_A    10.752
+LGA    G    12_A      G    12_A    10.538
+LGA    L    13_A      L    13_A    10.580
+LGA    R    14_A      R    14_A     9.468
+LGA    L    15_A      L    15_A     9.420
+LGA    K    16_A      K    16_A     8.212
+.........................................
+LGA    K    60_A      K    60_A     6.946
+LGA    D    61_A      D    61_A     7.011
+LGA    E    62_A      E    62_A     3.782
+LGA    A    63_A      A    63_A     3.027
+LGA    E    64_A      E    64_A     4.870
+LGA    K    65_A      K    65_A     5.735
+LGA    L    66_A      L    66_A     5.332
+LGA    F    67_A      F    67_A     2.681
+LGA    N    68_A      N    68_A     4.077
+LGA    Q    69_A      Q    69_A     8.089
+LGA    D    70_A      D    70_A     7.413
+LGA    V    71_A      V    71_A     2.131
+LGA    D    72_A      D    72_A     7.762
+
+#CA            N1   N2   DIST      N    RMSD    GDT_TS    LGA_S3     LGA_Q
+SUMMARY(GDT)   72   72    4.0     22    2.93    42.014    33.626     0.726
+
+LGA_LOCAL      RMSD:   2.929  Number of atoms:   22  under DIST:   4.00
+LGA_ASGN_ATOMS RMSD:   8.532  Number of assigned atoms:   72
+Std_ASGN_ATOMS RMSD:   5.648  Standard rmsd on all 72 assigned CA atoms
+
+Unitary ROTATION matrix and the SHIFT vector superimpose molecules  (1=>2)
+  X_new =   0.407935 * X  +  -0.032836 * Y  +   0.912420 * Z  +  11.435461
+  Y_new =   0.509052 * X  +  -0.821424 * Y  +  -0.257154 * Z  +  61.613953
+  Z_new =   0.757928 * X  +   0.569372 * Y  +  -0.318373 * Z  + -36.757996
+
+Euler angles from the ROTATION matrix. Conventions XYZ and ZXZ:
+           Phi     Theta       Psi   [DEG:       Phi     Theta       Psi ]
+XYZ:  0.895225 -0.860131  2.080649   [DEG:   51.2926  -49.2818  119.2124 ]
+ZXZ:  1.296085  1.894809  0.926514   [DEG:   74.2602  108.5646   53.0853 ]
+
+...........................................................................
+
+After setting an option: -lw:3
+the LGA records will look like below:
+
+#      Molecule1      Molecule2  DISTANCE  RMSD(lw:3)
+LGA    M     1_A      M     1_A     9.592      -
+LGA    N     2_A      N     2_A    11.124      -
+LGA    I     3_A      I     3_A    13.468      -
+LGA    F     4_A      F     4_A    11.355     2.541
+LGA    E     5_A      E     5_A     8.107     1.718
+LGA    M     6_A      M     6_A    13.142     1.511
+LGA    L     7_A      L     7_A    13.326     1.622
+LGA    R     8_A      R     8_A     8.502     2.042
+LGA    I     9_A      I     9_A     6.853     2.876
+LGA    D    10_A      D    10_A    10.670     3.337
+LGA    E    11_A      E    11_A    10.752     3.222
+.........................................
+
+where in the last column for each residue a RMSD value is
+calculated on 3+1+3=7 residues window. This information can be
+helpful to detect local similarity of structures when such
+a similarity is difficult to capture from the global superposition.
+
+-------------------------------------------------------------------------------
+
+There are several ways how to select from both structures the set
+of residues for calculations. Here are some described options and examples:
+
+  -sda            - amino-acids identical by numbering and chain IDs are selected
+  -ch2:B          - chain B from molecule2 is selected
+  -aa1:1:317      - residues 1 till 317 from molecule1
+  -gap1:152:156   - remove residues 152 - 156 from molecule1
+  -aa2:45:361     - residues 45 till 361 from molecule2
+  -er2:45_B:50_B  - residues 45 till 50 from molecule2 chain B
+
+Let us note that with "-sda" mode the two protein structures have to overlap 
+by the numbering of amino acids and also by the chain IDs (unless the chains 
+are specified using parameters: -ch1:A -ch2:B ,...).
+
+The mode "-sia" has to be used for structure comparison of regions where proteins
+differ in residue numbering.
+  
+Example1:  
+If user needs to perform LCS and GDT analysis ("-3" option) of two structures 
+(mol1 and mol2) in selected regions, then "-sia" mode and the exact range of 
+residues (-er1:s1:s2 -er2:s1:s2) may be used:
+  -3 -sia -o1 -d:5.0 -er1:10:23 -er2:45_B:50_B,56_B:63_B
+And the following residue correspondence is established:
+  mol1        mol2
+    10        45_B
+    11        46_B
+    12        47_B
+    13        48_B
+    14        49_B
+    15        50_B
+    16        56_B
+    17        57_B
+    18        58_B
+    19        59_B
+    20        60_B
+    21        61_B
+    22        62_B
+    23        63_B
+Only residue-pairs above will be used for "-3 -sia" calculations.
+
+Example2:
+The following sets of parameters are equivalent:
+  -3 -sia -d:5.0 -lw:3 -aa1:1:317 -ch2:B -aa2:45:361 -gap1:152:156
+and
+  -3 -sia -d:5.0 -lw:3 -er1:1:151,157:317 -er2:45_B:361_B 
+And in both cases the following residue-residue correspondence is established 
+for "-3 -sia" calculation:
+  mol1     mol2  
+     1     45_B
+     2     46_B
+    --- - ---
+   151    195_B
+   157    201_B
+    --- - ---
+   316    360_B
+   317    361_B
+
+Example3:
+Running lga program with an option: -aa
+  lga -aa mol1.mol2
+the following list of amino-acids from both structures is generated:
+
+............
+AAMOL1   44   CA PRO A  44      11.895  -3.179   6.411  1.00  0.25   P
+AAMOL1   45   CA LYS A  45      10.950  -3.861   9.969  1.00  0.47   K
+AAMOL1   46   CA ILE A  46      10.943  -2.854  13.584  1.00  0.23   I
+AAMOL1   47   CA VAL A  47      11.713  -5.569  16.139  1.00  0.90   V
+AAMOL1   48   CA GLY A  48      11.015  -5.370  19.871  1.00  0.32   G
+AAMOL1   49   CA GLY A  49      13.564  -6.389  22.407  1.00  0.35   G
+AAMOL1   50   CA ILE A  50      14.197  -5.657  26.148  1.00  0.30   I
+AAMOL1   51   CA GLY A  51      14.921  -1.941  26.352  1.00  0.28   G
+AAMOL1   52   CA GLY A  52      13.330  -0.914  23.036  1.00  0.37   G
+AAMOL1   53   CA PHE A  53      12.838  -1.655  19.390  1.00  0.62   F
+AAMOL1   54   CA ILE A  54      15.143  -1.706  16.475  1.00  0.17   I
+............
+AAMOL2   25   CA ASP B  25       8.355   2.887  20.497  1.00  6.13   D
+AAMOL2   26   CA THR B  26       6.153   1.507  23.318  1.00  6.74   T
+AAMOL2   27   CA GLY B  27       4.727  -0.899  20.732  1.00  5.25   G
+AAMOL2   28   CA ALA B  28       8.095  -2.602  20.027  1.00  4.63   A
+AAMOL2   29   CA ASP B  29       9.157  -5.564  22.158  1.00 10.93   D
+AAMOL2   30   CA ASP B  30      12.717  -5.124  20.840  1.00 10.93   D
+AAMOL2   31   CA THR B  31      15.176  -2.485  19.633  1.00  5.17   T
+AAMOL2   32   CA VAL B  32      15.713  -2.539  15.844  1.00  8.25   V
+AAMOL2   33   CA LEU B  33      18.305  -0.371  14.098  1.00  8.85   L
+AAMOL2   34   CA GLU B  34      18.800   0.083  10.364  1.00 19.16   E
+AAMOL2   35   CA GLU B  35      21.637  -1.821   8.658  1.00 23.35   E
+AAMOL2   36   CA MET B  36      25.047  -1.128  10.270  1.00 24.89   M
+AAMOL2   37   CA ASN B  37      28.299  -3.021  10.681  1.00 39.03   N
+AAMOL2   38   CA LEU B  38      28.793  -3.464  14.423  1.00 33.97   L
+AAMOL2   39   CA PRO B  39      31.839  -5.455  15.462  1.00 32.47   P
+............
+
+User can attach to the file "mol1.mol2" a set of selected AAMOL* records and run lga
+with an option "-al". In this case only residues listed in AAMOL* records will be 
+used for calculations.
+
+Example4: 
+User can attach to the file "mol1.mol2" a set of selected "LGA" records (see below), 
+and run lga with an option "-al". In this case only residue pairs for which the 
+DISTANCE column is different than "-" will be used for calculations.
+
+#      Molecule1      Molecule2       DISTANCE
+LGA    -       -      A    30_B           -
+LGA    -       -      A    31_B           -
+LGA    -       -      I    32_B           -
+LGA    -       -      A    33_B           -
+LGA    -       -      K    34_B           -
+LGA    -       -      E    35_B           -
+LGA    L    39_A      L    36_B          0.401
+LGA    K    40_A      K    37_B          0.409
+LGA    -       -      L    38_B           -
+LGA    D    42_A      D    39_B          0.350
+LGA    Y    43_A      Y    40_B          0.236
+LGA    E    44_A      E    41_B          0.560
+LGA    L    45_A      L    42_B          0.466
+LGA    K    46_A      K    43_B           -
+LGA    P    47_A      P    44_B           -
+LGA    M    48_A      M    45_B          0.329
+LGA    D    49_A      D    46_B          0.089
+LGA    F    50_A      F    47_B          0.037
+LGA    S    51_A      S    48_B          0.186
+LGA    G    52_A      G    49_B          0.176
+LGA    I    53_A      I    50_B           #
+LGA    I    54_A      I    51_B           #
+LGA    P    55_A      P    52_B          0.210
+LGA    A    56_A      A    53_B          0.558
+LGA    L    57_A      L    54_B          0.398
+LGA    Q    58_A      -       -           -
+LGA    T    59_A      -       -           -
+LGA    K    60_A      K    57_B           #
+LGA    N    61_A      N    58_B           #
+LGA    V    62_A      V    59_B           #
+LGA    D    63_A      D    60_B           #
+LGA    L    64_A      L    61_B           #
+LGA    A    65_A      A    62_B           #
+LGA    L    66_A      L    63_B           #
+LGA    A    67_A      A    64_B           #
+LGA    G    68_A      G    65_B           #
+LGA    I    69_A      I    66_B           #
+LGA    T    70_A      T    67_B           #
+LGA    -       -      I    68_B           -
+LGA    -       -      T    69_B           -
+LGA    -       -      D    70_B           -
+LGA    -       -      E    71_B           -
+MOLECULE  mol1
+ATOM    269  N   LEU A  39      16.096 -48.145  12.331  1.00 12.81           N 
+ATOM    270  CA  LEU A  39      15.692 -49.459  12.808  1.00 13.11           C 
+ATOM    271  C   LEU A  39      16.406 -50.631  12.156  1.00 16.36           C 
+----
+END
+MOLECULE  mol2
+ATOM    237  N   ALA B  30       7.845  28.839   9.911  1.00 16.17           N 
+ATOM    238  CA  ALA B  30       8.434  30.179   9.855  1.00 15.10           C 
+ATOM    239  C   ALA B  30       9.116  30.407   8.502  1.00 17.22           C 
+ATOM    240  O   ALA B  30       8.909  31.432   7.859  1.00 16.39           O 
+----
+ATOM    552  OE1 GLU B  71      -7.284   5.475   5.563  1.00 46.00           O 
+ATOM    553  OE2 GLU B  71      -6.414   4.507   7.314  1.00 42.95           O 
+END
+
+-------------------------------------------------------------------------------
+
+Remember:
+The options -1, -2, -3 work on already established (FIXED) residue-residue
+correspondence. With these options the residue-residue correspondence will 
+not be changed during calculations.
+If user needs to find structure alignment (automatically establish the
+residue-residue correspondence), then the option "-4" has to be used.
+
+-------------------------------------------------------------------------------
+
+                                 LGA 
+                         general description
+
+-------------------------------------------------------------------------------
+
+LGA has been designed to search for the best structure superposition of two 
+protein structures or fragments of protein structures.
+Structure comparative analysis can be made in two general modes:
+
+  - Fixed residue-residue correspondence (options: -1, -2, -3). 
+    This mode can be used when user knows how to establish residue-residue 
+    correspondence for LGA processing (the residue-residue correspondence will 
+    not be changed during the calculations). For example by using the option 
+    "-3 -sda" the program will select for calculations the residues that are 
+    identical ("-sda") by the numbering of amino acid and chain id, and then 
+    identify the fragments where two structures are similar or structurally 
+    different ("-3": LCS and GDT analysis).
+    
+  - Search for residue-residue correspondence (option: -4). 
+    This mode can be used for structural comparison of any two proteins. 
+    For example using the option "-4 -sia" the best superposition (according 
+    to the LGA technique) is calculated completely ignoring sequence 
+    relationship ("-sia") between the two proteins, and the suitable amino 
+    acid correspondence (structural alignment) is reported ("-4").
+
+Most of the structure comparison programs are built on the principle that a
+suitable scoring function can be defined with its optimum corresponding to the
+most significant structural match. Many established comparison techniques
+define structural similarity by two numbers, the root mean square deviation
+(RMSD) between two superimposed structures together with the number of
+"equivalent" (structurally aligned) residues. However, it is impossible
+to optimize these two quantities simultaneously, since one can be optimized
+on the expense of the other. The structural aligner DALI by L. Holm [1] solves
+the optimization problem by combining several numbers to a single quantity,
+called z-score. ProSup aligner by M. Sippl [2] maximizes the number of equivalent
+residues while RMSD is kept close to the constant value.
+
+As a basis for scoring function for LGA aligner serve two new measures LCS and
+GDT. These two measures established by A. Zemla [3] for detection of local and 
+global structure similarities between two proteins were successfully verified 
+during CASP process (see [4], [5]) providing very good ranking of evaluated 
+protein models. Comparing two protein structures LCS procedure is able to localize 
+(along the sequence) the Longest Continuous Segments of residues that can fit 
+under selected RMSD cutoff. Global Distance Test (GDT) algorithm is designed to
+complement evaluations made with LCS searching for the largest (not necessary
+continuous) set of "equivalent" residues deviating by no more than a specified
+DISTANCE cutoff. In comparison with LCS, which provides numerically exact results,
+generation of maximal sets of residues that are not necessarily continuous along
+the main chain is only approximate. The algorithm however uses many different
+DISTANCE cutoffs to find the best global structural match.
+
+                     LCS, GDT, and LGA_S description (see [3], [6])
+
+Longest Continuous Segments under specified CA RMSD cutoff (LCS).
+  The algorithm identifies the longest continuous segments of residues
+  in the target deviating from the model by not more than specified
+  CA RMSD cutoff. Each residue in a target is assigned to the longest 
+  of such segments provided if is a part of that segment (see LCS_GDT records).
+  For different values of the CA RMSD cutoff (1.0 A, 2.0 A, and 5.0 A) the
+  longest continuous segments in the target are reported.
+
+Global Distance Test (GDT). The algorithm identifies in the target
+  the sets of residues deviating from the model by no more than
+  specified CA DISTANCE cutoff using many different superpositions.
+  Each residue from the target is assigned to the largest set of the residues
+  (not necessary continuous) deviating from the model by no more than a
+  specified distance cutoff (see LCS_GDT records: GDT_DATA_COLUMNS).
+  For different values of DISTANCE cutoff (0.5 A, 1.0 A, 1.5 A, ... 10.0 A)
+  the several measures are reported:
+    NUMBER_CA   - the number of CA's from the "largest set" that can fit
+                    under specified distance cutoff
+    PERCENT_CA  - percent of CA's from the "largest set" comparing to the
+                    total number of CA's in target (see GDT_Pn below)
+    RMS_LOCAL   - RMSD (root mean square deviation) calculated on the
+                    "largest set" of CA's
+    RMS_ALL_CA  - RMSD calculated on all CA after superposition of the
+                    prediction structure to the target structure based on
+                    the "largest set" of CA's
+
+    GDT_TS = (GDT_P1 + GDT_P2 + GDT_P4 + GDT_P8)/4.0
+      where GDT_Pn is an estimation of the percent of residues that can
+      fit under distance cutoff <= n.0 Angstroms
+
+
+The GDT procedure is the following. Each three-residue segment and each
+continuous segment found by LCS is used as a starting point to give an
+initial equivalences (model-target CA pairs) for a superposition.
+The list of equivalences is iteratively extended to produce the largest
+set of residues that can fit under considered distance cutoff.
+For collecting data about largest sets of residues the Iterative 
+Superposition Procedure (ISP) is implemented.
+The goal of the ISP method is to exclude from the calculations atoms
+that are more than some threshold (cutoff) distance between the
+model and the target structure after the transform is applied.
+Starting from the initial set of atoms (C-alphas) the algorithm is the
+following:
+  a) calculate the transform
+  b) identify in superimposed structures all atom pairs for which the 
+     distance is not larger than the threshold
+  c) calculate a new transform on the set of identified atom pairs
+  d) exclude from that set the atoms for which the distance (after 
+     applying a new transform) is larger than the threshold
+  e) repeat a) - d) until the set of atoms used in calculations
+     is the same for two cycles running
+
+Results of the analysis given by LCS algorithm show rather local features 
+of the model compared to the target, while the residues considered in GDT 
+come from the whole model structure (they do not have to maintain the continuity 
+along the sequence). From this point of view GDT can detect the kind of GLOBAL 
+level of structure similarity.
+
+By combining these two techniques (RMSD based and distance based), LGA not only 
+calculates a "best" superposition between two proteins (meaning "under certain 
+RMSD and distance cutoffs"), but also identifies the regions of local similarity 
+between compared structures. In the structure alignment search procedure, for each 
+generated list of equivalent residues, the following values are calculated: 
+   LCS_vi - percent of residues in target (continuous set) that can fit under an RMSD 
+            cutoff of vi Angstroms (for vi = 1.0, 2.0, ...), and 
+   GDT_vi - an estimation of the percent of residues in target (largest set) that 
+            can fit under the distance cutoff of vi Angstroms (for vi = 0.5, 1.0, ...). 
+A scoring function (LGA_S - structure similarity score) is defined as a combination 
+of these values. For a given parameter w (0.0<=w<=1.0), representing a weighting 
+factor, LGA_S value is calculated by the formula (see [3], [6] for details): 
+   LGA_S = w*S(GDT) + (1-w)*S(LCS) 
+where S(F) function is defined as follows:
+   S(F) = 2 * (k*F_v1 + (k-1)*F_v2 +...+ 1*F_vk) / ((k+1)*k)
+
+This formula is used to calculate LGA_S values in both cases: the sequence 
+dependent ("-3") and in the sequence independent ("-4") modes.
+NOTE: LGA_S values may slightly differ between "-3" and "-4" calculations even if 
+      performed on the same set of residues. This is because "-3" and "-4" modes use 
+      different procedures to search for the "best" sets of residue pairs to calculate 
+      "optimal" superpositions (to detect maximum number of residues that can fit under 
+      rmsd and distance cutoffs).
+      In order to distinguish these two cases ("-3" and "-4") the calculated value LGA_S
+      is named LGA_S3 when the option "-3" is used.
+
+For the purpose of structure similarity search or ordering of models (or PDB templates),
+the target (frame of the reference, second molecule) should be fixed and then user may
+sort models (see SUMMARY results) by the number of superimposed residues N (under one 
+selected DIST cutoff), or by the values of GDT_TS (average from four distance cutoffs), 
+or LGA_S (weighted results from the full set of distance cutoffs). Let us notice that 
+LGA_S can be used to evaluate the level of structure similarity between proteins in 
+sequence dependent ("-3") mode as well as in structure alignment search ("-4") mode. 
+The experiments show that LGA_S is slightly more sensitive and accurate in scoring 
+structural similarity than GDT_TS.
+
+A set of additional GDT-like measures GDC (Global Distance Calculation) have been developed 
+to allow detailed structure comparison and evaluation of structure similarity of proteins 
+using a list of selected atom positions, not only Calpha positions. For example, to apply 
+superposition-based scoring to the functional ends of protein sidechains, a GDC score 
+for sidechains ("-gdc_sc") uses a characteristic atom near the end of each sidechain type for 
+the evaluation of residue residue distance deviations. The selection of atoms for GDC
+calculations can be done by the "-gdc_at" flag in the LGA command line (see [7] for details).
+
+REFERENCES
+
+[1]   L. Holm, C. Sander: "Protein structure comparison by alignment of distance
+      matrices", J Mol Biol, 1993, 233, pp. 123-138.
+
+[2]   Z. K. Feng, M. J. Sippl: "Optimum superimposition of protein structures:
+      ambiguities and implications", Fold Des, 1996, 1, pp. 123-132.
+
+[3]   A. Zemla: "LGA - A Method for Finding 3-D Similarities in Protein Structures",
+      Nucleic Acids Research, 2003, Vol. 31, No. 13, pp. 3370-3374.
+
+[4]   A. Zemla, C. Venclovas, J. Moult, K. Fidelis: "Processing and evaluation of
+      predictions in CASP4", PROTEINS: Structure, Function, and Genetics,
+      Volume 45, Issue S5, 2001, pp. 13-21.
+
+[5]   S. Cristobal, A. Zemla, D. Fischer, L. Rychlewski, A. Elofsson: "A study
+      of quality measures for protein threading models", BMC Bioinformatics,
+      2001 2: 5.
+
+[6]   A. Zemla, B. Geisbrecht, J. Smith, M. Lam, B. Kirkpatrick, M. Wagner, T. Slezak, 
+      C.E. Zhou. "STRALCP structure alignment-based clustering of proteins", Nucleic 
+      Acids Research, 2007, 35, 22, Pp. e150; doi: 10.1093/nar/gkm1049.
+
+[7]   D. A. Keedy, C. J. Williams, J. J. Headd, W. B. Arendall III, V. B. Chen, 
+      G. J. Kapral, R. A. Gillespie, J. N. Block, A. Zemla, D. C. Richardson, 
+      J. S. Richardson. "The other 90% of the protein: Assessment beyond the Calphas 
+      for CASP8 template-based and high-accuracy models", Proteins: Structure, Function, 
+      Bioinformatics, 2009, 10.1002/prot.22551
+      
+-------------------------------------------------------------------------------
+
+Changes, improvements, development:
+
+-------------------------------------------------------------------------------
+
+### Date: 15 Oct 1999
+
+First version of the LGA program was tested.
+
+### Date: 21 Mar 2000
+
+An extensive analysis of the structure comparison results from PROSUP and LGA programs
+used to evaluate CASP3 models was performed. Evaluation results were compared with Alexey
+Murzin's "Fold recognition" CASP3 assessment.
+
+### Date: 10 May 2000
+
+The performance of LGA program and other structure comparison programs was 
+analysed. Collaborative work with: S. Cristobal, D. Fischer, L. Rychlewski, 
+and A. Elofsson.
+
+### Date: 29 Aug 2000
+
+The results of the comparison of different measures used for the analysis of the 
+quality of protein structure predictions were prepared for the manuscript [5]:
+   S. Cristobal, A. Zemla, D. Fischer, L. Rychlewski, A. Elofsson: "A study
+   of quality measures for protein threading models", BMC Bioinformatics
+   2001 2: 5, 2001.
+       
+### Date: 20 Mar 2001
+
+Thanks to the suggestion from Daniel Barsky (barsky@llnl.gov) an option to
+perform calculation on selected CA atoms was included (AAMOL1 and AAMOL2 records).
+
+### Date: 06 Sep 2001
+
+"Lesk window" option was included to the program. RMSD value calculated 
+on length=2*n+1 residue window (-lw:n).
+
+### Date: 15 Jul 2002
+
+Thanks to the suggestion from Dat H. Nguyen (nguyend@gps01.llnl.gov) an option to
+perform calculations on chosen atoms (NOT only CA) was included.
+
+  -atom:CB    CB atoms will be used for calculations. NOTE (special character
+              in the PARAMATER-OPTIONS line): use , instead of '
+              (for example: H5,1 to select H5'1 atom)
+
+  -ah:i       ATOM or HETATM records are used for calculations:
+                i=0 both (default)
+                i=1 ATOM
+                i=2 HETATM
+
+### Date: 05 Jan 2003
+
+Thanks to the discussions with Michael Levitt (michael.levitt@stanford.edu) the 
+accuracy of LGA (GDT_TS) calculations was improved, and the problem with erroneous 
+calculations on "singular structures" (compressed coordinates, very small distances 
+between atoms) was reduced. 
+
+### Date: 02 Mar 2003
+
+Thanks to the discussions with Nick Grishin (grishin@chop.swmed.edu)
+LGA_S scoring function was improved.
+
+### Date: 11 Oct 2003
+
+Thanks to the suggestion from Bernhard Rupp (br@llnl.gov) the calculation of Euler
+angles has been included:
+
+The convention used (XYZ):
+    phi is about x-axis
+    theta is about y-axis
+    psi is about z-axis
+
+and the translation formulas are the following:
+
+    c1 = cos(phi);    s1 = sin(phi);
+    c2 = cos(theta);  s2 = sin(theta);
+    c3 = cos(psi);    s3 = sin(psi);
+
+    r[1][1] =  c1 * c2;
+    r[2][1] =  c1 * s2 * s3 - s1 * c3;
+    r[3][1] =  c1 * s2 * c3 + s1 * s3;
+    r[1][2] =  s1 * c2;
+    r[2][2] =  s1 * s2 * s3 + c1 * c3;
+    r[3][2] =  s1 * s2 * c3 - c1 * s3;
+    r[1][3] = -s2;
+    r[2][3] =  c2 * s3;
+    r[3][3] =  c2 * c3;
+
+LGA reports ROTATION matrix, VECTOR and Euler angles in the following format:
+
+Unitary ROTATION matrix and the SHIFT vector superimpose molecules  (1=>2)
+  X_new =   0.407935 * X  +  -0.032836 * Y  +   0.912420 * Z  +  11.435461
+  Y_new =   0.509052 * X  +  -0.821424 * Y  +  -0.257154 * Z  +  61.613953
+  Z_new =   0.757928 * X  +   0.569372 * Y  +  -0.318373 * Z  + -36.757996
+
+Euler angles from the ROTATION matrix. Conventions XYZ and ZXZ:
+           Phi     Theta       Psi   [DEG:       Phi     Theta       Psi ]
+XYZ:  0.895225 -0.860131  2.080649   [DEG:   51.2926  -49.2818  119.2124 ]
+ZXZ:  1.296085  1.894809  0.926514   [DEG:   74.2602  108.5646   53.0853 ]
+
+### Date: 21 Dec 2003
+
+Alignment verification module has been improved.
+
+### Date: 11 Jan 2004
+
+New options: -er1:s1:s2 and -er2:s1:s2 have been included. This allows to select
+the exact ranges of residues from molecule1 and molecule2.
+Example: -er1:10_A:16_A -er1:B:B -er2:8_A:20_A -er2:7S_B:7_C
+  where: -er1:10_A:16_A selects in molecule1 the residues 10-16 (chain A)
+         -er1:B:B selects in molecule1 all residues from chain B
+         -er2:8_A:20_A selects in molecule2 the residues 8-20 (chain A)
+         -er2:7S_B:7_C selects in molecule2 the residues 7S_B (residue 7 insertion S
+                       from chain B) up to 7_C (residue 7 from chain C)
+
+### Date: 05 Aug 2004
+
+To run lga calculation on the selected set of residues defined by the 
+attached AAMOL* or LGA records, user has to use the parameter: -al
+otherwise the attached records are ignored.
+
+### Date: 07 Jan 2006
+
+The residue selection module has been improved.
+
+### Date: 23 Jun 2006
+
+The reported total number of atoms in compared structures has been corrected.
+It was calculated based on the number of selected residues, not based on the 
+actual number of residues in compared structures. 
+Thanks to Andriy Kryshtafovych (akryshtafovych@ucdavis.edu) for reporting the issue.
+
+### Date: 25 Sept 2006
+
+The residue selection options "-er1:s1:s2" and "-er2:s1:s2" were corrected.
+Thanks to Yun He (jarod@spg.biosci.tsinghua.edu.cn) for poining out the error.
+
+The residue selection options -er1:s1:s2 (s1 , s2 - strings) have been upgrated. 
+Now, if several "-er1" or "-er2" options are used, then the si pairs (ranges) can be
+separated by ',' -er1:s1:s2,s3:s4,s5:s6,s7:s8,s9:s10 
+
+### Date: 15 Oct 2006
+
+The following option has been introduced: -cb:f
+The coordinates of the point representing amino-acid position for LGA processing 
+can be defined by the point f on the CA-CB vector: -5.0 <= f <= 5.0
+For example: -cb:0 is equivalent to CA position, and -cb:1 is equivalent to CB position
+NOTE: for each amino-acid a complete set of main chain atoms (N,CA,C,O) is required 
+in the input structures.
+
+### Date: 28 Dec 2007
+
+The following options have been introduced: -rmsd , -swap
+They allow to calculate RMSD values on aligned CA, MC (main chain), and ALL atoms. 
+If the option "-swap" is chosen then calculating RMSD on ALL atoms "swapping" 
+is considered. It means that in amino acids where atom names can be switched, i.e.
+       for ASP: OD1 <-> OD2
+       for GLU: OE1 <-> OE2
+       for PHE: CD1 <-> CD2
+                CE1 <-> CE2
+       for TYR: CD1 <-> CD2
+                CE1 <-> CE2
+cartesian rmsd is calculated with an option to minimize its value. Sets (CD1, CE1) and 
+(CD2, CE2) in PHE and TYR, as well as atoms OD1 and OD2 in ASP, OE1 and OE2 in GLU are 
+exchanged and more favorable contributions to rmsd are taken into account.
+For example, if "-rmsd" option is included (./lga 2gff_A.1lq9_A -4 -rmsd) then program 
+will produce results in the following format:
+
+#      Molecule1      Molecule2  DISTANCE    Mis    MC     All    Dist_max   GDC_mc  GDC_all
+..........................
+LGA    I    52_A      N    62_A     0.500     3    0.031   0.038     0.639   92.857   58.929
+LGA    Y    53_A      Y    63_A     0.745     0    0.017   1.384     3.159   88.214   80.040
+LGA    E    54_A      A    64_A     0.907     0    0.095   0.095     1.019   88.214   88.667
+LGA    A    55_A      Q    65_A     1.665     4    0.089   0.104     2.060   79.286   42.434
+LGA    Y    56_A      W    66_A     1.275     9    0.076   0.099     1.556   79.286   28.469
+LGA    T    57_A      E    67_A     1.446     4    0.026   0.030     1.614   81.429   44.286
+LGA    D    58_A      S    68_A     1.400     1    0.070   0.118     1.400   81.429   67.857
+LGA    E    59_A      E    69_A     1.595     0    0.082   1.042     2.146   75.000   77.884
+LGA    A    60_A      Q    70_A     1.584     4    0.033   0.032     1.774   77.143   42.381
+..........................
+# RMSD_GDC results:       CA      MC common percent     ALL common percent   GDC_mc  GDC_all
+NUMBER_OF_ATOMS_AA:       91     364    364  100.00     700    490   70.00               112
+SUMMARY(RMSD_GDC):     2.343          2.349                  2.539           56.941   41.648
+
+#CA            N1   N2   DIST      N    RMSD   Seq_Id      LGA_S     LGA_Q
+SUMMARY(LGA)   97  112    5.0     91    2.34    18.68     62.085     3.724
+
+where "Mis" column gives the number of missing atoms in a given amino acid (missing atom 
+pairs; relative to the amino acid defined in Molecule2), "MC" - rmsd calculated on main 
+chain atoms, and "All" - rmsd on all corresponding (common) atoms from aligned amino acids. 
+
+If both options are included "-rmsd -swap" (or just "-swap") then the following results 
+are reported:
+ 
+# Checking swapping
+#   possible swapping detected:  Y    53_A      Y    63_A
+#   possible swapping detected:  E    59_A      E    69_A
+#   possible swapping detected:  E    76_A      E    87_A
+
+#      Molecule1      Molecule2  DISTANCE    Mis    MC     All    Dist_max   GDC_mc  GDC_all
+..........................
+LGA    I    52_A      N    62_A     0.500     3    0.031   0.038     0.639   92.857   58.929
+LGA    Y    53_A      Y    63_A     0.745     0    0.017   0.058     1.037   88.214   88.214
+LGA    E    54_A      A    64_A     0.907     0    0.095   0.095     1.019   88.214   88.667
+LGA    A    55_A      Q    65_A     1.665     4    0.089   0.104     2.060   79.286   42.434
+LGA    Y    56_A      W    66_A     1.275     9    0.076   0.099     1.556   79.286   28.469
+LGA    T    57_A      E    67_A     1.446     4    0.026   0.030     1.614   81.429   44.286
+LGA    D    58_A      S    68_A     1.400     1    0.070   0.118     1.400   81.429   67.857
+LGA    E    59_A      E    69_A     1.595     0    0.082   0.640     1.898   75.000   80.741
+LGA    A    60_A      Q    70_A     1.584     4    0.033   0.032     1.774   77.143   42.381
+..........................
+
+# RMSD_GDC results:       CA      MC common percent     ALL common percent   GDC_mc  GDC_all
+NUMBER_OF_ATOMS_AA:       91     364    364  100.00     700    490   70.00               112
+SUMMARY(RMSD_GDC):     2.343          2.349                  2.524           56.941   41.751
+
+#CA            N1   N2   DIST      N    RMSD   Seq_Id      LGA_S     LGA_Q
+SUMMARY(LGA)   97  112    5.0     91    2.34    18.68     62.085     3.724
+
+These options can be combined with "-lw:n" to specify the length of sliding window for 
+calculating local RMSDs.
+
+### Date: 02 Jan 2008
+
+The output from the calculations of Euler angles from the ROTATION matrix has been 
+modified. The calculations for two most popular conventions XYZ and ZXZ (ZXZ is used 
+in CHIMERA) are now reported:
+
+Unitary ROTATION matrix and the SHIFT vector superimpose molecules  (1=>2)
+  X_new =  -0.347115 * X  +  -0.009255 * Y  +   0.937777 * Z  + -11.467628
+  Y_new =  -0.754312 * X  +  -0.591409 * Y  +  -0.285043 * Z  +  10.637938
+  Z_new =   0.557247 * X  +  -0.806319 * Y  +   0.198306 * Z  +  -8.800918
+
+Euler angles from the ROTATION matrix. Conventions XYZ and ZXZ:
+           Phi     Theta       Psi   [DEG:       Phi     Theta       Psi ]
+XYZ: -2.002079 -0.591067 -1.329643   [DEG: -114.7107  -33.8656  -76.1829 ]
+ZXZ:  1.275714  1.371167  2.536865   [DEG:   73.0930   78.5621  145.3516 ]
+
+The translation formulas for ZXZ convention are the following:
+
+    c1 = cos(phi);    s1 = sin(phi);
+    c2 = cos(theta);  s2 = sin(theta);
+    c3 = cos(psi);    s3 = sin(psi);
+
+    r[1][1] =  c1 * c3 - s1 * c2 * s3;
+    r[1][2] =  s1 * c3 + c1 * c2 * s3;
+    r[1][3] =  s2 * s3; 
+    r[2][1] = -c1 * s3 - s1 * c2 * c3;
+    r[2][2] = -s1 * s3 + c1 * c2 * c3;
+    r[2][3] =  s2 * c3;
+    r[3][1] =  s1 * s2;
+    r[3][2] = -c1 * s2;
+    r[3][3] =  c2;
+
+Thanks to Bernhard Rupp (bernhardrupp@sbcglobal.net) for suggesting this modification.
+
+### Date: 21 Feb 2008
+
+The format of the LCS_GDT lines has been slightly modified to provide a better description 
+of the results reported in the LCS GDT section:
+LCS_GDT    MOLECULE-1    MOLECULE-2     LCS_DETAILS     GDT_DETAILS                   ...
+LCS_GDT     RESIDUE       RESIDUE       SEGMENT_SIZE    GLOBAL DISTANCE TEST COLUMNS: ...
+LCS_GDT   NAME NUMBER   NAME NUMBER    1.0  2.0  5.0    0.5  1.0  1.5  2.0  2.5  3.0  ...
+
+The option "-gdt" has been introduced. It can be combined ONLY with the "-3" option. 
+If "-3 -gdt" is used then the reported final superposition is the one that fits maximum 
+number of residues (N) under a given distance cutoff. This is exactly the same superposition 
+as is reported by default in the previous versions of the LGA program when "-3" option was used.
+From now the default reported superposition for "-3" mode is the standard superposition 
+calculated using the set of identified N residues. 
+NOTE: when the standard superposition is applied then not all residues from N identified by 
+LGA (GDT algoritm) may stil fit under a selected distance cutoff DIST.
+
+### Date: 10 July 2008
+
+The option of calculating CB atom positions "-cb:f" can be combined with "-atom:CB".
+If two options are combined (e.g. "-cb:1 -atom:CB"), then all existing CB atoms are 
+leveraged and only missing CB atoms are calculated.
+
+A new option "-check" has been introduced to check and report amino acids with missing 
+pre-selected atoms ("CA" atoms are pre-selected as default atoms for LGA calculations).
+If "-cb:f" option is used, then program will report amino-acids with missing main chain 
+atoms (N, CA, C, or O).
+
+### Date: 18 July 2008
+
+The new two options "-gdc_sup" and "-gdc_set" have been introduced  to allow calculate 
+an additional superposition on a selected set of amino acids and use this superposition 
+to evaluate distances between atoms from another set of selected amino acids.
+
+Thanks to Yun He (jarodpardon@gmail.com) and Daniel Barsky (barsky@llnl.gov) for 
+suggesting this modification.
+
+When "-swap" or "-rmsd" options are used, then the GDC (Global Distance Calculations) 
+analysis (as default) is performed on all amino acids that are used for regular LGA 
+calculations. 
+
+To define a set of amino acids for calculating additional superposition for GDC analysis
+we can make amino acids selection using an option "-gdc_sup:s1:s2,s3:s4". 
+To evaluate a selected set of amino acids we can use an option "-gdc_set:s5:s6,s7:s8". 
+For example, if we run the LGA program as:
+./lga model.target -3 -sda -d:4 -swap -gdc_sup:s1:s2 -gdc_set:s5:s6,s7:s8
+then the SUMMARY(GDT) results (GDT_TS, LGA_S3, N, ...) will be calculated as before 
+(using all (in common) amino acids from both structures (model and target)), but the 
+GDC results (Dist_max and GDC columns in LGA records, and SUMMARY(RMSD_GDC)) will be 
+calculated for s5:s6,s7:s8 ranges only using the superposition created based on the 
+amino acids from the range s1:s2.
+
+Another example: 
+./lga 1hiv_A.1sip_A -4 -er2:10_A:70_A -gdc_sup:14_A:50_A -gdc_set:24_A:33_A
+
+#      Molecule1      Molecule2  DISTANCE    Mis    MC     All    Dist_max   GDC_mc  GDC_all
+..........................
+LGA    E    21_A      E    21_A     0.828     0    0.109   0.345      -        -        -
+LGA    A    22_A      V    22_A     0.377     2    0.057   0.109      -        -        -
+LGA    L    23_A      L    23_A     0.409     0    0.075   0.255      -        -        -
+LGA    L    24_A      L    24_A     0.296     0    0.123   0.142     0.714  100.000   96.429
+LGA    D    25_A      D    25_A     0.242     0    0.136   0.346     0.787  100.000   96.429
+LGA    T    26_A      T    26_A     0.393     0    0.074   0.236     0.501  100.000   98.639
+LGA    G    27_A      G    27_A     0.181     0    0.032   0.032     0.273  100.000  100.000
+LGA    A    28_A      A    28_A     0.481     0    0.103   0.203     0.681   97.619   96.190
+LGA    D    29_A      D    29_A     0.355     0    0.121   0.157     0.563  100.000   98.810
+LGA    D    30_A      D    30_A     0.484     0    0.075   0.531     2.046  100.000   88.869
+LGA    T    31_A      S    31_A     0.726     1    0.025   0.059     0.762   97.619   80.159
+LGA    V    32_A      I    32_A     0.473     3    0.095   0.149     0.857  100.000   61.310
+LGA    L    33_A      V    33_A     0.287     2    0.086   0.096     0.722   97.619   68.707
+LGA    E    34_A      T    34_A     0.791     2    0.095   0.102      -        -        -
+LGA    E    35_A      G    35_A     3.617     0    0.609   0.609      -        -        -
+LGA    M    36_A      I    36_A     2.135     3    0.044   0.095      -        -        -
+LGA    S    37_A      E    37_A     1.098     4    0.029   0.042      -        -        -
+..........................
+# RMSD_GDC results:       CA      MC common percent     ALL common percent   GDC_mc  GDC_all
+NUMBER_OF_ATOMS_AA:       61     244    244  100.00     457    361   78.99                10
+SUMMARY(RMSD_GDC):     1.281          1.245                  1.560           99.286   88.554
+
+#CA            N1   N2   DIST      N    RMSD   Seq_Id      LGA_S     LGA_Q
+SUMMARY(LGA)   99   61    5.0     61    1.28    45.90     95.952     4.417
+
+In the example above the main superposition and the distances between CA atoms (DISTANCE 
+column) were calculated using selected set of CA atoms (see range: -er2:10_A:70_A) from 
+the target (molecule2; 1sip_A). MC and All columns contain "local" RMSD values calculated 
+on mainchain (MC) and all (All) atoms from the given aligned amino acids. The GDC columns 
+(Dist_max, GDC_mc and GDC_all) contain results from distance calculations using an additional 
+superposition which is calculated as a standard CA-based superposition applied to the 
+restricted set (see range "-gdc_sup:14_A:50_A" from molecule2) of residue-residue pairs 
+(correspondences) identified by the main LGA superposition. The additional superposition is 
+used for GDC calculations applied to the set of residue-residue pairs from the range defined 
+by "-gdc_set:24_A:33_A". The row SUMMARY(RMSD_GDC) contains an average value from all 10 (in
+this example) calculated GDC_mc and 10 GDC_all values. Dist_max is a maximum distance between 
+corresponding atoms from the aligned (equivalent) amino acids.
+
+For each amino acid from the set "-gdc_set:24_A:33_A" the values of GDC_mc and GDC_all are
+calculated by the following GDC algorithm:
+1) superposition is calculated using the range "-gdc_sup:14_A:50_A" of amino acids from 
+   the molecule2
+2) the distances between corresponding atoms (model.target) from each selected amino acid 
+   are assigned to the k=20 distance bins: 0.5A, 1.0A, 1.5A, 2.0A, 2.5A, ... 
+   (NOTE: the lowest distance deviation bin is defined as a range: 0.0 - 0.5 Angstroms,
+   the second bin is defined as" 0.0 - 1.0 Angstroms, third: 0.0 - 1.5A, etc)
+3) for each bin_i (i=1 ... 20) the percentages Pa_i of assigned atoms are calculated
+4) all percentages are added by the formula: 
+   GDC_all = 100.0 * 2 * (k*Pa_1 + (k-1)*Pa_2 +...+ 1*Pa_k) / ((k+1)*k), where k=20.
+
+NOTE: The ranges defined by the options "-gdc_sup" and "-gdc_set" have to be the subsets 
+of the list of residues used for main superposition. It is because the LGA program needs 
+to identify residue-residue correspondences (equivalences) before GDC evaluation of the 
+selected residues and atoms can be performed.
+
+If ranges "-gdc_sup:s1:s2" and "-gdc_set:s3:s4" are not specified, then the GDC calculations are 
+performed on the same set of amino acids as is used for regular LGA calculations (main
+superposition).
+
+### Date: 31 July 2008
+
+Many thanks to Jane Richardson (dcrjsr@kinemage.biochem.duke.edu) and the members of 
+the Richardson Lab. A number of improvements and new options has been introduced to 
+the LGA program. Details are below.
+
+A new option "-gdc_sup" has been introduced to report and rotate molecule1 using the 
+superposition that is used for GDC calculations (e.g. defined by "-gdc_sup:s1:s2"). 
+If "-gdc_sup" is not specified then the standard LGA superposition is reported.
+
+A new option: -gdc_at:a1,a2,a3,a4 has been implemented. It allows to select atoms (one 
+atom per one name of amino-acid) from the molecule2 for which the GDC calculations 
+(distances and GDC summary) will be calculated. 
+Format example (aa.atom): a1 = V.CG1, a2 = C.SG, a3 = T.OG1, a4 = H.NE2
+NOTE: this option is applied to the molecule2 only. The corresponding atoms from the 
+molecule1 will be detected based on the calculated alignment. Up to 20 representative 
+atoms (one atom per each of 20 amino-acids) can be selected for GDC evaluation.
+
+The following "aa.atom" naming scheme is allowed:
+  aa   atom
+  A:   N CA C O CB                                     
+  V:   N CA C O CB CG1 CG2                             
+  L:   N CA C O CB CG  CD1 CD2                         
+  I:   N CA C O CB CG1 CG2 CD1                         
+  P:   N CA C O CB CG  CD                              
+  M:   N CA C O CB CG  SD  CE                          
+  F:   N CA C O CB CG  CD1 CD2 CE1 CE2 CZ              
+  W:   N CA C O CB CG  CD1 CD2 NE1 CE2 CE3 CZ2 CZ3 CH2 
+  G:   N CA C O                                        
+  S:   N CA C O CB OG                                  
+  T:   N CA C O CB OG1 CG2                             
+  C:   N CA C O CB SG                                  
+  Y:   N CA C O CB CG  CD1 CD2 CE1 CE2 CZ  OH          
+  N:   N CA C O CB CG  OD1 ND2                         
+  Q:   N CA C O CB CG  CD  OE1 NE2                     
+  D:   N CA C O CB CG  OD1 OD2                         
+  E:   N CA C O CB CG  CD  OE1 OE2                     
+  K:   N CA C O CB CG  CD  CE  NZ                      
+  R:   N CA C O CB CG  CD  NE  CZ  NH1 NH2             
+  H:   N CA C O CB CG  ND1 CD2 CE1 NE2                 
+  X:   N CA C O CB                                     
+
+NOTE: if selected atom is not present in the coordinates of superimposed amino-acids 
+in both molecules (molecule1 and molecule2), then particular amino-acid position will 
+not be evaluated.
+ 
+Example of the complete list of atoms (side chain ends) selected for each amino-acid:
+-gdc_at:G.CA,A.CB,V.CG1,L.CD1,I.CD1,M.CE,S.OG,T.OG1,C.SG,N.OD1,Q.OE1,D.OD2,E.OE2,K.NZ
+-gdc_at:R.NH2,P.CG,W.CH2,H.NE2,F.CZ,Y.OH
+
+Example of the command line for running LGA program (the same example as shown above):
+./lga 1hiv_A.1sip_A -4 -er2:10_A:70_A -gdc_sup:14_A:50_A -gdc_set:24_A:33_A -gdc_at:G.CA,A.CB,V.CG1,L.CD1,I.CD1,M.CE,S.OG,T.OG1,C.SG,N.OD1,Q.OE1,D.OD2,E.OE2,K.NZ,R.NH2,P.CG,W.CH2,H.NE2,F.CZ,Y.OH
+
+The LGA program will produce the following output:
+
+#      Molecule1      Molecule2  DISTANCE    Mis    MC     All    Dist_max   GDC_mc  GDC_all  Dist_at
+................................................
+LGA    E    21_A      E    21_A     0.828     0    0.109   0.345      -        -        -        -
+LGA    A    22_A      V    22_A     0.377     2    0.057   0.109      -        -        -        -
+LGA    L    23_A      L    23_A     0.409     0    0.075   0.255      -        -        -        -
+LGA    L    24_A      L    24_A     0.296     0    0.123   0.142     0.714  100.000   96.429    0.714
+LGA    D    25_A      D    25_A     0.242     0    0.136   0.346     0.787  100.000   96.429    0.787
+LGA    T    26_A      T    26_A     0.393     0    0.074   0.236     0.501  100.000   98.639    0.501
+LGA    G    27_A      G    27_A     0.181     0    0.032   0.032     0.273  100.000  100.000    0.216
+LGA    A    28_A      A    28_A     0.481     0    0.103   0.203     0.681   97.619   96.190    0.681
+LGA    D    29_A      D    29_A     0.355     0    0.121   0.157     0.563  100.000   98.810    0.563
+LGA    D    30_A      D    30_A     0.484     0    0.075   0.531     2.046  100.000   88.869    2.046
+LGA    T    31_A      S    31_A     0.726     1    0.025   0.059     0.762   97.619   80.159     -
+LGA    V    32_A      I    32_A     0.473     3    0.095   0.149     0.857  100.000   61.310     -
+LGA    L    33_A      V    33_A     0.287     2    0.086   0.096     0.722   97.619   68.707     -
+LGA    E    34_A      T    34_A     0.791     2    0.095   0.102      -        -        -        -
+LGA    E    35_A      G    35_A     3.617     0    0.609   0.609      -        -        -        -
+LGA    M    36_A      I    36_A     2.135     3    0.044   0.095      -        -        -        -
+LGA    S    37_A      E    37_A     1.098     4    0.029   0.042      -        -        -        -
+................................................
+# RMSD_GDC results:       CA      MC common percent     ALL common percent   GDC_mc  GDC_all   GDC_at
+NUMBER_OF_ATOMS_AA:       61     244    244  100.00     457    361   78.99                10        7
+SUMMARY(RMSD_GDC):     1.281          1.245                  1.560           99.286   88.554   88.163
+
+#CA            N1   N2   DIST      N    RMSD   Seq_Id      LGA_S     LGA_Q
+SUMMARY(LGA)   99   61    5.0     61    1.28    45.90     95.952     4.417
+
+Another example of the command line for running LGA program:
+./lga 1m2f_A_2.1m2e_A -3 -gdc_at:G.CA,A.CB,V.CG1,L.CD1,I.CD1,M.CE,S.OG,T.OG1,C.SG,N.OD1,Q.OE1,D.OD2,E.OE2,K.NZ,R.NH2,P.CG,W.CH2,H.NE2,F.CZ,Y.OH -gdc_set:100_A:110_A
+ 
+The LGA program will produce the following output:
+ 
+# Molecule1: number of CA atoms  135 ( 2092),  selected  135 , name 1m2f_A_2
+# Molecule2: number of CA atoms  135 ( 2091),  selected  135 , name 1m2e_A
+# PARAMETERS: 1m2f_A_2.1m2e_A  -3  -gdc_at:G.CA,A.CB,V.CG1,L.CD1,I.CD1,M.CE,S.OG,T.OG1,C.SG,N.OD1,Q.OE1,D.OD2,E.OE2,K.NZ,R.NH2,P.CG,W.CH2,H.NE2,F.CZ,Y.OH  -gdc_set:100_A:110_A
+# FIXED Atom-Atom correspondence
+# GDT and LCS analysis
+................................................
+#      Molecule1      Molecule2  DISTANCE    Mis    MC     All    Dist_max   GDC_mc  GDC_all  Dist_at
+................................................
+LGA    K    95_A      K    95_A     0.975     0    0.443   1.011      -        -        -        -
+LGA    E    96_A      E    96_A     1.543     0    0.128   0.130      -        -        -        -
+LGA    Q    97_A      Q    97_A     1.169     0    0.056   0.702      -        -        -        -
+LGA    L    98_A      L    98_A     0.808     0    0.067   0.162      -        -        -        -
+LGA    Y    99_A      Y    99_A     0.356     0    0.024   0.128      -        -        -        -
+LGA    H   100_A      H   100_A     0.720     0    0.024   0.144     0.887   90.476   90.476    0.509
+LGA    S   101_A      S   101_A     1.141     0    0.006   0.611     1.420   83.690   82.937    1.073
+LGA    A   102_A      A   102_A     1.001     0    0.015   0.016     1.022   85.952   85.048    1.022
+LGA    E   103_A      E   103_A     0.627     0    0.060   0.777     1.947   90.476   89.630    1.475
+LGA    L   104_A      L   104_A     0.499     0    0.016   0.050     0.796  100.000   96.429    0.796
+LGA    H   105_A      H   105_A     0.458     0    0.002   0.222     0.949  100.000   94.286    0.817
+LGA    L   106_A      L   106_A     0.403     0    0.046   0.088     0.708   97.619   97.619    0.502
+LGA    G   107_A      G   107_A     0.486     0    0.027   0.027     0.486  100.000  100.000    0.486
+LGA    I   108_A      I   108_A     0.561     0    0.035   0.075     0.904   90.476   90.476    0.861
+LGA    H   109_A      H   109_A     0.765     0    0.046   1.005     6.852   90.476   59.190    6.852
+LGA    Q   110_A      Q   110_A     0.374     0    0.029   0.460     1.399  100.000   94.815    1.238
+LGA    L   111_A      L   111_A     0.381     0    0.006   0.042      -        -        -        -
+LGA    E   112_A      E   112_A     0.468     0    0.029   0.160      -        -        -        -
+LGA    Q   113_A      Q   113_A     0.475     0    0.015   0.630      -        -        -        -
+................................................
+# RMSD_GDC results:       CA      MC common percent     ALL common percent   GDC_mc  GDC_all   GDC_at
+NUMBER_OF_ATOMS_AA:      135     540    540  100.00    1054   1054  100.00                11       11
+SUMMARY(RMSD_GDC):     0.914          0.949                  1.486           93.561   89.173   81.039
+
+#CA            N1   N2   DIST      N    RMSD    GDT_TS    LGA_S3     LGA_Q
+SUMMARY(GDT)  135  135    5.0    135    0.91    96.296    98.268    13.314
+
+LGA_LOCAL      RMSD:   0.914  Number of atoms:  135  under DIST:   5.00
+LGA_ASGN_ATOMS RMSD:   0.914  Number of assigned atoms:  135
+Std_ASGN_ATOMS RMSD:   0.914  Standard rmsd on all 135 assigned CA atoms
+
+In "Dist_at" column are provided results from the distance calculations between 
+corresponding atoms (model:1m2f_A_2 - target:1m2e_A) using standard LGA (-3) 
+superposition.
+In the "GDC_at" column is shown the number of amino-acids for which "Dist_at" 
+values are calculated and the summary value GDC_at is calculated using similar 
+algorithm as for calculating GDC_mc and GDC_all:
+1) the distances (Dist_at) between corresponding atoms (model.target) from each 
+   selected amino acid are assigned to the k=20 distance bins: 0.5A, 1.0A, 1.5A, 
+   2.0A, 2.5A, ... 
+2) for each bin_i (i=1 ... 20) the percentages Pa_i of assigned atoms are calculated
+3) all percentages are added by the formula: 
+   GDC_at = 100.0 * 2 * (k*Pa_1 + (k-1)*Pa_2 +...+ 1*Pa_k) / ((k+1)*k), where k=20.
+
+A new option: -gdc_eat:e1:e2,e3:e4 has been implemented. It allows to select exact 
+atoms from the molecule1 and molecule2 for the GDC calculations (distances and GDC 
+summary).
+Format example (aanumber.atom): e1 = 132_A.CG1, e2 = 124_B.SG, e3 = 400.FE, e4 = 300.FE
+NOTE1: this option allows calculate the distances between any atoms from the molecule1 
+and molecule2. The distances are calculated after superposition is applied.
+NOTE2: "-gdc_eat:e1:e2" provides an information about the distances between any exact atom 
+positions (as they are loaded from the PDB file), so in this case a "-swap" option is 
+not fixing a possible ambiguity in atom names. See example below:
+
+Example of the command line:
+./lga 1m2f_A_2.1m2e_A -4 -gdc_set:20_A:30_A -swap -gdc_at:D.OD1 -gdc_eat:27_A.OD1:27_A.OD1,27_A.OD1:27_A.OD2,27_A.OD2:27_A.OD1,27_A.OD2:27_A.OD2 
+
+Created output:
+
+# Molecule1: number of CA atoms  135 ( 2092),  selected  135 , name 1m2f_A_2
+# Molecule2: number of CA atoms  135 ( 2091),  selected  135 , name 1m2e_A
+# PARAMETERS: 1m2f_A_2.1m2e_A  -4  -gdc_set:20_A:30_A  -swap  -gdc_at:D.OD1  -gdc_eat:27_A.OD1:27_A.OD1,27_A.OD1:27_A.OD2,27_A.OD2:27_A.OD1,27_A.OD2:27_A.OD2
+# Search for Atom-Atom correspondence
+# Structure alignment analysis
+
+# Checking swapping
+#   possible swapping detected:  D    27_A      D    27_A
+................................................
+#      Molecule1      Molecule2  DISTANCE    Mis    MC     All    Dist_max   GDC_mc  GDC_all  Dist_at
+................................................
+LGA    Q    18_A      Q    18_A     0.271     0    0.082   0.430      -        -        -        -
+LGA    D    19_A      D    19_A     0.644     0    0.046   0.155      -        -        -        -
+LGA    C    20_A      C    20_A     0.405     0    0.013   0.062     0.505   97.619   98.413     -
+LGA    Q    21_A      Q    21_A     0.448     0    0.024   0.087     0.871   95.238   92.593     -
+LGA    R    22_A      R    22_A     0.871     0    0.031   0.841     4.423   90.476   68.052     -
+LGA    A    23_A      A    23_A     0.767     0    0.025   0.029     0.778   90.476   90.476     -
+LGA    L    24_A      L    24_A     0.453     0    0.027   0.054     0.593   92.857   96.429     -
+LGA    S    25_A      S    25_A     0.746     0    0.067   0.108     0.916   90.476   90.476     -
+LGA    A    26_A      A    26_A     0.550     0    0.037   0.046     0.647   90.476   92.381     -
+LGA    D    27_A      D    27_A     0.720     0    0.020   0.231     0.846   90.476   90.476    0.818
+LGA    R    28_A      R    28_A     0.613     0    0.026   0.293     1.315   90.476   91.385     -
+LGA    Y    29_A      Y    29_A     0.562     0    0.025   0.627     1.799   90.476   88.413     -
+LGA    Q    30_A      Q    30_A     0.857     0    0.009   1.029     2.645   90.476   81.905     -
+LGA    L    31_A      L    31_A     0.970     0    0.072   0.437      -        -        -        -
+LGA    Q    32_A      Q    32_A     0.471     0    0.043   0.113      -        -        -        -
+................................................
+GDC_eat:   ASP     27_A.OD1     ASP     27_A.OD1   distance:    2.386
+GDC_eat:   ASP     27_A.OD1     ASP     27_A.OD2   distance:    0.846
+GDC_eat:   ASP     27_A.OD2     ASP     27_A.OD1   distance:    0.818
+GDC_eat:   ASP     27_A.OD2     ASP     27_A.OD2   distance:    1.985
+
+# RMSD_GDC results:       CA      MC common percent     ALL common percent   GDC_mc  GDC_all   GDC_at  GDC_eat
+NUMBER_OF_ATOMS_AA:      135     540    540  100.00    1054   1054  100.00                11        1        4
+SUMMARY(RMSD_GDC):     0.914          0.949                  1.461           91.775   89.182   90.476   79.643
+
+In the lines "GDC_eat:" are provided results from the distance calculations between selected 
+atoms (model:1m2f_A_2 - target:1m2e_A) using standard LGA (-4) superposition.
+In the section "# RMSD_GDC results:" are provided summary results from the distance 
+calculations ("GDC_eat" column). It is shown the number of compared pairs of atoms (4) and 
+the summary value GDC_eat calculated using a similar algorithm as is used for calculating 
+"GDC_at" (see above).
+
+### Date: 07 August 2008
+
+The following addition has been introduced to the option: -gdc_at:a1,a2,a3,a4 
+Now the selection of CB position for glycine is allowed: G.CB (the CB coordinates will be 
+calculated automatically based on the main chain atoms possitions).
+NOTE: a complete set of main chain atoms (N,CA,C,O) is required for both input structures.
+
+### Date: 28 August 2008
+
+The following addition to the option "-gdc_at" has been introduced: -gdc_at:*.atom 
+The selection of one mainchain or CB atom (N,CA,C,O,CB) the same for all amino-acids ('*') 
+is now allowed (e.g. -gdc_at:*.N).
+NOTE: amino-acids from the molecule2 serve as a frame of reference for GDC evaluation 
+(corresponding amino-acids or atoms that are missing in molecule1 are counted as 0 scores 
+in GDC calculations). If the option "-gdc_at:*.CB" is selected, then for "Dist_at" and "GDC_at" 
+calculations the coordinates for CB possitions are automatically calculated for GLYcines only
+(the CB coordinates for other than GLY amino-acids have to be present in the provided files).
+
+### Date: 14 March 2009
+
+A new option "-gdc:n" has been introduced to define a number of bins used for GDC evaluation 
+of atom pairs from the corresponding residues (1 <= n <= 20; bins: <0.5, <1.0, ... <10.0).
+If "-gdc:n" is not specified then n=20 (default).
+
+Many thanks to Jane Richardson (dcrjsr@kinemage.biochem.duke.edu) and the members of the 
+Richardson Lab for introducing a new GDT-like score called GDC_sc (global distance calculation 
+for sidechains). Instead of comparing residue positions on the basis of Calphas, GDC_sc uses a
+characteristic atom near the end of each sidechain type for the evaluation of residue-residue 
+distance deviations. The list of 18 atoms is given by the -gdc_at flags in the LGA command shown 
+below, where each one-letter amino-acid code is followed by the PDB-format atom name to be used. 
+
+List of flags to perform GDC_sc calculations: 
+  -swap -gdc:10 -gdc_at:V.CG1,L.CD1,I.CD1,P.CG,M.CE,F.CZ,W.CH2,S.OG
+  -gdc_at:T.OG1,C.SG,Y.OH,N.OD1,Q.OE1,D.OD2,E.OE2,K.NZ,R.NH2,H.NE2
+
+Gly and Ala are not included, since their positions are directly determined by the backbone.  
+The -swap flag takes care of the possible ambiguity in Asp or Glu terminal oxygen naming.
+For GDC_sc, the "optimal" LGA superposition is used to calculate percentages of corresponding 
+model-target atom pairs that fit under 10 distance-limit values from 0.5A to 5A.  
+The procedure assigns each reference atom to the relevant bin for its model vs target distance: 
+<0.5A, <1.0A, ... <4.5A, <5.0A; for each bin_i, the fraction (Pa_i) of assigned atoms is calculated; 
+finally the fractions are added and scaled to give a GDC_sc value between 0 and 100, by the formula:
+
+GDC_sc = 100*2*(k*Pa_1 + (k-1)*Pa_2 ... + 1*Pa_k) / (k+1)*k, where k=10.
+
+A new flag: "-gdc_sc" has been introduced to the LGA program to facilitate GDC_sc calculations.
+This new flag selects all parameters required for GDC_sc calculations (see list of GDC_sc flags
+above).
+
+### Date: 21 April 2009
+
+A new option "-gdc_ref:n" has been introduced to allow GDC evaluation using atoms from the target 
+as a frame of reference (missing atoms in compared amino acids are calculated relative to the 
+reference structure: second molecule).
+  -gdc_ref:0 - requesting a complete set of atoms within each residue from both structures. 
+               The score is calculated refering to the definition of the amino acid from the 
+               target structure (second molecule). Any missing atoms in any of compared structures
+               lower the GDC scores.
+  -gdc_ref:1 - using existing atoms from the target as a frame of reference. Atoms that are 
+               missing in the model structure (first molecule) are lowering the GDC scores.
+  -gdc_ref:2 - using existing atoms from the target as a frame of reference. When identical 
+               residues are aligned then the atoms that are missing in the model structure (first 
+               molecule) are lowering the score. In the case of different residues aligned only 
+               the main-chain and CB atoms are taken into account.
+
+The shortcut flag "-gdc" corresponds to "-gdc_ref:2 -swap".
+
+### Date: 16 September 2011
+
+A residue selection options -er1:s1:s1,s2:s2,s3:s3 (si - strings: single residues or chains) have
+been improved. Now, if several "single" residues or chains need to be selected then the si pairs 
+(ranges si:si) can be simplfied by: -er1:s1,s2,s3 (single residues or chains can be separated 
+by ','(no beg:end required)).
+
+A format of the output from the option "-aa" (listing selected residues) has been modified.

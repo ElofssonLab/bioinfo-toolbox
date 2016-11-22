@@ -1,0 +1,98 @@
+LGA package
+-----------
+
+NOTE: recommended settings: ulimit -s unlimited 
+      or for example (.cshrc sun): limit stacksize 32768
+      or for example (.profile apple): ulimit -s 32768
+
+The package contains the latest version of the LGA program (Linux, SunOS, and Apple executables).
+
+To calculate structural superpositions between two structures the user can select
+several different options (for details please check README.lga and "run_examples" files).
+
+In general, lga can perform calculations in two different modes:
+1. Fixed residue-residue correspondence (options: -1, -2, -3). For example: -3 -sda
+2. Search for residue-residue correspondence (option: -4). For example: -4 -sia
+
+IMPORTANT: the options "-1, -2, -3" do NOT calculate structure based alignment.
+With these options the user can calculate structure superpositions for a *given*
+(fixed) residue-residue correspondence.
+NOTE: the desired residue-residue correspondence can be defined
+using options like: -sda, -ch1:A, -aa1:n1:n2, -er1:s1:s2, -al, ...
+NOTE: the option -sda can be used if two protein structures overlap by the
+numbering of amino acids. The chain IDs can be specified using parameters, e.g.:
+-ch1:A -ch2:B.
+
+IMPORTANT: If the user needs to find structure alignment (automatically establish
+the residue-residue correspondence), then the option "-4" has to be used.
+
+To run LGA calculations the user can use a perl script:
+  runlga.mol_mol.pl <mol1> <mol2> <parameters>
+where <mol1> and <mol2> are the filenames of structures that have
+to be superimposed, and <parameters> are selected options.
+
+IMPORTANT: The second structure <mol2> in the command line serves as a frame
+of reference for the comparison of two structures. Briefly saying, LGA program
+calculates the number of residues from the model (<mol1> - first structure)
+that are close enough (under the distance cutoffs) to the corresponding residues
+from the target (<mol2> - second structure).
+
+For a given target for the purpose of structure similarity searches in PDB and for
+ordering models (templates) by the level of similarity to the target, it is recomended
+the target is used as frame of reference (<mol2> - second structure). This way the
+calculated results from "<mol1>.<mol2>" comparisons can be sorted by the number of
+superimposed residues N (under one selected DIST cutoff), or by GDT_TS (average from
+four distance cutoffs), or LGA_S (weighted results from the full set of distance
+cutoffs) values.
+
+To run multiple LGA calculations the user can use a perl script:
+  runlga.list_list.pl <list1> <list2> <parameters>
+where <list1> and <list2> are the lists of structures that have
+to be superimposed, and <parameters> are the selected options.
+For example in order to compare several NMR models a user can 
+proceed as follows (see run_examples):
+1) copy pdb NMR structures to the subdirectory PDB_local (e.g. pdbnzzz.ent)
+2) create list1 e.g.:
+nzzz___1
+nzzz___2
+nzzz___3
+nzzz___4
+nzzz___5
+3) create list2 e.g.:
+nzzz___1
+4) run script e.g.: runlga.list_list.pl list1 list2 -3 -sda
+
+NOTE: Specifying NMR MODEL please use the following notation:
+  1bve_B_5   for PDB entry: 1bve, chain: 'B', model: 5
+  1awo___7   for PDB entry: 1awo, chain: ' ', model: 7
+
+IMPORTANT: GDT_TS values are calculated with the option -3 only. GDT_TS value serves
+as a good structure similarity estimator, but the user should remember that the
+option "-3 -sda" can be used only when the residue-residue correspondences between 
+compared structures are known (e.g. comparing different models of the same protein 
+when the models have the same residue numbering and chain ID).
+
+The experiments show that LGA_S is slightly more sensitive and accurate in scoring
+structural similarity than GDT_TS, and it can be used to evaluate the level of
+structure similarity between proteins in both modes: -3 (LGA_S3) and -4 (LGA_S).
+
+The range of LGA_S is from 0.0% to 100.0%. It is important
+to remember that in LGA calculations the <mol2> (second structure) serves
+as a frame of reference. It means that if for example <mol1> is 50 residue
+long and <mol2> is 100 residue long then the maximum possible value
+of LGA_S could be 50% (a case when <mol1> is identical with the portion
+of <mol2>), but if <mol1> is 100 residue long and <mol2> is 50 residue long
+then the maximum value of LGA_S can be 100%.
+
+The user may vary DIST (distance cutoff) to calculate more tight (accurate)
+or more relaxed (to recognize overall similarity) superpositions.
+The default: -d:5.0 (DIST=5 Angstroms).
+
+Any questions or problems running LGA program as well as any comments or suggestions
+should be sent to Adam Zemla (adamz@llnl.gov).
+
+The LGA web servers are accessible here:
+http://as2ts.llnl.gov/
+http://proteinmodel.org/
+http://predictioncenter.org/local/lga/lga.html
+
