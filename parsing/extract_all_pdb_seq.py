@@ -11,8 +11,9 @@ from collections import defaultdict
 pdbfile = open(sys.argv[1], 'r')
 #chain = sys.argv[2]
 code = get_acc(pdbfile)
-if (code == 'XXXX' or code == ''):
+if (code == 'XXXX' or code == '' or code == 'xxxx' or code == '    '):
     code=sys.argv[1]
+print ":"+code+":"
 pdbfile.close()
 pdbfile = open(sys.argv[1], 'r')
 chains = get_all_chains(pdbfile)
