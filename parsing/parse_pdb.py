@@ -104,6 +104,9 @@ def read_chain(pdbfile, chain):
     prev_resi = 0
     
     for line in pdbfile:
+        # I think we should skip these when we read a chain
+        if line.startswith('HETATM'):
+            continue
         if not line.startswith('ATOM') and not seen_atoms:
             header += line
         elif not line.startswith('ATOM') and seen_atoms:
