@@ -30,14 +30,14 @@ def get_area(bvaluefile):
     file = open(bvaluefile, 'r')
     TMarea = 0.
     nonTMarea =0. 
-    TMboundary=20.
+    TMboundary=15.
     for line in file:
         if line.startswith('ATOM'):
             atm_record = parse_atm_record(line)
             if (atm_record['z'] > TMboundary or -1*atm_record['z'] > TMboundary):
                 nonTMarea=nonTMarea+atm_record['B']
             else:
-                TMarea=nonTMarea+atm_record['B']
+                TMarea=TMarea+atm_record['B']
     file.close()
     return (TMarea,nonTMarea)
         
