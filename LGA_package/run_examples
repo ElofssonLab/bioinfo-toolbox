@@ -1,0 +1,56 @@
+ulimit -s unlimited
+
+./runlga.mol_mol.pl PDB_local/1euw PDB_local/9zzz -1 -sia -lw:3 -ch1:A -er2:40_A:61_A,73_A:88_A
+diff RESULTS/1euw.9zzz.res TEST/test1 
+
+./runlga.mol_mol.pl PDB_local/1euw PDB_local/9zzz -2 -sia -lw:3 -ch1:A -d:3 -er2:40_A:61_A,73_A:88_A
+diff RESULTS/1euw.9zzz.res TEST/test2 
+
+./runlga.mol_mol.pl PDB_local/1euw PDB_local/9zzz -3 -sia -lw:3 -ch1:A -d:3 -er2:40_A:61_A,73_A:88_A
+diff RESULTS/1euw.9zzz.res TEST/test3 
+
+./runlga.mol_mol.pl PDB_local/1euw PDB_local/9zzz -4 -sia -lw:3 -ch1:A -d:3 -er2:40_A:61_A,73_A:88_A
+diff RESULTS/1euw.9zzz.res TEST/test4
+
+cp PDB_local/9zzz PDB_users/9zzz_lga
+grep "^LGA " TEST/test4 >> PDB_users/9zzz_lga
+./runlga.mol_mol.pl PDB_local/1euw PDB_users/9zzz_lga -3 -sia -lw:3 -d:3 -al
+diff RESULTS/1euw.9zzz_lga.res TEST/test5 
+
+./runlga.mol_mol.pl PDB_local/1euw PDB_users/users_file -5 -sda -o2 -d:5 -lw:1 -fit:0:2:58 -aa2:55:64 -gap2:59:60
+diff RESULTS/1euw.users_file.res TEST/test6 
+
+./runlga.mol_mol.pl PDB_local/1ofc_X PDB_local/1euw -4 -d:5 -stral -swap -er1:941_X:978_X -aa2:98:200
+diff RESULTS/1ofc_X.1euw.res TEST/test7 
+
+./runlga.mol_mol.pl PDB_local/1ofc_X PDB_local/1euw -4 -stral -swap -er1:941_X:978_X -aa2:98:200 -cb:1 -d:4 -atom:CB
+diff RESULTS/1ofc_X.1euw.res TEST/test8 
+
+./runlga.mol_mol.pl PDB_local/9zzz PDB_local/1euw -3 -sda -swap -d:4 -o2 -ch1:A -ch2:A
+diff RESULTS/9zzz.1euw.res TEST/test9
+
+./runlga.mol_mol.pl PDB_local/1euw PDB_local/9zzz -3 -sia -d:4 -aa1:40:108 -aa2:34:101 -gap1:62:62 -gdc_eat:68_A.CG:61_A.CB,69_A.CB:62_A.CB,70_A.CB:63_A.CB,71_A.CB:64_A.CB
+diff RESULTS/1euw.9zzz.res TEST/test10
+
+./runlga.mol_mol.pl nzzz___5 nzzz___1 -4 -er2:70:115 -gdc_sup:76:85 -gdc_set:91:110 -gdc_at:G.CA,A.CB,V.CG1,L.CD1,I.CD1,M.CE,S.OG,T.OG1,C.SG,N.OD1,Q.OE1,D.OD2,E.OE2,K.NZ,R.NH2,P.CG,W.CH2,H.NE2,F.CZ,Y.OH
+diff RESULTS/nzzz___5.nzzz___1.res TEST/test11
+
+./runlga.list_list.pl list1 list2 -3 -swap -gdc_at:*.CB
+diff RESULTS/nzzz___4.nzzz___1.res TEST/test12
+
+./runlga.mol_mol.pl 1wdn_A 1ggg_A -4 -gdc -stral -lga_M
+diff RESULTS/1wdn_A.1ggg_A.res TEST/test13
+
+./collect_PDB.pl 1wdn_A > MOL2/test14
+./collect_PDB.pl 1ggg_A >> MOL2/test14
+./lga test14 -aa > RESULTS/test14.res
+grep AAMOL1 RESULTS/test14.res | perl -ane 'if($F[5] >= 52 && $F[5] <= 86) { print "$_"; }' >> MOL2/test14
+grep AAMOL2 RESULTS/test14.res | perl -ane 'if(($F[5] >= 141 && $F[5] <= 160) || ($F[5] >= 172 && $F[5] <= 180)) { print "$_"; }'  >> MOL2/test14
+./lga -3 -o2 -gdc test14 -al > RESULTS/Option3_Selected_aa_correspondences_test14.res
+
+./collect_PDB.pl 1wdn_A > MOL2/test15
+./collect_PDB.pl 1ggg_A >> MOL2/test15
+./lga test15 -aa > RESULTS/test15.res
+grep AAMOL1 RESULTS/test15.res | perl -ane 'if($F[5] >= 52 && $F[5] <= 86) { print "$_"; }' >> MOL2/test15
+grep AAMOL2 RESULTS/test15.res | perl -ane 'if(($F[5] >= 141 && $F[5] <= 160) || ($F[5] >= 172 && $F[5] <= 180)) { print "$_"; }'  >> MOL2/test15
+./lga -4 -o2 -gdc test15 -al > RESULTS/Option4_Selected_aa_ranges_test15.res

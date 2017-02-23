@@ -13,23 +13,30 @@ def parse(afile, sep=' ', min_dist=5):
     """
     contacts = []
     for aline in afile:
-        # exclude PhyCmap header/tail lines
-        if aline.strip()[0].isalpha():
-            continue
         if aline.strip() != '':
+            # exclude comments
+            if aline.startswith('#'):
+                continue
+            # exclude PhyCmap header/tail lines
+            if aline.strip()[0].isalpha():
+                continue
             # ignore CASP RR format headers
             if len(aline.strip().split(sep)) < 3:
                 continue
             line_arr = filter(None, aline.strip().split(sep))
             if line_arr[0].startswith('E'):
                 continue
-            i = int(line_arr[0])
-            j = int(line_arr[1])
+            # parse MISTIC output (i res_i j res_j score)
+            if line_arr[1].isalpha():
+                i = int(line_arr[0])
+                j = int(line_arr[2])
+            else:
+                i = int(line_arr[0])
+                j = int(line_arr[1])
             score = float(line_arr[-1])
             if abs(i - j) >= min_dist:
                 contacts.append((score, i, j))
     afile.close()
-
     contacts.sort(key=lambda x: x[0], reverse=True)
     return contacts
 

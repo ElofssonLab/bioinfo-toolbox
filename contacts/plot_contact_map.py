@@ -148,14 +148,14 @@ def get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali=[]):
                 tp_colors.append('red')
                 continue
         if ref_contact_map[c_x, c_y] > 0:
-            tp_colors.append('blue')
+            tp_colors.append('#00ff00')
         else:
             tp_colors.append('red')
 
     return tp_colors
  
 
-def get_colors(contacts_np, ref_contact_map=[], th=0.5):
+def get_colors(contacts_np, ref_contact_map=[], th=0.5, binary=False):
 
     N = contacts_np.shape[0]
     img = np.ones((N,N,4))
@@ -186,15 +186,38 @@ def get_colors(contacts_np, ref_contact_map=[], th=0.5):
                     #img[j,i] = [1-sc,1-sc,1-sc,1]
                 # grey zone between 8 and 12 Angstroem
                 elif sc > th and (ref_contact_map[i,j] < 12 or ref_contact_map[i,j] >= 8):
-                    val = (ref_contact_map[i,j] - 8)/(12 - 8)
-                    img[i,j] = [0.5+val/2,1-val/2,0,1]
-                    img[j,i] = [0.5+val/2,1-val/2,0,1]
-                    #img[j,i] = [1-sc,1-sc,1-sc,1]
+                    if binary:
+                        img[i,j] = [1,0,0,1]
+                        img[j,i] = [1,0,0,1]
+                    else:
+                        val = (ref_contact_map[i,j] - 8)/(12 - 8)
+                        img[i,j] = [0.5+val/2,1-val/2,0,1]
+                        img[j,i] = [0.5+val/2,1-val/2,0,1]
+                        #img[j,i] = [1-sc,1-sc,1-sc,1]
             else:
                 if sc > th:
                     img[i,j] = [0.5-sc/2,0.5-sc/2,1,1]
                     img[j,i] = [0.5-sc/2,0.5-sc/2,1,1]
 
+    return img
+
+
+
+def get_ref_img(ref_contact_map):
+
+    N = ref_contact_map.shape[0]
+    img = np.ones((N,N,4))
+
+    for i in xrange(N):
+        for j in xrange(N):
+            if j < (i+5):
+                continue
+            if len(ref_contact_map) > 0:
+                # FN
+                if ref_contact_map[i,j] < 8:
+                    #img[i,j] = [0.5,0.5,1,1]
+                    img[i,j] = [0.5,0.5,0.5,1]
+                    img[j,i] = [0.5,0.5,0.5,1]
     return img
 
 
@@ -211,7 +234,7 @@ def get_seqlen(filename):
 
 def get_ali_coverage(filename):
     L = get_seqlen(filename)
-    N = 0
+    M = 0.
     alifile = open(filename, 'r')
     coverage = dict.fromkeys(range(L), 0)
     for line in alifile:
@@ -223,21 +246,23 @@ def get_ali_coverage(filename):
         pos_lst = [m.start() for m in re.finditer('-', line)]
         for pos in pos_lst:
             coverage[pos] += 1
-        N += 1
+        M += 1.
     alifile.close()
     #coverage_lst = [1-(coverage[i]/float(N)) for i in range(L)]
-    coverage_lst = [N - coverage[i] for i in range(L)]
-    return coverage_lst
+    coverage_lst = [M - coverage[i] for i in range(L)]
+    return coverage_lst, M
 
 
 def get_meff_coverage(meff_file):
     meff_lst = []
     with open(meff_file) as f:
         for l in f:
+            if 'Meff = ' in l:
+                meff = float(l.strip().split()[-1])
             if 'MeffPerPos' in l:
                 meff_lst = l.split()[-1].strip('[]').split(',')
                 meff_lst = map(float, meff_lst)
-    return meff_lst
+    return meff_lst, meff
 
 
 def is_gap(symbol):
@@ -307,7 +332,7 @@ def embedd_alignment(target_0, target_1, source_0, source_1):
 
 
 
-def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psipred_horiz_fname='', psipred_vert_fname='', pdb_filename='', is_heavy=False, chain='', sep=',', outfilename='', ali_filename='',  meff_filename='', name='', start=0, end=-1, pdb_start=0, pdb_end=-1, noalign=False, pdb_alignment='', pdb_id=''):
+def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, f_obs=-1, c2_filename='', psipred_horiz_fname='', psipred_vert_fname='', pdb_filename='', is_heavy=False, chain='', sep=',', outfilename='', ali_filename='',  meff_filename='', name='', start=0, end=-1, pdb_start=0, pdb_end=-1, noalign=False, pdb_alignment='', pdb_id='', binary=False):
   
     #acc = c_filename.split('.')[0]
     #acc = fasta_filename.split('.')[0][:4]
@@ -330,7 +355,7 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
 
     ### get top "factor" * "ref_len" predicted contacts
     contacts = parse_contacts.parse(open(c_filename, 'r'), sep)
-    contacts_np = parse_contacts.get_numpy_cmap(contacts)
+    contacts_np = parse_contacts.get_numpy_cmap(contacts, seq_len=ref_len)
     contacts_np = contacts_np[start:end,start:end]
 
     contacts_x = []
@@ -360,13 +385,19 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
             scores.append(score)
             count += 1
            
-        if count >= ref_len * factor and th == -1:
+        if count >= ref_len * factor and th == -1 and f_obs == -1:
             th = score
             break
         
-        if score < th and not th == -1:
+        if score < th and not th == -1 and f_obs == -1:
             factor = count/float(ref_len)
             break
+
+        # if cutoff by fraction of observed contacts:
+        # take all contacts and cut list after reading pdb
+        #if f_obs != -1:
+        #    factor = ref_len
+        #    th = -1
 
  
 
@@ -390,11 +421,15 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
         ax.set_ylim([-unit,ref_len])
 
         if ali_filename:
-            coverage_lst = get_ali_coverage(ali_filename)
+            coverage_lst, M = get_ali_coverage(ali_filename)
+            max_cover = M
         elif meff_filename:
-            coverage_lst = get_meff_coverage(meff_filename)
-        max_cover = max(coverage_lst)
+            coverage_lst, Meff = get_meff_coverage(meff_filename)
+            max_cover = Meff
+        #max_cover = max(coverage_lst)
 
+        coverage_lst = coverage_lst[start:end]
+        
         #lt = pow(10, max(1,floor(log10(max_cover)) - 1))
         #upper = int(ceil(max_cover/float(lt)) * lt)
         ax2 = plt.subplot2grid((8,8), (1,0), rowspan=7, sharey=ax)
@@ -494,7 +529,6 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
             ref_contact_map = dist_mat < cb_cutoff
             PPV, TP, FP = get_ppvs(contacts_x, contacts_y, ref_contact_map, ref_len, factor)
             tp_colors = get_tp_colors(contacts_x, contacts_y, ref_contact_map)
-            img = get_colors(contacts_np, ref_contact_map=dist_mat, th=th)
 
         else:
             if pdb_alignment and pdb_id:
@@ -563,12 +597,29 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
             
             ref_contacts_x = ref_contacts[0]
             ref_contacts_y = ref_contacts[1]
+            
+            # if f_obs given, take top f_obs * num_obs contacts:
+            if f_obs != -1:
+                num_obs = sum(ref_contacts_x-ref_contacts_y >= 5)
+                num_top = int(ceil(f_obs * num_obs))
+                contacts_x = contacts_x[:num_top]
+                contacts_y = contacts_y[:num_top]
+                scores = scores[:num_top]
+                th_obs = scores[-1]
+            else:
+                th_obs = th
 
             PPVs, TPs, FPs = get_ppvs(contacts_x, contacts_y, ref_contact_map, ref_len, factor, atom_seq_ali=atom_seq_ali)
             tp_colors = get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali=atom_seq_ali)
-            img = get_colors(contacts_np, ref_contact_map=dist_mat, th=th)
 
-        sc = ax.imshow(img, interpolation='none')
+        if not c2_filename:
+            img = get_colors(contacts_np, ref_contact_map=dist_mat, th=th_obs, binary=binary)
+            sc = ax.imshow(img, interpolation='none')
+        else:
+            # plot native contacts in background
+            img = get_ref_img(dist_mat)
+            sc = ax.imshow(img, interpolation='none')
+            
    
         print '%s %s %s %s' % (acc, PPVs[-1], TPs[-1], FPs[-1])
       
@@ -591,7 +642,7 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
 
     ### plot predicted contacts from second contact map if given
     if c2_filename:
-        contacts2 = parse_contacts.parse(open(c2_filename, 'r'), sep)
+        contacts2 = parse_contacts.parse(open(c2_filename, 'r'))
         contacts2_x = []
         contacts2_y = []
         scores2 = []
@@ -603,27 +654,40 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
             score = contacts2[i][0]
             c_x = contacts2[i][1] - 1
             c_y = contacts2[i][2] - 1
-
+            
             pos_diff = abs(c_x - c_y)
             too_close = pos_diff < 5
 
             if not too_close:
-                contacts2_x.append(c_x)
-                contacts2_y.append(c_y)
+                contacts2_x.append(c_x - start)
+                contacts2_y.append(c_y - start)
                 scores2.append(score)
                 count += 1
                
-            if count >= ref_len * factor:
+            if count >= ref_len * factor and th == -1 and f_obs == -1:
+                th = score
                 break
+            
+            if score < th and not th == -1 and  f_obs == -1:
+                factor = count/float(ref_len)
+                break
+
+            # if cutoff by fraction of observed contacts:
+            # stop at num_top = f_obs * num_obs 
+            if pdb_filename and f_obs != -1:
+                if count >= num_top:
+                    factor = count/float(ref_len)
+                    th = score
+                    break
 
         ### use TP/FP color coding if reference contacts given
         if pdb_filename:
-            PPVs2, TPs2, FPs2 = get_ppvs(contacts2_x, contacts2_y, ref_contact_map, atom_seq_ali, ref_len, factor)
+            #PPVs2, TPs2, FPs2 = get_ppvs(contacts2_x, contacts2_y, ref_contact_map, atom_seq_ali, ref_len, factor)
             tp2_colors = get_tp_colors(contacts2_x, contacts2_y, ref_contact_map, atom_seq_ali)
-            print '%s %s %s %s' % (acc, PPVs2[-1], TPs2[-1], FPs2[-1])
-            fig.suptitle('%s\nPPV (upper left) = %.2f | PPV (lower right) = %.2f' % (acc, PPVs[-1], PPVs2[-1]))
-            sc = ax.scatter(contacts2_y[::-1], contacts2_x[::-1], marker='o', c=tp2_colors[::-1], s=6, alpha=0.75, lw=0)
-            sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c=tp_colors[::-1], s=6, alpha=0.75, lw=0)
+            #print '%s %s %s %s' % (acc, PPVs2[-1], TPs2[-1], FPs2[-1])
+            #fig.suptitle('%s\nPPV (upper left) = %.2f | PPV (lower right) = %.2f' % (acc, PPVs[-1], PPVs2[-1]))
+            sc = ax.scatter(contacts2_y[::-1], contacts2_x[::-1], marker='s', c=tp2_colors[::-1], s=4, alpha=1, lw=0, edgecolor=tp2_colors[::-1])
+            sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='s', c=tp_colors[::-1], s=4, alpha=1, lw=0, edgecolor=tp_colors[::-1])
         else:
             sc = ax.scatter(contacts2_y[::-1], contacts2_x[::-1], marker='0', c='#D70909', edgecolor='#D70909', s=6, linewidths=0.5)
             sc = ax.scatter(contacts_x[::-1], contacts_y[::-1], marker='o', c='#004F9D', edgecolor='#004F9D', s=6, linewidths=0.5)
@@ -708,6 +772,7 @@ if __name__ == "__main__":
     p.add_argument('-o', '--outfile', default='')
     p.add_argument('-f', '--factor', default=1.0, type=float)
     p.add_argument('-t', '--threshold', default=-1, type=float)
+    p.add_argument('--f_obs', default=-1, type=float)
     p.add_argument('--c2', default='')
     p.add_argument('--psipred_horiz', default='')
     p.add_argument('--psipred_vert', default='')
@@ -722,6 +787,7 @@ if __name__ == "__main__":
     p.add_argument('--pdb_start', default=0, type=int)
     p.add_argument('--pdb_end', default=-1, type=int)
     p.add_argument('--noalign', action='store_true')
+    p.add_argument('--binary', action='store_true')
     p.add_argument('--pdb_alignment', default='')
     p.add_argument('--pdb_id', default='')
 
@@ -732,13 +798,19 @@ if __name__ == "__main__":
     psipred_filename = args['psipred_horiz']
 
     # guessing separator of constraint file
-    line = open(c_filename,'r').readline()
-    if len(line.split(',')) != 1:
-        sep = ','
-    elif len(line.split(' ')) != 1:
-        sep = ' '
-    else:
-        sep = '\t'
+    for line in open(c_filename,'r'):
+        # exclude comments
+        if line.startswith('#'):
+            continue
+        # exclude PhyCmap header/tail lines
+        if line.strip()[0].isalpha():
+            continue
+        if len(line.split(',')) != 1:
+            sep = ','
+        elif len(line.split('\t')) != 1:
+            sep = '\t'
+        else:
+            sep = ' '
     
-    plot_map(args['fasta_file'], args['contact_file'], factor=args['factor'], th=args['threshold'], c2_filename=args['c2'], psipred_horiz_fname=args['psipred_horiz'], psipred_vert_fname=args['psipred_vert'], pdb_filename=args['pdb'], is_heavy=args['heavy'], chain=args['chain'], sep=sep, outfilename=args['outfile'], ali_filename=args['alignment'], meff_filename=args['meff'], name=args['name'], start=args['start'], end=args['end'], pdb_start=args['pdb_start'], pdb_end=args['pdb_end'], noalign=args['noalign'], pdb_alignment=args['pdb_alignment'], pdb_id=args['pdb_id'])
+    plot_map(args['fasta_file'], args['contact_file'], factor=args['factor'], th=args['threshold'], f_obs=args['f_obs'], c2_filename=args['c2'], psipred_horiz_fname=args['psipred_horiz'], psipred_vert_fname=args['psipred_vert'], pdb_filename=args['pdb'], is_heavy=args['heavy'], chain=args['chain'], sep=sep, outfilename=args['outfile'], ali_filename=args['alignment'], meff_filename=args['meff'], name=args['name'], start=args['start'], end=args['end'], pdb_start=args['pdb_start'], pdb_end=args['pdb_end'], noalign=args['noalign'], pdb_alignment=args['pdb_alignment'], pdb_id=args['pdb_id'], binary=args['binary'])
 
