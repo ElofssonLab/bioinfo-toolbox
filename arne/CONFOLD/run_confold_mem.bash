@@ -9,11 +9,7 @@ ulimit -s unlimited
 #id=$1
 #echo $id
 
-#confold=/proj/bioinfo/software/confold/CONFOLD/confold.pl
-<<<<<<< HEAD
-confold=$HOME/git/bioinfo-toolbox/arne/CONFOLD/confold_mem.pl
-l=2.5
-=======
+#l=2.5
 #confold=$HOME/git/bioinfo-toolbox/arne/CONFOLD/confold_mem.pl
 
 if [ -s /proj/bioinfo/software/confold/CONFOLD/confold_mem.pl ]
@@ -29,7 +25,6 @@ fi
 
 
 #l=2.5
->>>>>>> 902382769cd14246316c6099f71f69d05967cb08
 
 #dir=data/29.0/$id
 
