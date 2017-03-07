@@ -46,7 +46,7 @@ outdir=${rr}_${cutoff}_${mindist}_${maxdist}_confold_mem
 if [ ! -f $outdir/stage2/${id}.fa_model1.pdb ]; then
     rm -rf $outdir
     mkdir $outdir
-    $confold -top $top -seq $seq -rr $rr -ss $ss -o $outdir -selectrr $cutoff -stage2 0 -mcount 50 -mindist $mindist -maxdist $maxdist &> $outdir/${id}.log
+    $confold -top $top -seq $seq -rr $rr -ss $ss -o $outdir -selectrr ${cutoff}L -stage2 0 -mcount 50 -mindist $mindist -maxdist $maxdist &> $outdir/${id}.log
 fi
 ls -l $outdir/stage2/${id}.fa_model1.pdb
 
