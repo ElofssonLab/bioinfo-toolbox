@@ -9,12 +9,31 @@ use File::Basename;
 use Getopt::Long;
 use Scalar::Util qw(looks_like_number);
 
-# Location of CNSsuite and DSSP
-my $program_dssp   = "/proj/bioinfo/software/dssp/dssp-2.0.4-linux-amd64";
-my $cns_suite      = "/proj/bioinfo/software/CNS/cns_solve_1.3";
-#my $cns_suite      = "/home/x_mirmi/glob/CNS/cns_solve_1.3";
-my $cns_executable = "$cns_suite/intel-x86_64bit-linux/bin/cns_solve";
 
+my $program_dssp="";
+my $cns_suite='';
+my $cns_executable='';
+
+# Location of CNSsuite and DSSP
+if ( -e '/proj/bioinfo/software/dssp/dssp-2.0.4-linux-amd64'  )
+{
+    # Triolith
+    $program_dssp   = "/proj/bioinfo/software/dssp/dssp-2.0.4-linux-amd64";
+    $cns_suite      = "/proj/bioinfo/software/CNS/cns_solve_1.3";
+    #my $cns_suite      = "/home/x_mirmi/glob/CNS/cns_solve_1.3";
+    $cns_executable = "$cns_suite/intel-x86_64bit-linux/bin/cns_solve";
+}
+elsif ( -e "/pfs/nobackup/home/a/arnee/Software/bin/dssp-2.0.4-linux-amd64"  )
+{
+# HPC2N
+    $program_dssp   = "/pfs/nobackup/home/a/arnee/Software/bin/dssp-2.0.4-linux-amd64";
+    $cns_suite      = "/pfs/nobackup/home/a/arnee/Software/bin/cns_solve_1.3";
+    $cns_executable = "$cns_suite/intel-x86_64bit-linux/bin/cns_solve";
+
+}else{
+    die "not found dssp and cns\n";
+}
+	
 # User inputs 
 my ($help, $dir_out, $file_fasta, $file_pair, $file_rr, $file_ss, $file_top);
 my ($selectrr, $rrtype, $lambda, $stage2, $contwt, $sswt, $mcount, $rep2, $pthres);
@@ -225,7 +244,7 @@ sub process_parameters{
 		for(my $i = 1; $i <= length($top); $i++){
 			my $char = substr $top, $i-1, 1;
 			if (not ($char eq "i" or $char eq "M" or $char eq "o")){
-				confess "ERROR! undefined secondary structure unit $char in $sec";
+				confess "ERROR! undefined secondary structure unit $char in $top";
 			}
 		}
 	}
@@ -514,7 +533,7 @@ sub print_helix_top_restraints{
 	my $minloop=3;
 	my $last="i";
 	foreach (keys %res_top){
-	    print "FOO: $_\n";
+	    #print "FOO: $_\n";
 	    if ($res_top{$_} eq "M") {
 		if ($last ne "M" &&  $looplength<= $minloop){
 		    my $middle=int(($_+$lastpos)/2);

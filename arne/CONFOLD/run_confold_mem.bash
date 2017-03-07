@@ -9,8 +9,8 @@ ulimit -s unlimited
 #id=$1
 #echo $id
 
-confold=/proj/bioinfo/software/confold/CONFOLD/confold.pl
-#confold=$HOME/git/bioinfo-toolbox/arne/CONFOLD/confold.pl
+#confold=/proj/bioinfo/software/confold/CONFOLD/confold.pl
+confold=$HOME/git/bioinfo-toolbox/arne/CONFOLD/confold_mem.pl
 l=2.5
 
 #dir=data/29.0/$id
