@@ -21,15 +21,22 @@ n=40
 
 for i in "$@"
 do
-    cd $i
-    j=`ls $i*.fa`
-    k=`basename $j .fa`
-
-    echo $i $j $k
-    if [ ! -s ${k}.rr_${l}_${n}_${m}_confold_mem/. ]
-    then
-	srun --mem $mem -A $snic --time=$minitime -n 1 -c 1  $HOME/git/bioinfo-toolbox/arne/CONFOLD/run_confold_mem.bash  $k.fa $k.rr $k.confold.ss $k.top $l $n $m   &> run_confold_mem_${l}_${n}_${m}.out &
-	sleep 10
-    fi
-    cd ..
+    for m in 20 30 40 50
+    do
+	for n in 30 40 45 50 55 
+	do
+	    cd $i
+	    j=`ls $i*.fa`
+	    k=`basename $j .fa`
+	    top=${k}.fa.hhE0.pconsc3.l3.rr
+	    
+	    echo $i $j $k
+	    if [ ! -s ${top}_${l}_${n}_${m}_confold_mem/. ]
+	    then
+		srun --mem $mem -A $snic --time=$minitime -n 1 -c 1  $HOME/git/bioinfo-toolbox/arne/CONFOLD/run_confold_mem.bash  $k.fa $top $k.confold.ss $k.top $l $n $m   &> run_confold_mem_${top}_${l}_${n}_${m}.out &
+		sleep 5
+	    fi
+	    cd ..
+	done
+    done
 done
