@@ -8,16 +8,38 @@ use Cwd 'abs_path';
 use File::Basename;
 use Getopt::Long;
 use Scalar::Util qw(looks_like_number);
+use List::Util qw(first max maxstr min minstr reduce shuffle sum);
+
+
+my $program_dssp="";
+my $cns_suite='';
+my $cns_executable='';
 
 # Location of CNSsuite and DSSP
-my $program_dssp   = "/proj/bioinfo/software/dssp/dssp-2.0.4-linux-amd64";
-my $cns_suite      = "/proj/bioinfo/software/CNS/cns_solve_1.3";
-#my $cns_suite      = "/home/x_mirmi/glob/CNS/cns_solve_1.3";
-my $cns_executable = "$cns_suite/intel-x86_64bit-linux/bin/cns_solve";
+if ( -e '/proj/bioinfo/software/dssp/dssp-2.0.4-linux-amd64'  )
+{
+    # Triolith
+    $program_dssp   = "/proj/bioinfo/software/dssp/dssp-2.0.4-linux-amd64";
+    $cns_suite      = "/proj/bioinfo/software/CNS/cns_solve_1.3";
+    #my $cns_suite      = "/home/x_mirmi/glob/CNS/cns_solve_1.3";
+    $cns_executable = "$cns_suite/intel-x86_64bit-linux/bin/cns_solve";
+}
+elsif ( -e "/pfs/nobackup/home/a/arnee/Software/bin/dssp-2.0.4-linux-amd64"  )
+{
+# HPC2N
+    $program_dssp   = "/pfs/nobackup/home/a/arnee/Software/bin/dssp-2.0.4-linux-amd64";
+    $cns_suite      = "/pfs/nobackup/home/a/arnee/Software/bin/cns_solve_1.3";
+#    $cns_suite      = "/pfs/nobackup/home/m/mircomic/CNS/cns_solve_1.3_stmax/";
+    $cns_executable = "$cns_suite/intel-x86_64bit-linux/bin/cns_solve";
 
+}else{
+    die "not found dssp and cns\n";
+}
+	
 # User inputs 
-my ($help, $dir_out, $file_fasta, $file_pair, $file_rr, $file_ss, $file_top);
+my ($help, $dir_out, $file_fasta, $file_pair, $file_rr, $file_ss, $file_ssorg, $file_top);
 my ($selectrr, $rrtype, $lambda, $stage2, $contwt, $sswt, $mcount, $rep2, $pthres);
+my ($mindist,$maxdist);
 
 GetOptions(
 	"h"			=> \$help,
@@ -27,7 +49,7 @@ GetOptions(
 	"rr=s"		=> \$file_rr,
 	"ss=s"		=> \$file_ss,
 	"top=s"		=> \$file_top,
-	"selectrr=s"=> \$selectrr,
+	"selectrr=s"    => \$selectrr,
 	"rrtype=s"	=> \$rrtype,
 	"lambda=s"	=> \$lambda,
 	"stage2=i"	=> \$stage2, 
@@ -35,6 +57,8 @@ GetOptions(
 	"sswt=s" 	=> \$sswt,
 	"mcount=i"	=> \$mcount,
 	"rep2=s"	=> \$rep2,
+	"mindist=s"	=> \$mindist,
+	"maxdist=s"	=> \$maxdist,
 	"pthres=s"	=> \$pthres)
 or confess "ERROR! Error in command line arguments!";
 
@@ -51,6 +75,8 @@ $sswt     = 5     if !$sswt;
 $mcount   = 20    if !$mcount;
 $rep2     = 0.85  if !$rep2;
 $pthres   = 7.0   if !$pthres;
+$maxdist  = 30   if !$maxdist;
+$mindist  = 30   if !$mindist;
 
 # Other parameters
 my $rep1         = 1.0;    # initial van der Waals repel radius (md.cool.init.rad)
@@ -139,10 +165,15 @@ sub process_parameters{
 	$L = length(seq_fasta($file_fasta));
 	$mini = 15 * $L;
 	$id = basename($file_fasta, ".fasta");
-	$selectrr =~ s/L//;
-	$selectrr = int($selectrr * $L + 0.5) if $selectrr ne "all";
-	$selectrr = 100000 if $selectrr eq "all";
-	confess "ERROR! Select rr option does not look right!" if !looks_like_number($selectrr);
+	if ($selectrr =~ s/L//){
+	    $selectrr = int($selectrr * $L + 0.5) if $selectrr ne "all";
+	}elsif($selectrr =~ s/S//){
+	    $selectrr=`grep -vE '[A-Z]' $file_rr  | sort -rnk +5 | gawk '{if (\$5 > $selectrr) print}' | wc -l`;
+	    chomp($selectrr);
+	}elsif($selectrr eq "all"){
+	    $selectrr = 100000;
+	}
+	confess "ERROR! Select rr option does not look right: $selectrr " if !looks_like_number($selectrr);
 	confess "ERROR! RR type must be ca or cb!" if ($rrtype ne "ca" and $rrtype ne "cb");
 	confess "ERROR! Lambda must be between 0.1 and 10.0!" if ($lambda > 10.0 or $lambda < 0.1);
 	confess "ERROR! Stage2 selection must be 1,2,or 3!" if ($stage2 > 3 or $stage2 < 0);
@@ -164,10 +195,12 @@ sub process_parameters{
 	system_cmd("cp $file_rr    $dir_out/input/$id.rr") if $file_rr;
 	system_cmd("cp $file_pair  $dir_out/input/$id.pair") if $file_pair;
 	$file_fasta = "$id.fasta";
-	$file_ss    = "$id.ss" if $file_ss;
+	$file_ssorg  = "$id.ss" if $file_ss;
 	$file_top    = "$id.top" if $file_top;
+	$file_ss    = "$id.sstop" if $file_ss;
 	$file_rr    = "$id.rr" if $file_rr;
 	$file_pair  = "$id.pair" if $file_pair;
+
 	chdir "$dir_out/input" or confess $!;
 	flatten_fasta($file_fasta);
 	%residues = fasta2residues_hash($file_fasta);
@@ -179,6 +212,8 @@ sub process_parameters{
 		my $b = seq_fasta($file_fasta);
 		confess "ERROR! Fasta and rr sequence do not match!\nFasta:$b\nRR   :$a" if $a ne $b;
 	}
+# First we need to merge ss and top files..
+	merge_ss_top();
 	if ($file_ss){
 		my $a = seq_fasta($file_ss);
 		my $b = seq_fasta($file_fasta);
@@ -225,7 +260,7 @@ sub process_parameters{
 		for(my $i = 1; $i <= length($top); $i++){
 			my $char = substr $top, $i-1, 1;
 			if (not ($char eq "i" or $char eq "M" or $char eq "o")){
-				confess "ERROR! undefined secondary structure unit $char in $sec";
+				confess "ERROR! undefined secondary structure unit $char in $top";
 			}
 		}
 	}
@@ -261,7 +296,7 @@ sub process_parameters{
 	print "\nfile_pair   $file_pair   " if $file_pair;
 	print "\nfile_rr     $file_rr     " if $file_rr;
 	print "\nfile_ss     $file_ss     " if $file_ss;
-	print "\nfile_top     $file_top     " if $file_top;
+	print "\nfile_top    $file_top     " if $file_top;
 	print "\nselectrr    $selectrr    ";
 	print "\nrrtype      $rrtype      ";
 	print "\nlambda      $lambda      ";
@@ -277,9 +312,11 @@ sub process_parameters{
 	print "\nmode        $mode        ";
 	print "\nid          $id          ";
 	print "\nL           $L           ";
+	print "\nmaxdist     $maxdist     ";
+	print "\nmindist     $mindist     ";
 	print "\nsequence    ".seq_fasta($file_fasta);
 	print "\nss          ".seq_fasta($file_ss) if $file_ss;
-	print "\ntop          ".seq_fasta($file_top) if $file_top;
+	print "\ntop         ".seq_fasta($file_top) if $file_top;
 	print "\n";
 	chk_errors_rr($file_rr) if $file_rr;
 }
@@ -341,7 +378,9 @@ sub contact_restraints{
 	if($stage eq "stage1"){
 		return if not $file_rr;
 		my $xL = $selectrr + 1; # +1 to account for header line
-		system_cmd("head -n $xL $file_rr > temp.rr");
+#		system_cmd("head -n $xL $file_rr > temp.rr");
+#		system_cmd(" grep -vE '[A-Z]' $file_rr | sort -rnk +5 | head -n $xL  > temp.rr");
+		system_cmd("grep -vE '^PFRMAT |^TARGET |^AUTHOR |^REMARK |^METHOD |^MODEL |^END ' $file_rr| head -n $xL  > temp.rr");
 		system_cmd("rm $file_rr");
 		system_cmd("mv temp.rr $file_rr");
 		rr2tbl($file_rr, "contact.tbl", $rrtype);
@@ -365,6 +404,7 @@ sub build_models{
 	my %tbl_list = ();
 	$tbl_list{"contact.tbl"}  = count_lines("contact.tbl")  if count_lines("contact.tbl");
 # new file for topoloy or the same ?
+	$tbl_list{"topology.tbl"} = count_lines("topology.tbl") if count_lines("topology.tbl");
 	$tbl_list{"ssnoe.tbl"}    = count_lines("ssnoe.tbl")    if count_lines("ssnoe.tbl");
 	$tbl_list{"hbond.tbl"}    = count_lines("hbond.tbl")    if count_lines("hbond.tbl");
 	$tbl_list{"dihedral.tbl"} = count_lines("dihedral.tbl") if count_lines("dihedral.tbl");
@@ -385,6 +425,7 @@ sub build_models{
 	system_cmd("sed -i s/hbond.tbl//g dgsa.inp")    if not defined $tbl_list{"hbond.tbl"};
 	system_cmd("sed -i s/dihedral.tbl//g dgsa.inp") if not defined $tbl_list{"dihedral.tbl"};
 	system_cmd("sed -i s/ssnoe.tbl//g dgsa.inp")    if not defined $tbl_list{"ssnoe.tbl"};
+	system_cmd("sed -i s/topology.tbl//g dgsa.inp")    if not defined $tbl_list{"topology.tbl"};
 	open  JOB, ">job.sh" or confess "ERROR! Could not open job.sh $!";
 	print JOB "#!/bin/bash                                       \n";
 	print JOB "echo \"starting cns..\"                           \n";
@@ -450,8 +491,10 @@ sub sec_restraints{
 	my $stage = shift;
 	return if not $file_ss;
 	system_cmd("rm -f ssrestraints.log");
+	# First we print topology restrains (i.e. max and min distances between all helix ends=)
+	print_topology_restraints();
 	# helix restraints; start writing to the files hbond.tbl, ssnoe.tbl and dihedral.tbl
-	print_helix_top_restraints();
+	print_helix_restraints();
 	# strand and/or sheet restraints
 	if (strand_count($file_ss) == 0){
 		print2file("ssrestraints.log", "no strand restraints");
@@ -502,37 +545,37 @@ sub sec_restraints{
 	}
 }
 
-sub print_helix_top_restraints{
-	my %res_sec = fasta2residues_hash($file_ss);
-	my %res_top = fasta2residues_hash($file_top);
-	foreach (keys %res_sec){
-	    delete $res_sec{$_} if ($res_sec{$_} ne "H" && $res_top{$_} ne "M") ;
-	}
-# We also need to make sure we have at least 3 (?) non-helices in each loopl.
-	my $looplength=99;
-	my $lastpos='';
-	my $minloop=3;
-	my $last="i";
-	foreach (keys %res_top){
-	    print "FOO: $_\n";
-	    if ($res_top{$_} eq "M") {
-		if ($last ne "M" &&  $looplength<= $minloop){
-		    my $middle=int(($_+$lastpos)/2);
-		    for (my $i=int($middle-$minloop/2);$i<=int($middle+$minloop/2);$i++){
-			print "Deleting $i\n";
-			delete $res_sec{$i};
-		    }
-		}
-		$looplength=0;
-		$lastpos=$_;
-		$last=$res_top{$_};
-	    }elsif($res_sec{$_} eq "C"){
-		$looplength++;
-	    }
-	    
 
+sub print_helix_restraints{
+	my %res_sec = fasta2residues_hash($file_ss);
+	foreach (keys %res_sec){
+		delete $res_sec{$_} if $res_sec{$_} ne "H";
 	}
-	exit 0;
+## We also need to make sure we have at least 3 (?) non-helices in each loopl.
+#	my $looplength=99;
+#	my $lastpos='';
+#	my $minloop=3;
+#	my $last="i";
+#	foreach (keys %res_top){
+#	    #print "FOO: $_\n";
+#	    if ($res_top{$_} eq "M") {
+#		if ($last ne "M" &&  $looplength<= $minloop){
+#		    my $middle=int(($_+$lastpos)/2);
+#		    for (my $i=int($middle-$minloop/2);$i<=int($middle+$minloop/2);$i++){
+#			print "Deleting $i\n";
+#			delete $res_sec{$i};
+#		    }
+#		}
+#		$looplength=0;
+#		$lastpos=$_;
+#		$last=$res_top{$_};
+#	    }elsif($res_sec{$_} eq "C"){
+#		$looplength++;
+#	    }
+#	    
+#
+#	}
+#	exit 0;
 	if (scalar keys %res_sec){
 		print2file("ssrestraints.log", "write helix tbl restraints");
 		foreach my $i (sort {$a <=> $b} keys %res_sec){
@@ -581,6 +624,156 @@ sub print_helix_top_restraints{
 		print2file("ssrestraints.log", "no helix predictions!");
 	}
 }
+sub print_topology_restraints{
+	my %res_top = fasta2residues_hash($file_top);
+	my (%inside,%outside);
+	my (%TMinside,%TMoutside);
+	foreach (keys %res_top){
+		$inside{$_}="i" if ($res_top{$_} eq "i");
+		$outside{$_}="o" if ($res_top{$_} eq "o");
+	}
+	foreach (keys %res_top){
+	    if (defined($res_top{$_+1})){
+		if ($res_top{$_+1} eq "M"){
+		    $TMinside{$_}="i" if ($res_top{$_} eq "i");
+		    $TMoutside{$_}="o" if ($res_top{$_} eq "o");
+		}
+	    }
+	    if (defined($res_top{$_-1})){
+		if ($res_top{$_-1} eq "M"){
+		    $TMinside{$_}="i" if ($res_top{$_} eq "i");
+		    $TMoutside{$_}="o" if ($res_top{$_} eq "o");
+		}
+	    }
+	}
+#
+	print "Printing TOPOLOLGY restraints\n";
+
+	#my $mindist=30;
+	#my $maxdist=30;
+	my $minsteep=5;
+	my $maxsteep=5;
+
+	foreach my $in (keys %TMinside){
+	    foreach my $out (keys %TMoutside){
+		print2file("topology.tbl", (sprintf "assign (resid %3d and name CA) (resid %3d and name CA) %.2f %.2f %.2f ! opposite sides", $in, $out, $mindist, $minsteep,9999.));
+	    }
+	}
+	foreach my $a (keys %TMinside){
+	    foreach my $b (keys %TMinside){
+		if ($a != $b){
+		    print2file("topology.tbl", (sprintf "assign (resid %3d and name CA) (resid %3d and name CA) %.2f %.2f %.2f ! inside", $a, $b, $maxdist, 9999.,$maxsteep));
+		}
+	    }
+	}
+	foreach my $a (keys %TMoutside){
+	    foreach my $b (keys %TMoutside){
+		if ($a != $b){
+		    print2file("topology.tbl", (sprintf "assign (resid %3d and name CA) (resid %3d and name CA) %.2f %.2f %.2f ! outside", $a, $b, $maxdist, 9999.,$maxsteep));
+		}
+	    }
+	}
+}
+
+
+sub merge_ss_top{
+    my ($sec,$top,@sec,@top);
+    if ($file_ssorg){
+	$sec = seq_fasta($file_ssorg);
+    }else{
+	confess "ERROR! secondare structure file $file_ssorg does not exist";
+    }
+    if ($file_top){
+	$top = seq_fasta($file_top);
+    }else{
+	confess "ERROR! topology file $file_top  does not exist";
+    }
+    for(my $i = 1; $i <= length($sec); $i++){
+	$top[$i]=substr $top, $i-1, 1;
+	$sec[$i]=substr $sec, $i-1, 1;
+    }
+    for(my $i = 2; $i < length($sec); $i++){
+	if ($top[$i] eq "M"){
+	    $sec[$i]="H";
+	    if ($top[$i+1] ne "M"){
+		$sec[$i+1]="C";
+		$sec[min(length($sec),$i+2)]="C";
+		$sec[min(length($sec),$i+3)]="C";
+	    }elsif ($top[$i-1] ne "M"){
+		$sec[$i-1]="C";
+		$sec[max(1,$i-2)]="C";
+		$sec[max(1,$i-3)]="C";
+	    }
+	}
+    }
+# Delete single state helices and sheets
+    for(my $i = 2; $i < length($sec); $i++){
+	if ($sec[$i-1] ne "H" && $sec[$i] eq "H"  && $sec[$i+1] ne "H" ){$sec[$i]="C";}
+	if ($sec[$i-1] ne "E" && $sec[$i] eq "E"  && $sec[$i+1] ne "E" ){$sec[$i]="C";}
+    }
+    for(my $i = 2; $i<= length($sec); $i++){
+	if ($sec[$i-1] eq "E" && $sec[$i] eq "H" ){$sec[$i-1]="C";}
+	if ($sec[$i-1] ne "H" && $sec[$i] eq "E" ){$sec[$i]="C";}
+    }
+
+
+    open FILE, ">".$file_ss or confess "ERROR! Could not open $file_ss ! $!";
+    printf FILE "> Merged top-file: %s and secfile: %s \n",$file_top,$file_ssorg;
+    for(my $i = 1; $i <= length($sec); $i++){
+	print FILE $sec[$i];
+    }
+   
+
+    
+    print FILE "\n";
+    close FILE;
+}
+
+# We also need to make sure we have at least 3 (?) non-helices in each loopl.
+# Perhaps not the best idea...
+#	my $looplength=99;
+#	my $lastpos='';
+#	my $minloop=3;
+#	my $last="i";
+#	my $i=0;
+#	while (<@res_top>){
+#	    if ($res_top[$i] eq "M") {
+#		if ($last ne "M" &&  $looplength<= $minloop){
+#		    my $middle=int(($i+$lastpos)/2);
+#		    for (my $j=int($middle-$minloop/2-1);$j<=int($middle+1+$minloop/2);$j++){
+#			if (defined $res_sec{$j+1}){
+#			    delete $res_sec{$j+1};
+#			}
+#		    }
+#		}
+#		$looplength=0;
+#		$lastpos=$_;
+#		$last=$res_top[$i];
+#	    }elsif($res_sec[$i] ne "H"){
+#		$looplength++;
+#	    }
+#	    
+#	$i++;
+#	}
+#	$i=0;
+
+# Let's try this...
+
+# Also delete empty helices..
+#
+#	print "TESTING\n";
+#	my $i=0;
+#	while (<@res_sec>){
+#	    if (defined ($res_sec{$i+1})){
+#		print $res_sec{$i+1};
+#	    }else{
+#		print ".";
+#	    }
+#	    $i++;
+#	}
+#	print "\n";
+#	exit 0;
+
 
 sub pairing2hbonds{
 	my $file_pair = shift;
@@ -2273,6 +2466,17 @@ sub fasta2residues_hash{
 	return %res;
 }
 
+sub fasta2residues{
+	my $file_fasta = shift;
+	confess "ERROR! Fasta file $file_fasta does not exist!" if not -f $file_fasta;
+	my $seq = seq_fasta($file_fasta);
+	my @res = [];
+	foreach (my $i = 0; $i < length($seq); $i++){
+		$res[$i] = substr $seq, $i, 1;
+	}
+	return @res;
+}
+
 sub assess_dgsa{
 	my $stage = shift;
 	my $seq = seq_fasta($file_fasta);
@@ -2286,6 +2490,7 @@ sub assess_dgsa{
 	my %tbl_list = ();
 	$tbl_list{"contact.tbl"}  = count_lines("contact.tbl")  if count_lines("contact.tbl");
 	$tbl_list{"ssnoe.tbl"}    = count_lines("ssnoe.tbl")    if count_lines("ssnoe.tbl");
+	$tbl_list{"topology.tbl"}    = count_lines("topology.tbl")    if count_lines("topology.tbl");
 	$tbl_list{"hbond.tbl"}    = count_lines("hbond.tbl")    if count_lines("hbond.tbl");
 	$tbl_list{"dihedral.tbl"} = count_lines("dihedral.tbl") if count_lines("dihedral.tbl");
 	foreach my $tbl (sort keys %tbl_list){
@@ -2293,6 +2498,7 @@ sub assess_dgsa{
 		next if $tbl =~ m/dihedral.tbl/;
 		my $search_string = "N1";
 		$search_string = "N2" if $tbl eq "ssnoe.tbl";
+		$search_string = "N3" if $tbl eq "topology.tbl";
 		$search_string = "HBND" if $tbl eq "hbond.tbl";
 		if(not -f "dgsa.log"){
 			system_cmd("touch assess.failed");
@@ -2337,9 +2543,11 @@ sub assess_dgsa{
 		my $n2 = "-";
 		my $n3 = "-";
 		my $n4 = "-";
+		my $n5 = "-";
 		my $s1 = "-";
 		my $s2 = "-";
 		my $s3 = "-";
+		my $s4 = "-";
 		$e1 = get_cns_energy($pdb, "overall");
 		$e2 = get_cns_energy($pdb, "vdw");
 		$e3 = get_cns_energy($pdb, "bon");
@@ -2350,13 +2558,15 @@ sub assess_dgsa{
 		$e  = count_ss_match($pdb, $file_ss, "E") if $file_ss;
 		$n1 = count_satisfied_tbl_rows($pdb, "contact.tbl", "noe") if defined $tbl_list{"contact.tbl"};
 		$n2 = count_satisfied_tbl_rows($pdb, "ssnoe.tbl", "noe")   if defined $tbl_list{"ssnoe.tbl"};
+		$n5 = count_satisfied_tbl_rows($pdb, "topology.tbl", "noe")   if defined $tbl_list{"topology.tbl"};
 		$n3 = count_satisfied_tbl_rows($pdb, "hbond.tbl", "noe")   if defined $tbl_list{"hbond.tbl"};
 		$n4 = count_satisfied_tbl_rows($pdb, "dihedral.tbl", "dihedral")   if defined $tbl_list{"dihedral.tbl"};
 		$s1 = sum_noe_dev($pdb, "contact.tbl") if defined $tbl_list{"contact.tbl"};
 		$s2 = sum_noe_dev($pdb, "ssnoe.tbl")   if defined $tbl_list{"ssnoe.tbl"};
+		$s4 = sum_noe_dev($pdb, "topology.tbl")   if defined $tbl_list{"topology.tbl"};
 		$s3 = sum_noe_dev($pdb, "hbond.tbl")   if defined $tbl_list{"hbond.tbl"};
 		printf "%-6s %-6s %-6s %-6s %-3s %-3s  %-3s %-3s  ",  $e1, $e2, $e3, $e4, $c1, $c2, $h, $e;
-		printf "%-9s %-9s %-9s %-9s  %-8s %-8s %-8s %-25s\n", $n1, $n2, $n3, $n4, $s1, $s2, $s3, basename($pdb); 
+		printf "%-9s %-9s %-9s %-9s %-9s  %-8s %-8s %-8s %-8s %-25s\n", $n1, $n2, $n3, $n4, $n5, $s1, $s2, $s3,$s4, basename($pdb); 
 	}
 	print "\n";
 	foreach my $pdb (sort {$energy_noe{$a} <=> $energy_noe{$b}} keys %energy_noe){
@@ -2854,7 +3064,7 @@ sub write_cns_dgsa_file{
 	print2file("dgsa.inp", "{* restraint set 2 file *}");
 	print2file("dgsa.inp", "{===>} nmr.noe.file.2=\"ssnoe.tbl\";");
 	print2file("dgsa.inp", "{* restraint set 3 file *}");
-	print2file("dgsa.inp", "{===>} nmr.noe.file.3=\"\";");
+	print2file("dgsa.inp", "{===>} nmr.noe.file.3=\"topology.tbl\";");
 	print2file("dgsa.inp", "{* restraint set 4 file *}");
 	print2file("dgsa.inp", "{===>} nmr.noe.file.4=\"\";");
 	print2file("dgsa.inp", "{* restraint set 5 file *}");
@@ -4262,8 +4472,9 @@ ss       : string : *     : Input FASTA format secondary structure file;
                             Either 'rr' or 'ss' parameter must be provided
 top      : string : *     : Input FASTA format topology structure file;
                             Either 'top' or 'ss' parameter must be provided
-selectrr : string : all   : Number of contacts to use from the input rr file;
+selectrr : string : all   : Number or minuimum of contacts to use from the input rr file;
                             Options : 'all', '0.1L', '0.2L', ..., '2.0L', etc.
+                            or : '0.3S', '0.4S', ..., '1.0S', etc.
 rrtype   : string : cb    : 'ca' for Cα-Cα contacts and 'cb' for Cβ-Cβ contacts
 lambda   : float  : 0.4   : Range for secondary structure restraints to define; 
                             '0.4' for predicted contacts
