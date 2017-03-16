@@ -8,10 +8,10 @@ find tm-pairs/ -name "*\**" -exec rm {} \;
 
 echo -n "All pairs: " ; wc -l interacting-pairs.tsv
 echo -n "90% pairs: " ; 
-for i in `grep \> all_90.seq | sed s/\>//g  | sed s/tm.//g | sed s/.pdb//g `; do grep $i interacting-pairs.tsv ;  done | sort -u > interacting-pairs-90.tsv
+for i in `grep \> all_90.seq | sed s/\>//g  | sed s/tm.//g | sed s/\_.//g  | sed s/.pdb//g `; do grep $i interacting-pairs.tsv ;  done | sort -u > interacting-pairs-90.tsv
 wc -l interacting-pairs-90.tsv
 echo -n "40% pairs: " ; 
-for i in `grep \> all_40.seq | sed s/\>//g  | sed s/tm.//g | sed s/.pdb//g `; do grep $i interacting-pairs.tsv ;  done | sort -u > interacting-pairs-40.tsv
+for i in `grep \> all_40.seq | sed s/\>//g  | sed s/tm.//g | sed s/\_.//g | sed s/.pdb//g `; do grep $i interacting-pairs.tsv ;  done | sort -u > interacting-pairs-40.tsv
 wc -l interacting-pairs-40.tsv
 
 
@@ -34,9 +34,13 @@ echo "Interactions in TM region"
 
 #bin/extractinteractionareaTM.py  | sort  > interacting-pairs-TM.tsv
 
-gawk '{if ($6>500 && ($4 > 500. && $5 > 500.)) print $0}'  interacting-pairs-TM.tsv | sort > interacting-pairs-TMarea.tsv
-gawk '{if ($10>500 && ($4 > 500. && $5 > 500.)) print $0}'  interacting-pairs-TM.tsv | sort  > interacting-pairs-nonTMarea.tsv
-gawk '{if ($6>500 && $10>500 && ($4 > 500. && $5 > 500.)) print $0}'  interacting-pairs-TM.tsv | sort  > interacting-pairs-BOTH.tsv
+#gawk '{if ($6>500 && ($4 > 500. && $5 > 500.)) print $0}'  interacting-pairs-TM.tsv | sort > interacting-pairs-TMarea.tsv
+#gawk '{if ($10>500 && ($4 > 500. && $5 > 500.)) print $0}'  interacting-pairs-TM.tsv | sort  > interacting-pairs-nonTMarea.tsv
+#gawk '{if ($6>500 && $10>500 && ($4 > 500. && $5 > 500.)) print $0}'  interacting-pairs-TM.tsv | sort  > interacting-pairs-BOTH.tsv
+
+gawk '{if ($6>500 && ($4 > 1000. || $5 > 1000.)) print $0}'  interacting-pairs-TM.tsv | sort > interacting-pairs-TMarea.tsv
+gawk '{if ($10>500 && ($4 > 1000. || $5 > 1000.)) print $0}'  interacting-pairs-TM.tsv | sort  > interacting-pairs-nonTMarea.tsv
+gawk '{if ($6>500 && $10>500 && ($4 > 1000. || $5 > 1000.)) print $0}'  interacting-pairs-TM.tsv | sort  > interacting-pairs-BOTH.tsv
 
 
 echo -n "All pairs: " ; wc -l interacting-pairs-TMarea.tsv
