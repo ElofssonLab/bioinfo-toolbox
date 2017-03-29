@@ -1,0 +1,173 @@
+
+#######################################################
+#                                                     #
+#                        LGA                          #
+#                  ---------------                    #
+#                                                     #
+#               Local-Global Alignment                #
+#        A Method for Finding 3-D Similarities        #
+#               in Protein Structures                 #
+#                                                     #
+#                  ------------ 09/2011               #
+#                                                     #
+#      Adam Zemla (adamz@llnl.gov)                    #
+#      Lawrence Livermore National Laboratory, CA     #
+#                                                     #
+#######################################################
+
+# Molecule1: number of CA atoms  136 ( 2092),  selected  136 , name 1euw.pdb
+# Molecule2: number of CA atoms  134 (  993),  selected  134 , name 9zzz.pdb
+# PARAMETERS: 1euw.pdb.9zzz.pdb  -sia  -lw:3  -d:3  -al  
+# FIXED Atom-Atom correspondence
+# Standard RMSD calculation 
+
+#      Molecule1      Molecule2  DISTANCE  RMSD(lw:3)
+LGA    M     1_A      S     2_A    11.433      -
+LGA    M     2_A      T     3_A     7.918      -
+LGA    K     3_A      T     4_A     9.184      -
+LGA    K     4_A      L     5_A     7.696     1.794
+LGA    I     5_A      A     6_A     8.473     1.822
+LGA    D     6_A      I     7_A     8.413     1.406
+LGA    V     7_A      V     8_A     8.243     1.409
+LGA    K     8_A      R     9_A     8.719     2.030
+LGA    I     9_A      L    10_A     7.277     2.649
+LGA    L    10_A      D    11_A     7.807     2.592
+LGA    D    11_A      P    12_A     5.357     2.595
+LGA    P    12_A      G    13_A     7.071     2.202
+LGA    R    13_A      L    14_A     3.990     3.012
+LGA    V    14_A      P    15_A     4.829     3.378
+LGA    G    15_A      L    16_A     2.160     3.980
+LGA    K    16_A      P    17_A     8.646     4.150
+LGA    E    17_A      S    18_A    10.834     4.474
+LGA    F    18_A      R    19_A    10.904     3.719
+LGA    P    19_A      A    20_A     8.753     2.560
+LGA    L    20_A      H    21_A    11.776     3.065
+LGA    P    21_A      D    22_A    10.620     2.892
+LGA    T    22_A      G    23_A     7.843     3.085
+LGA    Y    23_A      D    24_A     2.030     3.188
+LGA    A    24_A      A    25_A     6.537     1.881
+LGA    T    25_A      G    26_A     9.272     3.033
+LGA    S    26_A      V    27_A    12.692     3.847
+LGA    G    27_A      D    28_A    16.181     3.974
+LGA    S    28_A      L    29_A    16.101     3.398
+LGA    A    29_A      Y    30_A    19.224     2.743
+LGA    G    30_A      S    31_A    18.242     2.316
+LGA    L    31_A      A    32_A    18.245     2.690
+LGA    D    32_A      E    33_A    17.327     2.815
+LGA    L    33_A      D    34_A    16.231     2.480
+LGA    R    34_A      V    35_A    13.894     1.134
+LGA    A    35_A      E    36_A    13.489     1.188
+LGA    C    36_A      L    37_A    16.841     1.527
+LGA    L    37_A      A    38_A    18.893     1.572
+LGA    N    38_A      P    39_A    23.493     2.022
+LGA    D    39_A      G    40_A    21.560     2.570
+LGA    A    40_A      R    41_A    15.846     1.860
+LGA    V    41_A      R    42_A    10.853     1.863
+LGA    E    42_A      A    43_A     8.486     1.276
+LGA    L    43_A      L    44_A     9.240     1.587
+LGA    A    44_A      V    45_A    12.750     3.049
+LGA    P    45_A      R    46_A    18.281     3.702
+LGA    G    46_A      T    47_A    20.128     3.296
+LGA    D    47_A      G    48_A    19.827     2.303
+LGA    T    48_A      V    49_A    18.957     2.079
+LGA    T    49_A      A    50_A    16.994     2.053
+LGA    L    50_A      V    51_A    16.097     1.696
+LGA    V    51_A      A    52_A    17.168     1.260
+LGA    P    52_A      V    53_A    15.215     1.262
+LGA    T    53_A      P    54_A    16.779     1.448
+LGA    G    54_A      F    55_A    18.912     2.725
+LGA    L    55_A      G    56_A    17.362     3.545
+LGA    A    56_A      M    57_A    11.750     2.457
+LGA    I    57_A      V    58_A     7.211     1.720
+LGA    H    58_A      G    59_A     7.739     0.883
+LGA    I    59_A      L    60_A    10.452     1.488
+LGA    A    60_A      V    61_A    17.277     1.851
+LGA    D    61_A      H    62_A    20.547     2.797
+LGA    P    62_A      P    63_A    24.550     4.041
+LGA    S    63_A      R    64_A    25.692     3.451
+LGA    L    64_A      S    65_A    24.101     3.547
+LGA    A    65_A      G    66_A    25.424     4.616
+LGA    A    66_A      L    67_A    23.787     4.517
+LGA    M    67_A      A    68_A    18.306     4.358
+LGA    M    68_A      T    69_A    15.107     3.966
+LGA    L    69_A      R    70_A    15.542     4.030
+LGA    P    70_A      V    71_A    12.084     4.148
+LGA    R    71_A      G    72_A     8.979     3.687
+LGA    S    72_A      L    73_A     7.692     3.887
+LGA    G    73_A      S    74_A     8.032     4.186
+LGA    L    74_A      I    75_A     8.745     3.180
+LGA    G    75_A      V    76_A     9.790     3.166
+LGA    H    76_A      N    77_A    15.402     3.277
+LGA    K    77_A      S    78_A    16.320     3.838
+LGA    H    78_A      P    79_A    17.555     3.082
+LGA    G    79_A      G    80_A    16.430     1.502
+LGA    I    80_A      T    81_A    17.311     1.532
+LGA    V    81_A      I    82_A    16.535     1.422
+LGA    L    82_A      D    83_A    16.791     1.318
+LGA    G    83_A      A    84_A    21.121     1.602
+LGA    N    84_A      G    85_A    19.286     2.290
+LGA    L    85_A      Y    86_A    19.018     2.629
+LGA    V    86_A      R    87_A    19.319     2.316
+LGA    G    87_A      G    88_A    14.829     2.419
+LGA    L    88_A      E    89_A    15.326     2.815
+LGA    I    89_A      I    90_A    10.949     1.580
+LGA    D    90_A      K    91_A    15.692     2.813
+LGA    S    91_A      V    92_A    18.994     3.517
+LGA    D    92_A      A    93_A    21.209     3.627
+LGA    Y    93_A      L    94_A    21.066     2.882
+LGA    Q    94_A      I    95_A    24.975     2.489
+LGA    G    95_A      N    96_A    26.095     2.479
+LGA    Q    96_A      L    97_A    25.694     2.341
+LGA    L    97_A      D    98_A    25.530     2.533
+LGA    M    98_A      P    99_A    25.496     4.061
+LGA    I    99_A      A   100_A    23.206     4.255
+LGA    S   100_A      A   101_A    19.937     3.085
+LGA    V   101_A      P   102_A    13.704     1.746
+LGA    W   102_A      I   103_A    10.597     1.162
+LGA    N   103_A      V   104_A    10.380     1.492
+LGA    R   104_A      V   105_A    14.450     2.321
+LGA    G   105_A      H   106_A    18.049     1.939
+LGA    Q   106_A      R   107_A    21.409     2.192
+LGA    D   107_A      G   108_A    20.197     2.218
+LGA    S   108_A      D   109_A    15.118     2.264
+LGA    F   109_A      R   110_A    12.755     2.509
+LGA    T   110_A      I   111_A     9.914     2.392
+LGA    I   111_A      A   112_A    10.304     1.934
+LGA    Q   112_A      Q   113_A    14.338     3.149
+LGA    P   113_A      L   114_A    15.657     3.642
+LGA    G   114_A      L   115_A    16.416     4.135
+LGA    E   115_A      V   116_A    19.009     2.818
+LGA    R   116_A      Q   117_A    19.030     2.279
+LGA    I   117_A      R   118_A    22.269     1.886
+LGA    A   118_A      V   119_A    19.391     1.955
+LGA    Q   119_A      E   120_A    20.156     1.979
+LGA    M   120_A      L   121_A    18.090     1.036
+LGA    I   121_A      V   122_A    18.452     1.298
+LGA    F   122_A      E   123_A    19.012     1.401
+LGA    V   123_A      L   124_A    17.969     1.549
+LGA    P   124_A      V   125_A    18.237     1.531
+LGA    V   125_A      E   126_A    17.193     1.784
+LGA    V   126_A      V   127_A    15.702     2.712
+LGA    Q   127_A      S   128_A    16.449     2.894
+LGA    A   128_A      S   129_A    12.399     3.239
+LGA    E   129_A      F   130_A    10.136     3.339
+LGA    F   130_A      D   131_A    10.893     2.720
+LGA    N   131_A      E   132_A     6.596     3.205
+LGA    L   132_A      A   133_A    12.466      -
+LGA    V   133_A      G   134_A    14.708      -
+LGA    E   134_A      L   135_A    16.231      -
+
+# Standard rmsd calculations on all 134 assigned CA atoms:
+SUMMARY(RMS): N1 =  136  N2 =  134  RMSD = 15.955
+
+Unitary ROTATION matrix and the SHIFT vector superimpose molecules  (1=>2)
+  X_new =  -0.246320 * X  +  -0.765315 * Y  +   0.594659 * Z  +   0.367861
+  Y_new =   0.649790 * X  +   0.324833 * Y  +   0.687210 * Z  +  -1.235010
+  Z_new =  -0.719096 * X  +   0.555677 * Y  +   0.417281 * Z  +  11.574997 
+
+Euler angles from the ROTATION matrix. Conventions XYZ and ZXZ:
+           Phi     Theta       Psi   [DEG:       Phi     Theta       Psi ]
+XYZ:  1.933137  0.802501  0.926694   [DEG:  110.7606   45.9799   53.0956 ]
+ZXZ:  2.428269  1.140345 -0.912897   [DEG:  139.1296   65.3370  -52.3052 ]
+ 
+# END of job

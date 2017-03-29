@@ -9,8 +9,16 @@ ulimit -s unlimited
 #id=$1
 #echo $id
 
-confold=/proj/bioinfo/software/confold/CONFOLD/confold.pl
-#confold=$HOME/git/bioinfo-toolbox/arne/CONFOLD/confold.pl
+if [ -s /proj/bioinfo/software/confold/CONFOLD/confold.pl ]
+then
+    confold=/proj/bioinfo/software/confold/CONFOLD/confold.pl
+elif  [ -s /pfs/nobackup/home/m/mircomic/confold/CONFOLD/confold.pl ]
+then
+    confold=/pfs/nobackup/home/m/mircomic/confold/CONFOLD/confold.pl
+else
+    confold=$HOME/git/bioinfo-toolbox/arne/CONFOLD/confold.pl
+fi
+
 l=2.5
 
 #dir=data/29.0/$id

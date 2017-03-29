@@ -104,6 +104,9 @@ def read_chain(pdbfile, chain):
     prev_resi = 0
     
     for line in pdbfile:
+        # I think we should skip these when we read a chain
+        if line.startswith('HETATM'):
+            continue
         if not line.startswith('ATOM') and not seen_atoms:
             header += line
         elif not line.startswith('ATOM') and seen_atoms:
@@ -355,6 +358,18 @@ def get_first_chain(pdbfile):
 
     return atm_record['chain']
  
+def get_all_chains(pdbfile):
+    chains=[]
+    lastchain='*'
+    for line in pdbfile:
+        if not line.startswith('ATOM'):
+            continue
+        atm_record = parse_atm_record(line)
+        if atm_record['chain'] != lastchain:
+            chains.append(atm_record['chain'])
+            lastchain=atm_record['chain']
+    return chains
+
 
 def get_acc(pdbfile):
 
