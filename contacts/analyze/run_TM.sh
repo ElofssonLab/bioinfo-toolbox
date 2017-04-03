@@ -41,12 +41,18 @@ do
 	sleep 1
 	for k in $j/stage1/${id}*.pdb
 	do
-	    echo $k
-	    echo -n $k "   "  >> ${j}_TM.out
-	    $TMscore native.aligned_2.pdb $k | grep TM-score | grep d0 | sed s/TM-score\ =//g | sed s/\(d0=......//g  >> ${j}_TM.out
+	    if [ -s $k ]
+	    then
+		echo $k
+		echo -n $k "   "  >> ${j}_TM.out
+		$TMscore native.aligned_2.pdb $k | grep TM-score | grep d0 | sed s/TM-score\ =//g | sed s/\(d0=......//g  >> ${j}_TM.out
+	    fi
 	done
-	cp ${j}_TM.out  $dir/${j}_TM.out  
-	sleep 2
+	if [ -s ${j}_TM.out ]
+	then
+	    cp ${j}_TM.out  $dir/${j}_TM.out  
+	    sleep 2
+	fi
 	rm -r ${j}/
     fi
 done
