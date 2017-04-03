@@ -4,7 +4,7 @@ from __future__ import print_function
 import re
 import sys
 import os
-
+import csv
   
 
 # we have to guess the method from various type of names. inpout is a .tar.gz name
@@ -78,7 +78,7 @@ def parse_TM(id,fname):
             l_arr = l.strip().split()
             if not l_arr:
                 continue
-            p=re.compile('(fa\_.*)\.pdb')
+            p=re.compile('(fa\_[0-9]+).*\.pdb')
             m=p.search(l_arr[0])
             if m:
                 model=m.group(1)
@@ -147,9 +147,12 @@ if __name__=="__main__":
     length=length_PDB(dname+"/"+fname+"_proq3/"+target+"."+pdb+".fa_1.pdb")
     #    print length
     #    now we need to 
-    print ('target','ali','num','mindist','maxdist','length','model','TM','Pcons','cns','noe','ProQ2D','ProQ3D')
+    print ('target , ','ali , ','num , ','mindist , ','maxdist , ','length , ','model , ','TM , ','Pcons , ','cns , ','noe , ','ProQ2D , ','ProQ3D')
+
+                
+    
     for model in pcons:
         try:
-            print(target,ali,num,mindist,maxdist,length,model,TM[model],pcons[model],cns[model],noe[model],ProQ2D[model],ProQ3D[model])
+            print(target," , ",ali," , ",num," , ",mindist," , ",maxdist," , ",length," , ",model," , ",TM[model]," , ",pcons[model]," , ",cns[model]," , ",noe[model]," , ",ProQ2D[model]," , ",ProQ3D[model])
         except:
             print('Error printng output\n', file=sys.stderr)

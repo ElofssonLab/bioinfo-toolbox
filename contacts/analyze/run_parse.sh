@@ -32,7 +32,7 @@ do
 	tar -zxf $dir/${j}_proq3.tar.gz
 	ln -fs $dir/$j*.out ./
 	sleep 1
-	$dir/../bin/GetAllScores.py ${j}.tar.gz >  $dir/${j}_summary.out 
+	$dir/../bin/GetAllScores.py ${j}.tar.gz >  $dir/${j}_summary.csv
 	#	mv ${j}*out $dir/
 	sleep 1
 	rm -r ${j}/
