@@ -1,7 +1,7 @@
 #!/bin/bash -lx
 #SBATCH --output=NOE.%A_%a.out
 #SBATCH --error=NOE.%A_%a.out
-#SBATCH --array=1-1000
+#SBATCH --array=1-335
 #SBATCH -c 1
 #SBATCH -t 30:00
 #SBATCH -A SNIC2016-10-22
@@ -13,7 +13,8 @@ pos=$(($SLURM_ARRAY_TASK_ID + $offset))
 #id=`tail -n+$pos IDs_29.0_test_done_300.txt | head -n1`
 id=`tail -n+$pos $list | head -n1`
 
-#id="PF00001.18"
+id="PF00001.18"
+#id="PF00003.19"
 
 dir=`pwd`/$id
 
@@ -29,15 +30,25 @@ do
     j=`basename $i .tar.gz`
     if [ ! -s $dir/${j}_cns.out ]
     then
-	tar -zxf $i
-	echo "running"
+	if [ -s $i ]
+	then
+	    tar -zxf $i
+#	    echo "running"
 #	ls $j/stage1/${id}*.pdb > qa.input
 #	/pfs/nobackup/home/m/mircomic/Pcons/bin/pcons -i ./qa.input -A > ${dir}/${j}.raw
 #	python $dir/../bin/parse_pcons.py $j.raw > ${j}_local.out
-	python $dir/../bin/parse_confold_pdb_header.py ${j}/stage1/${id}*.pdb > ${dir}/${j}_cns.out
+	    if [ -s ${j}/stage1/${id}*fa_1.*.pdb ]
+	    then
+		python $dir/../bin/parse_confold_pdb_header.py ${j}/stage1/${id}*fa_[0-9].*.pdb  > ${dir}/${j}_cns.out
+		if [ -s ${j}/stage1/${id}*fa_10.pdb ]
+		then
+		    python $dir/../bin/parse_confold_pdb_header.py  ${j}/stage1/${id}*fa_[0-9][0-9].*.pdb > ${dir}/${j}_cns.out
+		fi
+	    fi
 #	mv ${j}*out $dir/
-	sleep 2
-	rm -r ${j}/
+	    sleep 2
+	    rm -r ${j}/
+	fi
     fi
 done
 

@@ -30,12 +30,16 @@ do
     then
 	tar -zxf $i
 	echo "running"
-	ls $j/stage1/${id}*.pdb > qa.input
-	/pfs/nobackup/home/m/mircomic/Pcons/bin/pcons -i ./qa.input -A > ${dir}/${j}.raw
-#	python $dir/../bin/parse_pcons.py $j.raw > ${j}_local.out
-	python $dir/../bin/reformat_pcons_out.py ${dir}/${j}.raw > ${dir}/${j}_pcons.out
-#	mv ${j}*out $dir/
-	sleep 2
+	ls $j/stage1/${id}*fa_[0-9].pdb > qa.input
+	ls $j/stage1/${id}*fa_[0-9][0-9].pdb >> qa.input
+	if [ -s qa.input ]
+	then
+	    /pfs/nobackup/home/m/mircomic/Pcons/bin/pcons -i ./qa.input -A > ${dir}/${j}.raw
+	    #	python $dir/../bin/parse_pcons.py $j.raw > ${j}_local.out
+	    python $dir/../bin/reformat_pcons_out.py ${dir}/${j}.raw > ${dir}/${j}_pcons.out
+	    #	mv ${j}*out $dir/
+	    sleep 2
+	fi
 	rm -r ${j}/
     fi
 done

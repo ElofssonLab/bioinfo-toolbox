@@ -44,14 +44,18 @@ do
     j=`basename $i .tar.gz`
     if [ ! -s $dir/${j}_proq3.tar.gz ]
     then
-	ls $j/stage1/${id}*.pdb > qa.input
-	sleep 10 # waiting for filesystem 
-	mkdir  $j_proq3
-	/pfs/nobackup/home/a/arnee/mircom/bin/proq3/run_proq3.sh  -l qa.input -profile ${scratch}${id}.????_?.fasta -outpath ${j}_proq3 --deep yes
-	sleep 10 # waiting for filesystem
-	tar -zcvf $dir/${j}_proq3.tar.gz ${j}_proq3 # --remove-files
-	rm -r ${j}_proq3
-	rm -r ${j}/
+	ls $j/stage1/${id}*fa_[0-9].pdb > qa.input
+	ls $j/stage1/${id}*fa_[0-9][0-9].pdb >> qa.input
+	if [ -s qa.input ]
+	then
+	    sleep 2 # waiting for filesystem 
+	    mkdir  $j_proq3
+	    /pfs/nobackup/home/a/arnee/mircom/bin/proq3/run_proq3.sh  -l qa.input -profile ${scratch}/${id}.????_?.fasta -outpath ${j}_proq3 --deep yes
+	    sleep 2 # waiting for filesystem
+	    tar -zcvf $dir/${j}_proq3.tar.gz ${j}_proq3 # --remove-files
+	    rm -r ${j}_proq3
+	    rm -r ${j}/
+	fi
     fi
 done
 

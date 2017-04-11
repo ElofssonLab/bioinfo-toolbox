@@ -139,7 +139,8 @@ if __name__=="__main__":
     (cns,noe)=parse_cns(target,dname+"/"+fname+"_cns.out")
     #print cns
     #print noe
-    for model in pcons:
+    for model in noe:
+        proq=parse_proq(dname+"/"+fname+"_proq3/"+target+"."+pdb+"."+model+".pdb.proq3.global")
         proq=parse_proq(dname+"/"+fname+"_proq3/"+target+"."+pdb+"."+model+".pdb.proq3.global")
         ProQ2D[model]=proq[0]
         ProQ3D[model]=proq[3]
