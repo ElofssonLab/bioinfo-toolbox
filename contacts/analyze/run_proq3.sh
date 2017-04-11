@@ -38,7 +38,7 @@ cd $scratch
 
 sleep 10 # waiting for filesystem
 
-for i in $dir/*cm.tar.gz $dir/conf*[04].tar.gz  $dir/*_mem.tar.gz
+for i in $dir/*cm.tar.gz $dir/conf*[04].tar.gz  # $dir/*_mem.tar.gz
 do
     tar -zxf $i
     j=`basename $i .tar.gz`

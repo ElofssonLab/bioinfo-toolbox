@@ -14,6 +14,7 @@ def parse(flist):
     for fname in flist:
         with open(fname) as f:
             model = parse_name(os.path.basename(fname))
+            orgname=os.path.basename(fname)
             for l in f:
                 if not l.startswith('REMARK'):
                     break
@@ -33,7 +34,7 @@ def parse(flist):
                     vdw = l_arr[-1]
                 if l.startswith('REMARK noe'):
                     noe = l_arr[-1]
-            print "%s %s %s %s %s %s %s %s" % (model, model_raw, total, bond, angle, imp, vdw, noe)
+            print "%s %s %s %s %s %s %s" % (orgname, total, bond, angle, imp, vdw, noe)
 
 
 if __name__=="__main__":

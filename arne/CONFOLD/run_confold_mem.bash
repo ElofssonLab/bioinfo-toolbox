@@ -18,6 +18,9 @@ then
 elif  [ -s /pfs/nobackup/home/m/mircomic/confold/CONFOLD/confold_mem.pl ]
 then
     confold=/pfs/nobackup/home/m/mircomic/confold/CONFOLD/confold_mem.pl
+elif  [ -s /pfs/nobackup/home/a/arnee/git/bioinfo-toolbox/CONFOLD/confold_mem.pl ]
+then
+    confold=/pfs/nobackup/home/a/arnee/git/bioinfo-toolbox/CONFOLD/confold_mem.pl 
 else
     confold=$HOME/git/bioinfo-toolbox/arne/CONFOLD/confold_mem.pl
 fi

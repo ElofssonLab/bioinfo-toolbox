@@ -13,7 +13,8 @@ pos=$(($SLURM_ARRAY_TASK_ID + $offset))
 #id=`tail -n+$pos IDs_29.0_test_done_300.txt | head -n1`
 id=`tail -n+$pos $list | head -n1`
 
-id="PF00001.18"
+#id="PF00001.18"
+#id=PF00230.17
 
 dir=`pwd`/$id
 
@@ -24,7 +25,7 @@ cd $scratch
 
 sleep 2 # waiting for filesystem
 
-for i in $dir/*cm.tar.gz $dir/conf*[04].tar.gz $dir/*_mem.tar.gz
+for i in $dir/*cm.tar.gz $dir/conf*[04].tar.gz # $dir/*_mem.tar.gz
 do
     j=`basename $i .tar.gz`
     if [ ! -s $dir/${j}_summary.out ]
@@ -33,6 +34,7 @@ do
 	then
 	    tar -zxf $dir/${j}_proq3.tar.gz
 	    ln -fs $dir/$j*.out ./
+	    ln -fs $dir/$j*.raw ./
 	    sleep 1
 	    $dir/../bin/GetAllScores.py ${j}.tar.gz >  $dir/${j}_summary.csv
 	    #	mv ${j}*out $dir/

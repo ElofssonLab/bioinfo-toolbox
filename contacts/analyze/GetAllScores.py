@@ -31,21 +31,22 @@ def parse_method(fname):
     if m:
         num=m.group(1)
     else:
-        num=9999
+        num=99
         #
     return(ali,num,mindist,maxdist)
 
 def parse_pcons(id,fname):
+    IGNORE_LST = ['PFRMAT','TARGET','AUTHOR','REMARK','METHOD','MODEL','QMODE','END']
+    score = {}
     with open(fname) as f:
-        score = {}
         for l in f:
             l_arr = l.strip().split()
-            if not l_arr:
+            first = l_arr[0]
+            if first in IGNORE_LST or not '.pdb' in first:
                 continue
-            target = l_arr[0]
-            pdb = l_arr[2]
-            model = l_arr[3]
-            pcons = l_arr[4]
+            pdb=l_arr[0]
+            model = id+"/stage1/"+pdb
+            pcons = l_arr[1]
             score[model]=pcons
     f.close
     return score,pdb
@@ -58,14 +59,14 @@ def parse_cns(id,fname):
             l_arr = l.strip().split()
             if not l_arr:
                 continue
-            target = l_arr[0]
-            model = l_arr[3]
-            total = l_arr[5]
-            bond = l_arr[6]
-            angle = l_arr[7]
-            imp = l_arr[8]
-            vdw = l_arr[9]
-            noe = l_arr[10]
+            pdb = l_arr[0]
+            model = id+"/stage1/"+pdb
+            total = l_arr[1]
+            bond = l_arr[2]
+            angle = l_arr[3]
+            imp = l_arr[4]
+            vdw = l_arr[5]
+            noe = l_arr[6]
             score_total[model]=total
             score_noe[model]=noe
     f.close
@@ -78,12 +79,7 @@ def parse_TM(id,fname):
             l_arr = l.strip().split()
             if not l_arr:
                 continue
-            p=re.compile('(fa\_[0-9]+).*\.pdb')
-            m=p.search(l_arr[0])
-            if m:
-                model=m.group(1)
-            else:
-                model="UNKNOWN"
+            model=l_arr[0]
             TM=l_arr[3]
             score[model]=TM
     f.close
@@ -132,28 +128,27 @@ if __name__=="__main__":
     #print fname,target
     (ali,num,mindist,maxdist)=parse_method(fname)
     #print ali,num,mindist,maxdist
-    (pcons,pdb)=parse_pcons(target,dname+"/"+fname+"_pcons.out")
+    (pcons,pdb)=parse_pcons(fname,dname+"/"+fname+".raw")
     # print pcons,pdb
     TM=parse_TM(target,dname+"/"+fname+"_TM.out")
     #print tm
-    (cns,noe)=parse_cns(target,dname+"/"+fname+"_cns.out")
+    (cns,noe)=parse_cns(fname,dname+"/"+fname+"_cns.out")
     #print cns
     #print noe
     for model in noe:
-        proq=parse_proq(dname+"/"+fname+"_proq3/"+target+"."+pdb+"."+model+".pdb.proq3.global")
-        proq=parse_proq(dname+"/"+fname+"_proq3/"+target+"."+pdb+"."+model+".pdb.proq3.global")
+        proq=parse_proq(dname+"/"+fname+"_proq3/"+pdb+".proq3.global")
         ProQ2D[model]=proq[0]
         ProQ3D[model]=proq[3]
         #    print ProQ3D
-    length=length_PDB(dname+"/"+fname+"_proq3/"+target+"."+pdb+".fa_1.pdb")
+    length=length_PDB(dname+"/"+fname+"_proq3/"+pdb)
     #    print length
     #    now we need to 
-    print ('target , ','ali , ','num , ','mindist , ','maxdist , ','length , ','model , ','TM , ','Pcons , ','cns , ','noe , ','ProQ2D , ','ProQ3D')
+    print ('target , ','model , ','ali , ','num , ','mindist , ','maxdist , ','length , ','TM , ','Pcons , ','cns , ','noe , ','ProQ2D , ','ProQ3D')
 
                 
     
     for model in pcons:
         try:
-            print(target," , ",ali," , ",num," , ",mindist," , ",maxdist," , ",length," , ",model," , ",TM[model]," , ",pcons[model]," , ",cns[model]," , ",noe[model]," , ",ProQ2D[model]," , ",ProQ3D[model])
+            print(target," , ",model," , ",ali," , ",num," , ",mindist," , ",maxdist," , ",length," , ",TM[model]," , ",pcons[model]," , ",cns[model]," , ",noe[model]," , ",ProQ2D[model]," , ",ProQ3D[model])
         except:
             print('Error printng output\n', file=sys.stderr)

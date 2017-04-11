@@ -23,7 +23,7 @@ cd $scratch
 
 sleep 2 # waiting for filesystem
 
-for i in $dir/*cm.tar.gz $dir/conf*[04].tar.gz $dir/*_mem.tar.gz
+for i in $dir/*cm.tar.gz $dir/conf*[04].tar.gz # $dir/*_mem.tar.gz
 do
     j=`basename $i .tar.gz`
     if [ ! -s $dir/${j}_pcons.out ]
@@ -36,7 +36,7 @@ do
 	then
 	    /pfs/nobackup/home/m/mircomic/Pcons/bin/pcons -i ./qa.input -A > ${dir}/${j}.raw
 	    #	python $dir/../bin/parse_pcons.py $j.raw > ${j}_local.out
-	    python $dir/../bin/reformat_pcons_out.py ${dir}/${j}.raw > ${dir}/${j}_pcons.out
+	    # python $dir/../bin/reformat_pcons_out.py ${dir}/${j}.raw > ${dir}/${j}_pcons.out
 	    #	mv ${j}*out $dir/
 	    sleep 2
 	fi
