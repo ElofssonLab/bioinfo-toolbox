@@ -288,9 +288,10 @@ def get_cb_coordinates(pdbfile, chain):
     return cb_lst
 
 
-def get_atom_seq(pdbfile, chain='', model=1):
+def get_atom_seq(pdbfile, chain='', model=1, return_lines=False):
 
     three_to_one = {'ARG':'R', 'HIS':'H', 'LYS':'K', 'ASP':'D', 'GLU':'E', 'SER':'S', 'THR':'T', 'ASN':'N', 'GLN':'Q', 'CYS':'C', 'GLY':'G', 'PRO':'P', 'ALA':'A', 'ILE':'I', 'LEU':'L', 'MET':'M', 'PHE':'F', 'TRP':'W', 'TYR':'Y', 'VAL':'V', 'UNK': 'X'}
+    line_dict = defaultdict(list)
     res_dict = {}
     
     in_model = False
@@ -308,9 +309,6 @@ def get_atom_seq(pdbfile, chain='', model=1):
         atm_record = parse_atm_record(line)
         if atm_record['chain'] != ' ' and atm_record['chain'] != chain and chain != '*':
             continue
-        if atm_record['atm_name'] != 'CA':
-            continue
-
         res_i = atm_record['res_no']
 
         if res_dict.keys():
@@ -323,7 +321,11 @@ def get_atom_seq(pdbfile, chain='', model=1):
         if atm_record['insert'] == 'X':
             res_i = res_i * 0.001
          
-        #print atm_record['res_name']
+        line_dict[res_i].append(line)
+        
+        if atm_record['atm_name'] != 'CA':
+            continue
+
         if atm_record['res_name'] in three_to_one:
             #res_name = three_to_one[atm_record['res_name']]
             #print res_name
@@ -331,9 +333,9 @@ def get_atom_seq(pdbfile, chain='', model=1):
         #else:
             #res_name = ''
             #continue
-
         res_dict[res_i] = res_name
 
+    line_lst = [l[1] for l in sorted(line_dict.iteritems(), key=operator.itemgetter(0))]
     res_lst = sorted(res_dict.iteritems(), key=operator.itemgetter(0))
     atom_seq = ''
 
@@ -341,6 +343,8 @@ def get_atom_seq(pdbfile, chain='', model=1):
         atom_seq += res[1]
 
     pdbfile.close()
+    if return_lines:
+        return atom_seq, ['', line_lst, 'END\n']
     return atom_seq
 
 
@@ -379,8 +383,10 @@ def get_acc(pdbfile):
 if __name__ == '__main__':
 
     pdbfile = open(sys.argv[1], 'r')
-    #chain = sys.argv[2]
-    chain = get_first_chain(pdbfile)
+    if len(sys.argv) == 3:
+        chain = sys.argv[2]
+    else:
+        chain = get_first_chain(pdbfile)
     print get_atom_seq(pdbfile, chain)
     pdbfile.close()
     #pdbfile = open(sys.argv[1], 'r')
