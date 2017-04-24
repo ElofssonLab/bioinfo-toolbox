@@ -2,7 +2,11 @@
 
 # Just a script that actually checks if everything is nicely packes in the way it should be
 
-
+# Clean up
+find ./ -name *.tar.gz -size 0 -exec rm {} \;
+find ./ -name *.tar.gz -size 1 -exec rm {} \;
+find ./ -name *.tar.gz -size 2 -exec rm {} \;
+find ./ -name *.tar.gz -size 3 -exec rm {} \;
 
 # Then we need to delete all directories that we already have as tar files.
 

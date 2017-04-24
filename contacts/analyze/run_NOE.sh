@@ -8,7 +8,10 @@
 
 
 offset=$2
-offset=0
+if [ -z $offset ]
+then
+    offset=0
+fi
 list=$1
 pos=$(($SLURM_ARRAY_TASK_ID + $offset))
 #id=`tail -n+$pos IDs_29.0_test_done_300.txt | head -n1`

@@ -3,7 +3,7 @@
 #SBATCH --error=proq3.%A_%a.out
 #SBATCH --array=1-335
 #SBATCH -c 1
-#SBATCH -t 3-00:00:00
+#SBATCH -t 24:00:00
 #SBATCH -A SNIC2016-10-22
 
 export PATH=$PATH:/pfs/nobackup/home/m/mircomic/EMBOSS-6.6.0/build/bin/
@@ -13,6 +13,12 @@ export THEANO_FLAGS='base_compiledir=/pfs/nobackup/home/a/arnee/python2.7/dist-p
 
 offset=$2
 list=$1
+if [ -z $offset ]
+then
+    offset=0
+fi
+
+
 pos=$(($SLURM_ARRAY_TASK_ID + $offset))
 #id=`tail -n+$pos IDs_29.0_test_done_300.txt | head -n1`
 id=`tail -n+$pos $list | head -n1`
@@ -33,8 +39,9 @@ cd $scratch
 
 #cd /pfs/nobackup/home/a/arnee/mircom/
 
+PROQ=/pfs/nobackup/home/m/mircomic/proq3/
 
-/pfs/nobackup/home/a/arnee/mircom/bin/proq3/run_proq3.sh -fasta $dir/${id}*.fa -outpath ./ -only-build-profile
+$PROQ/run_proq3.sh -fasta $dir/${id}*.fa -outpath ./ -only-build-profile
 
 sleep 10 # waiting for filesystem
 
@@ -50,7 +57,7 @@ do
 	then
 	    sleep 2 # waiting for filesystem 
 	    mkdir  $j_proq3
-	    /pfs/nobackup/home/a/arnee/mircom/bin/proq3/run_proq3.sh  -l qa.input -profile ${scratch}/${id}.????_?.fasta -outpath ${j}_proq3 --deep yes
+	    $PROQ/run_proq3.sh  -l qa.input -profile ${scratch}/${id}.????_?.fasta -outpath ${j}_proq3 --deep yes
 	    sleep 2 # waiting for filesystem
 	    tar -zcvf $dir/${j}_proq3.tar.gz ${j}_proq3 # --remove-files
 	    rm -r ${j}_proq3
