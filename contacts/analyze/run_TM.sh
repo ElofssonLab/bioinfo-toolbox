@@ -19,6 +19,7 @@ id=`tail -n+$pos $list | head -n1`
 
 #id="PF00001.18"
 #id="PF00002.21"
+#id="PF06808.9"
 
 dir=`pwd`/$id
 
@@ -34,10 +35,12 @@ sleep 2 # waiting for filesystem
 
 TMscore=/pfs/nobackup/home/a/arnee/Software/TMscore/TMscore
 
-for i in $dir/*cm.tar.gz $dir/conf*[04].tar.gz $dir/*_mem.tar.gz
+for i in $dir/*cm.tar.gz $dir/conf*[04].tar.gz # $dir/*_mem.tar.gz
 do
     j=`basename $i .tar.gz`
-    if [ ! -s $dir/${j}_TM.out ]
+    l=`grep -c PF $dir/${j}_TM.out `
+#    if [ ! -s $dir/${j}_TM.out ]
+    if [ $l -lt 10 ]
     then
 	echo $j
 	tar -zxf $i
