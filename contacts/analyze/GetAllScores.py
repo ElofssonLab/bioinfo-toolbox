@@ -5,7 +5,15 @@ import re
 import sys
 import os
 import csv
-  
+import glob, os
+
+def filename(dir,pattern):
+    os.chdir(dir)
+    file='NO-HIT"'
+    for f in glob.glob(pattern):
+        file=f
+    return file
+        
 
 # we have to guess the method from various type of names. inpout is a .tar.gz name
 def parse_method(fname):
@@ -85,6 +93,19 @@ def parse_TM(id,fname):
     f.close
     return score
 
+def parse_gneff(id,dname,pattern):
+    file=filename(dname,pattern)
+    fname=dname+"/"+file
+    with open(fname) as f:
+        gneff = {}
+        for l in f:
+            l_arr = l.strip().split()
+            if not l_arr[0] == "M":
+                continue
+            score=l_arr[8]
+    f.close
+    return score
+
 def parse_proq(fname):
     with open(fname) as f:
         for l in f:
@@ -131,6 +152,9 @@ if __name__=="__main__":
     (pcons,pdb)=parse_pcons(fname,dname+"/"+fname+".raw")
     # print pcons,pdb
     TM=parse_TM(target,dname+"/"+fname+"_TM.out")
+    # print pcons,pdb
+    gneff=parse_gneff(target,dname,"*"+ali+"*.gneff")
+#    print ("GNEFF: ",gneff)
     #print tm
     (cns,noe)=parse_cns(fname,dname+"/"+fname+"_cns.out")
     #print cns
@@ -143,12 +167,12 @@ if __name__=="__main__":
     length=length_PDB(dname+"/"+fname+"_proq3/"+pdb)
     #    print length
     #    now we need to 
-    print ('target , ','model , ','ali , ','num , ','mindist , ','maxdist , ','length , ','TM , ','Pcons , ','cns , ','noe , ','ProQ2D , ','ProQ3D')
+    print ('target , ','model , ','ali , ','num , ','mindist , ','maxdist , ','length , ','TM , ','Pcons , ','cns , ','noe , ','ProQ2D , ','ProQ3D ,','Meff')
 
                 
     
     for model in pcons:
         try:
-            print(target," , ",model," , ",ali," , ",num," , ",mindist," , ",maxdist," , ",length," , ",TM[model]," , ",pcons[model]," , ",cns[model]," , ",noe[model]," , ",ProQ2D[model]," , ",ProQ3D[model])
+            print(target," , ",model," , ",ali," , ",num," , ",mindist," , ",maxdist," , ",length," , ",TM[model]," , ",pcons[model]," , ",cns[model]," , ",noe[model]," , ",ProQ2D[model]," , ",ProQ3D[model]," , ",gneff)
         except:
             print('Error printng output\n', file=sys.stderr)
