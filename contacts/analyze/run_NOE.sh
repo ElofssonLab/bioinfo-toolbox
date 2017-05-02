@@ -29,7 +29,7 @@ cd $scratch
 
 sleep 2 # waiting for filesystem
 
-for i in $dir/*cm.tar.gz $dir/conf*[04].tar.gz # $dir/*_mem.tar.gz
+for i in $dir/*cm.tar.gz # $dir/conf*[04].tar.gz # $dir/*_mem.tar.gz
 do
     j=`basename $i .tar.gz`
     if [ ! -s $dir/${j}_cns.out ]

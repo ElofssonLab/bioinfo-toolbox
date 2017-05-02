@@ -53,7 +53,10 @@ def parse_pcons(id,fname):
             if first in IGNORE_LST or not '.pdb' in first:
                 continue
             pdb=l_arr[0]
-            model = id+"/stage1/"+pdb
+            if  not 'stage1' in first:
+                model = id+"/stage1/"+pdb
+            else:
+                model = pdb
             pcons = l_arr[1]
             score[model]=pcons
     f.close
@@ -150,6 +153,7 @@ if __name__=="__main__":
     (ali,num,mindist,maxdist)=parse_method(fname)
     #print ali,num,mindist,maxdist
     (pcons,pdb)=parse_pcons(fname,dname+"/"+fname+".raw")
+    (pconsall,pdball)=parse_pcons(fname,dname+"/"+target+".raw")
     # print pcons,pdb
     TM=parse_TM(target,dname+"/"+fname+"_TM.out")
     # print pcons,pdb
@@ -167,12 +171,12 @@ if __name__=="__main__":
     length=length_PDB(dname+"/"+fname+"_proq3/"+pdb)
     #    print length
     #    now we need to 
-    print ('target , ','model , ','ali , ','num , ','mindist , ','maxdist , ','length , ','TM , ','Pcons , ','cns , ','noe , ','ProQ2D , ','ProQ3D ,','Meff')
+    print ('target , ','model , ','ali , ','num , ','mindist , ','maxdist , ','length , ','TM , ','Pcons , ','cns , ','noe , ','ProQ2D , ','ProQ3D ,''Pcons-all ,','Meff')
 
                 
     
     for model in pcons:
         try:
-            print(target," , ",model," , ",ali," , ",num," , ",mindist," , ",maxdist," , ",length," , ",TM[model]," , ",pcons[model]," , ",cns[model]," , ",noe[model]," , ",ProQ2D[model]," , ",ProQ3D[model]," , ",gneff)
+            print(target," , ",model," , ",ali," , ",num," , ",mindist," , ",maxdist," , ",length," , ",TM[model]," , ",pcons[model]," , ",cns[model]," , ",noe[model]," , ",ProQ2D[model]," , ",ProQ3D[model]," , ",pconsall[model]," , ",gneff)
         except:
             print('Error printng output\n', file=sys.stderr)

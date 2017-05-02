@@ -35,12 +35,12 @@ sleep 2 # waiting for filesystem
 
 TMscore=/pfs/nobackup/home/a/arnee/Software/TMscore/TMscore
 
-for i in $dir/*cm.tar.gz $dir/conf*[04].tar.gz # $dir/*_mem.tar.gz
+for i in $dir/*cm.tar.gz # $dir/conf*[04].tar.gz # $dir/*_mem.tar.gz
 do
     j=`basename $i .tar.gz`
-    l=`grep -c PF $dir/${j}_TM.out `
-#    if [ ! -s $dir/${j}_TM.out ]
-    if [ $l -lt 10 ]
+#    l=`grep -c PF $dir/${j}_TM.out `
+    if [ ! -s $dir/${j}_TM.out ]
+#    if [ $l -lt 10 ]
     then
 	echo $j
 	tar -zxf $i

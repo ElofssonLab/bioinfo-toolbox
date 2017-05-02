@@ -27,26 +27,25 @@ cd $scratch
 
 sleep 2 # waiting for filesystem
 
-for i in $dir/*cm.tar.gz # $dir/conf*[04].tar.gz # $dir/*_mem.tar.gz
-do
-    j=`basename $i .tar.gz`
-    if [ ! -s $dir/${j}_pcons.out ]
-    then
+if [ ! -s $dir/${id}.raw ]
+then
+    rm -f qa.input
+    for i in $dir/*cm.tar.gz # $dir/conf*[04].tar.gz # $dir/*_mem.tar.gz
+    do
+	j=`basename $i .tar.gz`
 	tar -zxf $i
-	echo "running"
-	ls $j/stage1/${id}*fa_[0-9].pdb > qa.input
+	ls $j/stage1/${id}*fa_[0-9].pdb >> qa.input
 	ls $j/stage1/${id}*fa_[0-9][0-9].pdb >> qa.input
-	if [ -s qa.input ]
-	then
-	    /pfs/nobackup/home/m/mircomic/Pcons/bin/pcons -i ./qa.input -A > ${dir}/${j}.raw
-	    #	python $dir/../bin/parse_pcons.py $j.raw > ${j}_local.out
-	    # python $dir/../bin/reformat_pcons_out.py ${dir}/${j}.raw > ${dir}/${j}_pcons.out
-	    #	mv ${j}*out $dir/
-	    sleep 2
-	fi
-	rm -r ${j}/
+    done
+    if [ -s qa.input ]
+    then
+	/pfs/nobackup/home/a/arnee/git/Pcons/bin/pconsAE.LGscore.b-an01.hpc2n.umu.se -i ./qa.input -A > ${dir}/${id}.raw
+	sleep 2s
+	# We do eed to split this file I think
+	
     fi
-done
+    rm -r ${j}*/
+fi
 
 cd $dir/../
 

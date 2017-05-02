@@ -259,7 +259,7 @@ sub process_parameters{
 		my $top = seq_fasta($file_top);
 		for(my $i = 1; $i <= length($top); $i++){
 			my $char = substr $top, $i-1, 1;
-			if (not ($char eq "i" or $char eq "M" or $char eq "o")){
+			if (not ($char eq "i" or $char eq "M" or $char eq "o" or $char eq "S")){
 				confess "ERROR! undefined secondary structure unit $char in $top";
 			}
 		}
@@ -628,19 +628,21 @@ sub print_topology_restraints{
 	my %res_top = fasta2residues_hash($file_top);
 	my (%inside,%outside);
 	my (%TMinside,%TMoutside);
+	
+
 	foreach (keys %res_top){
 		$inside{$_}="i" if ($res_top{$_} eq "i");
 		$outside{$_}="o" if ($res_top{$_} eq "o");
 	}
 	foreach (keys %res_top){
 	    if (defined($res_top{$_+1})){
-		if ($res_top{$_+1} eq "M"){
+		if ($res_top{$_+1} eq "M" or $res_top{$_+1} eq "S"  ){
 		    $TMinside{$_}="i" if ($res_top{$_} eq "i");
 		    $TMoutside{$_}="o" if ($res_top{$_} eq "o");
 		}
 	    }
 	    if (defined($res_top{$_-1})){
-		if ($res_top{$_-1} eq "M"){
+		if ($res_top{$_-1} eq "M" or $res_top{$_-1} eq "S" ){
 		    $TMinside{$_}="i" if ($res_top{$_} eq "i");
 		    $TMoutside{$_}="o" if ($res_top{$_} eq "o");
 		}

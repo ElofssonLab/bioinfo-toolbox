@@ -14,6 +14,9 @@ data<-read.csv("summary-all.csv",header=TRUE,stringsAsFactors=F,strip.white=T)
 temp <- data %>% group_by(target) %>% slice(which(Pcons == max(Pcons)))
 pcons <- temp %>%  filter (! duplicated(target))
 
+temp <- data %>% group_by(target) %>% slice(which(Pcons.all == max(Pcons.all)))
+pconsall <- temp %>%  filter (! duplicated(target))
+
 temp <- data %>% group_by(target) %>% slice(which(noe == max(noe)))
 noe <- temp %>%  filter (! duplicated(target))
 
@@ -25,6 +28,7 @@ tm <- temp %>%  filter (! duplicated(target))
                                         #data.rank <- data %>% group_by(target) %>% slice(which(model == "fa_1"))
 
 summary(as.numeric(pcons$TM))
+summary(as.numeric(pconsall$TM))
 summary(as.numeric(noe$TM))
 summary(as.numeric(proq3d$TM))
 summary(as.numeric(tm$TM))
@@ -96,16 +100,19 @@ summary(as.numeric(tm.max50$TM))
 
 
 
-
-
+# Compare two set
 
                                         # We need to find common subset
 noconstr.tmp<-data[which(data$mindist == 0) ,]
-constr.tmp<-data[which(data$mindist > 0) ,]
+constr.tmpA<-data[which(data$maxdist ==  40) ,]
+constr.tmp<-constr.tmpA[which(constr.tmpA$mindist ==  40),]
 constr.list <-constr.tmp %>%  filter (! duplicated(target)) 
 noconstr.list <-noconstr.tmp %>%  filter (! duplicated(target)) 
 constr<-constr.tmp[constr.tmp$target %in% noconstr.list$target,]
 noconstr<-noconstr.tmp[noconstr.tmp$target %in% constr.list$target,]
+#constr<-constr.tmp
+#noconstr<-noconstr.tmp
+both=rbind(constr,noconstr)
 
 
 
@@ -116,6 +123,10 @@ temp <- noconstr %>% group_by(target) %>% slice(which(Pcons == max(Pcons)))
 pcons.noconstr <- temp %>%  filter (! duplicated(target))
 temp <- constr %>% group_by(target) %>% slice(which(Pcons == max(Pcons)))
 pcons.constr <- temp %>%  filter (! duplicated(target))
+temp <- noconstr %>% group_by(target) %>% slice(which(Pcons.all == max(Pcons.all)))
+pconsall.noconstr <- temp %>%  filter (! duplicated(target))
+temp <- constr %>% group_by(target) %>% slice(which(Pcons.all == max(Pcons.all)))
+pconsall.constr <- temp %>%  filter (! duplicated(target))
 temp <- noconstr %>% group_by(target) %>% slice(which(ProQ3D == max(ProQ3D)))
 proq3d.noconstr <- temp %>%  filter (! duplicated(target))
 temp <- constr %>% group_by(target) %>% slice(which(ProQ3D == max(ProQ3D)))
@@ -125,8 +136,22 @@ tm.noconstr <- temp %>%  filter (! duplicated(target))
 temp <- constr %>% group_by(target) %>% slice(which(TM == max(TM)))
 tm.constr <- temp %>%  filter (! duplicated(target))
 
+
+temp <- both %>% group_by(target) %>% slice(which(Pcons == max(Pcons)))
+pcons.both <- temp %>%  filter (! duplicated(target))
+temp <- both %>% group_by(target) %>% slice(which(Pcons.all == max(Pcons.all)))
+pconsall.both <- temp %>%  filter (! duplicated(target))
+temp <- both %>% group_by(target) %>% slice(which(ProQ3D == max(ProQ3D)))
+proq3d.constr <- temp %>%  filter (! duplicated(target))
+temp <- both %>% group_by(target) %>% slice(which(TM == max(TM)))
+tm.both <- temp %>%  filter (! duplicated(target))
+
+
+
 summary(pcons.noconstr$TM)
 summary(pcons.constr$TM)
+summary(pconsall.noconstr$TM)
+summary(pconsall.constr$TM)
 summary(proq3d.noconstr$TM)
 summary(proq3d.constr$TM)
 summary(tm.noconstr$TM)
@@ -155,3 +180,9 @@ m <- Reduce(merge.all, methods)
                                         # Now we have the data in a single table.
 plot(m$pcons.TM,m$proq3d.TM)
 
+                                        # ploTS
+
+count<-c(mean(pcons$TM),mean(pconsall$TM),mean(noe$TM),mean(proq3d$TM),mean(tm$TM),mean(pcons.constr$TM),mean(pcons.noconstr$TM),mean(pcons.both$TM))
+names<-c("Pcons","pconsall","noe","proq3d","tm","40-40Pcons","Noconstr.Pcons","Both")
+color<-c("blue","lightblue","green","black","red","blue","blue","blue")
+barplot(count,names.arg=names,ylab="<TM>",main="Average TM-score of 305 membrane protein families",col=color)

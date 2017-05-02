@@ -30,17 +30,18 @@ cd $scratch
 
 
 sleep 2 # waiting for filesystem
+ln -fs $dir/*.out ./
+ln -fs $dir/*.raw ./
+ln -fs $dir/*.gneff ./
 
-for i in $dir/*cm.tar.gz $dir/conf*[04].tar.gz # $dir/*_mem.tar.gz
+for i in $dir/*cm.tar.gz # $dir/conf*[04].tar.gz # $dir/*_mem.tar.gz
 do
     j=`basename $i .tar.gz`
-    if [ ! -s $dir/${j}_summary.out ]
+    if [ ! -s $dir/${j}_summary.csv ]
     then
 	if [ -s $dir/${j}_proq3.tar.gz ]
 	then
 	    tar -zxf $dir/${j}_proq3.tar.gz
-	    ln -fs $dir/$j*.out ./
-	    ln -fs $dir/$j*.raw ./
 	    sleep 1
 	    $dir/../bin/GetAllScores.py ${j}.tar.gz >  $dir/${j}_summary.csv
 	    #	mv ${j}*out $dir/
