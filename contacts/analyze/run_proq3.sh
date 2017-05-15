@@ -1,7 +1,7 @@
 #!/bin/bash -lx
 #SBATCH --output=proq3.%A_%a.out
 #SBATCH --error=proq3.%A_%a.out
-#SBATCH --array=1-335
+#SBATCH --array=1-1
 #SBATCH -c 1
 #SBATCH -t 24:00:00
 #SBATCH -A SNIC2016-10-22
@@ -23,7 +23,7 @@ pos=$(($SLURM_ARRAY_TASK_ID + $offset))
 #id=`tail -n+$pos IDs_29.0_test_done_300.txt | head -n1`
 id=`tail -n+$pos $list | head -n1`
 
-#id="PF00001.18"
+#id="PF00223.16"
 
 dir=`pwd`/$id
 

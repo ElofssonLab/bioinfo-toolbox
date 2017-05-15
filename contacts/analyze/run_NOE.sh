@@ -1,7 +1,7 @@
 #!/bin/bash -lx
 #SBATCH --output=NOE.%A_%a.out
 #SBATCH --error=NOE.%A_%a.out
-#SBATCH --array=1-335
+#SBATCH --array=1-2
 #SBATCH -c 1
 #SBATCH -t 30:00
 #SBATCH -A SNIC2016-10-22
