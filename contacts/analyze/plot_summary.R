@@ -6,6 +6,7 @@ library(ggplot2)
 
 data<-read.csv("summary-all.csv",header=TRUE,stringsAsFactors=F,strip.white=T)
 
+temp <- data %>% group_by(target) %>% slice(which(Pcons == max(Pcons)))
                                         #colnames(data) <- c("target","ali","num","mindist","maxdist","length","model","TM","Pcons","cns","noe","ProQ2D","ProQ3D")
 
 
