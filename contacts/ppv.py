@@ -3,7 +3,7 @@ import argparse
 from math import *
 
 # on UPPMAX only
-sys.path.append('/sw/apps/bioinfo/biopython/1.59/tintin/lib/python')
+#sys.path.append('/sw/apps/bioinfo/biopython/1.59/tintin/lib/python')
 
 import Bio.PDB
 from Bio import pairwise2
@@ -62,7 +62,7 @@ def get_ppv_helper(contacts_x, contacts_y, ref_contact_map, ref_len, factor, ato
 
 
 def get_ppv(fasta_filename, c_filename, pdb_filename, factor=1.0,
-        min_score=-1.0, chain='', sep=' ', outfilename='', name='', noalign=False):  
+        min_score=-1.0, chain='', sep=' ', outfilename='', name='', noalign=False, crange=5):  
     
     acc = fasta_filename.split('.')[-2][-5:-1]
 
@@ -85,7 +85,7 @@ def get_ppv(fasta_filename, c_filename, pdb_filename, factor=1.0,
         c_y = contacts[i][2] - 1
 
         pos_diff = abs(c_x - c_y)
-        too_close = pos_diff < 5
+        too_close = pos_diff < crange
 
         if not too_close:
             contacts_x.append(c_x)
@@ -203,6 +203,7 @@ if __name__ == "__main__":
     p.add_argument('-o', '--outfile', default='')
     p.add_argument('-f', '--factor', default=1.0, type=float)
     p.add_argument('-s', '--score', default=-1.0, type=float)
+    p.add_argument('-r', '--range', default=5, type=int)
     p.add_argument('--chain', default='')
     p.add_argument('--noalign', action='store_true')
     p.add_argument('--name', default='')
@@ -226,7 +227,7 @@ if __name__ == "__main__":
         get_ppv(args['fasta_file'], args['contact_file'], args['pdb'],
                 args['factor'], chain=args['chain'], sep=sep,
                 outfilename=args['outfile'], noalign=args['noalign'],
-                min_score=args['score'], name=args['name'])
+                min_score=args['score'], name=args['name'], crange=args['range'])
     else:
         get_ppv_hbond(args['fasta_file'], args['contact_file'],
                 args['pdb'], args['factor'], sep=sep,
