@@ -96,6 +96,7 @@ if __name__ == '__main__':
 
     pdb1_filename = sys.argv[1]
     pdb2_filename = sys.argv[2]
-    outfilename = sys.argv[3]
+    chain= sys.argv[3]
+    outfilename = sys.argv[4]
 
-    fix(pdb1_filename, pdb2_filename, outfilename)
+    fix(pdb1_filename, pdb2_filename, outfilename, chain2=chain)
