@@ -123,19 +123,27 @@ def get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, fac
     TP=0
     FP=0
 
+    orderPPVs = []
+    orderTPs = []
+    orderFPs = []
     disoPPVs = []
     disoTPs = []
     disoFPs = []
     mixPPVs = []
     mixTPs = []
     mixFPs = []
+    longcount = 1.e-20
+    count = 1.e-20
     disocount = 1.e-20
     mixcount = 1.e-20
+    ordercount = 1.e-20
     #    for num_c in range(min(len(contacts_x), int(ceil(ref_len * factor))) + 1)[1:]:
     TP = 0.0
     FP = 0.0
     disoTP = 0.0
     disoFP = 0.0
+    orderTP = 0.0
+    orderFP = 0.0
     mixTP = 0.0
     mixFP = 0.0
 
@@ -191,6 +199,16 @@ def get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, fac
             mixPPVs.append(mixTP / (mixTP + mixFP))
             mixTPs.append(mixTP/mixcount)
             mixFPs.append(mixFP/mixcount)
+        else:
+            if (ordercount < ref_len * factor):
+                ordercount+=1
+            if ref_contact_map[c_x, c_y] > 0:
+                orderTP += 1.0 
+            else:
+                orderFP += 1.0 
+            orderPPVs.append(orderTP / (orderTP + orderFP))
+            orderTPs.append(orderTP/ordercount)
+            orderFPs.append(orderFP/ordercount)
         if (num_c < ref_len * factor):
             if ref_contact_map[c_x, c_y] > 0:
                 TP += 1.0 / (ref_len*factor)
@@ -214,6 +232,12 @@ def get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, fac
         mixTPs.append(0.0)
     if len(mixFPs) == 0:
         mixFPs.append(0.0)
+    if len(orderPPVs) == 0:
+        orderPPVs.append(0.0)
+    if len(orderTPs) == 0:
+        orderTPs.append(0.0)
+    if len(orderFPs) == 0:
+        orderFPs.append(0.0)
     if len(disoPPVs) == 0:
         disoPPVs.append(0.0)
     if len(disoTPs) == 0:
@@ -221,7 +245,7 @@ def get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, fac
     if len(disoFPs) == 0:
         disoFPs.append(0.0)
 
-    return PPVs, TPs, FPs,mixPPVs, mixTPs, mixFPs,disoPPVs, disoTPs, disoFPs
+    return PPVs, TPs, FPs,orderPPVs, orderTPs, orderFPs,mixPPVs, mixTPs, mixFPs,disoPPVs, disoTPs, disoFPs
 
 
 def get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali):
@@ -387,16 +411,33 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
     else:
         max_cover = 0
     average_disorder=0.
+    average_order=0.
     fraction_disorder=0.
+    cover_order=0.
+    cover_disorder=0.
     if iupred_fname:
         disorder = parse_iupred.pred(open(iupred_fname, 'r'))
     else:
         disorder=np.zeros(ref_len)
     average_disorder = np.sum(disorder)/ref_len
     fraction_disorder = 0.0
+    num_disorder=0
+    num_order=0
+    j=0
     for i in disorder:
         if (i>0.5):
             fraction_disorder +=1/ref_len
+            num_disorder+=1
+            cover_disorder+=coverage_lst[j]
+        else:
+            num_order+=1
+            cover_order+=coverage_lst[j]
+        j+=1
+
+    if (num_disorder > 0):
+        cover_disorder=cover_disorder/num_disorder
+    if (num_order > 0):
+        cover_order=cover_order/num_order
             
     ### get top "factor" * "ref_len" predicted contacts
     contacts = parse_contacts.parse(open(c_filename, 'r'), sep,1)
@@ -408,6 +449,7 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
     scores = []
     mixscores = []
     disoscores = []
+    orderscores = []
     tooclose = []    
     contact_dict = {}
     if iupred_fname:
@@ -418,19 +460,29 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
     count = 1.e-20
     mixcount = 1.e-20
     disocount = 1.e-20
+    ordercount =1.e-20
+    longcount = 1.e-20
     highscore = 0
     numbins=20
     sum=0.0
+    longsum=0.0
     disosum=0.0
+    ordersum=0.0
     mixsum=0.0
     average=0.0
+    longaverage=0.0
     mixaverage=0.0
     disoaverage=0.0
+    orderaverage=0.0
     histo=np.zeros(numbins)
     disotop=0
+    ordertop=0
     doubletop=0
     mixcount=0
     mixtop=0
+    separation = 0.0
+
+
 
 
     # We actually divide the analysis into three groups (ordered,disordered and mixed)
@@ -448,7 +500,7 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
         
         pos_diff = abs(c_x - c_y)
         too_close = pos_diff < 5
-
+        long_dist = pos_diff > 24
         if not too_close:
             if score > th:
                 contacts_x.append(c_x - start)
@@ -465,18 +517,31 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
                     if (mixcount <= ref_len * factor):
                         mixsum += score
                         mixaverage=mixsum/mixcount
+                else:
+                    ordercount += 1
+                    orderscores.append(score)
+                    if (ordercount <= ref_len * factor):
+                        ordersum += score
+                        orderaverage=ordersum/ordercount
                 count += 1
                 scores.append(score)
                 if (count <= ref_len * factor):
                     sum += score
                     average=sum/count
+                separation += pos_diff
+                if long_dist:
+                    longcount += 1
+                    if (longcount <= ref_len * factor):
+                        longsum += score
+                        longaverage=longsum/longcount
         else:
             tooclose.append(score)
                 
+
 #    statline="Highs: %.1f (%.1f%%) (%.1f%%)  average:  %.2f (%.2f) (%.2f)  Meff: %.0f  Diso: %.1f%%  " % (count/ref_len,100*mixcount/count,100*disocount/count,average,mixaverage,disoaverage,max_cover,100*fraction_disorder)
 #    statline="Highs: %.1f %.3f %.3f  average:  %.2f %.2f %.2f  Meff: %.0f  Diso: %.3f  " % (count/ref_len,mixcount/count,disocount/count,average,mixaverage,disoaverage,max_cover,fraction_disorder)
 #    statline="Length: %d NumAli: %d Counts: %d %d %d %.3f %.3f %.3f %.3f\n"  % ( ref_len,max_cover,(count-mixcount-disocount),mixcount,disocount,sum,mixsum,disosum,fraction_disorder)
-    statline="NumAli: %d Length: %d Counts: %d %d %d Disorder: %.3f \n"  % ( max_cover,ref_len,count,mixcount,disocount,fraction_disorder)
+    statline="NumAli: %d %d %d Length: %d %d %d Counts: %d %d %d %d  RelContacts: %.3f %.3f %.3f Disorder: %.3f Long: %.3f %.3f %.3f \n"  % ( max_cover,cover_order,cover_disorder,ref_len,num_order,num_disorder,count,ordercount,mixcount,disocount,count/(ref_len+1.e-20),ordercount/(1.e-20+num_order),disocount/(1.e-20+num_disorder),fraction_disorder,longcount/count,longcount/(ref_len+1.e-20),separation/count)
     statfig = plt.figure(figsize=(8, 8), dpi=96, facecolor='w')
     plt.hist((tooclose,scores), numbins,range=(0,1), histtype='bar',
              normed=(numbins,numbins), alpha=0.75,
@@ -596,7 +661,7 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
         #statline = "Highs: %.3f  %.3f   %.3f    Aver: %.2f  Meff: %.0f  Diso: %.3f  " % (count/ref_len,disocount/count,doublecount/count,average,max_cover,fraction_disorder)
 
 
-    print "STATs: %s %s" % (fasta_filename,statline)
+    print "STATs: %s %s" % (c_filename,statline)
     if psipred_horiz_fname or psipred_vert_fname:
         if psipred_horiz_fname:
             ss = parse_psipred.horizontal(open(psipred_horiz_fname, 'r'))
@@ -674,12 +739,13 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
         ref_contacts_x = ref_contacts[0]
         ref_contacts_y = ref_contacts[1]
             
-        PPVs, TPs, FPs,mixPPVs, mixTPs, mixFPs,disoPPVs, disoTPs, disoFPs = get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, factor,disorder)
+        PPVs, TPs, FPs,orderPPVs, orderTPs, orderFPs,mixPPVs, mixTPs, mixFPs,disoPPVs, disoTPs, disoFPs = get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, factor,disorder)
         tp_colors = get_tp_colors(contacts_x, contacts_y, ref_contact_map, atom_seq_ali)
         img = get_colors(contacts_np, ref_contact_map=dist_mat, atom_seq_ali=atom_seq_ali, th=th, factor=factor)
         sc = ax.imshow(img, interpolation='none')
    
-        print 'PPV: %s %s %s %s' % (acc, PPVs[-1], TPs[-1], FPs[-1])
+        #       
+        print 'PPV: %s %s %s %s %s' % (acc, PPVs[-1], orderPPVs[-1], mixPPVs[-1], disoPPVs[-1])
         
         cmap = cm.get_cmap("binary")
         cmap.set_bad([1,1,1,0])
@@ -727,7 +793,7 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
 
         ### use TP/FP color coding if reference contacts given
         if pdb_filename:
-            PPVs, TPs, FPs,mixPPVs, mixTPs, mixFPs,disoPPVs, disoTPs, disoFPs = get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, factor,disorder)
+            PPVs, TPs, FPs,orderPPVs, orderTPs, orderFPs,mixPPVs, mixTPs, mixFPs,disoPPVs, disoTPs, disoFPs = get_ppvs(contacts_x, contacts_y, ref_contact_map, atom_seq_ali, ref_len, factor,disorder)
             tp2_colors = get_tp_colors(contacts2_x, contacts2_y, ref_contact_map, atom_seq_ali)
             print '%s %s %s %s' % (acc, PPVs2[-1], TPs2[-1], FPs2[-1])
             fig.suptitle('%s\nPPV (upper left) = %.2f | PPV (lower right) = %.2f' % (acc, PPVs[-1], PPVs2[-1]))
@@ -746,11 +812,11 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
             pdb_acc = parse_pdb.get_acc(open(pdb_filename))
             if pdb_acc:
                 if chain:
-                    fig.suptitle('%s (PDB: %s, chain %s)\nPPV = %.2f %s' % (acc, pdb_acc, chain, PPVs[-1],statline))
+                    fig.suptitle('%s (PDB: %s, chain %s)\nPPV = %.2f\n%s' % (c_filename , pdb_acc, chain, PPVs[-1],statline),fontsize = 8)
                 else:
-                    fig.suptitle('%s (PDB: %s)\nPPV = %.2f %s' % (acc, pdb_acc, PPVs[-1],statline))
+                    fig.suptitle('%s (PDB: %s)\nPPV = %.2f \n%s' % (c_filename, pdb_acc, PPVs[-1],statline),fontsize = 8)
             else:
-                fig.suptitle('%s\nPPV = %.2f %s' % (acc, PPVs[-1],statline))
+                fig.suptitle('%s\nPPV = %.2f\n%s' % (c_filename, PPVs[-1],statline),fontsize = 8)
             #cmap = cm.get_cmap("binary")
             #cmap.set_bad([1,1,1,0])
             #contacts_np_masked = np.ma.array(contacts_np, mask=np.tri(contacts_np.shape[0], k=-1))
@@ -764,7 +830,7 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
             #    acc = c_filename.split('/')[1]
             #else:
             #    acc = c_filename.split('/')[-1]
-            fig.suptitle('%s\n%s' % (acc,statline))
+            fig.suptitle('%s\n%s' % (c_filename,statline),fontsize = 8)
             #sc = ax.imshow(contacts_np + contacts_np.T, cmap=cm.hot_r)
             #sc = ax.imshow(contacts_np + contacts_np.T,
             #        cmap=cm.binary, vmin=th, vmax=1.0, interpolation='none')

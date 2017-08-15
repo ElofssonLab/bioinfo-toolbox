@@ -110,7 +110,10 @@ def get_residue_dict(afile):
     result_dict = {}
     # header: >tr|UniprotID|UniprotName
     for header, seq_lst in seq_dict.iteritems():
-        new_header = header.split('|')[1] # UniprotID
+        if header.startswith('embl-cds'):
+            new_header = header.split()[0].split(':')[-1] # embl cds ID
+        else:
+            new_header = header.split('|')[1] # UniprotID
         res_lst = list(seq_lst[0])
         result_dict[new_header] = res_lst
     return result_dict
