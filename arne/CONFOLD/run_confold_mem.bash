@@ -46,7 +46,8 @@ maxdist=$7
 
 #outdir=${rr}_${cutoff}_${mindist}_${maxdist}_confold_mem
 #outdir=${rr}_${cutoff}_${mindist}_${maxdist}
-out=`echo ${rr} | sed s/^.*.fa.//g | sed s/.pconsc3//g`
+#out=`echo ${rr} | sed s/^.*.fa.//g | sed s/.pconsc3//g`
+out=`basename ${rr} .rr`
 outdir=${out}_${cutoff}_${mindist}_${maxdist}_cm
 
 if [ ! -f $outdir/stage1/${id}.fa_model1.pdb ]; then
