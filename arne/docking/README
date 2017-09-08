@@ -1,0 +1,13 @@
+Fast version (minutes per target pair)
+1. MMseqs2 to detect PDB files (Same sequences as hhsuite -SEQRES ?)
+   	   Common templates for A and B ?
+	   Extract alignments
+
+MMseqs2 - krashar bara.. Måste kolla.
+Kör HHalign..
+
+
+Calculate interaction areas from template.
+	  Benchmark (Check http://onlinelibrary.wiley.com/doi/10.1002/prot.25280/epdf)
+	  Docking model quality  CnM set from 
+	  Braun .. Vidal set of 184 for interacting pairs
