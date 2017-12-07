@@ -5,24 +5,40 @@ import sys
 import operator
 import numpy as np
 from collections import defaultdict
+import gzip
 
-
-
-pdbfile = open(sys.argv[1], 'r')
-#chain = sys.argv[2]
+try:
+    pdbfile = gzip.open(sys.argv[1], 'rb')
+except:
+    pdbfile = open(sys.argv[1], 'r')
 code = get_acc(pdbfile)
 if (code == 'XXXX' or code == '' or code == 'xxxx' or code == '    '):
     code=sys.argv[1]
-print ":"+code+":"
 pdbfile.close()
-pdbfile = open(sys.argv[1], 'r')
+try:
+    pdbfile = gzip.open(sys.argv[1], 'rb')
+except:
+    pdbfile = open(sys.argv[1], 'r')
 name = sys.argv[1].replace(".pdb","_")
-chains = get_all_chains(pdbfile)
+try:
+    chain = sys.argv[2]
+except:
+    chains = get_all_chains(pdbfile)
+else:
+    chains = chain
+print ":"+code+":"
+print pdbfile
+print chains
 pdbfile.close()
 #print chains
 for chain in chains:
-    pdbfile = open(sys.argv[1], 'r')
-    outname=name+chain+".fa"
+    print (code, chain)
+    try:
+        pdbfile = gzip.open(sys.argv[1], 'r')
+    except:
+        pdbfile = open(sys.argv[1], 'r')
+    outname=code+chain+".fa"
+    print outname
     outfile = open(outname,'w')
     outfile.write("> " + code + "_" + chain + "\n")
     outfile.write(get_atom_seq(pdbfile, chain) + "\n")
