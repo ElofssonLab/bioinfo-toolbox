@@ -59,7 +59,7 @@ def print_distances(contacts_x, contacts_y, scores, dist_mat, atom_seq_ali=[], o
 
 def get_ppv_helper(contacts_x, contacts_y, ref_contact_map, ref_len, factor, atom_seq_ali=[]):
 
-    num_c = len(contacts_x)
+    num_c = len(contacts_x)*factor
     TP = 0.0
     FP = 0.0
     PPV = 0.0
