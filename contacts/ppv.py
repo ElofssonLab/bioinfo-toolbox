@@ -26,10 +26,10 @@ def get_cb_contacts(gapped_cb_lst):
     dist_mat.fill(float('inf'))
     
     for i, cb1 in enumerate(gapped_cb_lst):
-        if cb1 == '-':
+        if cb1[0] == '-':
             continue
         for j, cb2 in enumerate(gapped_cb_lst):
-            if cb2 == '-':
+            if cb2[0] == '-':
                 continue
             diff_vec = cb1 - cb2
             dist_mat[i,j] = np.sqrt(np.sum(diff_vec * diff_vec))
@@ -139,7 +139,7 @@ def get_ppv(fasta_filename, c_filename, pdb_filename, factor=1.0,
 
         for i in xrange(len(atom_seq_ali)):
             if atom_seq_ali[i] == '-':
-                gapped_cb_lst.append('-')
+                gapped_cb_lst.append(['-'])
             elif seq_ali[i] == '-':
                 j += 1
                 continue
