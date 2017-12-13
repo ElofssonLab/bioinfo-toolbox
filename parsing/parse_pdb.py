@@ -251,6 +251,74 @@ def get_res_dict(pdbfile, chain):
     return res_dict
 
 
+
+def get_bfactor_area(pdbfile, chain):
+    # Assumes that the B-factor is used to describe exposed surface area.
+    #  Returns surface area and relatice surface are per residue
+    
+    b_dict = defaultdict(list)
+    maxarea={"A":115,"R":225,"D":150,"N":160,"C":135,"E":190,"Q":180,"G":75,"H":195,"I":175,"L":170,"K":200,"M":185,"F":210,"P":145,"S":115,"T":140,"W":255,"Y":230,"V":155}
+    three_to_one = {'ARG':'R', 'HIS':'H', 'LYS':'K', 'ASP':'D', 'GLU':'E', 'SER':'S', 'THR':'T', 'ASN':'N', 'GLN':'Q', 'CYS':'C', 'GLY':'G', 'PRO':'P', 'ALA':'A', 'ILE':'I', 'LEU':'L', 'MET':'M', 'PHE':'F', 'TRP':'W', 'TYR':'Y', 'VAL':'V', 'UNK': 'X'}
+    #one_to_three = {'R':'ARG', 'H':'HIS', 'K':'LYS', 'D':'ASP', 'E':'GLU', 'S':'SER', 'T':'THR', 'N':'ASN', 'Q':'GLN', 'C':'CYS', 'G':'GLY', 'P':'PRO', 'A':'ALA', 'I':'ILE', 'L':'LEU', 'M':'MET', 'F':'PHE', 'W':'TRP', 'Y':'TYR', 'V':'VAL', 'X': 'UNK'}
+    lastres=-9999
+    area=0.0
+    fracarea=0.0
+    if not chain:
+        chain = get_first_chain(pdbfile)
+        pdbfile.seek(0)
+
+    for line in pdbfile:
+        if not line.startswith('ATOM'):
+            continue
+
+        atm_record = parse_atm_record(line)
+
+        if atm_record['chain'] != ' ' and atm_record['chain'] != chain  and chain != '*':
+            continue
+
+        res_i = atm_record['res_no']
+        
+        if b_dict.keys():
+            min_res_i = min(b_dict.keys())
+        else:
+            min_res_i = res_i
+        if res_i > 1000 and len(b_dict) < 1000 and min_res_i + len(b_dict) < 1000:
+            continue
+
+        if atm_record['insert'] == 'X':
+            res_i = res_i * 0.001
+
+        #atm = [float('inf'), float('inf'), float('inf')]
+        if res_i != lastres:
+            if lastres != -9999 :
+                bfactor = [float(area), float(fracarea)]
+                #print lastres,bfactor
+                b_dict[lastres].append(np.array(bfactor))
+            lastres = res_i
+            area=0.
+            fracarea=0.
+        area+=atm_record['B']
+        fracarea+=atm_record['B']/maxarea[three_to_one[atm_record['res_name']]]
+        
+    bfactor = [float(area), float(fracarea)]    
+    b_dict[lastres].append(np.array(bfactor))
+    return b_dict
+
+
+def get_area(pdbfile, chain):
+
+    res_dict = get_bfactor_area(pdbfile, chain)
+
+    bfactor_lst = []
+
+    # need to sort to get the sequence correct
+    sorted_keys = sorted(res_dict.keys())
+    
+    for i in sorted_keys:
+        bfactor_lst.append(res_dict[i][0])
+    pdbfile.close()
+    return bfactor_lst
+
 def get_ca_coordinates(pdbfile, chain):
 
     res_dict = get_res_dict(pdbfile, chain)
@@ -283,9 +351,10 @@ def get_cb_coordinates(pdbfile, chain):
         elif len(res_dict[i]) == 1:
             tmp_i += 1
             cb_lst.append(res_dict[i][0])
-    #print atm_count 
+            #print tmp_i,i,res_dict[i][0],res_dict[i][-1]
     pdbfile.close()
     return cb_lst
+
 
 
 def get_atom_seq(pdbfile, chain='', model=1, return_lines=False):

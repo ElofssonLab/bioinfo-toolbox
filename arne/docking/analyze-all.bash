@@ -9,7 +9,7 @@ do
 	then
 	    if [ ! -s out/$1-$2.${ali}.${dca}.out ]
 	    then
-		$bin/ppv-contact.py  seq_chains/$1.seq seq_chains/$2.seq tm-chains/$1.pdb tm-chains/$2.pdb seq_chains/$1-$2.${ali}.${dca} --print_dist --outfile out/$1-$2.${ali}.${dca}.dist > out/$1-$2.${ali}.${dca}.out
+		$bin/ppv-contact.py  seq_chains/$1.seq seq_chains/$2.seq tm-chains/$1.pdb.pdb-Bvalue.pdb tm-chains/$2.pdb.pdb-Bvalue.pdb seq_chains/$1-$2.${ali}.${dca} --print_dist --outfile out/$1-$2.${ali}.${dca}.dist > out/$1-$2.${ali}.${dca}.out
 	    fi
 	fi
     done

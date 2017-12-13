@@ -3,31 +3,20 @@
 import sys
 import argparse
 from math import *
-
-     
-# on UPPMAX only
-#sys.path.append('/sw/apps/bioinfo/biopython/1.59/tintin/lib/python')
-
 import Bio.PDB
 from Bio import pairwise2
-
 import numpy as np
+
 
 from os.path import expanduser
 home = expanduser("~")
-sys.path.append(home + '/git/bioinfo-toolbox')
+sys.path.append(home + '/git/bioinfo-toolbox/')
 
 from parsing import parse_contacts
 from parsing import parse_fasta
 from parsing import parse_pdb
 
-def get_surfacea_area(aa):
-    default=100
-    area={"A":115,"R":225,"D":150,"N":160,"C":135,"E":190,"Q":180,"G":75,"H":195,"I":175,"L":170,"K":200,"M":185,"F":210,"P":145,"S":115,"T":140,"W":255,"Y":230,"V":155}
-    if aa in area:
-        return float(area[aa])
-    else:
-        return float(default)
+
     
 def get_cb_contacts(gapped_cb_lst):
 
@@ -45,7 +34,7 @@ def get_cb_contacts(gapped_cb_lst):
     return dist_mat
 
 
-def print_distances(contacts_x, contacts_y, scores, dist_mat, lenA,lenB,atom_seq_ali=[], outfile=""):
+def print_distances(contacts_x, contacts_y, scores, dist_mat, area, lenA,lenB,atom_seq_ali=[], outfile=""):
     num_c = len(contacts_x)
     outstr = ""
     domain = ""
@@ -63,7 +52,9 @@ def print_distances(contacts_x, contacts_y, scores, dist_mat, lenA,lenB,atom_seq
             domain="B"
         else:
             domain="I"
-        outstr += "%s %s %s %s %s\n" % (domain,c_x, c_y, scores[i], dist_mat[c_x, c_y])
+        areaX=area[c_x][1]
+        areaY=area[c_y][1]
+        outstr += "%s %s %s %.2f %.2f %s %s\n" % (domain,c_x, c_y,areaX,areaY, scores[i], dist_mat[c_x, c_y])
     if outfile:
         with open(outfile, 'w') as outf:
             outf.write(outstr)
@@ -94,14 +85,18 @@ def get_ppv_helper(contacts_x, contacts_y, ref_contact_map, ref_len, factor, ato
     return (PPV, TP, FP)
 
 
-def get_ppv_helper_interface(contacts_x, contacts_y, ref_contact_map, chainlenA, chainlenB,numcontacts, atom_seq_ali=[]):
+def get_ppv_helper_interface(contacts_x, contacts_y, ref_contact_map, area, chainlenA, chainlenB,numcontacts,cutoff,atom_seq_ali=[]):
     num_c = numcontacts
     count=0
     TP = 0.0
     FP = 0.0
     PPV = 0.0
+    countE=0
+    TPe = 0.0
+    FPe = 0.0
+    PPVe = 0.0
     i=0
-    while count < numcontacts:
+    for i in range(len(contacts_x)):
         c_x = contacts_x[i]
         c_y = contacts_y[i]
         if atom_seq_ali:
@@ -112,22 +107,32 @@ def get_ppv_helper_interface(contacts_x, contacts_y, ref_contact_map, chainlenA,
         
         if ( c_x < chainlenA and c_y > chainlenA) or ( c_x > chainlenA and c_y < chainlenA):
             #print "I: ",i,c_x,c_y,ref_contact_map[c_x, c_y]
-            count += 1
-            if ref_contact_map[c_x, c_y] > 0:
-                TP += 1.0 / num_c
-            else:
-                FP += 1.0 / num_c
-        i+=1
+            if (count < numcontacts):
+                count += 1
+                if ref_contact_map[c_x, c_y] > 0:
+                    TP += 1.0 
+                else:
+                    FP += 1.0 
+            if (countE < numcontacts):
+                if area[c_x][1]>cutoff and area[c_y][1]>cutoff:
+                    countE += 1
+                    if ref_contact_map[c_x, c_y] > 0:
+                        TPe += 1.0
+                    else:
+                        FPe += 1.0 
+
     if TP > 0:
         PPV = TP / (TP + FP)
-    return (PPV, TP, FP)
+    if TPe > 0:
+        PPVe = TPe / (TPe + FPe)
+    return (PPV, TP, FP,PPVe, TPe, FPe)
 
 
     
 def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
             fasta_filenameB, pdb_filenameB,factor=1.0, min_score=-1.0,
             chainA='',chainB='', sep=' ', outfilename='', name='', noalign=False,
-            min_dist=5, interfacelen=10, print_dist=False):  
+            min_dist=5, interfacelen=10, print_dist=False,cutoff=0.25):  
     
 
     ### get sequence
@@ -202,8 +207,10 @@ def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
 
     cb_lstA = parse_pdb.get_cb_coordinates(open(pdb_filenameA, 'r'), chainA)
     cb_lstB = parse_pdb.get_cb_coordinates(open(pdb_filenameB, 'r'), chainB)
-
     cb_lst=cb_lstA+cb_lstB
+    bfactorA = parse_pdb.get_area(open(pdb_filenameA, 'r'), chainA)
+    bfactorB = parse_pdb.get_area(open(pdb_filenameB, 'r'), chainA)
+    bfactor = bfactorA+bfactorB
     #print cb_lst,noalign
     if noalign:
         dist_mat = get_cb_contacts(cb_lst)
@@ -267,12 +274,12 @@ def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
     ref_contact_mapB = dist_matB < cb_cutoff
 
     if print_dist:
-        print_distances(contacts_x, contacts_y, scores, dist_mat, ref_lenA,ref_lenB,atom_seq_ali=atom_seq_ali, outfile=outfilename)
+        print_distances(contacts_x, contacts_y, scores, dist_mat, bfactor, ref_lenA,ref_lenB,atom_seq_ali=atom_seq_ali, outfile=outfilename)
 
     PPV, TP, FP = get_ppv_helper(contacts_x, contacts_y, ref_contact_map, ref_len, factor, atom_seq_ali=atom_seq_ali)
     PPVa, TPa, FPa = get_ppv_helper(contactsA_x, contactsA_y, ref_contact_mapA, interfacelen, factor, atom_seq_ali=atom_seq_aliA)
     PPVb, TPb, FPb = get_ppv_helper(contactsB_x, contactsB_y, ref_contact_mapB, interfacelen, factor, atom_seq_ali=atom_seq_aliB)
-    PPVi, TPi, FPi = get_ppv_helper_interface(contacts_x, contacts_y, ref_contact_map, ref_lenA,ref_lenB, interfacelen, atom_seq_ali=atom_seq_ali)
+    PPVi, TPi, FPi, PPViE, TPiE, FPiE = get_ppv_helper_interface(contacts_x, contacts_y, ref_contact_map, bfactor, ref_lenA,ref_lenB, interfacelen, cutoff, atom_seq_ali=atom_seq_ali)
     #for i in range(10):
     #    print "I: ",i,contactsI_x[i],contactsI_y[i],scoresI[i],dist_mat[contactsI_x[i]][contactsI_y[i]],ref_contact_map[contactsI_x[i]][contactsI_y[i]]
     #    print "A: ",i,contactsA_x[i],contactsA_y[i],scoresA[i],dist_mat[contactsA_x[i]][contactsA_y[i]],ref_contact_map[contactsA_x[i]][contactsA_y[i]]
@@ -283,11 +290,13 @@ def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
         print '%s %s %s %s' % (name, PPVb, TPb, FPb)
         print '%s %s %s %s' % ("BOTH", PPV, TP, FP)
         print '%s %s %s %s' % ("Interface", PPVi, TPi, FPi)
+        print '%s %s %s %s' % ("Interface Exposed", PPViE, TPiE, FPiE)
     else:
         print '%s %s %s %s %s' % (fasta_filenameA, c_filename, PPVa, TPa, FPa)
         print '%s %s %s %s %s' % (fasta_filenameB, c_filename, PPVb, TPb, FPb)
         print '%s %s %s %s %s' % ("BOTH", c_filename, PPV, TP, FP)
         print '%s %s %s %s %s' % ("Interface", c_filename, PPVi, TPi, FPi)
+        print '%s %s %s %s %s' % ("Interface Exposed", c_filename, PPViE, TPiE, FPiE)
     return (pdb_filenameA, PPV, TP, FP)
   
     
@@ -310,6 +319,7 @@ if __name__ == "__main__":
     p.add_argument('--name', default='')
     p.add_argument('--min_dist', default=5, type=int)
     p.add_argument('--interfacelen', default=10, type=int)
+    p.add_argument('--cutoff', default=0.25, type=float)
     p.add_argument('--print_dist', action='store_true')
 
     args = vars(p.parse_args(sys.argv[1:]))
@@ -334,5 +344,5 @@ if __name__ == "__main__":
             outfilename=args['outfile'], noalign=args['noalign'],
             min_score=args['score'], name=args['name'],
             min_dist=args['min_dist'],
-            interfacelen=args['interfacelen'],print_dist=args['print_dist'])
+            interfacelen=args['interfacelen'],print_dist=args['print_dist'],cutoff=args['cutoff'])
 
