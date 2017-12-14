@@ -319,6 +319,58 @@ def get_area(pdbfile, chain):
     pdbfile.close()
     return bfactor_lst
 
+
+def get_dist_to_surface(pdbfile, chain):
+
+    bf_dict = get_bfactor_area(pdbfile, chain)
+
+    bfactor_lst = []
+
+    # need to sort to get the sequence correct
+    sorted_keys = sorted(bf_dict.keys())
+
+    for i in sorted_keys:
+        bfactor_lst.append(bf_dict[i][0])
+
+    pdbfile.seek(0,0)
+
+    res_dict = get_res_dict(pdbfile, chain)
+    cb_lst = []
+    tmp_i = 0
+
+    # need to sort to get the sequence correct
+    
+    for i in sorted_keys:
+        if len(res_dict[i]) > 1:
+            tmp_i += 1
+            cb_lst.append(res_dict[i][-1])
+        elif len(res_dict[i]) == 1:
+            tmp_i += 1
+            cb_lst.append(res_dict[i][0])
+            #print tmp_i,i,res_dict[i][0],res_dict[i][-1]
+    pdbfile.close()
+
+    dist_lst = []
+    exposed = 0.25
+    k=0
+    for i in sorted_keys:
+        if bfactor_lst[k][1]>exposed:
+            dist_lst.append(0.0)
+        else:
+            dist_lst.append(9999.0)
+            l=0
+            for j in sorted_keys:
+                if k != l:
+                    if bfactor_lst[l][1]>exposed:
+                        dist_vec=cb_lst[k]-cb_lst[l]
+                        dist=np.sqrt(np.sum(dist_vec * dist_vec))
+                        if dist < dist_lst[k]:
+                            dist_lst[k]=dist
+
+                l+=1
+        k+=1
+    return dist_lst
+
 def get_ca_coordinates(pdbfile, chain):
 
     res_dict = get_res_dict(pdbfile, chain)

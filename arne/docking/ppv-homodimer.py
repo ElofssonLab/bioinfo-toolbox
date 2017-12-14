@@ -15,6 +15,9 @@ from parsing import parse_pdb
 
 from  ppvlibrary import * 
 
+
+
+    
     
 def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
             fasta_filenameB, pdb_filenameB,factor=1.0, min_score=-1.0,
@@ -25,7 +28,7 @@ def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
     ### get sequence
     seqA = parse_fasta.read_fasta(open(fasta_filenameA, 'r')).values()[0][0]
     seqB = parse_fasta.read_fasta(open(fasta_filenameB, 'r')).values()[0][0]
-    seq=seqA+seqB
+    seq=seqA+seqA # Actually the contact map sequence is just two copies of seqA
 
     ref_lenA = len(seqA)
     ref_lenB = len(seqB)
@@ -62,32 +65,27 @@ def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
         too_close = pos_diff < min_dist
 
         if not too_close:
-            # Check if it is protein A or B or interchain contact
+            # The contacts only covers 
             contacts_x.append(c_x)
             contacts_y.append(c_y)
             scores.append(score)
-            count += 1
-            if (c_x < ref_lenA and c_y < ref_lenA):
-                contactsA_x.append(c_x)
-                contactsA_y.append(c_y)
-                scoresA.append(score)
-                countA += 1
-            elif (c_x >= ref_lenA and c_y >= ref_lenA):
-                contactsB_x.append(c_x-ref_lenA)
-                contactsB_y.append(c_y-ref_lenA)
-                scoresB.append(score)
-                countB += 1
-            else:
-                contactsI_x.append(c_x)
-                contactsI_y.append(c_y)
-                scoresI.append(score)
-                countI += 1
+            contacts_x.append(c_x+ref_lenA)
+            contacts_y.append(c_y+ref_lenA)
+            scores.append(score)
+            contactsA_x.append(c_x)
+            contactsA_y.append(c_y)
+            scoresA.append(score)
+            contactsB_x.append(c_x)
+            contactsB_y.append(c_y)
+            scoresB.append(score)
+
            
                 #        if min_score == -1.0 and count >= ref_len * factor:
                 #            break
                 #        if score < min_score:
                 #            break
                 
+    assert(len(contacts_x) == len(contacts_y) == len(scores))
     assert(len(contactsA_x) == len(contactsA_y) == len(scoresA))
     assert(len(contactsB_x) == len(contactsB_y) == len(scoresB))
     assert(len(contactsI_x) == len(contactsI_y) == len(scoresI))
@@ -98,6 +96,9 @@ def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
     bfactorA = parse_pdb.get_area(open(pdb_filenameA, 'r'), chainA)
     bfactorB = parse_pdb.get_area(open(pdb_filenameB, 'r'), chainA)
     bfactor = bfactorA+bfactorB
+    surfA = parse_pdb.get_dist_to_surface(open(pdb_filenameA, 'r'), chainA)
+    #surfB = parse_pdb.get_dist_to_surface(open(pdb_filenameB, 'r'), chainA)
+    #surf = surfA+surfB
     #print cb_lst,noalign
     if noalign:
         dist_mat = get_cb_contacts(cb_lst)
@@ -110,7 +111,7 @@ def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
         atom_seq = atom_seqA + atom_seqB
         align = pairwise2.align.globalms(atom_seq, seq, 2, -1, -0.5, -0.1)
         alignA = pairwise2.align.globalms(atom_seqA, seqA, 2, -1, -0.5, -0.1)
-        alignB = pairwise2.align.globalms(atom_seqB, seqB, 2, -1, -0.5, -0.1)
+        alignB = pairwise2.align.globalms(atom_seqB, seqA, 2, -1, -0.5, -0.1) # Align to seq A
         atom_seq_ali = align[-1][0]
         seq_ali = align[-1][1]
         atom_seq_aliA = alignA[-1][0]
@@ -156,10 +157,12 @@ def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
         dist_matA = get_cb_contacts(gapped_cb_lstA)
         dist_matB = get_cb_contacts(gapped_cb_lstB)
     cb_cutoff = 8
-    ref_contact_map = dist_mat < cb_cutoff
+    #ref_contact_map = dist_mat < cb_cutoff
+    contacts_x,contacts_y,scores = get_interface_contacts(contacts_x, contacts_y, scores, dist_mat, ref_lenA, factor, cb_cutoff+4,atom_seq_ali=atom_seq_ali)
+    ref_contact_map = dist_mat < cb_cutoff  
     ref_contact_mapA = dist_matA < cb_cutoff
     ref_contact_mapB = dist_matB < cb_cutoff
-
+    # Here we need to append
     if print_dist:
         print_distances(contacts_x, contacts_y, scores, dist_mat, bfactor, ref_lenA,ref_lenB,atom_seq_ali=atom_seq_ali, outfile=outfilename)
 
