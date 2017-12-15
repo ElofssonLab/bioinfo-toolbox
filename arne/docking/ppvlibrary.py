@@ -25,7 +25,7 @@ def get_cb_contacts(gapped_cb_lst):
     return dist_mat
 
 
-def print_distances(contacts_x, contacts_y, scores, dist_mat, area, lenA,lenB,atom_seq_ali=[], outfile=""):
+def print_distances(contacts_x, contacts_y, scores, dist_mat, area, dist, lenA,lenB,seq,atom_seq_ali=[], outfile=""):
     num_c = len(contacts_x)
     outstr = ""
     domain = ""
@@ -45,7 +45,11 @@ def print_distances(contacts_x, contacts_y, scores, dist_mat, area, lenA,lenB,at
             domain="I"
         areaX=area[c_x][1]
         areaY=area[c_y][1]
-        outstr += "%s %s %s %.2f %.2f %s %s\n" % (domain,c_x, c_y,areaX,areaY, scores[i], dist_mat[c_x, c_y])
+        distX=dist[c_x]
+        distY=dist[c_y]
+        outstr += "%s %s %s %s %s %.2f %.2f %.2f %.2f %s %s\n" % (domain,c_x,seq[c_x], c_y,seq[c_y],
+                                                                  areaX,areaY,distX,distY, scores[i],
+                                                                  dist_mat[c_x, c_y])
     if outfile:
         with open(outfile, 'w') as outf:
             outf.write(outstr)

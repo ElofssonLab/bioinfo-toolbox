@@ -15,9 +15,6 @@ from parsing import parse_pdb
 
 from  ppvlibrary import * 
 
-
-
-    
     
 def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
             fasta_filenameB, pdb_filenameB,factor=1.0, min_score=-1.0,
@@ -97,8 +94,8 @@ def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
     bfactorB = parse_pdb.get_area(open(pdb_filenameB, 'r'), chainA)
     bfactor = bfactorA+bfactorB
     surfA = parse_pdb.get_dist_to_surface(open(pdb_filenameA, 'r'), chainA)
-    #surfB = parse_pdb.get_dist_to_surface(open(pdb_filenameB, 'r'), chainA)
-    #surf = surfA+surfB
+    surfB = parse_pdb.get_dist_to_surface(open(pdb_filenameB, 'r'), chainA)
+    surf = surfA+surfB
     #print cb_lst,noalign
     if noalign:
         dist_mat = get_cb_contacts(cb_lst)
@@ -164,7 +161,10 @@ def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
     ref_contact_mapB = dist_matB < cb_cutoff
     # Here we need to append
     if print_dist:
-        print_distances(contacts_x, contacts_y, scores, dist_mat, bfactor, ref_lenA,ref_lenB,atom_seq_ali=atom_seq_ali, outfile=outfilename)
+        print_distances(contacts_x, contacts_y, scores, dist_mat,
+                        bfactor, surf, ref_lenA,ref_lenB,
+                        seq,atom_seq_ali=atom_seq_ali,
+                        outfile=outfilename)
 
     PPV, TP, FP = get_ppv_helper(contacts_x, contacts_y, ref_contact_map, ref_len, factor, atom_seq_ali=atom_seq_ali)
     PPVa, TPa, FPa = get_ppv_helper(contactsA_x, contactsA_y, ref_contact_mapA, interfacelen, factor, atom_seq_ali=atom_seq_aliA)
@@ -187,6 +187,7 @@ def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
         print '%s %s %s %s %s' % ("BOTH", c_filename, PPV, TP, FP)
         print '%s %s %s %s %s' % ("Interface", c_filename, PPVi, TPi, FPi)
         print '%s %s %s %s %s' % ("Interface Exposed", c_filename, PPViE, TPiE, FPiE)
+    print 'PPV %s %s %s %s %s %s' % (c_filename, PPV, PPVa, PPVb, PPVi, PPPViE)
     return (pdb_filenameA, PPV, TP, FP)
   
     

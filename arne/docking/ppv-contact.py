@@ -98,6 +98,9 @@ def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
     bfactorA = parse_pdb.get_area(open(pdb_filenameA, 'r'), chainA)
     bfactorB = parse_pdb.get_area(open(pdb_filenameB, 'r'), chainA)
     bfactor = bfactorA+bfactorB
+    surfA = parse_pdb.get_dist_to_surface(open(pdb_filenameA, 'r'), chainA)
+    surfB = parse_pdb.get_dist_to_surface(open(pdb_filenameB, 'r'), chainA)
+    surf = surfA+surfB
     #print cb_lst,noalign
     if noalign:
         dist_mat = get_cb_contacts(cb_lst)
@@ -161,7 +164,9 @@ def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
     ref_contact_mapB = dist_matB < cb_cutoff
 
     if print_dist:
-        print_distances(contacts_x, contacts_y, scores, dist_mat, bfactor, ref_lenA,ref_lenB,atom_seq_ali=atom_seq_ali, outfile=outfilename)
+        print_distances(contacts_x, contacts_y, scores, dist_mat,
+                        bfactor,surf, ref_lenA,ref_lenB,seq,atom_seq_ali=atom_seq_ali,
+                        outfile=outfilename)
 
     PPV, TP, FP = get_ppv_helper(contacts_x, contacts_y, ref_contact_map, ref_len, factor, atom_seq_ali=atom_seq_ali)
     PPVa, TPa, FPa = get_ppv_helper(contactsA_x, contactsA_y, ref_contact_mapA, interfacelen, factor, atom_seq_ali=atom_seq_aliA)
@@ -177,13 +182,14 @@ def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
         print '%s %s %s %s' % (name, PPVb, TPb, FPb)
         print '%s %s %s %s' % ("BOTH", PPV, TP, FP)
         print '%s %s %s %s' % ("Interface", PPVi, TPi, FPi)
-        print '%s %s %s %s' % ("Interface Exposed", PPViE, TPiE, FPiE)
+        print '%s %s %s %s' % ("Interface-Exposed", PPViE, TPiE, FPiE)
     else:
         print '%s %s %s %s %s' % (fasta_filenameA, c_filename, PPVa, TPa, FPa)
         print '%s %s %s %s %s' % (fasta_filenameB, c_filename, PPVb, TPb, FPb)
         print '%s %s %s %s %s' % ("BOTH", c_filename, PPV, TP, FP)
         print '%s %s %s %s %s' % ("Interface", c_filename, PPVi, TPi, FPi)
-        print '%s %s %s %s %s' % ("Interface Exposed", c_filename, PPViE, TPiE, FPiE)
+        print '%s %s %s %s %s' % ("Interface-Exposed", c_filename, PPViE, TPiE, FPiE)
+    print 'PPV %s %s %s %s %s %s' % (c_filename, PPV, PPVa, PPVb, PPVi, PPPViE) 
     return (pdb_filenameA, PPV, TP, FP)
   
     

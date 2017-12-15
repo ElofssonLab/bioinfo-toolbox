@@ -58,6 +58,7 @@ def get_ppv(fasta_filename, c_filename, pdb_filename, factor=1.0,
 
     cb_lst = parse_pdb.get_cb_coordinates(open(pdb_filename, 'r'), chain)
     bfactor = parse_pdb.get_area(open(pdb_filename, 'r'), chain)
+    surf = parse_pdb.get_dist_to_surface(open(pdb_filename, 'r'), chain)
 
     if noalign:
         dist_mat = get_cb_contacts(cb_lst)
@@ -85,7 +86,10 @@ def get_ppv(fasta_filename, c_filename, pdb_filename, factor=1.0,
 
         dist_mat = get_cb_contacts(gapped_cb_lst)
         if print_dist:
-            print_distances(contacts_x, contacts_y, scores,  dist_mat, bfactor, ref_len,ref_len,atom_seq_ali=atom_seq_ali, outfile=outfilename)
+            print_distances(contacts_x, contacts_y, scores,
+                            dist_mat,surf, bfactor,
+                            ref_len,ref_len,seq,atom_seq_ali=atom_seq_ali,
+                            outfile=outfilename)
         cb_cutoff = 8
         ref_contact_map = dist_mat < cb_cutoff
    
