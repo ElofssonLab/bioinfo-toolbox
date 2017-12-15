@@ -163,7 +163,7 @@ def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
     if print_dist:
         print_distances(contacts_x, contacts_y, scores, dist_mat,
                         bfactor, surf, ref_lenA,ref_lenB,
-                        seq,atom_seq_ali=atom_seq_ali,
+                        seq, fasta_filenameA, fasta_filenameB, atom_seq_ali=atom_seq_ali,
                         outfile=outfilename)
 
     PPV, TP, FP = get_ppv_helper(contacts_x, contacts_y, ref_contact_map, ref_len, factor, atom_seq_ali=atom_seq_ali)
@@ -187,7 +187,7 @@ def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
         print '%s %s %s %s %s' % ("BOTH", c_filename, PPV, TP, FP)
         print '%s %s %s %s %s' % ("Interface", c_filename, PPVi, TPi, FPi)
         print '%s %s %s %s %s' % ("Interface Exposed", c_filename, PPViE, TPiE, FPiE)
-    print 'PPV %s %s %s %s %s %s' % (c_filename, PPV, PPVa, PPVb, PPVi, PPPViE)
+    print 'PPV %s %s %s %s %s %s' % (c_filename, PPV, PPVa, PPVb, PPVi, PPViE)
     return (pdb_filenameA, PPV, TP, FP)
   
     

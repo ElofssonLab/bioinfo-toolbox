@@ -1,4 +1,5 @@
 import sys
+import re
 from math import *
 import Bio.PDB
 import numpy as np
@@ -25,10 +26,13 @@ def get_cb_contacts(gapped_cb_lst):
     return dist_mat
 
 
-def print_distances(contacts_x, contacts_y, scores, dist_mat, area, dist, lenA,lenB,seq,atom_seq_ali=[], outfile=""):
+def print_distances(contacts_x, contacts_y, scores, dist_mat, area, dist, lenA,lenB,seq,nameA,nameB,atom_seq_ali=[], outfile=""):
     num_c = len(contacts_x)
     outstr = ""
     domain = ""
+    codeA=nameA
+    codeB=nameB
+    
     for i in range(num_c):
         c_x = contacts_x[i]
         c_y = contacts_y[i]
@@ -47,9 +51,9 @@ def print_distances(contacts_x, contacts_y, scores, dist_mat, area, dist, lenA,l
         areaY=area[c_y][1]
         distX=dist[c_x]
         distY=dist[c_y]
-        outstr += "%s %s %s %s %s %.2f %.2f %.2f %.2f %s %s\n" % (domain,c_x,seq[c_x], c_y,seq[c_y],
+        outstr += "%s %s %s %s %s %.2f %.2f %.2f %.2f %s %s %s %s \n" % (domain,c_x,seq[c_x], c_y,seq[c_y],
                                                                   areaX,areaY,distX,distY, scores[i],
-                                                                  dist_mat[c_x, c_y])
+                                                                         dist_mat[c_x, c_y],codeA,codeB)
     if outfile:
         with open(outfile, 'w') as outf:
             outf.write(outstr)

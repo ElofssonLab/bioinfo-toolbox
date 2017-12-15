@@ -88,7 +88,7 @@ def get_ppv(fasta_filename, c_filename, pdb_filename, factor=1.0,
         if print_dist:
             print_distances(contacts_x, contacts_y, scores,
                             dist_mat,surf, bfactor,
-                            ref_len,ref_len,seq,atom_seq_ali=atom_seq_ali,
+                            ref_len,ref_len,seq,fast_filename,fasta_filename,atom_seq_ali=atom_seq_ali,
                             outfile=outfilename)
         cb_cutoff = 8
         ref_contact_map = dist_mat < cb_cutoff
