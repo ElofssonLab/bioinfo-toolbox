@@ -1,7 +1,7 @@
 #!/bin/bash -lx
 #SBATCH --output=analyze.%A_%a.out
 #SBATCH --error=analyze.%A_%a.out
-#SBATCH --array=1-200
+#SBATCH --array=1-223
 #SBATCH -c 1
 #SBATCH -t 1:00:00
 #SBATCH -A SNIC2017-11-7

@@ -1,7 +1,7 @@
 #!/bin/bash -lx
 #SBATCH --output=gdca.%A_%a.out
 #SBATCH --error=gdca.%A_%a.out
-#SBATCH --array=1-600
+#SBATCH --array=1-1000
 #SBATCH -c 6
 #SBATCH -t 72:00:00
 #SBATCH -A SNIC2017-11-7
