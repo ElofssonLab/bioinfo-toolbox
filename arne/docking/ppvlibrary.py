@@ -3,6 +3,7 @@ import re
 from math import *
 import Bio.PDB
 import numpy as np
+import operator
 
 from os.path import expanduser
 home = expanduser("~")
@@ -26,7 +27,7 @@ def get_cb_contacts(gapped_cb_lst):
     return dist_mat
 
 
-def print_distances(contacts_x, contacts_y, scores, dist_mat, area, dist, lenA,lenB,seq,nameA,nameB,atom_seq_ali=[], outfile=""):
+def print_distances(contacts_x, contacts_y, scores, dist_mat, area, dist, lenA,lenB,seq,nameA,nameB,ali_lst=[], atom_seq=[], outfile=""):
     num_c = len(contacts_x)
     outstr = ""
     domain = ""
@@ -36,22 +37,35 @@ def print_distances(contacts_x, contacts_y, scores, dist_mat, area, dist, lenA,l
     for i in range(num_c):
         c_x = contacts_x[i]
         c_y = contacts_y[i]
-        if atom_seq_ali:
-            if atom_seq_ali[c_x] == '-':
+        if ali_lst:
+            if ali_lst[c_x] < 0:
                 continue
-            if atom_seq_ali[c_y] == '-':
+            if ali_lst[c_y] < 0:
                 continue
-        if c_x < lenA and c_y < lenA:
+        if ali_lst[c_x] < lenA and ali_lst[c_y] < lenA:
             domain="A"
-        elif c_x > lenA and c_y > lenA:
+        elif ali_lst[c_x] >= lenA and ali_lst[c_y] >= lenA:
             domain="B"
         else:
             domain="I"
-        areaX=area[c_x][1]
-        areaY=area[c_y][1]
-        distX=dist[c_x]
-        distY=dist[c_y]
-        outstr += "%s %s %s %s %s %.2f %.2f %.2f %.2f %s %s %s %s \n" % (domain,c_x,seq[c_x], c_y,seq[c_y],
+        if ali_lst[c_x] > 0:
+            areaX=area[ali_lst[c_x]][1]
+            distX=dist[ali_lst[c_x]]
+        else:
+            areaX=-1
+            distX=-1
+        if ali_lst[c_y] > 0:
+            areaY=area[ali_lst[c_y]][1]
+            distY=dist[ali_lst[c_y]]
+        else:
+            areaY=-1
+            distY=-1
+        if ali_lst:
+            outstr += "%s %s %s %s %s %.2f %.2f %.2f %.2f %s %s %s %s \n" % (domain,c_x,atom_seq[ali_lst[c_x]], c_y,atom_seq[ali_lst[c_y]],
+                                                                  areaX,areaY,distX,distY, scores[i],
+                                                                         dist_mat[c_x, c_y],codeA,codeB)
+        else:
+            outstr += "%s %s %s %s %s %.2f %.2f %.2f %.2f %s %s %s %s \n" % (domain,c_x,seq[c_x], c_y,seq[c_y],
                                                                   areaX,areaY,distX,distY, scores[i],
                                                                          dist_mat[c_x, c_y],codeA,codeB)
     if outfile:
@@ -61,6 +75,12 @@ def print_distances(contacts_x, contacts_y, scores, dist_mat, area, dist, lenA,l
         print outstr
 
 def get_interface_contacts(contacts_x, contacts_y, scores, dist_mat, ref_len, factor, cutoff, atom_seq_ali=[]):
+    temp={}
+    tempX={}
+    tempY={}
+    tempcontacts_x=[]
+    tempcontacts_y=[]
+    tempscores=[]
     for i in range(len(contacts_x)):
         c_x = contacts_x[i]
         c_y = contacts_y[i]
@@ -70,9 +90,29 @@ def get_interface_contacts(contacts_x, contacts_y, scores, dist_mat, ref_len, fa
             if atom_seq_ali[c_y] == '-':
                 continue
         if dist_mat[c_x, c_y] > cutoff and c_x < ref_len:
-            contacts_x.append(c_x)
-            contacts_y.append(c_y+ref_len)
-            scores.append(scores[i])
+            tempcontacts_x.append(c_x)
+            tempcontacts_y.append(c_y+ref_len)
+            tempscores.append(scores[i])
+        else:
+            tempcontacts_x.append(c_x)
+            tempcontacts_y.append(c_y)
+            tempscores.append(scores[i])
+            tempcontacts_x.append(c_x+ref_len)
+            tempcontacts_y.append(c_y+ref_len)
+            tempscores.append(scores[i])
+            # Now we need to sort all scores...
+    for i in range(len(contacts_x)):
+        temp[i]=tempscores[i]
+        tempX[i]=tempcontacts_x[i]
+        tempY[i]=tempcontacts_y[i]
+    temp_sorted = sorted(temp.items(), key=operator.itemgetter(1))
+    contacts_x=[]
+    contacts_y=[]
+    scores=[]
+    for i in reversed(temp_sorted):
+        contacts_x.append(tempX[i[0]])
+        contacts_y.append(tempY[i[0]])
+        scores.append(temp[i[0]])
     return (contacts_x,contacts_y,scores)
 
 

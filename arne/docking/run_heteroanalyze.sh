@@ -21,4 +21,4 @@ scratch=$SNIC_TMP/arnee/anal/$dir/
 #cd $dir
 
 
-$dir/bin/analyze-all.bash $pair
+$dir/bin/analyze-hetero.bash $pair

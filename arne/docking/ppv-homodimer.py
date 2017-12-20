@@ -66,9 +66,9 @@ def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
             contacts_x.append(c_x)
             contacts_y.append(c_y)
             scores.append(score)
-            contacts_x.append(c_x+ref_lenA)
-            contacts_y.append(c_y+ref_lenA)
-            scores.append(score)
+            #contacts_x.append(c_x+ref_lenA)
+            #contacts_y.append(c_y+ref_lenA)
+            #scores.append(score)
             contactsA_x.append(c_x)
             contactsA_y.append(c_y)
             scoresA.append(score)
@@ -91,10 +91,10 @@ def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
     cb_lstB = parse_pdb.get_cb_coordinates(open(pdb_filenameB, 'r'), chainB)
     cb_lst=cb_lstA+cb_lstB
     bfactorA = parse_pdb.get_area(open(pdb_filenameA, 'r'), chainA)
-    bfactorB = parse_pdb.get_area(open(pdb_filenameB, 'r'), chainA)
+    bfactorB = parse_pdb.get_area(open(pdb_filenameB, 'r'), chainB)
     bfactor = bfactorA+bfactorB
     surfA = parse_pdb.get_dist_to_surface(open(pdb_filenameA, 'r'), chainA)
-    surfB = parse_pdb.get_dist_to_surface(open(pdb_filenameB, 'r'), chainA)
+    surfB = parse_pdb.get_dist_to_surface(open(pdb_filenameB, 'r'), chainB)
     surf = surfA+surfB
     #print cb_lst,noalign
     if noalign:
@@ -115,47 +115,70 @@ def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
         seq_aliA = alignA[-1][1]
         atom_seq_aliB = alignB[-1][0]
         seq_aliB = alignB[-1][1]
-        j = 0
         gapped_cb_lst = []
         gapped_cb_lstA = []
         gapped_cb_lstB = []
-
+        ali_lst =[]
+        ali_lstA =[]
+        ali_lstB =[]
+        j = 0
+        k = 0
         for i in xrange(len(atom_seq_ali)):
+            #print i,j,k,seq_ali[i],atom_seq_ali[i]
             if atom_seq_ali[i] == '-':
                 gapped_cb_lst.append(['-'])
+                ali_lst.append(-9999)
+                k += 1
             elif seq_ali[i] == '-':
                 j += 1
                 continue
             else:
+                ali_lst.append(j)
                 gapped_cb_lst.append(cb_lst[j])
+                k += 1
                 j += 1
         j = 0
+        k = 0
         for i in xrange(len(atom_seq_aliA)):
             if atom_seq_aliA[i] == '-':
                 gapped_cb_lstA.append(['-'])
+                ali_lstA.append(-9999)
+                k += 1
             elif seq_aliA[i] == '-':
                 j += 1
                 continue
             else:
-                gapped_cb_lstA.append(cb_lst[j])
+                ali_lstA.append(j)
+                gapped_cb_lstA.append(cb_lstA[j])
+                k += 1
                 j += 1
         j = 0
+        k = 0
         for i in xrange(len(atom_seq_aliB)):
+            #print "B",i,j,k,seq_aliB[i],atom_seq_aliB[i]
             if atom_seq_aliB[i] == '-':
                 gapped_cb_lstB.append(['-'])
+                ali_lstB.append(-9999)
+                k += 1
             elif seq_aliB[i] == '-':
                 j += 1
                 continue
             else:
-                gapped_cb_lstB.append(cb_lst[j])
+                ali_lstB.append(j)
+                gapped_cb_lstB.append(cb_lstB[j])
+                k += 1
                 j += 1
 
+
+        #print len(gapped_cb_lst),len(gapped_cb_lstA),len(gapped_cb_lstB)
         dist_mat = get_cb_contacts(gapped_cb_lst)
         dist_matA = get_cb_contacts(gapped_cb_lstA)
         dist_matB = get_cb_contacts(gapped_cb_lstB)
     cb_cutoff = 8
     #ref_contact_map = dist_mat < cb_cutoff
-    contacts_x,contacts_y,scores = get_interface_contacts(contacts_x, contacts_y, scores, dist_mat, ref_lenA, factor, cb_cutoff+4,atom_seq_ali=atom_seq_ali)
+    # This routine adds all interface and B chain contacts
+    contacts_x,contacts_y,scores = get_interface_contacts(contacts_x, contacts_y, scores, dist_mat, ref_lenA,
+                                                          factor, cb_cutoff+4,atom_seq_ali=atom_seq_ali)
     ref_contact_map = dist_mat < cb_cutoff  
     ref_contact_mapA = dist_matA < cb_cutoff
     ref_contact_mapB = dist_matB < cb_cutoff
@@ -163,7 +186,7 @@ def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
     if print_dist:
         print_distances(contacts_x, contacts_y, scores, dist_mat,
                         bfactor, surf, ref_lenA,ref_lenB,
-                        seq, fasta_filenameA, fasta_filenameB, atom_seq_ali=atom_seq_ali,
+                        seq, fasta_filenameA, fasta_filenameB, ali_lst=ali_lst, atom_seq=atom_seq,
                         outfile=outfilename)
 
     PPV, TP, FP = get_ppv_helper(contacts_x, contacts_y, ref_contact_map, ref_len, factor, atom_seq_ali=atom_seq_ali)

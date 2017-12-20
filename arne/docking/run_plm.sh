@@ -1,7 +1,7 @@
 #!/bin/bash -lx
 #SBATCH --output=plm.%A_%a.out
 #SBATCH --error=plm.%A_%a.out
-#SBATCH --array=1-1000
+#SBATCH --array=1-770
 #SBATCH -c 6
 #SBATCH -t  72:00:00
 #SBATCH --mem 120GB

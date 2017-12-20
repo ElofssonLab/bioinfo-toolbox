@@ -71,25 +71,34 @@ def get_ppv(fasta_filename, c_filename, pdb_filename, factor=1.0,
         align = pairwise2.align.globalms(atom_seq, seq, 2, -1, -0.5, -0.1)
         atom_seq_ali = align[-1][0]
         seq_ali = align[-1][1]
-        j = 0
         gapped_cb_lst = []
 
+        ali_lst =[]
+        j = 0
+        k = 0
         for i in xrange(len(atom_seq_ali)):
+            #print i,j,k,seq_ali[i],atom_seq_ali[i]
             if atom_seq_ali[i] == '-':
                 gapped_cb_lst.append(['-'])
+                ali_lst.append(-9999)
+                k += 1
             elif seq_ali[i] == '-':
                 j += 1
                 continue
             else:
+                ali_lst.append(j)
                 gapped_cb_lst.append(cb_lst[j])
+                k += 1
                 j += 1
 
         dist_mat = get_cb_contacts(gapped_cb_lst)
+        area = parse_pdb.get_area(open(pdb_filename, 'r'), chain)
+        surf = parse_pdb.get_dist_to_surface(open(pdb_filename, 'r'), chain)
         if print_dist:
-            print_distances(contacts_x, contacts_y, scores,
-                            dist_mat,surf, bfactor,
-                            ref_len,ref_len,seq,fast_filename,fasta_filename,atom_seq_ali=atom_seq_ali,
-                            outfile=outfilename)
+            print_distances(contacts_x, contacts_y, scores, dist_mat,
+                                                area, surf, ref_len,ref_len,
+                                                seq, fasta_filename, fasta_filename, ali_lst=ali_lst, atom_seq=atom_seq,
+                                                outfile=outfilename)
         cb_cutoff = 8
         ref_contact_map = dist_mat < cb_cutoff
    
@@ -107,8 +116,8 @@ if __name__ == "__main__":
 
     p = argparse.ArgumentParser(description='Plot protein residue contact maps.')
     p.add_argument('fasta_file')#, required=True)
-    p.add_argument('contact_file')#, required=True)
     p.add_argument('pdb')
+    p.add_argument('contact_file')#, required=True)
     p.add_argument('-o', '--outfile', default='')
     p.add_argument('-f', '--factor', default=1.0, type=float)
     p.add_argument('-s', '--score', default=-1.0, type=float)

@@ -124,35 +124,55 @@ def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
         gapped_cb_lst = []
         gapped_cb_lstA = []
         gapped_cb_lstB = []
-
+        ali_lst=[]
+        ali_lstA=[]
+        ali_lstB=[]
+        j = 0
+        k = 0
         for i in xrange(len(atom_seq_ali)):
+            #print i,j,k,seq_ali[i],atom_seq_ali[i]
             if atom_seq_ali[i] == '-':
                 gapped_cb_lst.append(['-'])
+                ali_lst.append(-9999)
+                k += 1
             elif seq_ali[i] == '-':
                 j += 1
                 continue
             else:
+                ali_lst.append(j)
                 gapped_cb_lst.append(cb_lst[j])
+                k += 1
                 j += 1
         j = 0
+        k = 0
         for i in xrange(len(atom_seq_aliA)):
             if atom_seq_aliA[i] == '-':
                 gapped_cb_lstA.append(['-'])
+                ali_lstA.append(-9999)
+                k += 1
             elif seq_aliA[i] == '-':
                 j += 1
                 continue
             else:
-                gapped_cb_lstA.append(cb_lst[j])
+                ali_lstA.append(j)
+                gapped_cb_lstA.append(cb_lstA[j])
+                k += 1
                 j += 1
         j = 0
+        k = 0
         for i in xrange(len(atom_seq_aliB)):
+            #print "B",i,j,k,seq_aliB[i],atom_seq_aliB[i]
             if atom_seq_aliB[i] == '-':
                 gapped_cb_lstB.append(['-'])
+                ali_lstB.append(-9999)
+                k += 1
             elif seq_aliB[i] == '-':
                 j += 1
                 continue
             else:
-                gapped_cb_lstB.append(cb_lst[j])
+                ali_lstB.append(j)
+                gapped_cb_lstB.append(cb_lstB[j])
+                k += 1
                 j += 1
 
         dist_mat = get_cb_contacts(gapped_cb_lst)
@@ -166,7 +186,7 @@ def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
     if print_dist:
         print_distances(contacts_x, contacts_y, scores, dist_mat,
                         bfactor,surf, ref_lenA,ref_lenB,seq, fasta_filenameA, fasta_filenameB,
-                        atom_seq_ali=atom_seq_ali,
+                        ali_lst=ali_lst,atom_seq=atom_seq,
                         outfile=outfilename)
 
     PPV, TP, FP = get_ppv_helper(contacts_x, contacts_y, ref_contact_map, ref_len, factor, atom_seq_ali=atom_seq_ali)
