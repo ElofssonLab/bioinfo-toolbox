@@ -1,7 +1,7 @@
 #!/bin/bash -lx
 #SBATCH --output=gdca.%A_%a.out
 #SBATCH --error=gdca.%A_%a.out
-#SBATCH --array=1-770
+#SBATCH --array=1-7
 #SBATCH -c 6
 #SBATCH -t 72:00:00
 #SBATCH -A SNIC2017-11-7
@@ -20,8 +20,8 @@ id=`tail -n+$pos $list | head -n1`
 #cd $scratch
 
 # DIR=/pfs/nobackup/home/m/mircomic/PconsC3
-myjulia=/pfs/nobackup/home/a/arnee/Software/julia-0d7248e2ff  # (v0.6)
-#myjulia=/pfs/nobackup/home/a/arnee/Software/julia-ae26b25d43  # (v0.4)
+#myjulia=/pfs/nobackup/home/a/arnee/Software/julia-0d7248e2ff  # (v0.6)
+myjulia=/pfs/nobackup/home/a/arnee/Software/julia-ae26b25d43  # (v0.4) (Compiled with Mircos MeffPoss position
 #myjulia=/pfs/nobackup/home/a/arnee/Software/julia  # (0.6.1 compiled on keb)
 #myjulia=/pfs/nobackup/home/m/mircomic/julia-ae26b25d43/
 export JULIA_PKGDIR=$myjulia

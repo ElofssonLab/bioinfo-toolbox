@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from parse_pdb import *
+from parse_pdb_resid import *
 import sys
 import operator
 import numpy as np

@@ -2,7 +2,7 @@
 #SBATCH -A SNIC2017-11-7
 #SBATCH --output=hh.%A_%a.out
 #SBATCH --error=hh.%A_%a.out
-#SBATCH --array=1-520
+#SBATCH --array=1-14
 #SBATCH -c 6
 #SBATCH -t 06:00:00
 #SBATCH -A SNIC2017-11-7

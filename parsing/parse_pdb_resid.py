@@ -3,13 +3,16 @@ import operator
 import numpy as np
 from collections import defaultdict
 
+# Here we try to correct some problems in parse_pdb that occurs from the assumption that res_no is a unique number
+
 
 def parse_atm_record(line):
-
+#
     record = defaultdict()
     record['name'] = line[0:6].strip()
     record['atm_no'] = int(line[6:11])
     record['atm_name'] = line[12:16].strip()
+    record['atm_alt'] = line[17]
     record['res_name'] = line[17:20].strip()
     record['chain'] = line[21]
     record['res_no'] = int(line[22:26])
@@ -34,8 +37,8 @@ def read(pdbfile, chain='', model=1):
     seen_atoms = False
     in_atoms = False
     in_model = False
-    curr_resi = 0
-    prev_resi = 0
+    curr_resi = ''
+    prev_resi = ''
     
     for line in pdbfile:
         if line.startswith('MODEL') and int(line.strip().split()[-1]) == model:
@@ -76,10 +79,10 @@ def read(pdbfile, chain='', model=1):
                 atm_lst = [line]
                 continue
             if not in_atoms:
-                curr_resi = atm_record['res_no']
+                curr_resi = atm_record['resid']
                 prev_resi = curr_resi
             in_atoms = True
-            curr_resi = atm_record['res_no']
+            curr_resi = atm_record['resid']
             if curr_resi == prev_resi:
                 atm_lst.append(line)
             else:
@@ -101,8 +104,8 @@ def read_chain(pdbfile, chain):
     tail = ''
 
     seen_atoms = False
-    curr_resi = 0
-    prev_resi = 0
+    curr_resi = ''
+    prev_resi = ''
     
     for line in pdbfile:
         # I think we should skip these when we read a chain
@@ -117,10 +120,10 @@ def read_chain(pdbfile, chain):
             if not atm_record['chain'] == chain:
                 continue
             if not seen_atoms:
-                curr_resi = atm_record['res_no']
+                curr_resi = atm_record['resid']
                 prev_resi = curr_resi
             seen_atoms = True
-            curr_resi = atm_record['res_no']
+            curr_resi = atm_record['resid']
             if curr_resi == prev_resi:
                 atm_lst.append(line)
             else:
@@ -165,12 +168,13 @@ def get_coordinates(pdbfile, chain):
 
         res_i = atm_record['res_no']
 
-        if res_dict.keys():
-            min_res_i = min(res_dict.keys())
-        else:
-            min_res_i = res_i
-        if res_i > 1000 and len(res_dict) < 1000 and min_res_i + len(res_dict) < 1000:
-            continue
+        # Not really sure why this was here.
+        #if res_dict.keys():
+        #    min_res_i = min(res_dict.keys())
+        #else:
+        #    min_res_i = res_i
+        #if res_i > 1000 and len(res_dict) < 1000 and min_res_i + len(res_dict) < 1000:
+        #    continue
         atm = [atm_record['x'], atm_record['y'], atm_record['z']]
 
         """
@@ -211,10 +215,12 @@ def get_coordinates(pdbfile, chain):
 
 
 def get_res_dict(pdbfile, chain):
-# This is the orignal one that actually used the resid fiels
+# This just reads every new residue as a new resid
     cb_lst = []
     res_dict = defaultdict(list)
-
+    lastresid=''
+    resid=''
+    i=-1
     if not chain:
         chain = get_first_chain(pdbfile)
         pdbfile.seek(0)
@@ -228,31 +234,21 @@ def get_res_dict(pdbfile, chain):
         if atm_record['chain'] != ' ' and atm_record['chain'] != chain  and chain != '*':
             continue
 
-        res_i = atm_record['res_no']
+        resid = atm_record['resid']
         
-        if res_dict.keys():
-            min_res_i = min(res_dict.keys())
-        else:
-            min_res_i = res_i
-
-        # I do not really understand whatis tested here, but seems to never be true/AE
-        if res_i > 1000 and len(res_dict) < 1000 and min_res_i + len(res_dict) < 1000:
-            continue
-
-        # Why ?
-        if atm_record['insert'] == 'X':
-            res_i = res_i * 0.001
-
         atm = [float('inf'), float('inf'), float('inf')]
 
         if atm_record['atm_name'] == 'CA':
+                i+=1
                 atm = [atm_record['x'], atm_record['y'], atm_record['z']]
-                res_dict[res_i].append(np.array(atm))   
+                res_dict[i].append(np.array(atm))   
+                lastresid=resid
         elif atm_record['atm_name'] == 'CB':
                 atm = [atm_record['x'], atm_record['y'], atm_record['z']]
-                res_dict[res_i].append(np.array(atm)) 
+                res_dict[i].append(np.array(atm)) 
     
     return res_dict
+
 
 
 def get_bfactor_area(pdbfile, chain):
@@ -263,7 +259,8 @@ def get_bfactor_area(pdbfile, chain):
     maxarea={"A":115,"R":225,"D":150,"N":160,"C":135,"E":190,"Q":180,"G":75,"H":195,"I":175,"L":170,"K":200,"M":185,"F":210,"P":145,"S":115,"T":140,"W":255,"Y":230,"V":155}
     three_to_one = {'ARG':'R', 'HIS':'H', 'LYS':'K', 'ASP':'D', 'GLU':'E', 'SER':'S', 'THR':'T', 'ASN':'N', 'GLN':'Q', 'CYS':'C', 'GLY':'G', 'PRO':'P', 'ALA':'A', 'ILE':'I', 'LEU':'L', 'MET':'M', 'PHE':'F', 'TRP':'W', 'TYR':'Y', 'VAL':'V', 'UNK': 'X'}
     #one_to_three = {'R':'ARG', 'H':'HIS', 'K':'LYS', 'D':'ASP', 'E':'GLU', 'S':'SER', 'T':'THR', 'N':'ASN', 'Q':'GLN', 'C':'CYS', 'G':'GLY', 'P':'PRO', 'A':'ALA', 'I':'ILE', 'L':'LEU', 'M':'MET', 'F':'PHE', 'W':'TRP', 'Y':'TYR', 'V':'VAL', 'X': 'UNK'}
-    lastres=-9999
+    lastresid=''
+    resid=''
     area=0.0
     fracarea=0.0
     if not chain:
@@ -279,25 +276,19 @@ def get_bfactor_area(pdbfile, chain):
         if atm_record['chain'] != ' ' and atm_record['chain'] != chain  and chain != '*':
             continue
 
-        res_i = atm_record['res_no']
+        resid = atm_record['resid']
         
-        if b_dict.keys():
-            min_res_i = min(b_dict.keys())
-        else:
-            min_res_i = res_i
-        if res_i > 1000 and len(b_dict) < 1000 and min_res_i + len(b_dict) < 1000:
-            continue
-
         if atm_record['insert'] == 'X':
             res_i = res_i * 0.001
 
         #atm = [float('inf'), float('inf'), float('inf')]
-        if res_i != lastres:
-            if lastres != -9999 :
+        if resid != lastresid:
+            if lastres != '' :
                 bfactor = [float(area), float(fracarea)]
                 #print lastres,bfactor
-                b_dict[lastres].append(np.array(bfactor))
-            lastres = res_i
+                b_dict[i].append(np.array(bfactor))
+            lastres = resid
+            i+=1
             area=0.
             fracarea=0.
         area+=atm_record['B']
@@ -411,15 +402,15 @@ def get_cb_coordinates(pdbfile, chain):
     return cb_lst
 
 
-
 def get_atom_seq(pdbfile, chain='', model=1, return_lines=False):
 
     three_to_one = {'ARG':'R', 'HIS':'H', 'LYS':'K', 'ASP':'D', 'GLU':'E', 'SER':'S', 'THR':'T', 'ASN':'N', 'GLN':'Q', 'CYS':'C', 'GLY':'G', 'PRO':'P', 'ALA':'A', 'ILE':'I', 'LEU':'L', 'MET':'M', 'PHE':'F', 'TRP':'W', 'TYR':'Y', 'VAL':'V', 'UNK': 'X'}
     line_dict = defaultdict(list)
     res_dict = {}
-    
+    resid=''
+    lastresid=''
     in_model = False
-
+    atom_seq = ''
     if not chain:
         chain = get_first_chain(pdbfile)
         pdbfile.seek(0)
@@ -433,39 +424,18 @@ def get_atom_seq(pdbfile, chain='', model=1, return_lines=False):
         atm_record = parse_atm_record(line)
         if atm_record['chain'] != ' ' and atm_record['chain'] != chain and chain != '*':
             continue
-        res_i = atm_record['res_no']
-
-        if res_dict.keys():
-            min_res_i = min(res_dict.keys())
-        else:
-            min_res_i = res_i
-        if res_i > 1000 and len(res_dict) < 1000 and min_res_i + len(res_dict) < 1000:
-            continue
-
-        if atm_record['insert'] == 'X':
-            res_i = res_i * 0.001
-         
-        line_dict[res_i].append(line)
+        resid = atm_record['resid']
         
         if atm_record['atm_name'] != 'CA':
             continue
-
+        # IF you do not use this you read a resid with two CA as two sequnces..
+        #if resid == lastresid:
+        #    continue
         if atm_record['res_name'] in three_to_one:
-            #res_name = three_to_one[atm_record['res_name']]
-            #print res_name
             res_name = three_to_one[atm_record['res_name']]
-        #else:
-            #res_name = ''
-            #continue
-        res_dict[res_i] = res_name
-
-    line_lst = [l[1] for l in sorted(line_dict.iteritems(), key=operator.itemgetter(0))]
-    res_lst = sorted(res_dict.iteritems(), key=operator.itemgetter(0))
-    atom_seq = ''
-
-    for res in res_lst:
-        atom_seq += res[1]
-
+            atom_seq += res_name
+            lastresid=resid
+        
     pdbfile.close()
     if return_lines:
         return atom_seq, ['', line_lst, 'END\n']

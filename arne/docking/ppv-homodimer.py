@@ -186,7 +186,7 @@ def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
     if print_dist:
         print_distances(contacts_x, contacts_y, scores, dist_mat,
                         bfactor, surf, ref_lenA,ref_lenB,
-                        seq, fasta_filenameA, fasta_filenameB, ali_lst=ali_lst, atom_seq=atom_seq,
+                        seq,  ali_lst=ali_lst, atom_seq=atom_seq,
                         outfile=outfilename)
 
     PPV, TP, FP = get_ppv_helper(contacts_x, contacts_y, ref_contact_map, ref_len, factor, atom_seq_ali=atom_seq_ali)
