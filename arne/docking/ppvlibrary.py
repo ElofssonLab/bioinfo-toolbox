@@ -226,6 +226,7 @@ def get_ppv_helper(contacts_x, contacts_y, ref_contact_map, ref_len, factor, ato
     TP = 0.0
     FP = 0.0
     PPV = 0.0
+    Zscore = 0.0
     for i in range(num_c):
         c_x = contacts_x[i]
         c_y = contacts_y[i]
@@ -243,6 +244,77 @@ def get_ppv_helper(contacts_x, contacts_y, ref_contact_map, ref_len, factor, ato
         PPV = TP / (TP + FP)
 
     return (PPV, TP, FP)
+
+def get_Zscore(contacts_x, contacts_y, ref_contact_map,  score, atom_seq_ali=[]):
+    Zscore = 0.0
+
+    #contact=np.array()
+    #noncontact=np.array()
+    numcontacts=0.
+    numnoncontacts=0.
+    sumcontacts=0.
+    sumnoncontacts=0.
+    sum2contacts=0.
+    sum2noncontacts=0.
+    for i in range(len(contacts_x)):
+        c_x = contacts_x[i]
+        c_y = contacts_y[i]
+        if atom_seq_ali:
+            if atom_seq_ali[c_x] == '-':
+                continue
+            if atom_seq_ali[c_y] == '-':
+                continue
+        if ref_contact_map[c_x, c_y] > 0:
+            numcontacts+=1
+            sumcontacts+=score[i]
+            sum2contacts+=score[i]*score[i]
+        else:
+            numnoncontacts+=1
+            sumnoncontacts+=score[i]
+            sum2noncontacts+=score[i]*score[i]
+                                                                                                                    
+    avecontact=sumcontacts/numcontacts
+    avenoncontact=sumnoncontacts/numnoncontacts
+    sdnoncontact=sqrt((numnoncontacts*sum2noncontacts-sumnoncontacts*sumnoncontacts)/(numnoncontacts*(numnoncontacts-1)))
+    Zscore=(avecontact-avenoncontact)/sdnoncontact
+    return (Zscore)
+
+
+
+def get_Zscore_interface(contacts_x, contacts_y, ref_contact_map, chainlenA,chainlenB, score, atom_seq_ali=[]):
+    Zscore = 0.0
+
+    #contact=np.array()
+    #noncontact=np.array()
+    numcontacts=0.
+    numnoncontacts=0.
+    sumcontacts=0.
+    sumnoncontacts=0.
+    sum2contacts=0.
+    sum2noncontacts=0.
+    for i in range(len(contacts_x)):
+        c_x = contacts_x[i]
+        c_y = contacts_y[i]
+        if ( c_x < chainlenA and c_y > chainlenA) or ( c_x > chainlenA and c_y < chainlenA):
+            if atom_seq_ali:
+                if atom_seq_ali[c_x] == '-':
+                    continue
+                if atom_seq_ali[c_y] == '-':
+                    continue
+            if ref_contact_map[c_x, c_y] > 0:
+                numcontacts+=1
+                sumcontacts+=score[i]
+                sum2contacts+=score[i]*score[i]
+            else:
+                numnoncontacts+=1
+                sumnoncontacts+=score[i]
+                sum2noncontacts+=score[i]*score[i]
+                                                                                                                    
+    avecontact=sumcontacts/numcontacts
+    avenoncontact=sumnoncontacts/numnoncontacts
+    sdnoncontact=sqrt((numnoncontacts*sum2noncontacts-sumnoncontacts*sumnoncontacts)/(numnoncontacts*(numnoncontacts-1)))
+    Zscore=(avecontact-avenoncontact)/sdnoncontact
+    return (Zscore)
 
 
 def get_ppv_helper_interface(contacts_x, contacts_y, ref_contact_map, area, chainlenA, chainlenB,numcontacts,cutoff,atom_seq_ali=[]):

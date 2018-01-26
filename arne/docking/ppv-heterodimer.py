@@ -189,6 +189,11 @@ def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
                         ali_lst=ali_lst,atom_seq=atom_seq,
                         outfile=outfilename)
 
+    Zscore = get_Zscore(contacts_x, contacts_y, ref_contact_map, scores, atom_seq_ali=atom_seq_ali)
+    ZscoreA = get_Zscore(contactsA_x, contactsA_y, ref_contact_mapA, scoresA, atom_seq_ali=atom_seq_aliA)
+    ZscoreB = get_Zscore(contactsB_x, contactsB_y, ref_contact_mapB, scoresB, atom_seq_ali=atom_seq_aliB)
+    ZscoreI = get_Zscore_interface(contacts_x, contacts_y, ref_contact_map, ref_lenA,ref_lenB, scores, atom_seq_ali=atom_seq_ali)
+
     PPV, TP, FP = get_ppv_helper(contacts_x, contacts_y, ref_contact_map, ref_len, factor, atom_seq_ali=atom_seq_ali)
     PPVa, TPa, FPa = get_ppv_helper(contactsA_x, contactsA_y, ref_contact_mapA, interfacelen, factor, atom_seq_ali=atom_seq_aliA)
     PPVb, TPb, FPb = get_ppv_helper(contactsB_x, contactsB_y, ref_contact_mapB, interfacelen, factor, atom_seq_ali=atom_seq_aliB)
@@ -199,18 +204,19 @@ def get_ppv(fasta_filenameA, c_filename, pdb_filenameA,
     #    print "B: ",i,contactsB_x[i],contactsB_y[i],scoresB[i],dist_mat[contactsB_x[i]][contactsB_y[i]],ref_contact_map[contactsB_x[i]][contactsB_y[i]]
 
     if name:
-        print '%s %s %s %s' % (name, PPVa, TPa, FPa)
-        print '%s %s %s %s' % (name, PPVb, TPb, FPb)
-        print '%s %s %s %s' % ("BOTH", PPV, TP, FP)
-        print '%s %s %s %s' % ("Interface", PPVi, TPi, FPi)
+        print '%s %s %s %s %s' % (name, PPVa, TPa, FPa,ZscoreA)
+        print '%s %s %s %s %s' % (name, PPVb, TPb, FPb,ZscoreB)
+        print '%s %s %s %s %s' % ("BOTH", PPV, TP, FP,Zscore)
+        print '%s %s %s %s %s' % ("Interface", PPVi, TPi, FPi,ZscoreI)
         print '%s %s %s %s' % ("Interface-Exposed", PPViE, TPiE, FPiE)
     else:
-        print '%s %s %s %s %s' % (fasta_filenameA, c_filename, PPVa, TPa, FPa)
-        print '%s %s %s %s %s' % (fasta_filenameB, c_filename, PPVb, TPb, FPb)
-        print '%s %s %s %s %s' % ("BOTH", c_filename, PPV, TP, FP)
-        print '%s %s %s %s %s' % ("Interface", c_filename, PPVi, TPi, FPi)
+        print '%s %s %s %s %s %s' % (fasta_filenameA, c_filename, PPVa, TPa, FPa,ZscoreA)
+        print '%s %s %s %s %s %s' % (fasta_filenameB, c_filename, PPVb, TPb, FPb,ZscoreB)
+        print '%s %s %s %s %s %s' % ("BOTH", c_filename, PPV, TP, FP,Zscore)
+        print '%s %s %s %s %s %s' % ("Interface", c_filename, PPVi, TPi, FPi,ZscoreI)
         print '%s %s %s %s %s' % ("Interface-Exposed", c_filename, PPViE, TPiE, FPiE)
     print 'PPV %s %s %s %s %s %s' % (c_filename, PPV, PPVa, PPVb, PPVi, PPViE) 
+    print 'Zscore %s %s %s %s %s' % (c_filename, Zscore,ZscoreA,ZscoreB,ZscoreI)
     return (pdb_filenameA, PPV, TP, FP)
   
     
