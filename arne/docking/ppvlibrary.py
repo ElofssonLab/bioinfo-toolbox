@@ -283,7 +283,7 @@ def get_Zscore(contacts_x, contacts_y, ref_contact_map,  score, atom_seq_ali=[])
 
 def get_Zscore_interface(contacts_x, contacts_y, ref_contact_map, chainlenA,chainlenB, score, atom_seq_ali=[]):
     Zscore = 0.0
-
+    ZscoreTop = 0.0  # The Zscore for top 5 contacts
     #contact=np.array()
     #noncontact=np.array()
     numcontacts=0.
@@ -292,6 +292,9 @@ def get_Zscore_interface(contacts_x, contacts_y, ref_contact_map, chainlenA,chai
     sumnoncontacts=0.
     sum2contacts=0.
     sum2noncontacts=0.
+    topcontacts=0.
+    topsumcontacts=0.
+    topsum2contacts=0.
     for i in range(len(contacts_x)):
         c_x = contacts_x[i]
         c_y = contacts_y[i]
