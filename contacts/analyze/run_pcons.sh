@@ -4,7 +4,7 @@
 #SBATCH --array=1-335
 #SBATCH -c 1
 #SBATCH -t 60:00
-#SBATCH -A SNIC2016-10-22
+#SBATCH -A SNIC2017-11-7
 
 offset=$2
 list=$1
@@ -27,12 +27,14 @@ cd $scratch
 
 sleep 2 # waiting for filesystem
 
-for i in $dir/*cm.tar.gz # $dir/conf*[04].tar.gz # $dir/*_mem.tar.gz
+#for i in $dir/*cm.tar.gz # $dir/conf*[04].tar.gz # $dir/*_mem.tar.gz
+for i in $dir/*cm
 do
-    j=`basename $i .tar.gz`
+    #j=`basename $i .tar.gz`
+    j=`basename $i `
     if [ ! -s $dir/${j}.raw ]
     then
-	tar -zxf $i
+	#tar -zxf $i
 	echo "running"
 	ls $j/stage1/${id}*fa_[0-9].pdb > qa.input
 	ls $j/stage1/${id}*fa_[0-9][0-9].pdb >> qa.input
