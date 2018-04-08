@@ -1,7 +1,7 @@
 #!/bin/bash -lx
 #SBATCH --output=pcons.%A_%a.out
 #SBATCH --error=pcons.%A_%a.out
-#SBATCH --array=1-335
+#SBATCH --array=1-30
 #SBATCH -c 1
 #SBATCH -t 60:00
 #SBATCH -A SNIC2017-11-7
@@ -22,8 +22,8 @@ dir=`pwd`/$id
 
 scratch=$SNIC_TMP/arnee/Pcons/$id/
 mkdir -p $scratch
-cd $scratch
-
+#cd $scratch
+cd $dir
 
 sleep 2 # waiting for filesystem
 
@@ -36,8 +36,8 @@ do
     then
 	#tar -zxf $i
 	echo "running"
-	ls $j/stage1/${id}*fa_[0-9].pdb > qa.input
-	ls $j/stage1/${id}*fa_[0-9][0-9].pdb >> qa.input
+	ls $j/stage1/${id}*_[0-9].pdb > qa.input
+	ls $j/stage1/${id}*_[0-9][0-9].pdb >> qa.input
 	if [ -s qa.input ]
 	then
 	    /pfs/nobackup/home/m/mircomic/Pcons/bin/pcons -i ./qa.input -A > ${dir}/${j}.raw
@@ -46,7 +46,7 @@ do
 	    #	mv ${j}*out $dir/
 	    sleep 2
 	fi
-	rm -r ${j}/
+	#rm -r ${j}/
     fi
 done
 

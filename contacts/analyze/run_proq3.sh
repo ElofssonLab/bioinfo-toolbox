@@ -1,10 +1,10 @@
 #!/bin/bash -lx
 #SBATCH --output=proq3.%A_%a.out
 #SBATCH --error=proq3.%A_%a.out
-#SBATCH --array=1-1
+#SBATCH --array=1-30
 #SBATCH -c 1
 #SBATCH -t 24:00:00
-#SBATCH -A SNIC2016-10-22
+#SBATCH -A SNIC2017-11-7
 
 export PATH=$PATH:/pfs/nobackup/home/m/mircomic/EMBOSS-6.6.0/build/bin/
 export R_LIBS="/pfs/nobackup/home/m/mircomic/R_libs"
@@ -31,7 +31,8 @@ scratch=$SNIC_TMP/arnee/ProQ3/$id/
 mkdir -p $scratch
 
 
-cd $scratch
+#cd $scratch
+cd $dir
 # just in case the files are not compressed (should be fixed)
 
 # rsync -ar $dir/confold_2.5_m50_proq3/ ./confold_2.5_m50_proq3/
@@ -41,27 +42,28 @@ cd $scratch
 
 PROQ=/pfs/nobackup/home/m/mircomic/proq3/
 
-$PROQ/run_proq3.sh -fasta $dir/${id}*.fa -outpath ./ -only-build-profile
+$PROQ/run_proq3.sh -fasta $dir/${id}*.seq -outpath ./ -only-build-profile
 
 sleep 10 # waiting for filesystem
 
-for i in $dir/*cm.tar.gz # $dir/conf*[04].tar.gz  # $dir/*_mem.tar.gz
+for i in $dir/*cm # .tar.gz # $dir/conf*[04].tar.gz  # $dir/*_mem.tar.gz
 do
-    tar -zxf $i
-    j=`basename $i .tar.gz`
+    #tar -zxf $i
+    #j=`basename $i .tar.gz`
+    j=`basename $i `
     if [ ! -s $dir/${j}_proq3.tar.gz ]
     then
-	ls $j/stage1/${id}*fa_[0-9].pdb > qa.input
-	ls $j/stage1/${id}*fa_[0-9][0-9].pdb >> qa.input
+	ls $j/stage1/${id}*_[0-9].pdb > qa.input
+	ls $j/stage1/${id}*_[0-9][0-9].pdb >> qa.input
 	if [ -s qa.input ]
 	then
 	    sleep 2 # waiting for filesystem 
 	    mkdir  $j_proq3
 	    $PROQ/run_proq3.sh  -l qa.input -profile ${scratch}/${id}.????_?.fasta -outpath ${j}_proq3 --deep yes
 	    sleep 2 # waiting for filesystem
-	    tar -zcvf $dir/${j}_proq3.tar.gz ${j}_proq3 # --remove-files
-	    rm -r ${j}_proq3
-	    rm -r ${j}/
+	    #tar -zcvf $dir/${j}_proq3.tar.gz ${j}_proq3 # --remove-files
+	    #rm -r ${j}_proq3
+	    #rm -r ${j}/
 	fi
     fi
 done
