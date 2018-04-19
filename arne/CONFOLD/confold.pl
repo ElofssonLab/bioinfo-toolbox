@@ -10,10 +10,34 @@ use Getopt::Long;
 use Scalar::Util qw(looks_like_number);
 
 # Location of CNSsuite and DSSP
-my $program_dssp   = "/proj/bioinfo/software/dssp/dssp-2.0.4-linux-amd64";
-my $cns_suite      = "/proj/bioinfo/software/CNS/cns_solve_1.3";
-#my $cns_suite      = "/home/x_mirmi/glob/CNS/cns_solve_1.3";
-my $cns_executable = "$cns_suite/intel-x86_64bit-linux/bin/cns_solve";
+if ( -e '/proj/bioinfo/software/dssp/dssp-2.0.4-linux-amd64'  )
+{
+    # Triolith
+    $program_dssp   = "/proj/bioinfo/software/dssp/dssp-2.0.4-linux-amd64";
+    $cns_suite      = "/proj/bioinfo/software/CNS/cns_solve_1.3";
+    #my $cns_suite      = "/home/x_mirmi/glob/CNS/cns_solve_1.3";
+    $cns_executable = "$cns_suite/intel-x86_64bit-linux/bin/cns_solve";
+}
+elsif ( -e "/pfs/nobackup/home/a/arnee/Software/bin/dssp-2.0.4-linux-amd64"  )
+{
+# HPC2N
+    $program_dssp   = "/pfs/nobackup/home/a/arnee/Software/bin/dssp-2.0.4-linux-amd64";
+    $cns_suite      = "/pfs/nobackup/home/a/arnee/Software/bin/cns_solve_1.3";
+#    $cns_suite      = "/pfs/nobackup/home/m/mircomic/CNS/cns_solve_1.3_stmax/";
+    $cns_executable = "$cns_suite/intel-x86_64bit-linux/bin/cns_solve";
+
+elsif ( -e "/usr/bin/dssp"  )
+{
+# HPC2N
+    $program_dssp   = "/usr/bin/dssp";
+    $cns_suite      = "$home/bin/cns_solve_1.3";
+#    $cns_suite      = "/pfs/nobackup/home/m/mircomic/CNS/cns_solve_1.3_stmax/";
+    $cns_executable = "$cns_suite/intel-x86_64bit-linux/bin/cns_solve";
+
+}else{
+    die "not found dssp and cns\n";
+}
+
 
 # User inputs 
 my ($help, $dir_out, $file_fasta, $file_pair, $file_rr, $file_ss);
