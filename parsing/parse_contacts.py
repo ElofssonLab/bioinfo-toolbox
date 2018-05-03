@@ -27,6 +27,7 @@ def parse(afile, sep=' ', min_dist=5):
             if line_arr[0].startswith('E'):
                 continue
             # parse MISTIC output (i res_i j res_j score)
+            #print (line_arr)
             if line_arr[1].isalpha():
                 i = int(line_arr[0])
                 j = int(line_arr[2])

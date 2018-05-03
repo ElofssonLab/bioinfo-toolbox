@@ -215,7 +215,7 @@ sub process_parameters{
 		# Some files have leading white spaces
 		system_cmd("sed -i 's/^ *//' $file_rr");
 		# Stable sort with -s option, i.e. maintain order in case confidence are equal
-		system_cmd("sort -nr -s -k5 $file_rr > sorted.rr");
+		system_cmd("sort -gr -s -k5 $file_rr > sorted.rr");
 		system_cmd("rm -f $file_rr");
 		print2file($file_rr, $seq) if defined $seq;
 		system_cmd("cat sorted.rr >> $file_rr");
