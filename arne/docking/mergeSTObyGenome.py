@@ -21,27 +21,27 @@ dataB={}
 #print "opening "+ fileA +"\n"
 # For each record 
 first=True
-for record in SeqIO.parse(handleA, 'fasta') :
+for record in SeqIO.parse(handleA, 'stockholm') :
    if first:
       seqA=record
       first=False
    else:
-      organism= re.sub(r'[\<\>\/\\\|a-z].*_','',record.name)
-      organism= re.sub(r'\/.*','',organism)
+      organism= re.sub(r'.*TaxID=','',record.description)
+      organism= re.sub(r'\s.*','',organism)
       if (not organism in dataA.keys()):
-         #print (record.name,organism)
+         #print (record.name,record.description,organism)
          dataA[organism]=record
 
 handleB = open(fileB, 'rU')
 #print "opening "+ fileB +"\n"        
 first=True
-for record in SeqIO.parse(handleB, 'fasta') :
+for record in SeqIO.parse(handleB, 'stockholm') :
    if first:
       seqB=record
       first=False
    else:
-      organism= re.sub(r'[\<\>\/\\\|a-z].*_','',record.name)
-      organism= re.sub(r'\/.*','',organism)
+      organism= re.sub(r'.*TaxID=','',record.description)
+      organism= re.sub(r'\s.*','',organism)
       if (not organism in dataB.keys()):
          #        print record.name,organism
          dataB[organism]=record

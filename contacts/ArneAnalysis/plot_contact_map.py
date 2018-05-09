@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 from __future__ import division
 import sys, os, re, string
 import argparse
@@ -6,7 +6,7 @@ from math import *
 
 # on UPPMAX only
 sys.path.append('/sw/apps/bioinfo/biopython/1.59/tintin/lib/python')
-
+sys.path.append('../parsing')
 from Bio import pairwise2
 
 import numpy as np
@@ -19,7 +19,7 @@ import matplotlib.cm as cm
 #from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from os.path import expanduser
-home = expanduser("~")
+home = '/home/arnee'
 sys.path.append(home + '/bioinfo-toolbox/parsing')
 sys.path.append(home + '/git/bioinfo-toolbox/parsing')
 
@@ -409,6 +409,7 @@ def plot_map(fasta_filename, c_filename, factor=1.0, th=-1, c2_filename='', psip
         #        coverage_lst = get_meff_coverage(meff_filename)
         #        max_cover = max(coverage_lst)
     else:
+        coverage_lst=np.zeros(ref_len)
         max_cover = 0
     average_disorder=0.
     average_order=0.
