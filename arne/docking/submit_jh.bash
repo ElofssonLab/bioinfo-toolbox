@@ -13,7 +13,7 @@ pos=$(($SLURM_ARRAY_TASK_ID + $offset))
 #id=`tail -n+$pos list.txt | head -n1`
 id=`tail -n+$pos $list | head -n1`
 
-#id="pdbseq/1a3aB.fa"
+#id="seq_chains/1a0s_P.seq"
 
 CPU=6
 directory=`dirname $id`
