@@ -1,7 +1,7 @@
 #!/bin/bash -x
 #SBATCH -A SNIC2017-11-7
-#SBATCH --output=hh.%A_%a.out
-#SBATCH --error=hh.%A_%a.out
+#SBATCH --output=jh.%A_%a.out
+#SBATCH --error=jh.%A_%a.out
 #SBATCH --array=1-681
 #SBATCH -c 6
 #SBATCH -t 06:00:00
