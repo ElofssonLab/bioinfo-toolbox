@@ -26,8 +26,17 @@ for record in SeqIO.parse(handleA, 'stockholm') :
       seqA=record
       first=False
    else:
-      organism= re.sub(r'.*TaxID=','',record.description)
-      organism= re.sub(r'\s.*','',organism)
+      if re.match(r'.*TaxID=',record.description):
+         organism= re.sub(r'.*TaxID=','',record.description)
+         organism= re.sub(r'\s.*','',organism)
+      elif re.match(r'.*Tax=',record.description):
+         organism= re.sub(r'.*Tax=','',record.description)
+         organism= re.sub(r'\s.*','',organism)
+      elif re.match(r'.*RepID=',record.description):
+         organism= re.sub(r'.*RepID=','',record.description)
+         organism= re.sub(r'.*\_','',organism)
+         organism= re.sub(r'\s.*','',organism)
+
       if (not organism in dataA.keys()):
          #print (record.name,record.description,organism)
          dataA[organism]=record
@@ -40,8 +49,17 @@ for record in SeqIO.parse(handleB, 'stockholm') :
       seqB=record
       first=False
    else:
-      organism= re.sub(r'.*TaxID=','',record.description)
-      organism= re.sub(r'\s.*','',organism)
+      if re.match(r'.*TaxID=',record.description):
+         organism= re.sub(r'.*TaxID=','',record.description)
+         organism= re.sub(r'\s.*','',organism)
+      elif re.match(r'.*Tax=',record.description):
+         organism= re.sub(r'.*Tax=','',record.description)
+         organism= re.sub(r'\s.*','',organism)
+      elif re.match(r'.*RepID=',record.description):
+         organism= re.sub(r'.*RepID=','',record.description)
+         organism= re.sub(r'.*\_','',organism)
+         organism= re.sub(r'\s.*','',organism)
+
       if (not organism in dataB.keys()):
          #        print record.name,organism
          dataB[organism]=record

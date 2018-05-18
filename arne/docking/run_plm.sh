@@ -1,9 +1,9 @@
 #!/bin/bash -lx
 #SBATCH --output=plm.%A_%a.out
 #SBATCH --error=plm.%A_%a.out
-#SBATCH --array=1-65
+#SBATCH --array=1-700
 #SBATCH -c 6
-#SBATCH -t  72:00:00
+#SBATCH -t  24:00:00
 #SBATCH --mem 120GB
 #SBATCH -A SNIC2017-11-7
 

@@ -1,10 +1,10 @@
 #!/bin/bash -x
 #SBATCH -A SNIC2017-11-7
-#SBATCH --output=hh.%A_%a.out
-#SBATCH --error=hh.%A_%a.out
-#SBATCH --array=1-700
+#SBATCH --output=jh.%A_%a.out
+#SBATCH --error=jh.%A_%a.out
+#SBATCH --array=1-681
 #SBATCH -c 6
-#SBATCH -t 01:00:00
+#SBATCH -t 06:00:00
 #SBATCH -A SNIC2017-11-7
 
 offset=$2
@@ -13,24 +13,25 @@ pos=$(($SLURM_ARRAY_TASK_ID + $offset))
 #id=`tail -n+$pos list.txt | head -n1`
 id=`tail -n+$pos $list | head -n1`
 
-id="pdbseq/1a3aB.fa"
+#id="seq_chains/1a0s_P.seq"
 
 CPU=6
 directory=`dirname $id`
 dir=`pwd`/$directory
-idname=`basename $id .fa`
+foo=`basename $id .fa`
+idname=`basename $foo .seq`
 
 
-HH=/pfs/nobackup/home/a/arnee/git/PconsC3/extra/arne/MSA/runhhblits.py
+JH=/pfs/nobackup/home/a/arnee/git/PconsC3/extra/arne/MSA/runjackhmmer.py
 a3m=/pfs/nobackup/home/a/arnee/git/PconsC3/extra/arne/MSA/a3mToTrimmed.py
 
 for E in 1  0.0001 1.e-10
 do
-    file=$id.HH$E.a3m
+    file=$id.JH$E.a3m
     if [ ! -s ${file}  ]
     then
-	${HH} -c $CPU -e ${E} -name HH${E} $id
-	${a3m} -o -name $idname $id.HH${E}.a3m > $id.HH${E}.trimmed
+	${JH} -c $CPU -e ${E} -name JH${E} $id
+	${a3m} -o -name $idname $id.JH${E}.a3m > $id.JH${E}.trimmed
     fi
 
 done
