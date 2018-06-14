@@ -30,7 +30,7 @@ do
     file=$id.JH$E.a3m
     if [ ! -s ${file}  ]
     then
-	${JH} -c $CPU -e ${E} -name JH${E} $id
+	${JH} -c $CPU -e ${E} -name JH${E} $id -db /pfs/nobackup/home/a/arnee/data/uniref100.fasta
 	${a3m} -o -name $idname $id.JH${E}.a3m > $id.JH${E}.trimmed
     fi
 
