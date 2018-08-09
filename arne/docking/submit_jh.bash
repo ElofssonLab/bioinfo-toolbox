@@ -6,9 +6,16 @@
 #SBATCH -c 6
 #SBATCH -t 06:00:00
 #SBATCH -A SNIC2017-11-7
+#SBATCH -p largemem
 
 offset=$2
 list=$1
+
+if [ ! $offset ]
+then
+    offset=0
+fi
+
 pos=$(($SLURM_ARRAY_TASK_ID + $offset))
 #id=`tail -n+$pos list.txt | head -n1`
 id=`tail -n+$pos $list | head -n1`

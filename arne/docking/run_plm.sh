@@ -9,6 +9,12 @@
 
 list=$1
 offset=$2
+#offset=0
+
+if [ ! $offset ]
+then
+    offset=0
+fi
 
 pos=$(($SLURM_ARRAY_TASK_ID + $offset))
 
