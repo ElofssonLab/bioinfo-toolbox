@@ -1,0 +1,10 @@
+#!/bin/bash -x
+
+# Just a script that actually checks if everything is nicely packes in the way it should be
+
+
+# First check if all tar.gz files really are compressed
+
+find ./ -name "*.tar.gz" -exec gzip -r {} \;
+
+

@@ -1,0 +1,9 @@
+#!/bin/bash
+echo -n "PFRMAT TS
+TARGET "
+grep \> $1 | sed s/\>//g
+echo "AUTHOR 5229-7541-3942
+REMARK AUTHOR Elofsson
+REMARK developer Mirco Michel, Davide Menendez-Hurtado and Arne Elofsson 
+METHOD PconsC4
+MODEL  1"

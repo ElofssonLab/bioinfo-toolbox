@@ -1,0 +1,3 @@
+#!/bin/bash
+echo "target ,  model ,  ali ,  num ,  mindist ,  maxdist ,  length ,  TM ,  Pcons ,  cns ,  noe ,  ProQ2D ,  ProQ3D" > summary-all.csv
+cat PF*/*summary.csv | grep -v target >> summary-all.csv
