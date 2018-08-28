@@ -17,9 +17,12 @@ from Bio import SwissProt
 #from Bio.SwissProt import KeyWList
 
 
+dir='/scratch2/arne/annotate_uniprot_proteomes/'
 
+if  (not os.path.isdir(dir)):
+    dir='/pfs/nobackup/home/w/wbasile/annotate_uniprot_proteomes/'
+print ("HEJ",dir)
 
-dir='/pfs/nobackup/home/w/wbasile/annotate_uniprot_proteomes'
 data_dir = dir+"/data/"
 input_dir = data_dir + "proteomes/"
 
@@ -339,7 +342,7 @@ def annotate_genome(f):
             
         
 # load the list of PFAM domains that are shared by at least 5 bacteria and 5 euks
-out_domain_ids_filename = "bin/pfam_ids_orthologs_5.list"
+out_domain_ids_filename = dir+"bin/pfam_ids_orthologs_5.list"
 shared_domains_pfam_ids = set(filter(None, open(out_domain_ids_filename).read().split("\n")))
 shared_domains={}
 for key in shared_domains_pfam_ids:
