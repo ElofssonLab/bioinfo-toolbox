@@ -4,10 +4,10 @@
 #SBATCH --error=uniprot.%A_%a.out
 #SBATCH --array=1-1000
 #SBATCH -c 1
-#SBATCH -t 24:00:00
+#SBATCH -t 04:00:00
 
 snic=SNIC2018-1-26
-time="24:00:00"
+time="04:00:00"
 mem="2GB"
 
 offset=$2
