@@ -157,7 +157,7 @@ def parse_iupred(data_file):
     
     
 def do_seg(input_file):
-    segexec="/pfs/nobackup/home/w/wbasile/annotate_uniprot_proteomes/bin/seg  "
+    segexec=dir+"/bin/seg  "
     output = subprocess.check_output(segexec + input_file + " -x", shell=True,stderr=subprocess.PIPE)
     
     # parse the output
@@ -229,11 +229,12 @@ def parse_uniprot(input_file):
     dic_dom = {}
     dic_king = {}
     # probably faster/easier to use the XML parser directly
+    print ("Test:",input_file)
     handle = open(input_file)
     for record in SwissProt.parse(handle):
-        #print (record)
-        #print (record.entry_name)
-        #print (record.cross_references)
+        print (record)
+        print (record.entry_name)
+        print (record.cross_references)
         entry =record.entry_name
         id=entry
         dic_pfam[id]=''
@@ -263,13 +264,15 @@ def annotate_genome(f):
         proceed = True
         
         if not os.path.exists(iupred_long_data_file):
+            print ("Missing IUPRED-long")
             proceed = False
  
         if not os.path.exists(iupred_short_data_file):
+            print ("Missing IUPRED-short")
             proceed = False
 
         if proceed == True:
-            print (f)
+            print ("Trying:",f)
 
             f_name = f.split("/")[-1]
 
@@ -280,7 +283,7 @@ def annotate_genome(f):
                 # create an ampty file to prevent the other processes to work on the same genome
                 cmd = "touch " + out_annotation_file
                 os.system(cmd)
-
+                print ("hej1")
                 protein_recs = SeqIO.to_dict(SeqIO.parse(f,"fasta"))
                 recs = []
                 for k in protein_recs:
@@ -290,14 +293,17 @@ def annotate_genome(f):
                     rec["seq"] = str(protein_recs[k].seq)
                     recs += [rec]
 
+                print ("hej2")
                 df = pd.DataFrame(recs)
 
+                print ("hej3")
                 # annotate all properties
                 df["length"] = df.seq.apply(len)
                 df["top-idp"] = df["seq"].apply(get_topidp)
                 df["hessa"] = df["seq"].apply(get_hessa)
 
 
+                print ("hej4")
                 # AA frequencies
                 for aa in aas:
                     df["freq_" + aa] = df.seq.apply(aa_freq, args = (aa,)) 
@@ -306,12 +312,14 @@ def annotate_genome(f):
                 #for aa in aas:
                 #    df["count_" + aa] = df.seq.apply(aa_count, args = (aa,))
 
+                print ("hej5")
                 ## add SS scales
                 for ss_type, d_scale in zip(["alpha", "beta", "coil", "turn"],[dic_ss_alpha, dic_ss_beta, dic_ss_coil, dic_ss_turn]):
                     df["ss_" + ss_type] = df.seq.apply(get_ss_scale, args = (d_scale,))
 
                     
                 # disorder
+                print ("hej6")
 
                 # add iupred
                 #print "iupred long"
@@ -322,6 +330,7 @@ def annotate_genome(f):
                 dic_iupred_short = parse_fasta_x(iupred_short_data_file)
                 df['iupred_short'] = df['query_id'].map(dic_iupred_short)
 
+                print ("hej7",f)
 
                 # SEG
                 #print str(f),"Computing SEG"
@@ -329,11 +338,14 @@ def annotate_genome(f):
                 df["seg"] = df["query_id"].map(seg_dic)
 
 
+                print ("hej8",uniprot_data_file)
                 # Parsing uniprot - today only Pfam
                 (dic_pfam,dic_numdoms,dic_kingdom) = parse_uniprot(uniprot_data_file)
+                print ("TEST",dic_pfam,dic_numdoms,dic_kingdom)
                 df["Pfam"] = df['query_id'].map(dic_pfam)
                 df["NumDoms"] = df['query_id'].map(dic_numdoms)
                 df["PfamType"] = df['query_id'].map(dic_kingdom)
+                print ("hej9")
 
                 # export
                 columns = ["query_id",  "length", "top-idp", "iupred_long", "iupred_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa","Pfam","NumDoms","PfamType"]
