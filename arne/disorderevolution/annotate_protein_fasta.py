@@ -21,7 +21,6 @@ dir='/scratch2/arne/annotate_uniprot_proteomes/'
 
 if  (not os.path.isdir(dir)):
     dir='/pfs/nobackup/home/w/wbasile/annotate_uniprot_proteomes/'
-print ("HEJ",dir)
 
 data_dir = dir+"/data/"
 input_dir = data_dir + "proteomes/"
@@ -157,7 +156,7 @@ def parse_iupred(data_file):
     
     
 def do_seg(input_file):
-    segexec="/pfs/nobackup/home/w/wbasile/annotate_uniprot_proteomes/bin/seg  "
+    segexec=dir+"/bin/seg  "
     output = subprocess.check_output(segexec + input_file + " -x", shell=True,stderr=subprocess.PIPE)
     
     # parse the output
@@ -263,13 +262,15 @@ def annotate_genome(f):
         proceed = True
         
         if not os.path.exists(iupred_long_data_file):
+            print ("Missing IUPRED-long")
             proceed = False
  
         if not os.path.exists(iupred_short_data_file):
+            print ("Missing IUPRED-short")
             proceed = False
 
         if proceed == True:
-            print (f)
+            print ("Trying:",f)
 
             f_name = f.split("/")[-1]
 
@@ -280,7 +281,6 @@ def annotate_genome(f):
                 # create an ampty file to prevent the other processes to work on the same genome
                 cmd = "touch " + out_annotation_file
                 os.system(cmd)
-
                 protein_recs = SeqIO.to_dict(SeqIO.parse(f,"fasta"))
                 recs = []
                 for k in protein_recs:
