@@ -1,0 +1,50 @@
+
+
+
+aas = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
+
+data_dir = "../data/"
+results_dir = "../results/"
+input_dir = results_dir + "/uniprot_pfam_single/"
+#input_dir = results_dir + "/test/"
+
+file_list = []
+for f in os.listdir(input_dir):
+    if f.endswith("_full.csv"):
+        file_list += [input_dir + f]
+            
+
+
+columns = ["query_id",  "length_translation", "top-idp", "hessa", "iupred_long", "iupred_short", "seg"]
+columns += ["freq_" + aa for aa in aas]
+columns += ["ss_alpha", "ss_beta", "ss_coil", "ss_turn"]
+columns += ["pfamA_acc"]
+
+# Add the new columns
+newcolumns = list(columns)
+newcolumns += ["tax_id","phylum","kingdom","GC"]
+
+data = []
+for f in file_list:
+    #d = parse_annotation(f)
+    print f
+    df = pd.read_csv(f,names=columns)
+    print df
+    n_proteins=len(df.query_id)
+    
+    for row in df.iterrows():
+        mtemp=row[0]
+        mnemonic=mtemp.split("_")[1]
+        tax_id=memo2taxid.get(mnemonic,pd.np.nan)
+        phylum = taxid2phylum.get(tax_id,pd.np.nan)
+        kingdom = taxid2kingdom.get(tax_id,pd.np.nan)
+        GC = taxid2gc.get(tax_id,pd.np.nan)
+        row+=[tax_id,phylum,kingdom,GC]
+    data += [row]
+
+
+print data
+df_final = pd.DataFrame(data,columns=newcolumns)
+df_final.to_csv(results_dir + "df_pfam_single_proteomes_with_pfam.csv", index = False,header = True )
+
+
