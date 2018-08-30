@@ -1,4 +1,10 @@
 
-Uniprot data is downloaded from run_unirpot.bash for each proteome
-CSV files for each protemoe is created using annotate_protein_data
-findal CSV file is created using create_final_dataset.py
+1) Uniprot data is downloaded using run_uniprot.bash for each proteome
+   (other data was downloaded earlier)
+
+2) CSV files for each proteoe is created using annotate_protein_fasta.py
+
+
+
+
+3) findal CSV file is created using create_final_dataset.py
