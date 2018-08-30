@@ -1,11 +1,18 @@
 import pandas as pd
 import os
-
+import re
 
 aas = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
 
-data_dir = "../data/"
-results_dir = "../results/"
+
+
+dir='/scratch2/arne/annotate_uniprot_proteomes/'
+
+if  (not os.path.isdir(dir)):
+    dir='/pfs/nobackup/home/w/wbasile/annotate_uniprot_proteomes/'
+
+data_dir = dir + "/data/"
+results_dir = dir + "/results/"
 input_dir = results_dir + "extended/"
 
 
@@ -85,9 +92,10 @@ for f in os.listdir(input_dir):
 
 
 def parse_annotation(filename):
-
-    tax_id = int(filename.split("_")[1].split(".")[0])
-    print tax_id
+    tempname=re.match(r'.*UP.*\_(\d+)\.fasta.*',filename)
+    #tax_id = int(filename.split("_")[1].split(".")[0])
+    tax_id = int(tempname.group(1))
+    print (filename,tax_id)
 
     df = pd.read_csv(filename)
     n_proteins = len(df.query_id)
