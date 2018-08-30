@@ -53,8 +53,12 @@ def parse_annotation(filename):
 
 aas = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
 
-data_dir = "../data/"
-results_dir = "../results/"
+dir='/scratch2/arne/annotate_uniprot_proteomes/'
+
+if  (not os.path.isdir(dir)):
+    dir='/pfs/nobackup/home/w/wbasile/annotate_uniprot_proteomes/'
+data_dir = dir + "/data/"
+results_dir = dir + "/results/"
 input_dir = results_dir + "/uniprot_pfam_single/"
 #input_dir = results_dir + "/test/"
 
@@ -138,7 +142,7 @@ print "Setting phylum index"
 taxid2kingdom = df_taxonomy.set_index("Taxon").to_dict()["Kingdom"]
 
 
-datasets = ["full",  "domains_shared", "linkers"]
+datasets = ["full",  "domains_shared","domains_other", "linkers"]
 columns = ["query_id",  "length_translation", "top-idp", "hessa", "iupred_long", "iupred_short", "seg"]
 columns += ["freq_" + aa for aa in aas]
 columns += ["ss_alpha", "ss_beta", "ss_coil", "ss_turn"]

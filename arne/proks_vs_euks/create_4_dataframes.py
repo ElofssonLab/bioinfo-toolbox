@@ -31,12 +31,6 @@ def join_ranges(data, offset=0):
             
 
 
-# Top-IDP scale
-top_idp = {'A':0.06, 'C' :  0.02, 'D' : 0.192, 'E' : 0.736,
-    'F' :  -0.697, 'G' : 0.166, 'H':0.303, 'I' :  -0.486,
-    'K' : 0.586, 'L' :  -0.326, 'M': -0.397, 'N' : 0.007,
-    'P' : 0.987, 'Q' : 0.318, 'R' : 0.180, 'S':  0.341,
-    'T' : 0.059, 'V' :  -0.121, 'W':  -0.884, 'Y' : -0.510}
 
 def get_topidp(seq):
     
@@ -54,30 +48,6 @@ def get_topidp(seq):
     return top_idp_avg
 
 
-# Hessa scale
-hessa = {
-'C':-0.13,
-'D':3.49,
-'S':0.84,
-'Q':2.36,
-'K':2.71,
-'W':0.3,
-'P':2.23,
-'T':0.52,
-'I':-0.6,
-'A':0.11,
-'F':-0.32,
-'G':0.74,
-'H':2.06,
-'L':-0.55,
-'R':2.58,
-'M':-0.1,
-'E':2.68,
-'N':2.05,
-'Y':0.68,
-'V':-0.31
-}
-
 def get_hessa(seq):
     if len(seq) == 0:
         return np.nan
@@ -90,30 +60,6 @@ def get_hessa(seq):
     hessa_avg = str(float(hessa_avg) / float(len(seq)))
     
     return hessa_avg
-
-
-
-dic_aa = {'A': 'ALA', 'C': 'CYS', 'E': 'GLU', 'D': 'ASP', 'G': 'GLY', 'F': 'PHE', 'I': 'ILE', 'H': 'HIS', 'K': 'LYS',
-              'M': 'MET', 'L': 'LEU', 'N': 'ASN', 'Q': 'GLN', 'P': 'PRO', 'S': 'SER', 'R': 'ARG', 'T': 'THR', 'W': 'TRP', 
-              'V': 'VAL', 'Y': 'TYR'}
-
-
-
-
-df_scales = pd.read_csv("../data/scales_and_slopes.tsv",sep="\t")
-df_scales.AA = df_scales.AA.apply(string.upper)
-
-dic_aa_inv = {}
-for a in dic_aa:
-    dic_aa_inv[dic_aa[a]] = a
-    
-df_scales.AA = df_scales.AA.map(dic_aa_inv)
-
-dic_ss_alpha = df_scales.set_index("AA").to_dict()["Alpha"]
-dic_ss_beta = df_scales.set_index("AA").to_dict()["Beta"]
-dic_ss_coil = df_scales.set_index("AA").to_dict()["Coil"]
-dic_ss_turn = df_scales.set_index("AA").to_dict()["Turn"]
-
 
 def get_ss_scale(seq,dic_scale):
     
@@ -222,29 +168,6 @@ def parse_fasta_x(input_file,c_dic):
 
     return ret_dic
 
-
-aas = ['A',
- 'C',
- 'D',
- 'E',
- 'F',
- 'G',
- 'H',
- 'I',
- 'K',
- 'L',
- 'M',
- 'N',
- 'P',
- 'Q',
- 'R',
- 'S',
- 'T',
- 'V',
- 'W',
- 'Y']
-
-
 def aa_freq(seq,aa):
     if len(seq) == 0:
         return np.nan
@@ -343,17 +266,101 @@ def get_regions_coords(recs,ids):
     
 
 
+
 ############################################################################
 ##    MAIN
 ############################################################################
 
-data_dir = "../data/"
-input_dir = "../results/uniprot_sequences_groups/"
-annotations_dir = "../results/uniprot_pfam_annotations/"
+dir='/scratch2/arne/proks_euks/'
+
+if  (not os.path.isdir(dir)):
+    dir='/pfs/nobackup/home/w/wbasile/proks_euks/'
+        
+data_dir = dir + "/data/"
+input_dir = dir + "/results/uniprot_sequences_groups/"
+annotations_dir = dir + "/results/uniprot_pfam_annotations/"
+
+# MAIN
+
+# Top-IDP scale
+top_idp = {'A':0.06, 'C' :  0.02, 'D' : 0.192, 'E' : 0.736,
+    'F' :  -0.697, 'G' : 0.166, 'H':0.303, 'I' :  -0.486,
+    'K' : 0.586, 'L' :  -0.326, 'M': -0.397, 'N' : 0.007,
+    'P' : 0.987, 'Q' : 0.318, 'R' : 0.180, 'S':  0.341,
+    'T' : 0.059, 'V' :  -0.121, 'W':  -0.884, 'Y' : -0.510}
+
+# Hessa scale
+hessa = {
+'C':-0.13,
+'D':3.49,
+'S':0.84,
+'Q':2.36,
+'K':2.71,
+'W':0.3,
+'P':2.23,
+'T':0.52,
+'I':-0.6,
+'A':0.11,
+'F':-0.32,
+'G':0.74,
+'H':2.06,
+'L':-0.55,
+'R':2.58,
+'M':-0.1,
+'E':2.68,
+'N':2.05,
+'Y':0.68,
+'V':-0.31
+}
+
+dic_aa = {'A': 'ALA', 'C': 'CYS', 'E': 'GLU', 'D': 'ASP', 'G': 'GLY', 'F': 'PHE', 'I': 'ILE', 'H': 'HIS', 'K': 'LYS',
+              'M': 'MET', 'L': 'LEU', 'N': 'ASN', 'Q': 'GLN', 'P': 'PRO', 'S': 'SER', 'R': 'ARG', 'T': 'THR', 'W': 'TRP', 
+              'V': 'VAL', 'Y': 'TYR'}
 
 
-#~ input_dir = "../data/untitled_folder/"
-#~ annotations_dir = "../data/test_res/"
+
+
+df_scales = pd.read_csv(dir + "/data/scales_and_slopes.tsv",sep="\t")
+df_scales.AA = df_scales.AA.apply(string.upper)
+
+dic_aa_inv = {}
+for a in dic_aa:
+    dic_aa_inv[dic_aa[a]] = a
+    
+df_scales.AA = df_scales.AA.map(dic_aa_inv)
+
+dic_ss_alpha = df_scales.set_index("AA").to_dict()["Alpha"]
+dic_ss_beta = df_scales.set_index("AA").to_dict()["Beta"]
+dic_ss_coil = df_scales.set_index("AA").to_dict()["Coil"]
+dic_ss_turn = df_scales.set_index("AA").to_dict()["Turn"]
+
+
+
+aas = ['A',
+ 'C',
+ 'D',
+ 'E',
+ 'F',
+ 'G',
+ 'H',
+ 'I',
+ 'K',
+ 'L',
+ 'M',
+ 'N',
+ 'P',
+ 'Q',
+ 'R',
+ 'S',
+ 'T',
+ 'V',
+ 'W',
+ 'Y']
+
+
+
+#~ input_dir = dir + "/data/untitled_folder/"
+#~ annotations_dir = dir + "/data/test_res/"
 
 all_sets = ["full", "domains_shared", "domains_other", "linkers"]
 
@@ -370,7 +377,7 @@ shared_domains_pfam_ids = set(filter(None, open(out_domain_ids_filename).read().
 pfam_regions_selected_filename = data_dir + "/pfam/Pfam-A.regions.uniprot.selected_proteins.selected_fields.feather"
 print "loading coords file " + pfam_regions_selected_filename  + " ...",
 df_regions = pd.read_feather(pfam_regions_selected_filename)#[['uniprot_acc', u'pfamA_acc', u'seq_start', u'seq_end']]
-#df_regions = pd.read_csv("../data/pfam/PfamA.regions.uniprot.test.tsv", sep="\t")#[['uniprot_acc', u'pfamA_acc', u'seq_start', u'seq_end']]
+#df_regions = pd.read_csv(dir + "/data/pfam/PfamA.regions.uniprot.test.tsv", sep="\t")#[['uniprot_acc', u'pfamA_acc', u'seq_start', u'seq_end']]
 
 print "done"
 
