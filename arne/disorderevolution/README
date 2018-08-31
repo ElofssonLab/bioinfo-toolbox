@@ -3,8 +3,8 @@
    (other data was downloaded earlier)
 
 2) CSV files for each proteoe is created using annotate_protein_fasta.py
+   This crashes when files are missing  - had to rerun  (two files do crash on SEG, i.e are not annotated - deleted)
 
 
-
-
-3) findal CSV file is created using create_final_dataset.py
+3) final CSV file is created using bin/create_final_dataset.py
+  /But this needs to be modifies so that it makes one for all, one for unique Pfam etc...

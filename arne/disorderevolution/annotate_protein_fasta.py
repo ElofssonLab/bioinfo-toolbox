@@ -156,14 +156,19 @@ def parse_iupred(data_file):
     
     
 def do_seg(input_file):
-    segexec=dir+"/bin/seg  "
-    output = subprocess.check_output(segexec + input_file + " -x", shell=True,stderr=subprocess.PIPE)
     
-    # parse the output
+    segexec=dir+"/bin/seg  "
     seg_dic = {}
     gene_id = ""
     seq = ""
     x_count = 0
+    try:
+        output = subprocess.check_output(segexec + input_file + " -x", shell=True,stderr=subprocess.PIPE)
+    except:
+        with open(input_file, "rU") as handle:
+            for record in SeqIO.parse(handle, "fasta"):
+                seg_dic[record.id]=0
+                # parse the output
     for line in output.split("\n"):
         if len(line) > 0:
             if line[0] == ">":
@@ -228,10 +233,10 @@ def parse_uniprot(input_file):
     dic_dom = {}
     dic_king = {}
     # probably faster/easier to use the XML parser directly
-    print (input_file)
+    #print (input_file)
     handle = open(input_file)
     for record in SwissProt.parse(handle):
-        print (record)
+        #print (record)
         #print (record.entry_name)
         #print (record.cross_references)
         entry =record.entry_name
