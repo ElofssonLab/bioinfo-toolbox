@@ -228,9 +228,10 @@ def parse_uniprot(input_file):
     dic_dom = {}
     dic_king = {}
     # probably faster/easier to use the XML parser directly
+    print (input_file)
     handle = open(input_file)
     for record in SwissProt.parse(handle):
-        #print (record)
+        print (record)
         #print (record.entry_name)
         #print (record.cross_references)
         entry =record.entry_name
@@ -270,7 +271,7 @@ def annotate_genome(f):
             proceed = False
 
         if proceed == True:
-            print ("Trying:",f)
+            #print ("Trying:",f)
 
             f_name = f.split("/")[-1]
 
@@ -314,22 +315,23 @@ def annotate_genome(f):
                 # disorder
 
                 # add iupred
-                #print "iupred long"
+                print "iupred long"
                 dic_iupred_long = parse_fasta_x(iupred_long_data_file)
                 df['iupred_long'] = df['query_id'].map(dic_iupred_long)
                 
-                #print "iupred short"
+                print "iupred short"
                 dic_iupred_short = parse_fasta_x(iupred_short_data_file)
                 df['iupred_short'] = df['query_id'].map(dic_iupred_short)
 
 
                 # SEG
-                #print str(f),"Computing SEG"
+                print str(f),"Computing SEG"
                 seg_dic = do_seg(f)
                 df["seg"] = df["query_id"].map(seg_dic)
 
 
                 # Parsing uniprot - today only Pfam
+                print "Parse uniprot"
                 (dic_pfam,dic_numdoms,dic_kingdom) = parse_uniprot(uniprot_data_file)
                 df["Pfam"] = df['query_id'].map(dic_pfam)
                 df["NumDoms"] = df['query_id'].map(dic_numdoms)
