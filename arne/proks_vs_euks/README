@@ -1,0 +1,7 @@
+Trying to understand the pipeline..
+
+Scripts
+
+create_4_dataframes.py  This makes one anotations
+
+format_pfam_datasets.py  creates the feather fikle (adding taxon id etc..)
