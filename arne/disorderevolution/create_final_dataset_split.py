@@ -98,7 +98,7 @@ def parse_annotation(filename,ty):
     print (filename,tax_id)
 
     fulldf = pd.read_csv(filename)
-    df = fulldf.loc[(df.PfamType == ty) ]
+    df = fulldf.loc[(fulldf.PfamType == ty) ]
     n_proteins = len(df.query_id)
     
     df_mean = df.mean()
