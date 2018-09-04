@@ -6,5 +6,15 @@
    This crashes when files are missing  - had to rerun  (two files do crash on SEG, i.e are not annotated - deleted)
 
 
-3) final CSV file is created using bin/create_final_dataset.py
+3) final CSV file is created using bin/create_final_dataset_split.py
   /But this needs to be modifies so that it makes one for all, one for unique Pfam etc...
+Also need to skip files as it had no Pfam annotation (and this made the script carash.
+
+/scratch2/arne/annotate_uniprot_proteomes//results/extended/UP000031042_1579372.fasta_annotation.csv
+/scratch2/arne/annotate_uniprot_proteomes//results/extended/UP000078516_417368.fasta_annotation.csv
+/scratch2/arne/annotate_uniprot_proteomes//results/extended/UP000095530_61015.fasta_annotation.csv
+/scratch2/arne/annotate_uniprot_proteomes//results/extended/UP000011001_1249634.fasta_annotation.csv
+/scratch2/arne/annotate_uniprot_proteomes//results/extended/UP000065495_1003335.fasta_annotation.csv
+/scratch2/arne/annotate_uniprot_proteomes//results/extended/UP000181958_1805279.fasta_annotation.csv
+/scratch2/arne/annotate_uniprot_proteomes//results/extended/UP000182226_1805278.fasta_annotation.csv
+/scratch2/arne/annotate_uniprot_proteomes//results/extended/UP000177391_1797334.fasta_annotation.csv

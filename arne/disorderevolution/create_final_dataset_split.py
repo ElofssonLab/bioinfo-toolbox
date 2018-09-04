@@ -95,10 +95,14 @@ def parse_annotation(filename,ty):
     tempname=re.match(r'.*UP.*\_(\d+)\.fasta.*',filename)
     #tax_id = int(filename.split("_")[1].split(".")[0])
     tax_id = int(tempname.group(1))
-    print (filename,tax_id)
+    #print (filename,tax_id,ty)
 
     fulldf = pd.read_csv(filename)
-    df = fulldf.loc[(fulldf.PfamType == ty) ]
+    tempdf=fulldf[fulldf['PfamType'].notnull()]
+    df = tempdf.loc[(tempdf.PfamType == ty) ]
+    if (len(df)==0):
+        ret_dic = {}    
+        return ret_dic
     n_proteins = len(df.query_id)
     
     df_mean = df.mean()
