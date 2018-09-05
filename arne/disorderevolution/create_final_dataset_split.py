@@ -127,6 +127,7 @@ def parse_annotation(filename,ty):
     ret_dic["count_protein"] = n_proteins
 
     for c in columns:
+        ret_dic[c] = df[c]
         ret_dic[c+"-avg"] = df_mean[c]
     
     #gcs = df_reference.loc[df_reference["TaxID"] == tax_id]["GC%"].astype(float)
@@ -140,8 +141,7 @@ for ty in ["Shared","None","Unique"]:
     for f in file_list:
         d = parse_annotation(f,ty)
         data += [d]
-
+        
     df_final = pd.DataFrame(data)
     df_final.to_csv(results_dir + "df_uniprot_reference_proteomes_per_species-"+ty+".csv", index = False)
-
 

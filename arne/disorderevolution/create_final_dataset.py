@@ -117,6 +117,7 @@ def parse_annotation(filename):
     ret_dic["count_protein"] = n_proteins
 
     for c in columns:
+        ret_dic[c] = df[c]
         ret_dic[c+"-avg"] = df_mean[c]
     
     #gcs = df_reference.loc[df_reference["TaxID"] == tax_id]["GC%"].astype(float)
