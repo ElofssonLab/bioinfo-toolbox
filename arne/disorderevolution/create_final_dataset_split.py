@@ -16,6 +16,7 @@ results_dir = dir + "/results/"
 input_dir = results_dir + "extended/"
 
 
+
 # create and read the reference table file (to extract GC% and other metrics for each species)
 df_reference_file = data_dir  + "df_reference.csv"
 
@@ -24,7 +25,8 @@ if not os.path.exists(df_reference_file):
     ncbi_euks_file = data_dir + "eukaryotes.txt"
     ncbi_proks_file = data_dir + "prokaryotes.txt"
     ncbi_virs_file = data_dir + "viruses.txt"
-   
+    genomes_overview_file = data_dir + "overview.txt"
+
     if not os.path.exists(ncbi_euks_file):
         ncbi_url = "ftp://ftp.ncbi.nlm.nih.gov/genomes/GENOME_REPORTS/eukaryotes.txt"
         cmd = "wget '" + ncbi_url + "' -O " + ncbi_euks_file
@@ -45,8 +47,7 @@ if not os.path.exists(df_reference_file):
     df_virs = pd.read_csv(ncbi_virs_file, sep = "\t")
     df_reference = pd.concat([df_euks, df_proks, df_virs])
 
-    df_reference.to_csv(df_reference_file, index = False)
-
+    
 else:
     df_reference = pd.read_csv(df_reference_file)
 
@@ -80,6 +81,9 @@ def get_phylum(s):
 
 df_taxonomy["Phylum"] = df_taxonomy.Lineage.apply(get_phylum)
 taxid2phylum = df_taxonomy.set_index("Taxon").to_dict()["Phylum"]
+taxid2name = df_reference[["#Organism/Name","TaxID"]].set_index("TaxID").to_dict()['#Organism/Name']
+name2taxid = df_reference[["#Organism/Name","TaxID"]].set_index("#Organism/Name").to_dict()['TaxID']
+
 
 
 
@@ -95,10 +99,13 @@ def parse_annotation(filename,ty):
     tempname=re.match(r'.*UP.*\_(\d+)\.fasta.*',filename)
     #tax_id = int(filename.split("_")[1].split(".")[0])
     tax_id = int(tempname.group(1))
-    #print (filename,tax_id,ty)
+    print (filename,tax_id,ty)
 
     fulldf = pd.read_csv(filename)
     tempdf=fulldf[fulldf['PfamType'].notnull()]
+    if (len(tempdf)==0):
+        ret_dic = {}    
+        return ret_dic
     df = tempdf.loc[(tempdf.PfamType == ty) ]
     if (len(df)==0):
         ret_dic = {}    
@@ -112,13 +119,15 @@ def parse_annotation(filename,ty):
 
     ret_dic = {}    
     ret_dic["taxon_id"] = tax_id
+    ret_dic["name"] = taxid2name.get(tax_id,pd.np.nan)
     ret_dic["phylum"] = taxid2phylum.get(tax_id,pd.np.nan)
     ret_dic["kingdom"] = taxid2kingdom.get(tax_id,pd.np.nan)
     ret_dic["GC"] = taxid2gc.get(tax_id,pd.np.nan)
+    ret_dic["GC_genomic"] = taxid2gc.get(tax_id,pd.np.nan)
     ret_dic["count_protein"] = n_proteins
 
     for c in columns:
-        ret_dic[c] = df_mean[c]
+        ret_dic[c+"-avg"] = df_mean[c]
     
     #gcs = df_reference.loc[df_reference["TaxID"] == tax_id]["GC%"].astype(float)
     #ret_dic["GC"] = pd.np.mean(list(gcs))

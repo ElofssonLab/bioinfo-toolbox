@@ -80,6 +80,8 @@ def get_phylum(s):
 
 df_taxonomy["Phylum"] = df_taxonomy.Lineage.apply(get_phylum)
 taxid2phylum = df_taxonomy.set_index("Taxon").to_dict()["Phylum"]
+taxid2name = df_reference[["#Organism/Name","TaxID"]].set_index("TaxID").to_dict()['#Organism/Name']
+name2taxid = df_reference[["#Organism/Name","TaxID"]].set_index("#Organism/Name").to_dict()['TaxID']
 
 
 
@@ -107,13 +109,15 @@ def parse_annotation(filename):
 
     ret_dic = {}    
     ret_dic["taxon_id"] = tax_id
+    ret_dic["name"] = taxid2name.get(tax_id,pd.np.nan)
     ret_dic["phylum"] = taxid2phylum.get(tax_id,pd.np.nan)
     ret_dic["kingdom"] = taxid2kingdom.get(tax_id,pd.np.nan)
     ret_dic["GC"] = taxid2gc.get(tax_id,pd.np.nan)
+    ret_dic["GC_genomic"] = taxid2gc.get(tax_id,pd.np.nan)
     ret_dic["count_protein"] = n_proteins
 
     for c in columns:
-        ret_dic[c] = df_mean[c]
+        ret_dic[c+"-avg"] = df_mean[c]
     
     #gcs = df_reference.loc[df_reference["TaxID"] == tax_id]["GC%"].astype(float)
     #ret_dic["GC"] = pd.np.mean(list(gcs))
@@ -127,6 +131,6 @@ for f in file_list:
     data += [d]
 
 df_final = pd.DataFrame(data)
-df_final.to_csv(results_dir + "df_uniprot_reference_proteomes_per_species.csv", index = False)
+df_final.to_csv(results_dir + "df_uniprot_reference_proteomes_per_species-All.csv", index = False)
 
 
