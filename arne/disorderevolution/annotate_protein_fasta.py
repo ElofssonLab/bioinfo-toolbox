@@ -88,9 +88,11 @@ def get_hessa(seq):
 
 
 
-dic_aa = {'A': 'ALA', 'C': 'CYS', 'E': 'GLU', 'D': 'ASP', 'G': 'GLY', 'F': 'PHE', 'I': 'ILE', 'H': 'HIS', 'K': 'LYS',
-              'M': 'MET', 'L': 'LEU', 'N': 'ASN', 'Q': 'GLN', 'P': 'PRO', 'S': 'SER', 'R': 'ARG', 'T': 'THR', 'W': 'TRP', 
-              'V': 'VAL', 'Y': 'TYR'}
+dic_aa = {'A': 'ALA', 'C': 'CYS', 'E': 'GLU', 'D': 'ASP', 'G': 'GLY',
+          'F': 'PHE', 'I': 'ILE', 'H': 'HIS', 'K': 'LYS', 'M':
+          'MET', 'L': 'LEU', 'N': 'ASN', 'Q': 'GLN', 'P': 'PRO',
+          'S': 'SER', 'R': 'ARG', 'T': 'THR', 'W': 'TRP', 'V':
+          'VAL', 'Y': 'TYR'}
 
 
 import string
@@ -156,18 +158,20 @@ def parse_iupred(data_file):
     
     
 def do_seg(input_file):
-    
     segexec=dir+"/bin/seg  "
     seg_dic = {}
     gene_id = ""
     seq = ""
     x_count = 0
+    #print(segexec + input_file + " -x")
     try:
         output = subprocess.check_output(segexec + input_file + " -x", shell=True,stderr=subprocess.PIPE)
+        #print (output)
     except:
         with open(input_file, "rU") as handle:
             for record in SeqIO.parse(handle, "fasta"):
-                seg_dic[record.id]=0
+                ID=re.sub(r'.*\|','',record.id)
+                seg_dic[ID]=0
                 # parse the output
     for line in output.split("\n"):
         if len(line) > 0:
@@ -178,9 +182,9 @@ def do_seg(input_file):
                 seq += line
         else:
             if seq:
-                seg_dic[gene_id] = float(seq.count("x"))/float(len(seq))
+                ID=re.sub(r'.*\|','',gene_id)
+                seg_dic[ID] = float(seq.count("x"))/float(len(seq)+1.e-20)
                 seq = ""
-
     return seg_dic
 
 
@@ -223,8 +227,9 @@ def parse_fasta_x(input_file):
     recz = SeqIO.parse(input_file, "fasta")
     for r in recz:
         result = float(r.seq.count("x")) / float(len(r))
-        re.sub(r'.*\|','',r.id)
+        id=re.sub(r'.*\|','',r.id)
         ret_dic[id] = result
+        #print (r,result)
     return ret_dic
 
 
@@ -259,7 +264,6 @@ def parse_uniprot(input_file):
 def annotate_genome(f):
 
     if not os.path.exists("./stop"):
-
         # check the existence of these three data files (produced separately)
         iupred_long_data_file = f +  ".data_iupred_long"
         iupred_short_data_file = f +  ".data_iupred_short"
@@ -323,6 +327,7 @@ def annotate_genome(f):
                 print "iupred long"
                 dic_iupred_long = parse_fasta_x(iupred_long_data_file)
                 df['iupred_long'] = df['query_id'].map(dic_iupred_long)
+                #print (dic_iupred_long,df['iupred_long'],df['query_id'])
                 
                 print "iupred short"
                 dic_iupred_short = parse_fasta_x(iupred_short_data_file)
@@ -336,7 +341,7 @@ def annotate_genome(f):
 
 
                 # Parsing uniprot - today only Pfam
-                print "Parse uniprot"
+                #print "Parse uniprot"
                 (dic_pfam,dic_numdoms,dic_kingdom) = parse_uniprot(uniprot_data_file)
                 df["Pfam"] = df['query_id'].map(dic_pfam)
                 df["NumDoms"] = df['query_id'].map(dic_numdoms)
@@ -354,6 +359,8 @@ shared_domains_pfam_ids = set(filter(None, open(out_domain_ids_filename).read().
 shared_domains={}
 for key in shared_domains_pfam_ids:
     shared_domains[key]=1
+
+
 file_list = []
 for f in os.listdir(input_dir):
     if f.endswith(".fasta"):

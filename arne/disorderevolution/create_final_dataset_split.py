@@ -2,6 +2,67 @@ import pandas as pd
 import os
 import re
 
+
+def parse_annotation(filename,ty):
+    tempname=re.match(r'.*UP.*\_(\d+)\.fasta.*',filename)
+    #tax_id = int(filename.split("_")[1].split(".")[0])
+    tax_id = int(tempname.group(1))
+    print (filename,tax_id,ty)
+
+    fulldf = pd.read_csv(filename)
+    tempdf=fulldf[fulldf['PfamType'].notnull()]
+    if (len(tempdf)==0):
+        ret_dic = {}    
+        return ret_dic
+    df = tempdf.loc[(tempdf.PfamType == ty) ]
+    if (len(df)==0):
+        ret_dic = {}    
+        return ret_dic
+    n_proteins = len(df.query_id)
+    
+    df_sum = df.sum()
+    df_mean = df.mean()
+    
+    columns = ["length", "top-idp", "iupred_long", "iupred_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa"]
+    columns += ["freq_" + aa for aa in aas]
+
+    ret_dic = {}    
+    ret_dic["taxon_id"] = tax_id
+    ret_dic["name"] = taxid2name.get(tax_id,pd.np.nan)
+    ret_dic["phylum"] = taxid2phylum.get(tax_id,pd.np.nan)
+    ret_dic["kingdom"] = taxid2kingdom.get(tax_id,pd.np.nan)
+    ret_dic["GC"] = taxid2gc.get(tax_id,pd.np.nan)
+    ret_dic["GC_genomic"] = taxid2gc.get(tax_id,pd.np.nan)
+    ret_dic["count_protein"] = n_proteins
+    sum_dic = {}    
+    sum_dic["taxon_id"] = tax_id
+    sum_dic["name"] = taxid2name.get(tax_id,pd.np.nan)
+    sum_dic["phylum"] = taxid2phylum.get(tax_id,pd.np.nan)
+    sum_dic["kingdom"] = taxid2kingdom.get(tax_id,pd.np.nan)
+    sum_dic["GC"] = taxid2gc.get(tax_id,pd.np.nan)
+    sum_dic["GC_genomic"] = taxid2gc.get(tax_id,pd.np.nan)
+    sum_dic["count_protein"] = n_proteins
+
+    for c in columns:
+        #df.loc[:,c+"-sum"] = df.loc[:,c]*df.loc[:,"length"]*n_proteins
+        df[c+"-sum"] = df[c]*df["length"]*n_proteins
+        sum_dic[c] = df[c+"-sum"].sum()
+        ret_dic[c] = df_mean[c]
+    
+    #gcs = df_reference.loc[df_reference["TaxID"] == tax_id]["GC%"].astype(float)
+    #ret_dic["GC"] = pd.np.mean(list(gcs))
+
+    return ret_dic,sum_dic
+
+
+def get_phylum(s):
+    try:
+        return s.split(";")[1]
+    except:
+        return None    
+
+
+
 aas = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
 
 
@@ -73,11 +134,6 @@ for t in taxid2group:
 
 df_taxonomy = pd.read_csv(data_dir + "taxonomy.tab", sep="\t")
 
-def get_phylum(s):
-    try:
-        return s.split(";")[1]
-    except:
-        return None    
 
 df_taxonomy["Phylum"] = df_taxonomy.Lineage.apply(get_phylum)
 taxid2phylum = df_taxonomy.set_index("Taxon").to_dict()["Phylum"]
@@ -93,55 +149,19 @@ for f in os.listdir(input_dir):
     if f.endswith("_annotation.csv"):
         file_list += [input_dir + f]
             
+file_list = [input_dir+"UP000077428_66851.fasta_annotation.csv"]
 
-
-def parse_annotation(filename,ty):
-    tempname=re.match(r'.*UP.*\_(\d+)\.fasta.*',filename)
-    #tax_id = int(filename.split("_")[1].split(".")[0])
-    tax_id = int(tempname.group(1))
-    print (filename,tax_id,ty)
-
-    fulldf = pd.read_csv(filename)
-    tempdf=fulldf[fulldf['PfamType'].notnull()]
-    if (len(tempdf)==0):
-        ret_dic = {}    
-        return ret_dic
-    df = tempdf.loc[(tempdf.PfamType == ty) ]
-    if (len(df)==0):
-        ret_dic = {}    
-        return ret_dic
-    n_proteins = len(df.query_id)
-    
-    df_mean = df.mean()
-    
-    columns = ["length", "top-idp", "iupred_long", "iupred_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa"]
-    columns += ["freq_" + aa for aa in aas]
-
-    ret_dic = {}    
-    ret_dic["taxon_id"] = tax_id
-    ret_dic["name"] = taxid2name.get(tax_id,pd.np.nan)
-    ret_dic["phylum"] = taxid2phylum.get(tax_id,pd.np.nan)
-    ret_dic["kingdom"] = taxid2kingdom.get(tax_id,pd.np.nan)
-    ret_dic["GC"] = taxid2gc.get(tax_id,pd.np.nan)
-    ret_dic["GC_genomic"] = taxid2gc.get(tax_id,pd.np.nan)
-    ret_dic["count_protein"] = n_proteins
-
-    for c in columns:
-        ret_dic[c] = df[c]
-        ret_dic[c+"-avg"] = df_mean[c]
-    
-    #gcs = df_reference.loc[df_reference["TaxID"] == tax_id]["GC%"].astype(float)
-    #ret_dic["GC"] = pd.np.mean(list(gcs))
-
-    return ret_dic
 
 
 for ty in ["Shared","None","Unique"]:
     data = []
+    summ = []
     for f in file_list:
-        d = parse_annotation(f,ty)
+        d,s = parse_annotation(f,ty)
         data += [d]
-        
+        summ += [s]
     df_final = pd.DataFrame(data)
     df_final.to_csv(results_dir + "df_uniprot_reference_proteomes_per_species-"+ty+".csv", index = False)
+    df_sum = pd.DataFrame(summ)
+    df_final.to_csv(results_dir + "df_uniprot_reference_proteomes_per_species-sum-"+ty+".csv", index = False)
 
