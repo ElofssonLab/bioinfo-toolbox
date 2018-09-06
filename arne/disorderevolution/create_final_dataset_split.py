@@ -48,7 +48,10 @@ def parse_annotation(filename,ty):
 
     for c in columns:
         #df.loc[:,c+"-sum"] = df.loc[:,c]*df.loc[:,"length"]*n_proteins
-        df[c+"-sum"] = df[c]*df["length"]*n_proteins
+        if [c=="length"]:
+            df[c+"-sum"] = df[c]*n_proteins
+        else:
+            df[c+"-sum"] = df[c]*df["length"]*n_proteins
         sum_dic[c] = df[c+"-sum"].sum()
         ret_dic[c] = df_mean[c]
     
@@ -152,7 +155,7 @@ for f in os.listdir(input_dir):
     if f.endswith("_annotation.csv"):
         file_list += [input_dir + f]
             
-file_list = [input_dir+"UP000077428_66851.fasta_annotation.csv"]
+#file_list = [input_dir+"UP000077428_66851.fasta_annotation.csv"]
 
 
 
@@ -166,5 +169,5 @@ for ty in ["All","Shared","None","Unique"]:
     df_final = pd.DataFrame(data)
     df_final.to_csv(results_dir + "df_uniprot_reference_proteomes_per_species-"+ty+".csv", index = False)
     df_sum = pd.DataFrame(summ)
-    df_final.to_csv(results_dir + "df_uniprot_reference_proteomes_per_species-sum-"+ty+".csv", index = False)
+    df_sum.to_csv(results_dir + "df_uniprot_reference_proteomes_per_species-sum-"+ty+".csv", index = False)
 
