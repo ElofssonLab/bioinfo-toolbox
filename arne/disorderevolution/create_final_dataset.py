@@ -4,6 +4,43 @@ import re
 
 aas = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
 
+def get_phylum(s):
+    try:
+        return s.split(";")[1]
+    except:
+        return None    
+
+def parse_annotation(filename):
+    tempname=re.match(r'.*UP.*\_(\d+)\.fasta.*',filename)
+    #tax_id = int(filename.split("_")[1].split(".")[0])
+    tax_id = int(tempname.group(1))
+    print (filename,tax_id)
+
+    df = pd.read_csv(filename)
+    n_proteins = len(df.query_id)
+
+    df_mean = df.mean()
+    
+    columns = ["length", "top-idp", "iupred_long", "iupred_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa"]
+    columns += ["freq_" + aa for aa in aas]
+
+    ret_dic = {}    
+    ret_dic["taxon_id"] = tax_id
+    ret_dic["name"] = taxid2name.get(tax_id,pd.np.nan)
+    ret_dic["phylum"] = taxid2phylum.get(tax_id,pd.np.nan)
+    ret_dic["kingdom"] = taxid2kingdom.get(tax_id,pd.np.nan)
+    ret_dic["GC"] = taxid2gc.get(tax_id,pd.np.nan)
+    ret_dic["GC_genomic"] = taxid2gc.get(tax_id,pd.np.nan)
+    ret_dic["count_protein"] = n_proteins
+
+    for c in columns:
+        ret_dic[c] = df[c]
+        ret_dic[c+"-avg"] = df_mean[c]
+    
+    #gcs = df_reference.loc[df_reference["TaxID"] == tax_id]["GC%"].astype(float)
+    #ret_dic["GC"] = pd.np.mean(list(gcs))
+
+    return ret_dic
 
 
 dir='/scratch2/arne/annotate_uniprot_proteomes/'
@@ -72,11 +109,6 @@ for t in taxid2group:
 
 df_taxonomy = pd.read_csv(data_dir + "taxonomy.tab", sep="\t")
 
-def get_phylum(s):
-    try:
-        return s.split(";")[1]
-    except:
-        return None    
 
 df_taxonomy["Phylum"] = df_taxonomy.Lineage.apply(get_phylum)
 taxid2phylum = df_taxonomy.set_index("Taxon").to_dict()["Phylum"]
@@ -93,37 +125,6 @@ for f in os.listdir(input_dir):
             
 
 
-def parse_annotation(filename):
-    tempname=re.match(r'.*UP.*\_(\d+)\.fasta.*',filename)
-    #tax_id = int(filename.split("_")[1].split(".")[0])
-    tax_id = int(tempname.group(1))
-    print (filename,tax_id)
-
-    df = pd.read_csv(filename)
-    n_proteins = len(df.query_id)
-
-    df_mean = df.mean()
-    
-    columns = ["length", "top-idp", "iupred_long", "iupred_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa"]
-    columns += ["freq_" + aa for aa in aas]
-
-    ret_dic = {}    
-    ret_dic["taxon_id"] = tax_id
-    ret_dic["name"] = taxid2name.get(tax_id,pd.np.nan)
-    ret_dic["phylum"] = taxid2phylum.get(tax_id,pd.np.nan)
-    ret_dic["kingdom"] = taxid2kingdom.get(tax_id,pd.np.nan)
-    ret_dic["GC"] = taxid2gc.get(tax_id,pd.np.nan)
-    ret_dic["GC_genomic"] = taxid2gc.get(tax_id,pd.np.nan)
-    ret_dic["count_protein"] = n_proteins
-
-    for c in columns:
-        ret_dic[c] = df[c]
-        ret_dic[c+"-avg"] = df_mean[c]
-    
-    #gcs = df_reference.loc[df_reference["TaxID"] == tax_id]["GC%"].astype(float)
-    #ret_dic["GC"] = pd.np.mean(list(gcs))
-
-    return ret_dic
 
 
 data = []

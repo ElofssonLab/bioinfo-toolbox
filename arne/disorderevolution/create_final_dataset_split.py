@@ -14,7 +14,10 @@ def parse_annotation(filename,ty):
     if (len(tempdf)==0):
         ret_dic = {}    
         return ret_dic
-    df = tempdf.loc[(tempdf.PfamType == ty) ]
+    if (ty == "All"):
+        df = tempdf.copy()
+    else:
+        df = tempdf.loc[(tempdf.PfamType == ty) ]
     if (len(df)==0):
         ret_dic = {}    
         return ret_dic
@@ -153,7 +156,7 @@ file_list = [input_dir+"UP000077428_66851.fasta_annotation.csv"]
 
 
 
-for ty in ["Shared","None","Unique"]:
+for ty in ["All","Shared","None","Unique"]:
     data = []
     summ = []
     for f in file_list:
