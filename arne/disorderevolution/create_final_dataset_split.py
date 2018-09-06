@@ -13,14 +13,16 @@ def parse_annotation(filename,ty):
     tempdf=fulldf[fulldf['PfamType'].notnull()]
     if (len(tempdf)==0):
         ret_dic = {}    
-        return ret_dic
+        sum_dic = {}    
+        return ret_dic,sum_dic
     if (ty == "All"):
         df = tempdf.copy()
     else:
         df = tempdf.loc[(tempdf.PfamType == ty) ]
     if (len(df)==0):
         ret_dic = {}    
-        return ret_dic
+        sum_dic = {}    
+        return ret_dic,sum_dic
     n_proteins = len(df.query_id)
     
     df_sum = df.sum()
@@ -48,11 +50,14 @@ def parse_annotation(filename,ty):
 
     for c in columns:
         #df.loc[:,c+"-sum"] = df.loc[:,c]*df.loc[:,"length"]*n_proteins
+
         if [c=="length"]:
+            df[c+"-sum"] = df[c]
+        elif [ c in scales ]:
             df[c+"-sum"] = df[c]*n_proteins
         else:
             df[c+"-sum"] = df[c]*df["length"]*n_proteins
-        sum_dic[c] = df[c+"-sum"].sum()
+        sum_dic[c] = df[c+"-sum"]
         ret_dic[c] = df_mean[c]
     
     #gcs = df_reference.loc[df_reference["TaxID"] == tax_id]["GC%"].astype(float)
@@ -72,6 +77,7 @@ def get_phylum(s):
 aas = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
 
 
+scales =  ["ss_alpha", "ss_beta", "ss_coil", "ss_turn", "top-idp", "hessa"]
 
 dir='/scratch2/arne/annotate_uniprot_proteomes/'
 
