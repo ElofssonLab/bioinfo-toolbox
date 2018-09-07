@@ -60,9 +60,13 @@ def parse_annotation(filename,ty):
             df[c+"-sum"] = df[c]
         else:
             df[c+"-sum"] = df[c]*df["length"]
-        sum_dic[c] = df[c+"-sum"].sum()
+
+        if (c=="length"):
+            sum_dic[c] = df[c+"-sum"].mean()
+        else:
+            sum_dic[c] = df[c+"-sum"].sum()
         ret_dic[c] = df_mean[c]
-    
+        
     #gcs = df_reference.loc[df_reference["TaxID"] == tax_id]["GC%"].astype(float)
     #ret_dic["GC"] = pd.np.mean(list(gcs))
 
