@@ -39,6 +39,7 @@ def parse_annotation(filename,ty):
     ret_dic["GC"] = taxid2gc.get(tax_id,pd.np.nan)
     ret_dic["GC_genomic"] = taxid2gc.get(tax_id,pd.np.nan)
     ret_dic["count_protein"] = n_proteins
+    ret_dic["length_translation"]=df["length"].sum()
     sum_dic = {}    
     sum_dic["taxon_id"] = tax_id
     sum_dic["name"] = taxid2name.get(tax_id,pd.np.nan)
@@ -47,17 +48,19 @@ def parse_annotation(filename,ty):
     sum_dic["GC"] = taxid2gc.get(tax_id,pd.np.nan)
     sum_dic["GC_genomic"] = taxid2gc.get(tax_id,pd.np.nan)
     sum_dic["count_protein"] = n_proteins
+    sum_dic["length_translation"]=df["length"].sum()
 
     for c in columns:
         #df.loc[:,c+"-sum"] = df.loc[:,c]*df.loc[:,"length"]*n_proteins
-
-        if [c=="length"]:
+        if (c=="length"):
             df[c+"-sum"] = df[c]
-        elif [ c in scales ]:
-            df[c+"-sum"] = df[c]*n_proteins
+        elif ( c == "length_translation"):
+            df[c+"-sum"] = df[c]            
+        elif ( c in scales ):
+            df[c+"-sum"] = df[c]
         else:
-            df[c+"-sum"] = df[c]*df["length"]*n_proteins
-        sum_dic[c] = df[c+"-sum"]
+            df[c+"-sum"] = df[c]*df["length"]
+        sum_dic[c] = df[c+"-sum"].sum()
         ret_dic[c] = df_mean[c]
     
     #gcs = df_reference.loc[df_reference["TaxID"] == tax_id]["GC%"].astype(float)
