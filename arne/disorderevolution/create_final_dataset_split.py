@@ -56,8 +56,8 @@ def parse_annotation(filename,ty):
             df[c+"-sum"] = df[c]
         elif ( c == "length_translation"):
             df[c+"-sum"] = df[c]            
-        elif ( c in scales ):
-            df[c+"-sum"] = df[c]
+        #elif ( c in scales ):
+        #    df[c+"-sum"] = df[c]
         else:
             df[c+"-sum"] = df[c]*df["length"]
 
