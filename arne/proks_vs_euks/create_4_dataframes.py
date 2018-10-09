@@ -271,7 +271,7 @@ def get_regions_coords(recs,ids):
 ##    MAIN
 ############################################################################
 
-dir='/scratch2/arne/proks_euks/'
+dir='/scratch2/arne/proks-vs-euk/'
 
 if  (not os.path.isdir(dir)):
     dir='/pfs/nobackup/home/w/wbasile/proks_euks/'
@@ -371,7 +371,7 @@ if not os.path.exists(annotations_dir):
 
     
 # load the list of PFAM domains that are shared by at least 5 bacteria and 5 euks
-out_domain_ids_filename = data_dir + "pfam/pfam_ids_orthologs_5.list"
+out_domain_ids_filename = dir+"bin/pfam_ids_orthologs_10.list"
 shared_domains_pfam_ids = set(filter(None, open(out_domain_ids_filename).read().split("\n")))
 
 pfam_regions_selected_filename = data_dir + "/pfam/Pfam-A.regions.uniprot.selected_proteins.selected_fields.feather"
