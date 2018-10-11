@@ -354,7 +354,7 @@ def annotate_genome(f):
             
         
 # load the list of PFAM domains that are shared by at least 5 bacteria and 5 euks
-out_domain_ids_filename = dir+"bin/pfam_ids_orthologs_5.list"
+out_domain_ids_filename = dir+"bin/pfam_ids_orthologs_10.list"
 shared_domains_pfam_ids = set(filter(None, open(out_domain_ids_filename).read().split("\n")))
 shared_domains={}
 for key in shared_domains_pfam_ids:
