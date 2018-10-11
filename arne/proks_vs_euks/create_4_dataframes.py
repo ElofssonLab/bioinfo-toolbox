@@ -189,18 +189,17 @@ def get_regions_coords(recs,ids):
     dic_results["domains_shared"] = {}
     dic_results["domains_other"] = {}
     dic_results["linkers"] = {}
+    dic_results["N-linkers"] = {}
+    dic_results["C-linkers"] = {}
+    dic_results["M-linkers"] = {}
 
-    numlinkers=0
-    numshared=0
-    numother=0
-    Ntermlinker=0
-    Ctermlinker=0
     
     
     for r in ids:
         uniprot_id = recs[r].id.split(".")[0].split("_")[0]
         
         coords_all = [(0,len(recs[r]))]
+        length=len(recs[r])
         #print uniprot_id
 
         ## EXTRACT LINKERS COORDINATES
@@ -209,23 +208,36 @@ def get_regions_coords(recs,ids):
         ranges = []
         for index,row in df_coords_domains_selected[['seq_start','seq_end']].iterrows():
             ranges += [[row.seq_start,row.seq_end]]
-
+            
         ranges = list(join_ranges(ranges))
         subl = [item for sublist in ranges for item in sublist]
 
 
         coords_linkers = []
+        coords_Nlinkers = []
+        coords_Clinkers = []
+        coords_Mlinkers = []
 
         if subl[0] != 0:
             subl = [0] + subl + [len(recs[r])]
+            coords_Nlinkers += [(subl[0],subl[1])]
             for p in range(len(subl)):
-                if p % 2 == 0:
+                 if p % 2 == 0:
                     coords_linkers += [(subl[p],subl[p+1])]
+                    if (subl[p+1] == len(recs[r])):
+                        coords_Clinkers += [(subl[p],subl[p+1])]
+                    else:
+                        if (p>0):
+                            coords_Mlinkers += [(subl[p],subl[p+1])]
         else:
             subl = subl + [len(recs[r])]
             for p in range(len(subl)-1):
                 if p % 2 == 1:
                     coords_linkers += [(subl[p],subl[p+1])] 
+                    if (subl[p+1] == coords_all[1]):
+                        coords_Clinkers += [(subl[p],subl[p+1])]
+                    else:
+                        coords_Mlinkers += [(subl[p],subl[p+1])]
 
 
 
@@ -266,6 +278,9 @@ def get_regions_coords(recs,ids):
         dic_results["domains_shared"][r] = coords_shared_domains
         dic_results["domains_other"][r] = coords_other_domains
         dic_results["linkers"][r] = coords_linkers
+        dic_results["N-linkers"][r] = coords_Nlinkers
+        dic_results["M-linkers"][r] = coords_Mlinkers
+        dic_results["C-linkers"][r] = coords_Clinkers
     
     return dic_results
     
@@ -369,7 +384,7 @@ aas = ['A',
 #~ input_dir = dir + "/data/untitled_folder/"
 #~ annotations_dir = dir + "/data/test_res/"
 
-all_sets = ["full", "domains_shared", "domains_other", "linkers"]
+all_sets = ["full", "domains_shared", "domains_other", "linkers", "N-linkers", "M-linkers", "C-linkers"]
 
 
 
@@ -533,5 +548,4 @@ for f in file_list:
                     
         
                 #print 
-                
 
