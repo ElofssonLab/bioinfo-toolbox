@@ -189,6 +189,13 @@ def get_regions_coords(recs,ids):
     dic_results["domains_shared"] = {}
     dic_results["domains_other"] = {}
     dic_results["linkers"] = {}
+
+    numlinkers=0
+    numshared=0
+    numother=0
+    Ntermlinker=0
+    Ctermlinker=0
+    
     
     for r in ids:
         uniprot_id = recs[r].id.split(".")[0].split("_")[0]
