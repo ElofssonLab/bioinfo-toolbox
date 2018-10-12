@@ -2,7 +2,7 @@
 import pandas as pd
 import os
 import sys
-
+import os.path
 
 def get_kingdom(s):
     try:
@@ -25,7 +25,7 @@ def set_query_id(q):
 dir='/scratch2/arne/proks-vs-euk/'
 
 if  (not os.path.isdir(dir)):
-    dir='/pfs/nobackup/home/w/wbasile/proks-vs-euk/'
+    dir='/pfs/nobackup/home/w/wbasile/proks_euks/'
 
 data_dir = dir+"./data/"
 result_dir = dir + "./results/"
@@ -58,7 +58,8 @@ taxid2name = df_taxonomy.set_index("Taxon").to_dict()["Scientific name"]
 df_taxonomy["Phylum"] = df_taxonomy.Lineage.apply(get_phylum)
 taxid2phylum = df_taxonomy.set_index("Taxon").to_dict()["Phylum"]
 
-for ty in ["full", "pfam", "domains", "linkers"]:
+for ty in  ["full", "pfam", "domains", "linkers", "N-linkers", "M-linkers", "C-linkers"]:
+    #["full", "pfam", "domains", "linkers"]:
 
     
 
@@ -71,9 +72,14 @@ for ty in ["full", "pfam", "domains", "linkers"]:
     ###########################################################
     ##########################################################3
 
+    file1=result_dir+"./df_" + ty + ".csv"
+    file2=result_dir+"./df_" + ty + "_annotation_with_taxid.csv"
+    if os.path.getmtime(file1) < os.path.getmtime(file2):
+        phase = 2
+    else:
+        phase = 1
 
-    phase = 2
-
+    print "Phase:",phase
     ###########################################################
     ##########################################################3
 
