@@ -148,18 +148,25 @@ for ty in  ["full", "pfam", "domains", "linkers", "N-linkers", "M-linkers", "C-l
 
             if not os.path.exists(result_dir+"./df_" + ty + "_annotation_by_species.csv"):
 
-                df = pd.read_feather(result_dir+"./df_" + ty + "_annotation.feather")
-
+                #df = pd.read_feather(result_dir+"./df_" + ty + "_annotation.feather")
+                df = pd.read_csv(result_dir+"./df_" + ty + "_annotation_with_taxid.csv")
+                df.GC_genomic = df.GC_genomic.replace('-',pd.np.nan).astype(float)
+                #print df
                 for p in ['top-idp', 'hessa','ss_alpha', 'ss_beta', 'ss_coil',
                        'ss_turn']:
 
                     # multiply back these averages by the length, to obtain the raw n. of residues
                     df[p] = df[p] * df["length_translation"]
 
+                # This actually works to count the proteins
+                df['count_protein'] = 1
+                gdf = pd.DataFrame(df.groupby(["taxon_id"]).sum())
 
-                gdf = pd.DataFrame(df.groupby("taxon_id").sum())
-                gdf["count_protein"]=df.groupby("taxon_id")["taxon_id"].transform('count')
+                #df['Count_Column'] = df['Color'].map(df['Color'].value_counts())
+
                 gdf["taxon_id"] = list(gdf.index)
+                # This does not work for some unknown reason
+                #gdf["count_protein"]=df.groupby(["taxon_id"])["taxon_id"].transform('count')
                 gdf["kingdom"] = gdf.taxon_id.map(taxid2kingdom)
                 gdf["phylum"] = gdf.taxon_id.map(taxid2phylum)
                 gdf["name"] = gdf.taxon_id.map(taxid2name)
