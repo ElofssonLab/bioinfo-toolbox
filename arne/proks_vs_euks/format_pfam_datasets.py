@@ -74,12 +74,12 @@ for ty in  ["full", "pfam", "domains", "linkers", "N-linkers", "M-linkers", "C-l
 
     file1=result_dir+"./df_" + ty + ".csv"
     file2=result_dir+"./df_" + ty + "_annotation_with_taxid.csv"
-    if os.path.getmtime(file1) < os.path.getmtime(file2):
-        phase = 2
-    else:
-        phase = 1
+    phase = 1
+    if (os.path.isfile(file2)):
+        if os.path.getmtime(file1) < os.path.getmtime(file2):
+            phase = 2
 
-    print "Phase:",phase
+    print "Phase:",ty,phase
     ###########################################################
     ##########################################################3
 
@@ -87,8 +87,8 @@ for ty in  ["full", "pfam", "domains", "linkers", "N-linkers", "M-linkers", "C-l
     if phase == 1:
 
         df = pd.read_csv(result_dir+"./df_" + ty + ".csv")
-
-
+        df = df.loc[df["length_translation"]>0]
+        
         # In[4]:
         '''
         # only for the 3 new domains sets
