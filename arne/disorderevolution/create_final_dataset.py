@@ -23,6 +23,7 @@ def parse_annotation(filename):
     
     columns = ["length", "top-idp", "iupred_long", "iupred_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa"]
     columns += ["freq_" + aa for aa in aas]
+    Pfamcolumns = ["Pfam","NumDoms","PfamType"]
 
     ret_dic = {}    
     ret_dic["taxon_id"] = tax_id
