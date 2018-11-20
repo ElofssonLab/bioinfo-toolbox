@@ -3,7 +3,13 @@ import operator
 import numpy as np
 from collections import defaultdict
 
+def printf(format, *args):
+        sys.stdout.write(format % args)
 
+def write_pdb_atm_record(atom):
+    print("{:6s}{:5d} {:^4s}{:1s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}".format("ATOM",atom['atm_no'],atom['atm_name']," ",atom['res_name'],atom['chain'],atom['res_no']," ",atom['x'],atom['y'],atom['z'],atom['occ'],atom['B']))
+    return
+    
 def parse_atm_record(line):
 
     record = defaultdict()
