@@ -1,0 +1,14 @@
+#!/bin/bash 
+
+colL=$1
+colR=$2
+
+shift 2
+
+for file
+do
+ printf "%s\t" $file
+ awk -v v1=$colL -v v2=$colR -f $HOME/bin/correlation.awk $file 
+done
+
+
