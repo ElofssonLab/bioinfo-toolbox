@@ -71,7 +71,7 @@ for f in file_list:
                 cmd = "./iupred_multi " + f + " " + iupred_param + " > " + iupred_data_file_raw
                 print cmd
                 os.system(cmd)
-                sys.exit()
+                #sys.exit()
             #PARSE
             print "parsing " + iupred_data_file_raw
             ps = filter(None, open(iupred_data_file_raw).read().split("# Prediction output "))

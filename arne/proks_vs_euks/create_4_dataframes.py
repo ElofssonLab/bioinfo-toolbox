@@ -422,6 +422,8 @@ for f in file_list:
         # check the existence of these three data files (produced separately)
         iupred_long_data_file = f +  ".data_iupred_long"
         iupred_short_data_file = f +  ".data_iupred_short"
+        iupred04_long_data_file = f +  ".data_iupred_0.4_long"
+        iupred04_short_data_file = f +  ".data_iupred_0.4_short"
         seg_data_file = f +  ".data_seg"
         
         proceed = True
@@ -430,6 +432,12 @@ for f in file_list:
             proceed = False
  
         if not os.path.exists(iupred_short_data_file):
+            proceed = False
+ 
+        if not os.path.exists(iupred04_long_data_file):
+            proceed = False
+ 
+        if not os.path.exists(iupred04_short_data_file):
             proceed = False
  
         if not os.path.exists(seg_data_file):
@@ -527,6 +535,15 @@ for f in file_list:
                 #print "iupred short"
                 dic_iupred_short = parse_fasta_x(iupred_short_data_file,coords_dic[ty])
                 dataframes[ty]['iupred_short'] = dataframes[ty]['query_id'].map(dic_iupred_short)
+                # add iupred
+
+                #print "iupred long"
+                dic_iupred_long = parse_fasta_x(iupred_long_data_file,coords_dic[ty])
+                dataframes[ty]['iupred04_long'] = dataframes[ty]['query_id'].map(dic_iupred_long)
+                
+                #print "iupred short"
+                dic_iupred_short = parse_fasta_x(iupred_short_data_file,coords_dic[ty])
+                dataframes[ty]['iupred04_short'] = dataframes[ty]['query_id'].map(dic_iupred_short)
 
                 
                 # add SEG
@@ -536,7 +553,7 @@ for f in file_list:
                 
                 
                 # export
-                columns = ["query_id",  "length_translation", "top-idp", "hessa", "iupred_long", "iupred_short", "seg"]
+                columns = ["query_id",  "length_translation", "top-idp", "hessa", "iupred_long", "iupred_short", "iupred04_long", "iupred04_short", "seg"]
                 columns += ["freq_" + aa for aa in aas]
                 columns += ["ss_alpha", "ss_beta", "ss_coil", "ss_turn"]
                 

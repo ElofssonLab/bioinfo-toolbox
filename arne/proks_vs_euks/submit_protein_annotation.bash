@@ -1,6 +1,9 @@
 #!/bin/bash
 #SBATCH -A SNIC2018-1-26
-#SBATCH -J create-4-dataframes
+#SBATCH --output=create_4.%A_%a.out
+#SBATCH --error=create_4.%A_%a.out
+#SBATCH --array=1-500
+#SBATCH -J create-4-dataframes.%A_%a
 #SBATCH -t 04:00:00
 #SBATCH -n 1
 #SBATCH -c 8 # Or 14, or any other number of cores to use for tblastn

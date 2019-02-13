@@ -267,6 +267,8 @@ def annotate_genome(f):
         # check the existence of these three data files (produced separately)
         iupred_long_data_file = f +  ".data_iupred_long"
         iupred_short_data_file = f +  ".data_iupred_short"
+        iupred04_long_data_file = f +  ".data_iupred_0.4_long"
+        iupred04_short_data_file = f +  ".data_iupred_0.4_short"
         uniprot_data_file = re.sub(r'\.fasta','.txt',f)
 
         proceed = True
@@ -277,6 +279,14 @@ def annotate_genome(f):
  
         if not os.path.exists(iupred_short_data_file):
             print ("Missing IUPRED-short")
+            proceed = False
+
+        if not os.path.exists(iupred04_long_data_file):
+            print ("Missing IUPRED04-long")
+            proceed = False
+ 
+        if not os.path.exists(iupred04_short_data_file):
+            print ("Missing IUPRED04-short")
             proceed = False
 
         if proceed == True:
@@ -333,6 +343,15 @@ def annotate_genome(f):
                 dic_iupred_short = parse_fasta_x(iupred_short_data_file)
                 df['iupred_short'] = df['query_id'].map(dic_iupred_short)
 
+                print "iupred long 0.4"
+                dic_iupred04_long = parse_fasta_x(iupred04_long_data_file)
+                df['iupred04_long'] = df['query_id'].map(dic_iupred04_long)
+                #print (dic_iupred04_long,df['iupred04_long'],df['query_id'])
+                
+                print "iupred short 0.4"
+                dic_iupred04_short = parse_fasta_x(iupred04_short_data_file)
+                df['iupred04_short'] = df['query_id'].map(dic_iupred04_short)
+
 
                 # SEG
                 print str(f),"Computing SEG"
@@ -348,7 +367,7 @@ def annotate_genome(f):
                 df["PfamType"] = df['query_id'].map(dic_kingdom)
 
                 # export
-                columns = ["query_id",  "length", "top-idp", "iupred_long", "iupred_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa","Pfam","NumDoms","PfamType"]
+                columns = ["query_id",  "length", "top-idp", "iupred_long", "iupred_short","iupred04_long", "iupred04_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa","Pfam","NumDoms","PfamType"]
                 columns += ["freq_" + aa for aa in aas]
                 df[columns].to_csv(out_annotation_file, index = False)
             
@@ -369,6 +388,7 @@ for f in os.listdir(input_dir):
 
 #annotate_genome('data/proteomes/UP000001554_7739.fasta')
 for f in file_list:
+    #print (f)
     try:
         annotate_genome(f)
     except:

@@ -2,15 +2,18 @@
 1) Uniprot data is downloaded using run_uniprot.bash for each proteome
    (other data was downloaded earlier)
 
+2) run_iupred.py is used to create fasta files with disorder annotations.
+   Now modified to also use 0.4 as a xutoff
+
 2) CSV files for each proteoe is created using annotate_protein_fasta.py
    This crashes when files are missing  - had to rerun  (two files do crash on SEG, i.e are not annotated - deleted)
 
-IUPRED data are missing...
+IUPRED data are missing...  (Was rerun in Feb 2019)
 
 
 3) final CSV file is created using bin/create_final_dataset_split.py
-  /But this needs to be modifies so that it makes one for all, one for unique Pfam etc...
-Also need to skip files as it had no Pfam annotation (and this made the script carash.
+  But this needs to be modified so that it makes one for all, one for unique Pfam etc...
+  Also need to skip files as it had no Pfam annotation (and this made the script crash.
 
 /scratch2/arne/annotate_uniprot_proteomes//results/extended/UP000031042_1579372.fasta_annotation.csv
 /scratch2/arne/annotate_uniprot_proteomes//results/extended/UP000078516_417368.fasta_annotation.csv
