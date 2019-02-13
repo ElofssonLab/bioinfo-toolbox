@@ -23,7 +23,7 @@ for f in os.listdir(input_dir):
         
 
 for f in file_list:
-    print f
+    #print f
     for iupred_param in ["long", "short"]:
         iupred_data_file = f +  ".data_iupred_" + iupred_param 
         iupred_data_file_04 = f +  ".data_iupred_0.4_" + iupred_param 
@@ -31,7 +31,7 @@ for f in file_list:
         
         # This makes it possible to run in parallell
         if os.path.exists(iupred_data_file) and  os.path.exists(iupred_data_file_04):
-            print "Skipping ", f
+            #print "Skipping ", f
             continue
         # clean empty files
         #if os.path.exists(iupred_data_file):
@@ -56,18 +56,20 @@ for f in file_list:
                 # remove empty files
                 st = os.stat(iupred_data_file_raw)
                 if st.st_size == 0:
+                    print "Removing file, size 0",iupred_data_file_raw
                     os.system("rm " + iupred_data_file_raw)
-                #else:
-                #    group_num = int(f.split(".fasta")[0].split("_")[-1])
+                else:
+                    group_num = int(f.split(".fasta")[0].split("_")[-1])
                     
                     # remove the incomplete raw files
                     if group_num != 1208:
-                        cmd = "grep -c Prediction " + f 
+                        cmd = "grep -c Prediction " + iupred_data_file_raw 
+                        print cmd
                         ret = int(commands.getoutput(cmd))
-                        
+                        print "Testing number of entries:", ret 
                         if ret != 50000:
                             print ("rm " + iupred_data_file_raw)
-                            sys.exit()
+                            #sys.exit()
                             os.system("rm " + iupred_data_file_raw)
 
             if not os.path.exists(iupred_data_file_raw):
@@ -75,36 +77,8 @@ for f in file_list:
                 cmd = "./iupred_multi " + f + " " + iupred_param + " > " + iupred_data_file_raw
                 print cmd
                 os.system(cmd)
-        if not os.path.exists(iupred_data_file_04):
-            print "creating " + iupred_data_file_04
-            os.system("touch " + iupred_data_file_04)
-            if os.path.exists(iupred_data_file_raw):
 
-                # remove empty files
-                st = os.stat(iupred_data_file_raw)
-                if st.st_size == 0:
-                    os.system("rm " + iupred_data_file_raw)
-                else:
-                    group_num = int(f.split(".fasta")[0].split("_")[-1])
-                    
-                    # remove the incomplete raw files
-                    if group_num != 1208:
-                        cmd = "grep -c Prediction " + f 
-                        ret = int(commands.getoutput(cmd))
-                        
-                        if ret != 50000:
-                               print ("rm " + iupred_data_file_raw)
-                               sys.exit()
-                               os.system("rm " + iupred_data_file_raw)
-
-            if not os.path.exists(iupred_data_file_raw):
-            
-                cmd = "./iupred_multi " + f + " " + iupred_param + " > " + iupred_data_file_raw
-                print cmd
-                os.system(cmd)
-        
-                            
-                        
+                
             
                 
             #PARSE
@@ -141,6 +115,37 @@ for f in file_list:
                 for k in iupred_dic.keys():
                     outf.write(">" + k + "\n" + iupred_dic[k] + "\n")
 
+        if not os.path.exists(iupred_data_file_04):
+            print "creating " + iupred_data_file_04
+            os.system("touch " + iupred_data_file_04)
+            if os.path.exists(iupred_data_file_raw):
+
+                # remove empty files
+                st = os.stat(iupred_data_file_raw)
+                if st.st_size == 0:
+                    print "Removing file, size 0",iupred_data_file_raw
+                    os.system("rm " + iupred_data_file_raw)
+                else:
+                    group_num = int(f.split(".fasta")[0].split("_")[-1])
+                    
+                    # remove the incomplete raw files
+                    if group_num != 1208:
+                        cmd = "grep -c Prediction " + iupred_data_file_raw
+                        ret = int(commands.getoutput(cmd))
+                        
+                        if ret != 50000:
+                               print ("rm " + iupred_data_file_raw)
+                               #sys.exit()
+                               os.system("rm " + iupred_data_file_raw)
+
+            if not os.path.exists(iupred_data_file_raw):
+            
+                cmd = "./iupred_multi " + f + " " + iupred_param + " > " + iupred_data_file_raw
+                print cmd
+                os.system(cmd)
+        
+                            
+                        
             #PARSE
             print "parsing " + iupred_data_file_raw  + " into " + iupred_data_file
             ps = filter(None, open(iupred_data_file_raw).read().split("# Prediction output "))
