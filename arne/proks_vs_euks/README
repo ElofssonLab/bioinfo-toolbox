@@ -8,10 +8,11 @@ Scripts
 run_iupred.py  (creates iupred annotations in results/uniprot_sequences_grops.
   (This is run by submit_protein_annotations.bash
   To retrun delete files *_annotate_
+  
 create_4_dataframes.py  This makes one anotations
 
 cat_all_results.sh  (merges all the results)
 
 format_pfam_datasets.py  creates the feather pickle (adding taxon id etc..)
-			This is now updated to dad number of proteins to the CSB
+			This is now updated to add number of proteins to the CSV file
 			Needs to be run twice

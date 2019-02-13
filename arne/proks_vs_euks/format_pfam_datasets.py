@@ -110,7 +110,7 @@ for ty in  ["full", "pfam", "domains", "linkers", "N-linkers", "M-linkers", "C-l
             df = pd.merge(df,df_uniprot_sel,on="query_id",how="left")
 
             df = df[['query_id', 'length_translation', 'top-idp', 'hessa',
-               'iupred_long', 'iupred_short', 'seg', 'freq_A', 'freq_C',
+               'iupred_long', 'iupred_short', 'iupred04_long', 'iupred04_short', 'seg', 'freq_A', 'freq_C',
                'freq_D', 'freq_E', 'freq_F', 'freq_G', 'freq_H', 'freq_I',
                'freq_K', 'freq_L', 'freq_M', 'freq_N', 'freq_P', 'freq_Q',
                'freq_R', 'freq_S', 'freq_T', 'freq_V', 'freq_W', 'freq_Y',
@@ -175,7 +175,7 @@ for ty in  ["full", "pfam", "domains", "linkers", "N-linkers", "M-linkers", "C-l
                 gdf.GC_genomic = gdf.GC_genomic.replace('-',pd.np.nan).astype(float)
 
                 cols = ['length_translation', 'top-idp', 'hessa',
-                       'iupred_long', 'iupred_short', 'seg', 'freq_A', 'freq_C',
+                       'iupred_long', 'iupred_short', 'iupred04_long', 'iupred04_short', 'seg', 'freq_A', 'freq_C',
                        'freq_D', 'freq_E', 'freq_F', 'freq_G', 'freq_H', 'freq_I',
                        'freq_K', 'freq_L', 'freq_M', 'freq_N', 'freq_P', 'freq_Q',
                        'freq_R', 'freq_S', 'freq_T', 'freq_V', 'freq_W', 'freq_Y',
