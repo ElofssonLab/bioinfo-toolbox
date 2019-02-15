@@ -1,18 +1,25 @@
 Trying to understand the pipeline..
 
+To activate python
+
+source /pfs/nobackup/home/w/wbasile/venv-work/bin/activate
 
 Not clear with the start, but it all starts from groups of fast files.
 
 Scripts
 
-run_iupred.py  (creates iupred annotations in results/uniprot_sequences_grops.
-  (This is run by submit_protein_annotations.bash
-  To retrun delete files *_annotate_
-  
-create_4_dataframes.py  This makes one anotations
+#run_iupred.py  (creates iupred annotations in results/uniprot_sequences_grops.
+sbatch submit_run_iupred.bash
+
+
+To rerun delete files *_annotate_
+#python create_4_dataframes.py  This makes one anotations
+sbatch submit_protein_annotation.bash
+
+
 
 cat_all_results.sh  (merges all the results)
 
-format_pfam_datasets.py  creates the feather pickle (adding taxon id etc..)
+python format_pfam_datasets.py  creates the feather pickle (adding taxon id etc..)
 			This is now updated to add number of proteins to the CSV file
 			Needs to be run twice

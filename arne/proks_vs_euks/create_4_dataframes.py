@@ -538,12 +538,12 @@ for f in file_list:
                 # add iupred
 
                 #print "iupred long"
-                dic_iupred_long = parse_fasta_x(iupred_long_data_file,coords_dic[ty])
-                dataframes[ty]['iupred04_long'] = dataframes[ty]['query_id'].map(dic_iupred_long)
+                dic_iupred04_long = parse_fasta_x(iupred04_long_data_file,coords_dic[ty])
+                dataframes[ty]['iupred04_long'] = dataframes[ty]['query_id'].map(dic_iupred04_long)
                 
                 #print "iupred short"
-                dic_iupred_short = parse_fasta_x(iupred_short_data_file,coords_dic[ty])
-                dataframes[ty]['iupred04_short'] = dataframes[ty]['query_id'].map(dic_iupred_short)
+                dic_iupred04_short = parse_fasta_x(iupred04_short_data_file,coords_dic[ty])
+                dataframes[ty]['iupred04_short'] = dataframes[ty]['query_id'].map(dic_iupred04_short)
 
                 
                 # add SEG
