@@ -83,6 +83,39 @@ do
 done
 
 
+# best results
+
+
+# We also need to find best method and best possible individual method
+
+
+grep _1 QA237_2-CAD.tsv | sed "s/.*TS/TS/g" | gawk '{print $1}' > servers.txt
+
+# best possible
+
+for k in TM CAD GDT_TS GDT_HA lDDT
+do
+    #echo -n $k " " 
+    for i in  `cat servers.txt`
+    do
+	echo -n $i " " 
+	grep $i QA237_2-$k.tsv | gawk '{i++;sum+=$3};END{print i,sum,sum/i}' 
+    done  | sort -n -k 3 > servers-$k.tsv
+done 
+
+
+    
+# best possible
+
+for k in TM CAD GDT_TS GDT_HA lDDT
+do
+    echo -n $k " " 
+    for i in  `cat targets.txt | sed "s/\-D1//g" | sort -u`
+    do
+	grep $i QA237_2-$k.tsv | sort -g -k 3 | tail -1 
+    done  | gawk '{i++;sum+=$3};END{print i,sum,sum/i}' 
+done > best.tsv
+
 
 
 
