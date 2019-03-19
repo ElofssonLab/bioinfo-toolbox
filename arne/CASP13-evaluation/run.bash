@@ -100,7 +100,7 @@ do
     do
 	echo -n $i " " 
 	grep $i QA237_2-$k.tsv | gawk '{i++;sum+=$3};END{print i,sum,sum/i}' 
-    done  | sort -n -k 3 > servers-$k.tsv
+    done  | sort -rn -k 3 > servers-$k.tsv
 done 
 
 
