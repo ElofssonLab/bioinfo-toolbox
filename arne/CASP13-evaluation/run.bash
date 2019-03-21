@@ -89,7 +89,7 @@ done
 # We also need to find best method and best possible individual method
 
 
-grep _1 QA237_2-CAD.tsv | sed "s/.*TS/TS/g" | gawk '{print $1}' > servers.txt
+grep \_1 QA237_2-CAD.tsv | sed "s/.*TS/TS/g" | gawk '{print $1}' | sort -u > servers.txt
 
 # best possible
 
@@ -104,7 +104,22 @@ do
 done 
 
 
-    
+
+# best possible
+
+for k in TM CAD GDT_TS GDT_HA lDDT
+do
+    echo -n $k "best "
+    for i in  `cat targets.txt | sed "s/\-D1//g" | sort -u`
+    do
+	grep $i QA237_2-$k.tsv | sort -g -k 3 | tail -1
+    done  | gawk '{i++;sum+=$3};END{print "best",i,sum,sum/i}' > best-$k.tsv
+done 
+
+
+
+
+
 # best possible
 
 for k in TM CAD GDT_TS GDT_HA lDDT
@@ -116,6 +131,19 @@ do
     done  | gawk '{i++;sum+=$3};END{print i,sum,sum/i}' 
 done > best.tsv
 
+
+# Summarize 
+
+echo "Measure" "BEST" "Server" "EMA" "Num" > summary-firstranked.tsv
+for k in TM CAD GDT_TS GDT_HA lDDT
+do
+    j=`cat servers-$k.tsv best-$k.tsv sum-$k.tsv  | sort -rn -k +3 |grep -n TS  | head -1 | sed s/:.*//g`
+    num=$((j -2))
+    best=`gawk '{print $4}' best-$k.tsv`
+    qa=`sort -rnk 3 sum-$k.tsv | head -1 | gawk '{print $4}' `
+    server=`gawk '{print $4}' servers-$k.tsv | head -1`
+    echo  $k $best $server $qa $num
+done  >> summary-firstranked.tsv
 
 
 
