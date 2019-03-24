@@ -6,6 +6,9 @@ do
 done | sort -nrk 4 | sed s/.txt//g > targets-difficulty.txt
 gawk '{print $1}' targets-difficulty.txt | sort > alltargets.txt
 
+gawk '{if ($4>50) print $1}' targets-difficulty.txt | sed "s/-D1//g"| sed "s/-D2//g" > easy-targets.txt
+gawk '{if ($4<=50) print $1}' targets-difficulty.txt | sed "s/-D1//g" | sed "s/-D2//g" > hard-targets.txt
+
 # Manally edited to create targets.txt
 
 for i in `cat targets.txt` ; do cat $i.txt ; done | gawk '{print $2, $4}'    | grep -v Model | grep TS | sed "s/-D1//g" | sort > GDT_TS.tsv
@@ -18,6 +21,8 @@ for i in ../../qa/QA*tsv ; do j=`basename $i .tsv` ; for k in GDT_*.tsv lDDT.tsv
 
 
 ls QA*TM.tsv  | sed s/\-TM.tsv//g | sort -u   > methods.txt
+grep -cf easy-targets.txt QA*TM.tsv | grep -v :0  | sed s/\-TM.tsv.*//g > methods-easy.txt
+grep -cf hard-targets.txt QA*TM.tsv | grep -v :0  | sed s/\-TM.tsv.*//g > methods-hard.txt
 
 
 for j in TM CAD GDT_TS GDT_HA lDDT
@@ -40,6 +45,31 @@ do
 	    sort -nk 2 $j-$k.tsv | grep $i  | tail -1
 	done | gawk '{i++;sum+=$3};END{print i,sum,sum/i}'
     done | sort -rnk 4 | sed s/QA267_2/ProQ3D_TM/ | sed s/QA457_2/Pcomb/ | sed s/QA139_2/ProQ3D/ | sed s/QA044_2/ProQ2/ | sed s/QA022_2/Pcons/ | sed s/QA187_2/ProQ3/  | sed s/QA360_2/ProQ3D_lDDT/ | sed s/QA198_2/ProQ3D_CAD/ | sed s/QA359_2/3DCNN/g |     sed s/QA014_2/Bhattacharya-ClustQ/g |      sed s/QA102_2/Bhattacharya-Server/g |      sed s/QA170_2/Bhattacharya-SingQ/g |      sed s/QA471_2/CPClab/g |      sed s/QA349_2/Davis-EMAconsensus/g |      sed s/QA413_2/FALCON-QA/g | sed s/QA027_2/FaeNNz/g |      sed s/QA196_2/Grudinin/g |      sed s/QA065_2/Jagodzinski-Cao-QA/g | sed s/QA344_2/Kiharalab/g |      sed s/QA067_2/LamoureuxLab/g |      sed s/QA146_2/MASS1/g |      sed s/QA415_2/MASS2/g |      sed s/QA197_2/MESHI/g |      sed s/QA289_2/MESHI-enrich-server/g |      sed s/QA347_2/MESHI-server/g |      sed s/QA113_2/MUFold-QA/g | sed s/QA312_2/MUFold_server/g |      sed s/QA243_2/MULTICOM-CONSTRUCT/g |      sed s/QA023_2/MULTICOM-NOVEL/g |      sed s/QA058_2/MULTICOM_CLUSTER/g |      sed s/QA107_2/MUfold-QA2/g | sed s/QA211_2/MUfold-QA-T/g | sed s/QA275_2/ModFOLD7/g |      sed s/QA213_2/ModFOLD7_cor/g |      sed s/QA272_2/ModFOLD7_rank/g |      sed s/QA373_2/ModFOLDclust2/g |      sed s/QA209_2/PLU-Angular-QA/g | sed s/QA134_2/PLU-Top-QA/g | sed s/QA083_2/Pcomb/g |      sed s/QA022_2/Pcons/g |      sed s/QA044_2/ProQ2/g |      sed s/QA187_2/ProQ3/g |      sed s/QA139_2/ProQ3D/g |      sed s/QA198_2/ProQ3D-CAD/g |      sed s/QA267_2/ProQ3D-TM/g |      sed s/QA360_2/ProQ3D-lDDT/g |      sed s/QA440_2/ProQ4/g |      sed s/QA334_2/RaptorX-Deep-QA/g | sed s/QA220_2/SASHAN/g |      sed s/QA135_2/SBROD/g |      sed s/QA207_2/SBROD-plus/g |      sed s/QA364_2/SBROD-server/g |      sed s/QA194_2/UOSHAN/g |      sed s/QA339_2/VoroM-QA-A/g | sed s/QA030_2/VoroM-QA-B/g | sed s/QA457_2/Wallner/g |       sed s/QA440_2/ProQ4/| sed "s/\s+/ /g" > sum-$k.tsv
+done
+
+
+for k in TM CAD GDT_TS GDT_HA lDDT
+do
+    for j in `cat methods-easy.txt `
+    do
+	echo -n $j " "
+	for i in `cat targets.txt | sed "s/\-D1//g" | grep -f  easy-targets.txt`
+	do
+	    sort -nk 2 $j-$k.tsv | grep $i  | tail -1
+	done | gawk '{i++;sum+=$3};END{print i,sum,sum/i}'
+    done | sort -rnk 4 | sed s/QA267_2/ProQ3D_TM/ | sed s/QA457_2/Pcomb/ | sed s/QA139_2/ProQ3D/ | sed s/QA044_2/ProQ2/ | sed s/QA022_2/Pcons/ | sed s/QA187_2/ProQ3/  | sed s/QA360_2/ProQ3D_lDDT/ | sed s/QA198_2/ProQ3D_CAD/ | sed s/QA359_2/3DCNN/g |     sed s/QA014_2/Bhattacharya-ClustQ/g |      sed s/QA102_2/Bhattacharya-Server/g |      sed s/QA170_2/Bhattacharya-SingQ/g |      sed s/QA471_2/CPClab/g |      sed s/QA349_2/Davis-EMAconsensus/g |      sed s/QA413_2/FALCON-QA/g | sed s/QA027_2/FaeNNz/g |      sed s/QA196_2/Grudinin/g |      sed s/QA065_2/Jagodzinski-Cao-QA/g | sed s/QA344_2/Kiharalab/g |      sed s/QA067_2/LamoureuxLab/g |      sed s/QA146_2/MASS1/g |      sed s/QA415_2/MASS2/g |      sed s/QA197_2/MESHI/g |      sed s/QA289_2/MESHI-enrich-server/g |      sed s/QA347_2/MESHI-server/g |      sed s/QA113_2/MUFold-QA/g | sed s/QA312_2/MUFold_server/g |      sed s/QA243_2/MULTICOM-CONSTRUCT/g |      sed s/QA023_2/MULTICOM-NOVEL/g |      sed s/QA058_2/MULTICOM_CLUSTER/g |      sed s/QA107_2/MUfold-QA2/g | sed s/QA211_2/MUfold-QA-T/g | sed s/QA275_2/ModFOLD7/g |      sed s/QA213_2/ModFOLD7_cor/g |      sed s/QA272_2/ModFOLD7_rank/g |      sed s/QA373_2/ModFOLDclust2/g |      sed s/QA209_2/PLU-Angular-QA/g | sed s/QA134_2/PLU-Top-QA/g | sed s/QA083_2/Pcomb/g |      sed s/QA022_2/Pcons/g |      sed s/QA044_2/ProQ2/g |      sed s/QA187_2/ProQ3/g |      sed s/QA139_2/ProQ3D/g |      sed s/QA198_2/ProQ3D-CAD/g |      sed s/QA267_2/ProQ3D-TM/g |      sed s/QA360_2/ProQ3D-lDDT/g |      sed s/QA440_2/ProQ4/g |      sed s/QA334_2/RaptorX-Deep-QA/g | sed s/QA220_2/SASHAN/g |      sed s/QA135_2/SBROD/g |      sed s/QA207_2/SBROD-plus/g |      sed s/QA364_2/SBROD-server/g |      sed s/QA194_2/UOSHAN/g |      sed s/QA339_2/VoroM-QA-A/g | sed s/QA030_2/VoroM-QA-B/g | sed s/QA457_2/Wallner/g |       sed s/QA440_2/ProQ4/| sed "s/\s+/ /g" > sum-easy-$k.tsv
+done
+
+for k in TM CAD GDT_TS GDT_HA lDDT
+do
+    for j in `cat methods-hard.txt `
+    do
+	echo -n $j " "
+	for i in `cat targets.txt | sed "s/\-D1//g" | grep -f  hard-targets.txt`
+	do
+	    sort -nk 2 $j-$k.tsv | grep $i  | tail -1
+	done | gawk '{i++;sum+=$3};END{print i,sum,sum/i}'
+    done | sort -rnk 4 | sed s/QA267_2/ProQ3D_TM/ | sed s/QA457_2/Pcomb/ | sed s/QA139_2/ProQ3D/ | sed s/QA044_2/ProQ2/ | sed s/QA022_2/Pcons/ | sed s/QA187_2/ProQ3/  | sed s/QA360_2/ProQ3D_lDDT/ | sed s/QA198_2/ProQ3D_CAD/ | sed s/QA359_2/3DCNN/g |     sed s/QA014_2/Bhattacharya-ClustQ/g |      sed s/QA102_2/Bhattacharya-Server/g |      sed s/QA170_2/Bhattacharya-SingQ/g |      sed s/QA471_2/CPClab/g |      sed s/QA349_2/Davis-EMAconsensus/g |      sed s/QA413_2/FALCON-QA/g | sed s/QA027_2/FaeNNz/g |      sed s/QA196_2/Grudinin/g |      sed s/QA065_2/Jagodzinski-Cao-QA/g | sed s/QA344_2/Kiharalab/g |      sed s/QA067_2/LamoureuxLab/g |      sed s/QA146_2/MASS1/g |      sed s/QA415_2/MASS2/g |      sed s/QA197_2/MESHI/g |      sed s/QA289_2/MESHI-enrich-server/g |      sed s/QA347_2/MESHI-server/g |      sed s/QA113_2/MUFold-QA/g | sed s/QA312_2/MUFold_server/g |      sed s/QA243_2/MULTICOM-CONSTRUCT/g |      sed s/QA023_2/MULTICOM-NOVEL/g |      sed s/QA058_2/MULTICOM_CLUSTER/g |      sed s/QA107_2/MUfold-QA2/g | sed s/QA211_2/MUfold-QA-T/g | sed s/QA275_2/ModFOLD7/g |      sed s/QA213_2/ModFOLD7_cor/g |      sed s/QA272_2/ModFOLD7_rank/g |      sed s/QA373_2/ModFOLDclust2/g |      sed s/QA209_2/PLU-Angular-QA/g | sed s/QA134_2/PLU-Top-QA/g | sed s/QA083_2/Pcomb/g |      sed s/QA022_2/Pcons/g |      sed s/QA044_2/ProQ2/g |      sed s/QA187_2/ProQ3/g |      sed s/QA139_2/ProQ3D/g |      sed s/QA198_2/ProQ3D-CAD/g |      sed s/QA267_2/ProQ3D-TM/g |      sed s/QA360_2/ProQ3D-lDDT/g |      sed s/QA440_2/ProQ4/g |      sed s/QA334_2/RaptorX-Deep-QA/g | sed s/QA220_2/SASHAN/g |      sed s/QA135_2/SBROD/g |      sed s/QA207_2/SBROD-plus/g |      sed s/QA364_2/SBROD-server/g |      sed s/QA194_2/UOSHAN/g |      sed s/QA339_2/VoroM-QA-A/g | sed s/QA030_2/VoroM-QA-B/g | sed s/QA457_2/Wallner/g |       sed s/QA440_2/ProQ4/| sed "s/\s+/ /g" > sum-hard-$k.tsv
 done
 
 
@@ -90,6 +120,8 @@ done
 
 
 grep \_1 QA237_2-CAD.tsv | sed "s/.*TS/TS/g" | gawk '{print $1}' | sort -u > servers.txt
+grep \_1 QA237_2-CAD.tsv | grep -f easy-targets.txt | sed "s/.*TS/TS/g" | gawk '{print $1}' | sort -u > servers-easy.txt
+grep \_1 QA237_2-CAD.tsv | grep -f hard-targets.txt | sed "s/.*TS/TS/g" | gawk '{print $1}' | sort -u > servers-hard.txt
 
 # best possible
 
@@ -102,6 +134,7 @@ do
 	grep $i QA237_2-$k.tsv | gawk '{i++;sum+=$3};END{print i,sum,sum/i}' 
     done  | sort -rn -k 3 > servers-$k.tsv
 done 
+
 
 
 
@@ -134,16 +167,139 @@ done > best.tsv
 
 # Summarize 
 
+
+
+# Easye targets
+
+
+for k in TM CAD GDT_TS GDT_HA lDDT
+do
+    #echo -n $k " " 
+    for i in  `cat servers-easy.txt`
+    do
+	echo -n $i " " 
+	grep $i QA237_2-$k.tsv  | grep  -f  easy-targets.txt | gawk '{i++;sum+=$3};END{print i,sum,sum/i}' 
+    done  | sort -rn -k 3 > servers-easy-$k.tsv
+done 
+
+
+
+
+# best possible
+
+for k in TM CAD GDT_TS GDT_HA lDDT
+do
+    echo -n $k "best "
+    for i in  `cat targets.txt | sed "s/\-D1//g" | sort -u`
+    do
+	grep $i QA237_2-$k.tsv | grep  -f  easy-targets.txt | sort -g -k 3 | tail -1
+    done  | gawk '{i++;sum+=$3};END{print "best",i,sum,sum/i}' > best-easy-$k.tsv
+done 
+
+
+
+
+
+# best possible
+
+for k in TM CAD GDT_TS GDT_HA lDDT
+do
+    echo -n $k " " 
+    for i in  `cat targets.txt | sed "s/\-D1//g" | sort -u`
+    do
+	grep $i QA237_2-$k.tsv | grep  -f  easy-targets.txt | sort -g -k 3 | tail -1 
+    done  | gawk '{i++;sum+=$3};END{print i,sum,sum/i}' 
+done > best-easy.tsv
+
+
+
+
+
+# Hard targets
+
+
+for k in TM CAD GDT_TS GDT_HA lDDT
+do
+    #echo -n $k " " 
+    for i in  `cat servers-hard.txt`
+    do
+	echo -n $i " " 
+	grep $i QA237_2-$k.tsv  | grep  -f  hard-targets.txt | gawk '{i++;sum+=$3};END{print i,sum,sum/i}' 
+    done  | sort -rn -k 3 > servers-hard-$k.tsv
+done 
+
+
+
+
+# best possible
+
+for k in TM CAD GDT_TS GDT_HA lDDT
+do
+    echo -n $k "best "
+    for i in  `cat targets.txt | sed "s/\-D1//g" | sort -u`
+    do
+	grep $i QA237_2-$k.tsv | grep  -f  hard-targets.txt | sort -g -k 3 | tail -1
+    done  | gawk '{i++;sum+=$3};END{print "best",i,sum,sum/i}' > best-hard-$k.tsv
+done 
+
+
+
+
+
+# best possible
+
+for k in TM CAD GDT_TS GDT_HA lDDT
+do
+    echo -n $k " " 
+    for i in  `cat targets.txt | sed "s/\-D1//g" | sort -u`
+    do
+	grep $i QA237_2-$k.tsv | grep  -f  hard-targets.txt | sort -g -k 3 | tail -1 
+    done  | gawk '{i++;sum+=$3};END{print i,sum,sum/i}' 
+done > best-hard.tsv
+
+
+
 echo "Measure" "BEST" "Server" "EMA" "Num" > summary-firstranked.tsv
 for k in TM CAD GDT_TS GDT_HA lDDT
 do
-    j=`cat servers-$k.tsv best-$k.tsv sum-$k.tsv  | sort -rn -k +3 |grep -n TS  | head -1 | sed s/:.*//g`
+    j=`cat servers-easy-$k.tsv best-easy-$k.tsv sum-easy-$k.tsv  | sort -rn -k +3 |grep -n TS  | head -1 | sed s/:.*//g`
     num=$((j -2))
-    best=`gawk '{print $4}' best-$k.tsv`
-    qa=`sort -rnk 3 sum-$k.tsv | head -1 | gawk '{print $4}' `
-    server=`gawk '{print $4}' servers-$k.tsv | head -1`
-    echo  $k $best $server $qa $num
+    best=`gawk '{print $4}' best-easy-$k.tsv`
+    qa=`sort -rnk 3 sum-easy-$k.tsv | head -1 | gawk '{print $4}' `
+    server=`gawk '{print $4}' servers-easy-$k.tsv | head -1`
+    fracserver=`calc $server / $best | sed s/~//g`
+    fracqa=`calc $qa / $best  | sed s/~//g`
+    frac=`calc $qa / $server  | sed s/~//g`
+    echo  $k $best $server $qa $num $fracserver $fracqa $frac
 done  >> summary-firstranked.tsv
 
+echo "Measure" "BEST" "Server" "EMA" "Num" > summary-easy-firstranked.tsv
+for k in TM CAD GDT_TS GDT_HA lDDT
+do
+    j=`cat servers-easy-$k.tsv best-easy-$k.tsv sum-easy-$k.tsv  | sort -rn -k +3 |grep -n TS  | head -1 | sed s/:.*//g`
+    num=$((j -2))
+    best=`gawk '{print $4}' best-easy-$k.tsv`
+    qa=`sort -rnk 3 sum-easy-$k.tsv | head -1 | gawk '{print $4}' `
+    server=`gawk '{print $4}' servers-easy-$k.tsv | head -1`
+    fracserver=`calc $server / $best | sed s/~//g`
+    fracqa=`calc $qa / $best  | sed s/~//g`
+    frac=`calc $qa / $server  | sed s/~//g`
+    echo  $k $best $server $qa $num $fracserver $fracqa $frac
+done  >> summary-easy-firstranked.tsv
 
+# Summarize 
+
+echo "Measure" "BEST" "Server" "EMA" "Num" > summary-hard-firstranked.tsv
+for k in TM CAD GDT_TS GDT_HA lDDT
+do
+    j=`cat servers-hard-$k.tsv best-hard-$k.tsv sum-hard-$k.tsv  | sort -rn -k +3 |grep -n TS  | head -1 | sed s/:.*//g`
+    num=$((j -2))
+    best=`gawk '{print $4}' best-hard-$k.tsv`
+    qa=`sort -rnk 3 sum-hard-$k.tsv | head -1 | gawk '{print $4}' `
+    server=`gawk '{print $4}' servers-hard-$k.tsv | head -1`
+    fracserver=`calc $server / $best | sed s/~//g`
+    fracqa=`calc $qa / $best  | sed s/~//g` 
+    frac=`calc $qa / $server  | sed s/~//g`
+    echo  $k $best $server $qa $num $fracserver $fracqa $frac
+done  >> summary-hard-firstranked.tsv
 
