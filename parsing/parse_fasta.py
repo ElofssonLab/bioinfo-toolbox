@@ -130,4 +130,4 @@ if __name__ == "__main__":
     seq_dict = read_fasta(afile, query_id)
     afile.close()
     #print 'There are %d entries with unique headers in your file.' % len(seq_dict)
-    print sys.argv[1] + ' ' + str(len(seq_dict.values()[0][0]))
+    print(sys.argv[1] + ' ' + str(len(seq_dict.values()[0][0])))
