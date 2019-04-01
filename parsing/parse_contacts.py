@@ -23,7 +23,7 @@ def parse(afile, sep=' ', min_dist=5):
             # ignore CASP RR format headers
             if len(aline.strip().split(sep)) < 3:
                 continue
-            line_arr = filter(None, aline.strip().split(sep))
+            line_arr = list(filter(None, aline.strip().split(sep)))
             if line_arr[0].startswith('E'):
                 continue
             # parse MISTIC output (i res_i j res_j score)
