@@ -10,9 +10,9 @@ from Bio import pairwise2
 
 import numpy as np
 
-from os.path import expanduser
-home = expanduser("~")
-sys.path.append(home + '/git/bioinfo-toolbox/')
+# from os.path import expanduser
+# home = expanduser("~")
+# sys.path.append(home + '/git/bioinfo-toolbox/')
 
 
 from parsing import parse_fasta
