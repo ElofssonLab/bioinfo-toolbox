@@ -10,9 +10,9 @@ from Bio import pairwise2
 
 import numpy as np
 
-from os.path import expanduser
-home = expanduser("~")
-sys.path.append(home + '/git/bioinfo-toolbox/')
+# from os.path import expanduser
+# home = expanduser("~")
+# sys.path.append(home + '/git/bioinfo-toolbox/')
 
 
 from parsing import parse_fasta
@@ -22,7 +22,7 @@ from parsing import parse_pdb
 def realign(fasta_filename, pdb_filename, outfilename='',chain='*'):
     
     ### get sequence
-    seq = parse_fasta.read_fasta(open(fasta_filename, 'r')).values()[0][0]
+    seq = list(parse_fasta.read_fasta(open(fasta_filename, 'r')).values())[0][0]
     ref_len = len(seq)
     atom_seq = parse_pdb.get_atom_seq(open(pdb_filename, 'r'), chain)
     pdbfile=open(pdb_filename, 'r')

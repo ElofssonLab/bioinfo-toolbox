@@ -23,7 +23,7 @@ def parse(afile, sep=' ', min_dist=5):
             # ignore CASP RR format headers
             if len(aline.strip().split(sep)) < 3:
                 continue
-            line_arr = filter(None, aline.strip().split(sep))
+            line_arr = list(filter(None, aline.strip().split(sep)))
             if line_arr[0].startswith('E'):
                 continue
             # parse MISTIC output (i res_i j res_j score)
@@ -50,8 +50,8 @@ def get_numpy_cmap(contacts, seq_len=-1, min_dist=5):
     @return np.array((seq_len, seq_len), score)
     """
 
-    max_i = max(contacts, key=lambda(x):x[1])[1]
-    max_j = max(contacts, key=lambda(x):x[2])[2]
+    max_i = max(contacts, key=lambda x : x[1])[1]
+    max_j = max(contacts, key=lambda x : x[2])[2]
     n = int(max(seq_len, max_i, max_j))
     cmap = np.zeros((n,n))
 
@@ -93,5 +93,5 @@ if __name__ == "__main__":
     cm = parse(open(c_filename), sep=sep)
 
     for c in cm:
-        print c[1], c[2], c[0]
+        print(c[1], c[2], c[0])
 

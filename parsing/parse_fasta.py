@@ -22,7 +22,7 @@ def read_fasta(afile, query_id=''):
         # check for header
         if aline.startswith('>'):
             if header != '' and seq != '':
-                if seq_dict.has_key(header):
+                if header in seq_dict:
                     seq_dict[header].append(seq)
                 else:
                     seq_dict[header] = [seq]
@@ -39,7 +39,7 @@ def read_fasta(afile, query_id=''):
 
     # add last entry
     if header != '':
-        if seq_dict.has_key(header):
+        if header in seq_dict:
             seq_dict[header].append(seq)
         else:
             seq_dict[header] = [seq]
@@ -68,7 +68,7 @@ def read_fasta_pdb(afile, query_id=''):
         # check for header
         if aline.startswith('>'):
             if header != '' and seq != '':
-                if seq_dict.has_key(header):
+                if header in seq_dict:
                     seq_dict[header].append(seq)
                 else:
                     seq_dict[header] = [seq]
@@ -85,7 +85,7 @@ def read_fasta_pdb(afile, query_id=''):
 
     # add last entry
     if header != '':
-        if seq_dict.has_key(header):
+        if header in seq_dict:
             seq_dict[header].append(seq)
         else:
             seq_dict[header] = [seq]
@@ -130,4 +130,4 @@ if __name__ == "__main__":
     seq_dict = read_fasta(afile, query_id)
     afile.close()
     #print 'There are %d entries with unique headers in your file.' % len(seq_dict)
-    print sys.argv[1] + ' ' + str(len(seq_dict.values()[0][0]))
+    print(sys.argv[1] + ' ' + str(len(seq_dict.values()[0][0])))
