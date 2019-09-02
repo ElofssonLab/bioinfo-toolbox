@@ -236,27 +236,27 @@ def annotate_genome(f):
                 # disorder
 
                 # add iupred
-                print "iupred long"
+                print ("iupred long")
                 dic_iupred_long = parse_fasta_x(iupred_long_data_file)
                 df['iupred_long'] = df['query_id'].map(dic_iupred_long)
                 #print (dic_iupred_long,df['iupred_long'],df['query_id'])
                 
-                print "iupred short"
+                print ("iupred short")
                 dic_iupred_short = parse_fasta_x(iupred_short_data_file)
                 df['iupred_short'] = df['query_id'].map(dic_iupred_short)
 
-                print "iupred long 0.4"
+                print ("iupred long 0.4")
                 dic_iupred04_long = parse_fasta_x(iupred04_long_data_file)
                 df['iupred04_long'] = df['query_id'].map(dic_iupred04_long)
                 #print (dic_iupred04_long,df['iupred04_long'],df['query_id'])
                 
-                print "iupred short 0.4"
+                print ("iupred short 0.4")
                 dic_iupred04_short = parse_fasta_x(iupred04_short_data_file)
                 df['iupred04_short'] = df['query_id'].map(dic_iupred04_short)
 
 
                 # SEG
-                print str(f),"Computing SEG"
+                print (str(f),"Computing SEG")
                 seg_dic = do_seg(f)
                 df["seg"] = df["query_id"].map(seg_dic)
 
@@ -277,15 +277,8 @@ if __name__ == '__main__':
 
 	# This is where we start
 	
-	dir='/scratch2/arne/annotate_uniprot_proteomes/'
-	
-	if  (not os.path.isdir(dir)):
-	    dir='/pfs/nobackup/home/w/wbasile/annotate_uniprot_proteomes/'
-	
-	data_dir = dir+"/data/"
-	input_dir = data_dir + "proteomes/"
-	
-	output_dir = dir+"/results/extended/"
+	output_dir=':~/git/paper_proks_vs_euks_proteins/data/'
+        input_dir = '/scratch2/arne/genbank/'
 	
 	if not os.path.exists(output_dir):
 	    os.makedirs(output_dir)
@@ -301,28 +294,10 @@ if __name__ == '__main__':
 	
 	
 	# Hessa scale
-	hessa = {
-	'C':-0.13,
-	'D':3.49,
-	'S':0.84,
-	'Q':2.36,
-	'K':2.71,
-	'W':0.3,
-	'P':2.23,
-	'T':0.52,
-	'I':-0.6,
-	'A':0.11,
-	'F':-0.32,
-	'G':0.74,
-	'H':2.06,
-	'L':-0.55,
-	'R':2.58,
-	'M':-0.1,
-	'E':2.68,
-	'N':2.05,
-	'Y':0.68,
-	'V':-0.31
-	}
+	hessa = { 'C':-0.13, 'D':3.49, 'S':0.84, 'Q':2.36, 'K':2.71,
+	          'W':0.3, 'P':2.23, 'T':0.52, 'I':-0.6, 'A':0.11, 'F':-0.32,
+	          'G':0.74, 'H':2.06, 'L':-0.55, 'R':2.58, 'M':-0.1, 'E':2.68,
+	          'N':2.05, 'Y':0.68, 'V':-0.31 }
 	
 	
 	
@@ -351,35 +326,27 @@ if __name__ == '__main__':
 	dic_ss_turn = df_scales.set_index("AA").to_dict()["Turn"]
 	
 	
-	
-	    
-	
 	    
 	
 	
 	aas = ['A','C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P',
 	       'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
 	
-	
+	nucl = ['A','C','T','G']
+
+	GC = ['C','G']
 	            
 	        
-	# load the list of PFAM domains that are shared by at least 5 bacteria and 5 euks
-	out_domain_ids_filename = dir+"bin/pfam_ids_orthologs_10.list"
-	shared_domains_pfam_ids = set(filter(None, open(out_domain_ids_filename).read().split("\n")))
-	shared_domains={}
-	for key in shared_domains_pfam_ids:
-	    shared_domains[key]=1
 	
 	
 	file_list = []
 	for f in os.listdir(input_dir):
-	    if f.endswith(".fasta"):
-	        if f.find("DNA") == -1:
-	            file_list += [input_dir + f]
+	    if f.endswith(".gbk.gz"):
+	        file_list += [input_dir + f]
 	
 	#annotate_genome('data/proteomes/UP000001554_7739.fasta')
 	for f in file_list:
-	    #print (f)
+	    print (f)
 	    try:
 	        annotate_genome(f)
 	    except:
