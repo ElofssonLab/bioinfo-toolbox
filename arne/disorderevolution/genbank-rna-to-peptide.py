@@ -33,21 +33,25 @@ def index_genbank_features(gb_record, feature_type, qualifier) :
 
 
 filename=sys.argv[1]
-record = next(SeqIO.parse(filename, "genbank"))
+#record = next(SeqIO.parse(filename, "genbank"))
 from Bio import SeqIO
 for seq_record in SeqIO.parse(filename, "genbank"):
     print(seq_record.id)
-    print(repr(seq_record.seq))
+    print(seq_record.seq)
+    nucleotideseq=seq_record.seq
     #print(len(seq_record))
-    (aaseq,feature)=index_genbank_features(record,"CDS","translation")
+    (aaseq,feature)=index_genbank_features(seq_record,"CDS","translation")
     print (aaseq)
-    start=record.features[feature]
+    start=seq_record.features[feature]
+    codingseq=''
     for (index, feature) in enumerate(start) :
-        print (index,feature)
-    print (start)
+        #print (index,feature,nucleotideseq[index],nucleotideseq[feature])
+        codingseq+=nucleotideseq[feature]
+    #print (start)
+    print (codingseq)
     #print (record.features[2])
     #xsys.exit()
-    for (index, feature) in enumerate(record.features) :
+    for (index, feature) in enumerate(seq_record.features) :
         print (index,feature)
     #print(seq_record.features)
     sys.exit()
