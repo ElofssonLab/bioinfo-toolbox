@@ -1,5 +1,5 @@
 #!/bin/bash -x
-#SBATCH -A SNIC2018-1-26
+#SBATCH -A SNIC2019-3-319
 #SBATCH --output=annotate.%A_%a.out
 #SBATCH --error=annotate.%A_%a.out
 #SBATCH --array=1-50

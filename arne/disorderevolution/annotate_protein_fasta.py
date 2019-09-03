@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import os
 import re
+import sys
 from multiprocessing import Pool
 from Bio import SeqIO
 from Bio.Seq import Seq
@@ -54,8 +55,7 @@ def get_topidp(seq):
 
 
 # Hessa scale
-hessa = {
-'C':-0.13,
+hessa = {'C':-0.13,
 'D':3.49,
 'S':0.84,
 'Q':2.36,
@@ -215,6 +215,14 @@ def aa_freq(seq,aa):
         return np.nan
     return float(seq.count(aa)) / float(len(seq))
 
+def gc_freq(seq,pos):
+    if len(seq) == 0:
+        return np.nan
+    tempseq=''
+    for i in range(pos-1,len(seq),3):
+        tempseq+=seq[i]
+    return float(tempseq.count('G')+tempseq.count('C')) / float(len(tempseq))
+
       
 def aa_count(seq,aa):
     if len(seq) == 0:
@@ -270,6 +278,7 @@ def annotate_genome(f):
         iupred04_long_data_file = f +  ".data_iupred_0.4_long"
         iupred04_short_data_file = f +  ".data_iupred_0.4_short"
         uniprot_data_file = re.sub(r'\.fasta','.txt',f)
+        DNA_fasta_file = re.sub(r'\.fasta','_DNA.fasta',f)
 
         proceed = True
         
@@ -290,7 +299,7 @@ def annotate_genome(f):
             proceed = False
 
         if proceed == True:
-            #print ("Trying:",f)
+            print ("Trying:",f)
 
             f_name = f.split("/")[-1]
 
@@ -304,31 +313,34 @@ def annotate_genome(f):
                 protein_recs = SeqIO.to_dict(SeqIO.parse(f,"fasta"))
                 recs = []
                 for k in protein_recs:
-                    id=re.sub(r'.*\|','',k)
+                    longid=re.sub(r'.*\|','',k)
+                    id=re.sub(r'\|.*','',re.sub(r'tr\|','',k))
                     rec = {}
                     rec["query_id"] = id
+                    rec["longid"] = longid
                     rec["seq"] = str(protein_recs[k].seq)
                     recs += [rec]
 
-                df = pd.DataFrame(recs)
+                df_prot = pd.DataFrame(recs)
 
                 # annotate all properties
-                df["length"] = df.seq.apply(len)
-                df["top-idp"] = df["seq"].apply(get_topidp)
-                df["hessa"] = df["seq"].apply(get_hessa)
+                df_prot["length"] = df_prot.seq.apply(len)
+                df_prot["top-idp"] = df_prot["seq"].apply(get_topidp)
+                df_prot["hessa"] = df_prot["seq"].apply(get_hessa)
 
 
                 # AA frequencies
                 for aa in aas:
-                    df["freq_" + aa] = df.seq.apply(aa_freq, args = (aa,)) 
+                    df_prot["freq_" + aa] = df_prot.seq.apply(aa_freq, args = (aa,)) 
 
-                # AA counts
+                for ss_type, d_scale in zip(["alpha", "beta", "coil", "turn"],[dic_ss_alpha, dic_ss_beta, dic_ss_coil, dic_ss_turn]):
+                    df_prot["ss_" + ss_type] = df_prot.seq.apply(get_ss_scale, args = (d_scale,))
+
+                    # AA counts
                 #for aa in aas:
-                #    df["count_" + aa] = df.seq.apply(aa_count, args = (aa,))
+                #    df["count_" + aa] = df_prot.seq.apply(aa_count, args = (aa,))
 
                 ## add SS scales
-                for ss_type, d_scale in zip(["alpha", "beta", "coil", "turn"],[dic_ss_alpha, dic_ss_beta, dic_ss_coil, dic_ss_turn]):
-                    df["ss_" + ss_type] = df.seq.apply(get_ss_scale, args = (d_scale,))
 
                     
                 # disorder
@@ -336,41 +348,66 @@ def annotate_genome(f):
                 # add iupred
                 print "iupred long"
                 dic_iupred_long = parse_fasta_x(iupred_long_data_file)
-                df['iupred_long'] = df['query_id'].map(dic_iupred_long)
-                #print (dic_iupred_long,df['iupred_long'],df['query_id'])
+                df_prot['iupred_long'] = df_prot['longid'].map(dic_iupred_long)
+                #print (dic_iupred_long,df_prot['iupred_long'],df_prot['longid'])
                 
                 print "iupred short"
                 dic_iupred_short = parse_fasta_x(iupred_short_data_file)
-                df['iupred_short'] = df['query_id'].map(dic_iupred_short)
+                df_prot['iupred_short'] = df_prot['longid'].map(dic_iupred_short)
 
                 print "iupred long 0.4"
                 dic_iupred04_long = parse_fasta_x(iupred04_long_data_file)
-                df['iupred04_long'] = df['query_id'].map(dic_iupred04_long)
-                #print (dic_iupred04_long,df['iupred04_long'],df['query_id'])
+                df_prot['iupred04_long'] = df_prot['longid'].map(dic_iupred04_long)
+                #print (dic_iupred04_long,df_prot['iupred04_long'],df_prot['longid'])
                 
                 print "iupred short 0.4"
                 dic_iupred04_short = parse_fasta_x(iupred04_short_data_file)
-                df['iupred04_short'] = df['query_id'].map(dic_iupred04_short)
+                df_prot['iupred04_short'] = df_prot['longid'].map(dic_iupred04_short)
 
 
                 # SEG
                 print str(f),"Computing SEG"
                 seg_dic = do_seg(f)
-                df["seg"] = df["query_id"].map(seg_dic)
+                df_prot["seg"] = df_prot["longid"].map(seg_dic)
 
+
+
+                # GC counts
+                dna_recs = SeqIO.to_dict(SeqIO.parse(DNA_fasta_file,"fasta"))
+                dnarecs = []
+                for k in dna_recs:
+                    id=re.sub(r'\|.*','',re.sub(r'tr\|','',k))
+                    dnarec = {}
+                    #print (k,id)
+                    dnarec["query_id"] = id
+                    dnarec["dnaseq"] = str(dna_recs[k].seq)
+                    dnarecs += [dnarec]
+
+                #print ("RECS",len(recs))
+                #print ("DNA",len(dnarecs))
+                df_dna=pd.DataFrame(dnarecs)
+
+                    #print(df)
+                #print(tempdf)
+                for i in range(1,4):
+                    df_dna["GC"+str(i)] = df_dna.dnaseq.apply(gc_freq,args = (i,))
+                df=pd.merge(df_prot,df_dna,on='query_id')
+
+                    
 
                 # Parsing uniprot - today only Pfam
                 #print "Parse uniprot"
                 (dic_pfam,dic_numdoms,dic_kingdom) = parse_uniprot(uniprot_data_file)
-                df["Pfam"] = df['query_id'].map(dic_pfam)
-                df["NumDoms"] = df['query_id'].map(dic_numdoms)
-                df["PfamType"] = df['query_id'].map(dic_kingdom)
+                df["Pfam"] = df['longid'].map(dic_pfam)
+                df["NumDoms"] = df['longid'].map(dic_numdoms)
+                df["PfamType"] = df['longid'].map(dic_kingdom)
 
                 # export
-                columns = ["query_id",  "length", "top-idp", "iupred_long", "iupred_short","iupred04_long", "iupred04_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa","Pfam","NumDoms","PfamType"]
+                columns = ["longid",  "length", "top-idp", "iupred_long", "iupred_short","iupred04_long", "iupred04_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa","Pfam","NumDoms","PfamType"]
                 columns += ["freq_" + aa for aa in aas]
+                columns += ["GC1","GC2","GC3"]
                 df[columns].to_csv(out_annotation_file, index = False)
-            
+
         
 # load the list of PFAM domains that are shared by at least 5 bacteria and 5 euks
 out_domain_ids_filename = dir+"bin/pfam_ids_orthologs_10.list"
@@ -386,7 +423,8 @@ for f in os.listdir(input_dir):
         if f.find("DNA") == -1:
             file_list += [input_dir + f]
 
-#annotate_genome('data/proteomes/UP000001554_7739.fasta')
+annotate_genome('/pfs/nobackup/home/w/wbasile/annotate_uniprot_proteomes/data/proteomes/UP000001554_7739.fasta')
+sys.exit()
 for f in file_list:
     #print (f)
     try:
