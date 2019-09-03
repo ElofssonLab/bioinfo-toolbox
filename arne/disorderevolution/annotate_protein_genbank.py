@@ -345,6 +345,7 @@ if __name__ == '__main__':
 	        file_list += [input_dir + f]
 	
 	#annotate_genome('data/proteomes/UP000001554_7739.fasta')
+        #sys.exit()
 	for f in file_list:
 	    print (f)
 	    try:
