@@ -23,12 +23,13 @@ def parse_annotation(filename,ty):
         ret_dic = {}    
         sum_dic = {}    
         return ret_dic,sum_dic
+    df.rename(columns={'longid':'query_id'}, inplace=True)
     n_proteins = len(df.query_id)
     
     df_sum = df.sum()
     df_mean = df.mean()
     
-    columns = ["length", "top-idp", "iupred_long", "iupred_short","iupred04_long", "iupred04_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa"]
+    columns = ["length", "top-idp", "iupred_long", "iupred_short","iupred04_long", "iupred04_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa","GC1","GC2","GC3"]
     columns += ["freq_" + aa for aa in aas]
 
     ret_dic = {}    

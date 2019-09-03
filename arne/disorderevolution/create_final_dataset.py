@@ -21,7 +21,7 @@ def parse_annotation(filename):
 
     df_mean = df.mean()
     
-    columns = ["length", "top-idp", "iupred_long", "iupred_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa"]
+    columns = ["length", "top-idp", "iupred_long", "iupred_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa","GC1","GC2","GC3"]
     columns += ["freq_" + aa for aa in aas]
     Pfamcolumns = ["Pfam","NumDoms","PfamType"]
 
