@@ -423,8 +423,8 @@ for f in os.listdir(input_dir):
         if f.find("DNA") == -1:
             file_list += [input_dir + f]
 
-annotate_genome('/pfs/nobackup/home/w/wbasile/annotate_uniprot_proteomes/data/proteomes/UP000001554_7739.fasta')
-sys.exit()
+#annotate_genome('/pfs/nobackup/home/w/wbasile/annotate_uniprot_proteomes/data/proteomes/UP000001554_7739.fasta')
+#sys.exit()
 for f in file_list:
     #print (f)
     try:
