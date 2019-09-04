@@ -314,10 +314,12 @@ def annotate_genome(f):
                 recs = []
                 for k in protein_recs:
                     longid=re.sub(r'.*\|','',k)
-                    id=re.sub(r'\|.*','',re.sub(r'tr\|','',k))
+                    #id=re.sub(r'\>[a-z]+\|','',re.sub(r'\|.*','',k))
+                    id=re.split('\|',k)
+                    print (id,longid,k)
                     rec = {}
-                    rec["query_id"] = id
-                    rec["longid"] = longid
+                    rec["query_id"] = longid
+                    rec["shortid"] = id[1]
                     rec["seq"] = str(protein_recs[k].seq)
                     recs += [rec]
 
@@ -348,27 +350,27 @@ def annotate_genome(f):
                 # add iupred
                 print "iupred long"
                 dic_iupred_long = parse_fasta_x(iupred_long_data_file)
-                df_prot['iupred_long'] = df_prot['longid'].map(dic_iupred_long)
-                #print (dic_iupred_long,df_prot['iupred_long'],df_prot['longid'])
+                df_prot['iupred_long'] = df_prot['query_id'].map(dic_iupred_long)
+                #print (dic_iupred_long,df_prot['iupred_long'],df_prot['query_id'])
                 
                 print "iupred short"
                 dic_iupred_short = parse_fasta_x(iupred_short_data_file)
-                df_prot['iupred_short'] = df_prot['longid'].map(dic_iupred_short)
+                df_prot['iupred_short'] = df_prot['query_id'].map(dic_iupred_short)
 
                 print "iupred long 0.4"
                 dic_iupred04_long = parse_fasta_x(iupred04_long_data_file)
-                df_prot['iupred04_long'] = df_prot['longid'].map(dic_iupred04_long)
-                #print (dic_iupred04_long,df_prot['iupred04_long'],df_prot['longid'])
+                df_prot['iupred04_long'] = df_prot['query_id'].map(dic_iupred04_long)
+                #print (dic_iupred04_long,df_prot['iupred04_long'],df_prot['query_id'])
                 
                 print "iupred short 0.4"
                 dic_iupred04_short = parse_fasta_x(iupred04_short_data_file)
-                df_prot['iupred04_short'] = df_prot['longid'].map(dic_iupred04_short)
+                df_prot['iupred04_short'] = df_prot['query_id'].map(dic_iupred04_short)
 
 
                 # SEG
                 print str(f),"Computing SEG"
                 seg_dic = do_seg(f)
-                df_prot["seg"] = df_prot["longid"].map(seg_dic)
+                df_prot["seg"] = df_prot["query_id"].map(seg_dic)
 
 
 
@@ -376,10 +378,11 @@ def annotate_genome(f):
                 dna_recs = SeqIO.to_dict(SeqIO.parse(DNA_fasta_file,"fasta"))
                 dnarecs = []
                 for k in dna_recs:
-                    id=re.sub(r'\|.*','',re.sub(r'tr\|','',k))
+                    #id=re.sub(r'\|.*','',re.sub(r'\>[a-z]+\|','',k))
+                    id=re.split('\|',k)
                     dnarec = {}
-                    #print (k,id)
-                    dnarec["query_id"] = id
+                    print (k,id[1])
+                    dnarec["shortid"] = id[1]
                     dnarec["dnaseq"] = str(dna_recs[k].seq)
                     dnarecs += [dnarec]
 
@@ -391,19 +394,19 @@ def annotate_genome(f):
                 #print(tempdf)
                 for i in range(1,4):
                     df_dna["GC"+str(i)] = df_dna.dnaseq.apply(gc_freq,args = (i,))
-                df=pd.merge(df_prot,df_dna,on='query_id')
+                df=pd.merge(df_prot,df_dna,on='shortid')
 
                     
 
                 # Parsing uniprot - today only Pfam
                 #print "Parse uniprot"
                 (dic_pfam,dic_numdoms,dic_kingdom) = parse_uniprot(uniprot_data_file)
-                df["Pfam"] = df['longid'].map(dic_pfam)
-                df["NumDoms"] = df['longid'].map(dic_numdoms)
-                df["PfamType"] = df['longid'].map(dic_kingdom)
+                df["Pfam"] = df['query_id'].map(dic_pfam)
+                df["NumDoms"] = df['query_id'].map(dic_numdoms)
+                df["PfamType"] = df['query_id'].map(dic_kingdom)
 
                 # export
-                columns = ["longid",  "length", "top-idp", "iupred_long", "iupred_short","iupred04_long", "iupred04_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa","Pfam","NumDoms","PfamType"]
+                columns = ["query_id",  "length", "top-idp", "iupred_long", "iupred_short","iupred04_long", "iupred04_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa","Pfam","NumDoms","PfamType"]
                 columns += ["freq_" + aa for aa in aas]
                 columns += ["GC1","GC2","GC3"]
                 df[columns].to_csv(out_annotation_file, index = False)
@@ -417,14 +420,17 @@ for key in shared_domains_pfam_ids:
     shared_domains[key]=1
 
 
+
+#annotate_genome('/pfs/nobackup/home/w/wbasile/annotate_uniprot_proteomes/data/proteomes/UP000001554_7739.fasta')
+#annotate_genome('/pfs/nobackup/home/w/wbasile/annotate_uniprot_proteomes/data/proteomes/UP000002311_559292.fasta')
+#sys.exit()
+    
 file_list = []
 for f in os.listdir(input_dir):
     if f.endswith(".fasta"):
         if f.find("DNA") == -1:
             file_list += [input_dir + f]
 
-#annotate_genome('/pfs/nobackup/home/w/wbasile/annotate_uniprot_proteomes/data/proteomes/UP000001554_7739.fasta')
-#sys.exit()
 for f in file_list:
     #print (f)
     try:

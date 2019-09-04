@@ -23,7 +23,7 @@ def parse_annotation(filename,ty):
         ret_dic = {}    
         sum_dic = {}    
         return ret_dic,sum_dic
-    df.rename(columns={'longid':'query_id'}, inplace=True)
+    #df.rename(columns={'longid':'query_id'}, inplace=True)
     n_proteins = len(df.query_id)
     
     df_sum = df.sum()
