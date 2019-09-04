@@ -12,4 +12,4 @@
 
 source /pfs/nobackup/home/w/wbasile/venv-work/bin/activate
 
-python ./annotate_protein_fasta.py
+python /pfs/nobackup/home/w/wbasile/annotate_uniprot_proteomes/bin/annotate_protein_fasta.py
