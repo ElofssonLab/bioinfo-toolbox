@@ -176,7 +176,10 @@ for f in os.listdir(input_dir):
 for ty in ["All","Shared","None","Unique"]:
     data = []
     summ = []
+    i=0
     for f in file_list:
+        i++
+        print (i)
         d,s = parse_annotation(f,ty)
         data += [d]
         summ += [s]
