@@ -28,9 +28,21 @@ def parse_annotation(filename,ty):
     
     df_sum = df.sum()
     df_mean = df.mean()
-    
-    columns = ["length", "top-idp", "iupred_long", "iupred_short","iupred04_long", "iupred04_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa","GC1","GC2","GC3"]
+    nucleotides= ["A","C","T","G"]
+    codons=[]
+    nucleotidepos=[]
+    for one in nucleotides:
+        for pos in ["1","2","3","4"]:
+            nucleotidepos += [one+pos]
+            for two in nucleotides:
+                for three in nucleotides:
+                    codons+=[one+two+three]
+
+    columns = ["length", "top-idp", "iupred_long", "iupred_short","iupred04_long", "iupred04_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa"]
     columns += ["freq_" + aa for aa in aas]
+    columns += ["GC1","GC2","GC3","GCcoding"]
+    columns += nucleotidepos
+    columns += codons
 
     ret_dic = {}    
     ret_dic["taxon_id"] = tax_id

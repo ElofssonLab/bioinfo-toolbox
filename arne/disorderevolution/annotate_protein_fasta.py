@@ -54,28 +54,21 @@ def get_topidp(seq):
     return top_idp_avg
 
 
-# Hessa scale
-hessa = {'C':-0.13,
-'D':3.49,
-'S':0.84,
-'Q':2.36,
-'K':2.71,
-'W':0.3,
-'P':2.23,
-'T':0.52,
-'I':-0.6,
-'A':0.11,
-'F':-0.32,
-'G':0.74,
-'H':2.06,
-'L':-0.55,
-'R':2.58,
-'M':-0.1,
-'E':2.68,
-'N':2.05,
-'Y':0.68,
-'V':-0.31
-}
+nucleotides= ["A","C","T","G"]
+codons=[]
+nucleotidepos=[]
+for one in nucleotides:
+    for pos in ["1","2","3","4"]:
+        nucleotidepos += [one+pos]
+        for two in nucleotides:
+            for three in nucleotides:
+                codons+=[one+two+three]
+
+                
+# Hessa scale hessa = {'C':-0.13, 'D':3.49, 'S':0.84, 'Q':2.36,
+'K':2.71, 'W':0.3, 'P':2.23, 'T':0.52, 'I':-0.6, 'A':0.11, 'F':-0.32,
+'G':0.74, 'H':2.06, 'L':-0.55, 'R':2.58, 'M':-0.1, 'E':2.68, 'N':2.05,
+'Y':0.68, 'V':-0.31 }
 
 def get_hessa(seq):
     if len(seq) == 0:
@@ -188,26 +181,8 @@ def do_seg(input_file):
     return seg_dic
 
 
-aas = ['A',
- 'C',
- 'D',
- 'E',
- 'F',
- 'G',
- 'H',
- 'I',
- 'K',
- 'L',
- 'M',
- 'N',
- 'P',
- 'Q',
- 'R',
- 'S',
- 'T',
- 'V',
- 'W',
- 'Y']
+aas = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N',
+ 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
 
 
 def aa_freq(seq,aa):
@@ -222,6 +197,29 @@ def gc_freq(seq,pos):
     for i in range(pos-1,len(seq),3):
         tempseq+=seq[i]
     return float(tempseq.count('G')+tempseq.count('C')) / float(len(tempseq))
+
+def nucl_freq(seq):
+    if len(seq) == 0:
+        return np.nan
+    nucfreq={}
+    tempseq=''
+    for pos in range (1,4):
+        for i in range(pos-1,len(seq),3):
+            tempseq+=seq[i]
+        for nucl in nucleotides:
+            nucfrreq[nucl+pos]=float(tempseq.count(nucl)) / float(len(tempseq))
+    return nucfreq
+
+def codon_freq(seq,codon):
+    if len(seq) == 0:
+        return np.nan
+    codonfreq={}
+    tempseq=''
+    for i in range(0,len(seq),3):
+        tempcodon=seq[i:+3]
+        codonfreq[tempcodon]+=3./float(len(seq))
+            
+    return codonfreq
 
       
 def aa_count(seq,aa):
@@ -392,11 +390,26 @@ def annotate_genome(f):
 
                     #print(df)
                 #print(tempdf)
+                dnaseq=df_dna.dnaseq
+                sum=0
                 for i in range(1,4):
                     df_dna["GC"+str(i)] = df_dna.dnaseq.apply(gc_freq,args = (i,))
-                df=pd.merge(df_prot,df_dna,on='shortid')
+                    sum+=df_dna["GC"+str(i)]
+                df_dna["GCcoding"]= sum/3.
 
-                    
+                # Now also indiviual codons
+                nucl=nucl_freq(dnaseq)
+                for pos in range(1,4):
+                    for nuc in nucleotides:
+                        df_dna[nuc+pos]=nucl[nuc+pos]
+
+                # And codons
+                condonfreq=codon_freq(dnaseq)
+                for codon in codons:
+                    df_dna[codon]=codonfreq(codon)
+
+                
+                df=pd.merge(df_prot,df_dna,on='shortid')
 
                 # Parsing uniprot - today only Pfam
                 #print "Parse uniprot"
@@ -408,7 +421,9 @@ def annotate_genome(f):
                 # export
                 columns = ["query_id",  "length", "top-idp", "iupred_long", "iupred_short","iupred04_long", "iupred04_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa","Pfam","NumDoms","PfamType"]
                 columns += ["freq_" + aa for aa in aas]
-                columns += ["GC1","GC2","GC3"]
+                columns += ["GC1","GC2","GC3","GCcoding"]
+                columns += nucleotidepos
+                columns += codons
                 df[columns].to_csv(out_annotation_file, index = False)
 
         
