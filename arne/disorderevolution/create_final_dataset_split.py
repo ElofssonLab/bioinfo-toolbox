@@ -32,7 +32,7 @@ def parse_annotation(filename,ty):
     codons=[]
     nucleotidepos=[]
     for one in nucleotides:
-        for pos in ["1","2","3","4"]:
+        for pos in ["1","2","3"]:
             nucleotidepos += [one+pos]
             for two in nucleotides:
                 for three in nucleotides:

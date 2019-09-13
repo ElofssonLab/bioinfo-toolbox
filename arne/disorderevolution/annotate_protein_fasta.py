@@ -54,18 +54,22 @@ def get_topidp(seq):
     return top_idp_avg
 
 
+global nucleotides,codons
 nucleotides= ["A","C","T","G"]
 codons=[]
 nucleotidepos=[]
 for one in nucleotides:
-    for pos in ["1","2","3","4"]:
+    for pos in ["1","2","3"]:
         nucleotidepos += [one+pos]
         for two in nucleotides:
             for three in nucleotides:
                 codons+=[one+two+three]
 
                 
-# Hessa scale hessa = {'C':-0.13, 'D':3.49, 'S':0.84, 'Q':2.36,
+# Hessa scale
+
+
+hessa = {'C':-0.13, 'D':3.49, 'S':0.84, 'Q':2.36,
 'K':2.71, 'W':0.3, 'P':2.23, 'T':0.52, 'I':-0.6, 'A':0.11, 'F':-0.32,
 'G':0.74, 'H':2.06, 'L':-0.55, 'R':2.58, 'M':-0.1, 'E':2.68, 'N':2.05,
 'Y':0.68, 'V':-0.31 }
@@ -198,28 +202,26 @@ def gc_freq(seq,pos):
         tempseq+=seq[i]
     return float(tempseq.count('G')+tempseq.count('C')) / float(len(tempseq))
 
-def nucl_freq(seq):
+def nucl_freq(seq,pos,nucl):
     if len(seq) == 0:
         return np.nan
-    nucfreq={}
+    nucfreq=0.
     tempseq=''
-    for pos in range (1,4):
-        for i in range(pos-1,len(seq),3):
-            tempseq+=seq[i]
-        for nucl in nucleotides:
-            nucfrreq[nucl+pos]=float(tempseq.count(nucl)) / float(len(tempseq))
+    for i in range(pos-1,len(seq),3):
+        tempseq+=seq[i]
+    nucfreq=float(tempseq.count(nucl)) / float(len(tempseq))
     return nucfreq
 
 def codon_freq(seq,codon):
     if len(seq) == 0:
         return np.nan
-    codonfreq={}
-    tempseq=''
+    codonfreq=0.
     for i in range(0,len(seq),3):
-        tempcodon=seq[i:+3]
-        codonfreq[tempcodon]+=3./float(len(seq))
-            
+        tempcodon=seq[i:i+3]
+        if (tempcodon == codon):
+            codonfreq+=3./float(len(seq))
     return codonfreq
+
 
       
 def aa_count(seq,aa):
@@ -314,7 +316,7 @@ def annotate_genome(f):
                     longid=re.sub(r'.*\|','',k)
                     #id=re.sub(r'\>[a-z]+\|','',re.sub(r'\|.*','',k))
                     id=re.split('\|',k)
-                    print (id,longid,k)
+                    #print (id,longid,k)
                     rec = {}
                     rec["query_id"] = longid
                     rec["shortid"] = id[1]
@@ -346,27 +348,27 @@ def annotate_genome(f):
                 # disorder
 
                 # add iupred
-                print "iupred long"
+                #print "iupred long"
                 dic_iupred_long = parse_fasta_x(iupred_long_data_file)
                 df_prot['iupred_long'] = df_prot['query_id'].map(dic_iupred_long)
                 #print (dic_iupred_long,df_prot['iupred_long'],df_prot['query_id'])
                 
-                print "iupred short"
+                #print "iupred short"
                 dic_iupred_short = parse_fasta_x(iupred_short_data_file)
                 df_prot['iupred_short'] = df_prot['query_id'].map(dic_iupred_short)
 
-                print "iupred long 0.4"
+                #print "iupred long 0.4"
                 dic_iupred04_long = parse_fasta_x(iupred04_long_data_file)
                 df_prot['iupred04_long'] = df_prot['query_id'].map(dic_iupred04_long)
                 #print (dic_iupred04_long,df_prot['iupred04_long'],df_prot['query_id'])
                 
-                print "iupred short 0.4"
+                #print "iupred short 0.4"
                 dic_iupred04_short = parse_fasta_x(iupred04_short_data_file)
                 df_prot['iupred04_short'] = df_prot['query_id'].map(dic_iupred04_short)
 
 
                 # SEG
-                print str(f),"Computing SEG"
+                # print str(f),"Computing SEG"
                 seg_dic = do_seg(f)
                 df_prot["seg"] = df_prot["query_id"].map(seg_dic)
 
@@ -379,7 +381,7 @@ def annotate_genome(f):
                     #id=re.sub(r'\|.*','',re.sub(r'\>[a-z]+\|','',k))
                     id=re.split('\|',k)
                     dnarec = {}
-                    print (k,id[1])
+                    #print (k,id[1])
                     dnarec["shortid"] = id[1]
                     dnarec["dnaseq"] = str(dna_recs[k].seq)
                     dnarecs += [dnarec]
@@ -390,7 +392,6 @@ def annotate_genome(f):
 
                     #print(df)
                 #print(tempdf)
-                dnaseq=df_dna.dnaseq
                 sum=0
                 for i in range(1,4):
                     df_dna["GC"+str(i)] = df_dna.dnaseq.apply(gc_freq,args = (i,))
@@ -398,17 +399,19 @@ def annotate_genome(f):
                 df_dna["GCcoding"]= sum/3.
 
                 # Now also indiviual codons
-                nucl=nucl_freq(dnaseq)
+                #nucl=nucl_freq(dnaseq)
+                #print (nucl)
                 for pos in range(1,4):
-                    for nuc in nucleotides:
-                        df_dna[nuc+pos]=nucl[nuc+pos]
-
+                    for nucl in nucleotides:
+                        df_dna[nucl+str(pos)]=df_dna.dnaseq.apply(nucl_freq, args = (pos,nucl,))
+                        
+                #print (df_dna)
+                #sys.exit()
                 # And codons
-                condonfreq=codon_freq(dnaseq)
+                #codonfreq={}
+                #codonfreq=codon_freq(dnaseq)
                 for codon in codons:
-                    df_dna[codon]=codonfreq(codon)
-
-                
+                    df_dna[codon]=df_dna.dnaseq.apply(codon_freq, args =(codon,))
                 df=pd.merge(df_prot,df_dna,on='shortid')
 
                 # Parsing uniprot - today only Pfam
