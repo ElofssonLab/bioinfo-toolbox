@@ -404,7 +404,8 @@ def annotate_genome(f):
                 for pos in range(1,4):
                     for nucl in nucleotides:
                         df_dna[nucl+str(pos)]=df_dna.dnaseq.apply(nucl_freq, args = (pos,nucl,))
-                        
+                for nucl in nucleotides:
+                    df_dna[nucl]=(df_dna[nucl+"1"]+df_dna[nucl+"2"]+df_dna[nucl+"3"])/3
                 #print (df_dna)
                 #sys.exit()
                 # And codons
@@ -425,6 +426,7 @@ def annotate_genome(f):
                 columns = ["query_id",  "length", "top-idp", "iupred_long", "iupred_short","iupred04_long", "iupred04_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa","Pfam","NumDoms","PfamType"]
                 columns += ["freq_" + aa for aa in aas]
                 columns += ["GC1","GC2","GC3","GCcoding"]
+                columns += nucleotides
                 columns += nucleotidepos
                 columns += codons
                 df[columns].to_csv(out_annotation_file, index = False)

@@ -41,6 +41,7 @@ def parse_annotation(filename,ty):
     columns = ["length", "top-idp", "iupred_long", "iupred_short","iupred04_long", "iupred04_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa"]
     columns += ["freq_" + aa for aa in aas]
     columns += ["GC1","GC2","GC3","GCcoding"]
+    columns += nucleotides
     columns += nucleotidepos
     columns += codons
 
@@ -190,7 +191,7 @@ for ty in ["All","Shared","None","Unique"]:
     summ = []
     i=0
     for f in file_list:
-        i++
+        i+=1
         print (i)
         d,s = parse_annotation(f,ty)
         data += [d]
