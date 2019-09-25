@@ -41,7 +41,7 @@ def parse_annotation(filename,ty):
     columns = ["length", "top-idp", "iupred_long", "iupred_short","iupred04_long", "iupred04_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa"]
     columns += ["freq_" + aa for aa in aas]
     columns += ["GC1","GC2","GC3","GCcoding"]
-    columns += nucleotides
+#    columns += nucleotides
     columns += nucleotidepos
     columns += codons
 
@@ -55,7 +55,6 @@ def parse_annotation(filename,ty):
     ret_dic["count_protein"] = n_proteins
     ret_dic["length_translation"]=df["length"].sum()
     
-    ret_dic["GCnoncoding"]=
 
     
     
@@ -85,16 +84,16 @@ def parse_annotation(filename,ty):
         else:
             sum_dic[c] = df[c+"-sum"].sum()
         ret_dic[c] = df_mean[c]
-        
-    ret_dic["GenomeSize"]=taxid2Mb.get(tax_id,pd.np.nan)
-    ret_dic["NumGCall"]=ret_dic["GenomeSize"]*ret_dic["GC_genomic"]*10000
-    ret_dic["NumGCcoding"]=ret_dic["lenght_translation"]*ret_dic["GCcoding"]*3
-    ret_dic["NumGCnoncoding"]=ret_dic["NumGCAll"]-ret_dic["NumGCcoding"]
-    ret_dic["NonCodingsize"]=ret_dic["GenomeSize"]-ret_dic["lenght_translation"]*3
-    ret_dic["GCnoncodingsize"]=ret_dic["NumGCnoncoding"]/ret_dic["NonCodingsize"]
 
-    print (ret_dic)
-    sys.exit()
+    GC=float(ret_dic["GC"])
+    GenomeSize=float(taxid2Mb.get(tax_id,pd.np.nan))*1000000
+    NumGCall=GenomeSize*GC/100.
+    NumGCcoding=ret_dic["length_translation"]*ret_dic["GCcoding"]*3
+    NumGCnoncoding=NumGCall-NumGCcoding
+    NonCodingsize=GenomeSize-ret_dic["length_translation"]*3
+    ret_dic["GCnoncoding"]=100.*NumGCnoncoding/NonCodingsize
+    print (tax_id,ret_dic["GC"],ret_dic["GCcoding"],ret_dic["GCnoncoding"])
+    #print (ret_dic)
     #gcs = df_reference.loc[df_reference["TaxID"] == tax_id]["GC%"].astype(float)
     #ret_dic["GC"] = pd.np.mean(list(gcs))
 
