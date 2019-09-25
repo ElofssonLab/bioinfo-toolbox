@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import re
+import math
 
 
 def parse_annotation(filename,ty):
@@ -85,17 +86,26 @@ def parse_annotation(filename,ty):
             sum_dic[c] = df[c+"-sum"].sum()
         ret_dic[c] = df_mean[c]
 
-    GC=float(ret_dic["GC"])
-    GenomeSize=float(taxid2Mb.get(tax_id,pd.np.nan))*1000000
-    NumGCall=GenomeSize*GC/100.
-    NumGCcoding=ret_dic["length_translation"]*ret_dic["GCcoding"]*3
-    NumGCnoncoding=NumGCall-NumGCcoding
-    NonCodingsize=GenomeSize-ret_dic["length_translation"]*3
-
+    try:
+        GC=float(ret_dic["GC"])
+    except:
+        GC=float('nan')
+    try:
+        GenomeSize=float(taxid2Mb.get(tax_id,pd.np.nan))*1000000
+    except:
+        GenomeSize=float('nan')
+    if (not (math.isnan(GC) or math.isnan(GenomeSize))):
+        NumGCall=GenomeSize*GC/100.
+        NumGCcoding=ret_dic["length_translation"]*ret_dic["GCcoding"]*3
+        NumGCnoncoding=NumGCall-NumGCcoding
+        NonCodingsize=GenomeSize-ret_dic["length_translation"]*3
+        ret_dic["GCnoncoding"]=100.*NumGCnoncoding/NonCodingsize
+        sum_dic["GCnoncoding"]=100.*NumGCnoncoding/NonCodingsize
+    else:
+        ret_dic["GCnoncoding"]=float(nan)
+        sum_dic["GCnoncoding"]=float(nan)
     ret_dic["GenomeSize"]=GenomeSize
     sum_dic["GenomeSize"]=GenomeSize
-    ret_dic["GCnoncoding"]=100.*NumGCnoncoding/NonCodingsize
-    sum_dic["GCnoncoding"]=100.*NumGCnoncoding/NonCodingsize
     print (tax_id,ret_dic["GC"],ret_dic["GCcoding"],ret_dic["GCnoncoding"])
     #print (ret_dic)
     #gcs = df_reference.loc[df_reference["TaxID"] == tax_id]["GC%"].astype(float)
