@@ -54,6 +54,11 @@ def parse_annotation(filename,ty):
     ret_dic["GC_genomic"] = taxid2gc.get(tax_id,pd.np.nan)
     ret_dic["count_protein"] = n_proteins
     ret_dic["length_translation"]=df["length"].sum()
+    
+    ret_dic["GCnoncoding"]=
+
+    
+    
     sum_dic = {}    
     sum_dic["taxon_id"] = tax_id
     sum_dic["name"] = taxid2name.get(tax_id,pd.np.nan)
@@ -81,6 +86,15 @@ def parse_annotation(filename,ty):
             sum_dic[c] = df[c+"-sum"].sum()
         ret_dic[c] = df_mean[c]
         
+    ret_dic["GenomeSize"]=taxid2Mb.get(tax_id,pd.np.nan)
+    ret_dic["NumGCall"]=ret_dic["GenomeSize"]*ret_dic["GC_genomic"]*10000
+    ret_dic["NumGCcoding"]=ret_dic["lenght_translation"]*ret_dic["GCcoding"]*3
+    ret_dic["NumGCnoncoding"]=ret_dic["NumGCAll"]-ret_dic["NumGCcoding"]
+    ret_dic["NonCodingsize"]=ret_dic["GenomeSize"]-ret_dic["lenght_translation"]*3
+    ret_dic["GCnoncodingsize"]=ret_dic["NumGCnoncoding"]/ret_dic["NonCodingsize"]
+
+    print (ret_dic)
+    sys.exit()
     #gcs = df_reference.loc[df_reference["TaxID"] == tax_id]["GC%"].astype(float)
     #ret_dic["GC"] = pd.np.mean(list(gcs))
 
@@ -155,6 +169,10 @@ df_overview = pd.read_csv(genomes_overview_file, sep="\t")
 
 
 taxid2gc = df_reference.set_index("TaxID").to_dict()["GC%"]
+taxid2Kb = df_reference.set_index("TaxID").to_dict()["Size (Kb)"]
+taxid2Mb = df_reference.set_index("TaxID").to_dict()["Size (Mb)"]
+
+
 
 taxid2group = df_reference[["TaxID","Group"]].set_index("TaxID").to_dict()["Group"]
 group2kingdom = df_overview[["Group", "Kingdom"]].set_index("Group").to_dict()["Kingdom"]
