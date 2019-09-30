@@ -102,11 +102,11 @@ def parse_annotation(filename,ty):
         ret_dic["GCnoncoding"]=100.*NumGCnoncoding/NonCodingsize
         sum_dic["GCnoncoding"]=100.*NumGCnoncoding/NonCodingsize
     else:
-        ret_dic["GCnoncoding"]=float(nan)
-        sum_dic["GCnoncoding"]=float(nan)
+        ret_dic["GCnoncoding"]=float('nan')
+        sum_dic["GCnoncoding"]=float('nan')
     ret_dic["GenomeSize"]=GenomeSize
     sum_dic["GenomeSize"]=GenomeSize
-    print (tax_id,ret_dic["GC"],ret_dic["GCcoding"],ret_dic["GCnoncoding"])
+    #print (tax_id,ret_dic["GC"],ret_dic["GCcoding"],ret_dic["GCnoncoding"])
     #print (ret_dic)
     #gcs = df_reference.loc[df_reference["TaxID"] == tax_id]["GC%"].astype(float)
     #ret_dic["GC"] = pd.np.mean(list(gcs))
