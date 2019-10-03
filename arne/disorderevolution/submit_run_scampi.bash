@@ -1,9 +1,9 @@
 #!/bin/bash -x
 #SBATCH -A SNIC2019-3-319
-#SBATCH --output=iupred.%A_%a.out
-#SBATCH --error=iupred.%A_%a.out
+#SBATCH --output=scampi.%A_%a.out
+#SBATCH --error=scampi.%A_%a.out
 #SBATCH --array=1-50
-#SBATCH -J iupred.%A_%a
+#SBATCH -J scampi.%A_%a
 #SBATCH -t 04:00:00
 #SBATCH -n 1
 #SBATCH -c 1 # Or 14, or any other number of cores to use for tblastn
