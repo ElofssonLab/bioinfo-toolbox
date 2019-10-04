@@ -33,8 +33,8 @@ for f in file_list:
     # clean empty files
     if os.path.exists(scampi_data_file):
         st = os.stat(scampi_data_file)
-        if st.st_size == 0:
-            os.system("rm " + scampi_data_file)
+        #if st.st_size == 0:
+        #    os.system("rm " + scampi_data_file)
 
     if not os.path.exists(scampi_data_file):
         print "creating " + scampi_data_file

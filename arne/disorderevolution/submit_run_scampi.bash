@@ -2,7 +2,7 @@
 #SBATCH -A SNIC2019-3-319
 #SBATCH --output=scampi.%A_%a.out
 #SBATCH --error=scampi.%A_%a.out
-#SBATCH --array=1-50
+#SBATCH --array=1-500
 #SBATCH -J scampi.%A_%a
 #SBATCH -t 04:00:00
 #SBATCH -n 1
@@ -13,4 +13,4 @@
 
 source /pfs/nobackup/home/w/wbasile/venv-work/bin/activate
 
-python /pfs/nobackup/home/w/wbasile/annotate_uniprot_proteomes/bin/run_iupred.py
+python /pfs/nobackup/home/w/wbasile/annotate_uniprot_proteomes/bin/run_scampi.py

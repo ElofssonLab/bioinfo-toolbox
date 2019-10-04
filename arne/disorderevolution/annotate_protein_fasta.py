@@ -151,6 +151,51 @@ def parse_iupred(data_file):
             iupred_dic[query_id] = float(diso_aa)/float(len(values))
 
     return iupred_dic
+
+def parse_scampi(data_file):
+    scampi_i = {}
+    scampi_m = {}
+    scampi_o = {}
+    rec = SeqIO.parse(data_file, "fasta")
+    for r in rec:
+        i = float(r.seq.count("I")) / float(len(r))
+        o = float(r.seq.count("O")) / float(len(r))
+        m = float(r.seq.count("M")) / float(len(r))
+        id=re.sub(r'.*\|','',r.id)
+        scampi_i[id] = i
+        scampi_o[id] = o
+        scampi_m[id] = m
+
+    return scampi_i,scampi_m,scampi_o
+            
+    
+def parse_scampi_seq(scampi_file,fasta_file):
+    # This is not ready..
+
+    scampi = SeqIO.to_dict(SeqIO.parse(scampi_file, "fasta"))
+    seq = SeqIO.to_dict(SeqIO.parse(fasta_file, "fasta"))
+    freq={}
+    sumtype={}
+    for type in ["I","O","M"]:
+        for aa in  ['A','C','D','E','F','G','H','I','K','L','M','N','P','Q','R','S','T','V','W','Y']:
+            freq[type+"-"+aa]={}
+
+    for r in scampi:
+        
+        for type in ["I","O","M"]:
+            sumtype[type]=0
+        if (scampi[r].seq.count("M")>0):
+            for type in ["I","O","M"]:
+                sumtype[type]=scampi[r].seq.count(type) 
+            print (seq[r].seq,len(seq[r]),sumtype)
+            print (scampi[r].seq,len(scampi[r]))
+            for i in range(0,len(seq[r])):
+                type=scampi[r].seq[i]
+                aa=seq[r].seq[i]
+                freq[type+"-"+aa]+=1/sumtype[type]
+
+            
+    return freq
             
     
     
@@ -277,6 +322,7 @@ def annotate_genome(f):
         iupred_short_data_file = f +  ".data_iupred_short"
         iupred04_long_data_file = f +  ".data_iupred_0.4_long"
         iupred04_short_data_file = f +  ".data_iupred_0.4_short"
+        scampi_data_file = f +  ".scampi"
         uniprot_data_file = re.sub(r'\.fasta','.txt',f)
         DNA_fasta_file = re.sub(r'\.fasta','_DNA.fasta',f)
 
@@ -298,6 +344,10 @@ def annotate_genome(f):
             print ("Missing IUPRED04-short")
             proceed = False
 
+        if not os.path.exists(scampi_data_file):
+            print ("Missing SCAMPI")
+            proceed = False
+            
         if proceed == True:
             print ("Trying:",f)
 
@@ -366,7 +416,16 @@ def annotate_genome(f):
                 dic_iupred04_short = parse_fasta_x(iupred04_short_data_file)
                 df_prot['iupred04_short'] = df_prot['query_id'].map(dic_iupred04_short)
 
+                #print "iupred long"
+                dic_scampi_i,dic_scampi_m,dic_scampi_o = parse_scampi(scampi_data_file)
+                df_prot['scampi_i'] = df_prot['query_id'].map(dic_scampi_i)
+                df_prot['scampi_m'] = df_prot['query_id'].map(dic_scampi_m)
+                df_prot['scampi_o'] = df_prot['query_id'].map(dic_scampi_o)
+                #print (dic_iupred_long,df_prot['iupred_long'],df_prot['query_id'])
 
+                #scampi_freq = parse_scampi_seq(scampi_data_file,f)
+                #print (scampi_freq)
+                #sys.exit()
                 # SEG
                 # print str(f),"Computing SEG"
                 seg_dic = do_seg(f)
@@ -423,12 +482,16 @@ def annotate_genome(f):
                 df["PfamType"] = df['query_id'].map(dic_kingdom)
 
                 # export
-                columns = ["query_id",  "length", "top-idp", "iupred_long", "iupred_short","iupred04_long", "iupred04_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa","Pfam","NumDoms","PfamType"]
+                columns = ["query_id",  "length", "top-idp", "iupred_long", "iupred_short","iupred04_long", "iupred04_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa","Pfam","NumDoms","PfamType","scampi_i","scampi_o","scampi_m"]
                 columns += ["freq_" + aa for aa in aas]
                 columns += ["GC1","GC2","GC3","GCcoding"]
                 columns += nucleotides
                 columns += nucleotidepos
                 columns += codons
+                #for type in ["I","O","M"]:
+                #    for aa in  ['A','C','D','E','F','G','H','I','K','L','M','N','P','Q','R','S','T','V','W','Y']:
+                #        colums+=type+"-"+aa
+
                 df[columns].to_csv(out_annotation_file, index = False)
 
         

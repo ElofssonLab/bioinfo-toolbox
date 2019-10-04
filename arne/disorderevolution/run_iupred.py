@@ -34,8 +34,8 @@ for f in file_list:
         # clean empty files
         if os.path.exists(iupred_data_file):
             st = os.stat(iupred_data_file)
-            if st.st_size == 0:
-                os.system("rm " + iupred_data_file)
+            #if st.st_size == 0:
+            #    os.system("rm " + iupred_data_file)
 
         if os.path.exists(iupred_data_file_04):
             st = os.stat(iupred_data_file_04)
