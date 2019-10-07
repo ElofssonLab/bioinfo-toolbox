@@ -40,7 +40,7 @@ def parse_annotation(filename,ty):
                 for three in nucleotides:
                     codons+=[one+two+three]
 
-    columns = ["length", "top-idp", "iupred_long", "iupred_short","iupred04_long", "iupred04_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa"]
+    columns = ["length", "top-idp", "iupred_long", "iupred_short","iupred04_long", "iupred04_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa","scampi_i","scampi_m","scampi_o"]
     columns += ["freq_" + aa for aa in aas]
     columns += ["GC1","GC2","GC3","GCcoding"]
 #    columns += nucleotides
