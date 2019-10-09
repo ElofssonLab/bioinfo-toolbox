@@ -1,4 +1,4 @@
-#u/usr/bin/env python
+#/usr/bin/env python
 import pandas as pd
 import os
 import re
@@ -47,6 +47,9 @@ def parse_annotation(filename,ty):
     columns += nucleotidepos
     columns += codons
 
+    memprots=df[df['scampi_m']>0]
+    
+    
     ret_dic = {}    
     ret_dic["taxon_id"] = tax_id
     ret_dic["name"] = taxid2name.get(tax_id,pd.np.nan)
@@ -56,8 +59,10 @@ def parse_annotation(filename,ty):
     ret_dic["GC_genomic"] = taxid2gc.get(tax_id,pd.np.nan)
     ret_dic["count_protein"] = n_proteins
     ret_dic["length_translation"]=df["length"].sum()
-    
-
+    ret_dic["memprots"]= float(len(memprots))/float(n_proteins)
+    ret_dic["mem_in"]= memprots['scampi_i'].mean()
+    ret_dic["mem_mem"]= memprots['scampi_m'].mean()
+    ret_dic["mem_out"]= memprots['scampi_o'].mean()
     
     
     sum_dic = {}    
@@ -69,6 +74,10 @@ def parse_annotation(filename,ty):
     sum_dic["GC_genomic"] = taxid2gc.get(tax_id,pd.np.nan)
     sum_dic["count_protein"] = n_proteins
     sum_dic["length_translation"]=df["length"].sum()
+    sum_dic["memprots"]= len(memprots)
+    sum_dic["mem_in"]= memprots['scampi_i'].sum()
+    sum_dic["mem_mem"]= memprots['scampi_m'].sum()
+    sum_dic["mem_out"]= memprots['scampi_o'].sum()
 
     for c in columns:
         #df.loc[:,c+"-sum"] = df.loc[:,c]*df.loc[:,"length"]*n_proteins
@@ -214,7 +223,7 @@ for f in os.listdir(input_dir):
     if f.endswith("_annotation.csv"):
         file_list += [input_dir + f]
             
-#file_list = [input_dir+"UP000077428_66851.fasta_annotation.csv"]
+file_list = [input_dir+"UP000005777_641146.fasta_annotation.csv"]
 
 
 
