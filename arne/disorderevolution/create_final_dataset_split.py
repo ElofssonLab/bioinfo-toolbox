@@ -223,7 +223,7 @@ for f in os.listdir(input_dir):
     if f.endswith("_annotation.csv"):
         file_list += [input_dir + f]
             
-file_list = [input_dir+"UP000005777_641146.fasta_annotation.csv"]
+#file_list = [input_dir+"UP000005777_641146.fasta_annotation.csv"]
 
 
 
