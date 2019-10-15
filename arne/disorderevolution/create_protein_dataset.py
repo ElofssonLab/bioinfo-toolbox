@@ -66,7 +66,7 @@ aas = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N',
 
 scales =  ["ss_alpha", "ss_beta", "ss_coil", "ss_turn", "top-idp", "hessa"]
 
-dir='/scratch2/arne/annotate_uniprot_proteomes/'
+dir='/fast/arnee/proteomes/'
 # Columns to read
 #columns = ["length", "top-idp", "iupred_long", "iupred_short","iupred04_long", "iupred04_short","seg","ss_alpha", "ss_beta", "ss_coil", "ss_turn","hessa","scampi_i","scampi_m","scampi_o"]
 columns =  ["query_id","length"]
