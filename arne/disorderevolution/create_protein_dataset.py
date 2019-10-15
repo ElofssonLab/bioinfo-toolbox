@@ -164,6 +164,7 @@ for f in os.listdir(input_dir):
 data=pd.DataFrame()
 
 for f in file_list:
+    print (f)
     d = parse_annotation(f)
     if len(data)>0:
         #print (d)
