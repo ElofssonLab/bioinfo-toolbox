@@ -19,7 +19,7 @@ if __name__ == '__main__':
     joblist = [2, 4, 6, 8]
 
     p = mp.Process(target=output, args=())  ##### single process
-    pool = mp.Pool(processes=4)             ##### list of processes to split in a max number of parallel jobs
+    pool = mp.Pool(processes=4)             ##### set a pool of processes, jobs in a list are handled between those processes
     q = mp.Queue()                          ##### queue
 
     p.start()
