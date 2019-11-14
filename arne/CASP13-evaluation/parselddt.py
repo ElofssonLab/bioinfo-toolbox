@@ -12,6 +12,9 @@ for line in fileinput.input():
         inchain=False
         i=0
         score=[]
+    elif re.search("^Global LDDT",line):
+        temp=re.split("\s+",line)
+        glob=temp[3]
     elif re.search("^Chain",line):
         inchain=True
     elif (inchain and re.search("^[A-Z ]\s",line)):
@@ -21,5 +24,5 @@ for line in fileinput.input():
         i+=1
     elif len(line)==1:
         inchain=False
-        print (filename,score)
+        print (filename,glob,score)
         
