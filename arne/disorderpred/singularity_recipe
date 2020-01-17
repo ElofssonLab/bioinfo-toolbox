@@ -1,0 +1,15 @@
+Bootstrap: docker
+
+From: tensorflow/tensorflow:1.13.1-gpu-py3
+
+%post
+                python3 -m pip install keras==2.2.4
+                python3 -m pip install matplotlib
+                python3 -m pip install biopython
+                python3 -m pip install seaborn
+                python3 -m pip install sklearn
+                python3 -m pip install jupyter
+                python3 -m pip install pandas
+		apt-get update
+		#apt-get -s upgrade | grep "^Inst" |      grep -i securi | awk -F " " {'print $2'} |  xargs apt-get install
+                apt-get --assume-yes --fix-missing install python3-tk

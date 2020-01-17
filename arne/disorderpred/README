@@ -1,0 +1,45 @@
+1) Modify and use mobiformatter.py to create the formatted data for
+   training and testing.
+
+2) In DIScv there is a 5-fold homology partitioning (25% CD-hit) of
+   the formatted list I obtained from 1)
+
+3) To set up all the needed modules for training and test you can
+   build the singularity environment by running:
+   /opt/singularity3/bin/singularity build --fakeroot tf_image.sif
+   singularity_recipe
+
+However, if you want to plot something using the training/testing
+scripts, you will probably need to run instead:
+/opt/singularity3/bin/singularity build --sandbox --fakeroot tf_sandbox/ singularity_recipe
+
+And then open a shell inside the container:
+sudo /opt/singularity3/bin/singularity shell --writable tf_sandbox/
+# Fixed..to manually apt-get tkinter module (putting it into the recipe blocks the container build)
+(DO not upodate as this makes it incompatibv
+
+Then run the python scripts in the container with: 
+/opt/singularity3/bin/singularity exec --nv tf_sandbox/ python ...
+or 
+/opt/singularity3/bin/singularity exec --nv tf_image.sif python ...
+
+4) dis_trainer.py and dis_test.py have a -h option to display the help.
+
+5) Launch the training script into this folder. It produces in the logs folder: 
+	- an history file with losses and validation scores for all the epochs
+        - the trained model
+	
+move or rename the trained model/history to avoid overwrite, in case
+you run different models with the same parameters.
+
+6) The dis_test.py produces a .pickle file with the data to plot. Set
+   properly these file names in order to use them in the
+   gcdisplotter.py script.
+
+
+--
+/opt/singularity3/bin/singularity exec --nv tf_image.sif python3 dis_trainer.py -t DIScv/test1 -v DIScv/test2 -d formatted_data.h5py -f pro
+
+/opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 dis_test.py  -t DIScv/test2 -d ./ -f pro -m logs/model_200-1-0.001_1
+
+(This works with seaborn etc..)
