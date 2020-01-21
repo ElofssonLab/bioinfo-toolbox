@@ -8,7 +8,7 @@ import tensorflow
 import numpy as np
 import pandas as pd
 import seaborn as sb
-import datetime as day
+#import datetime as day
 import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
@@ -36,7 +36,7 @@ if __name__ == '__main__':
 
         iudisseq = ''
         for fline in iudis:
-            if fline.startswith('#'): continue
+            if fline.startswith('#'): contineu
             if float(fline.rstrip().split('\t')[2]) >= 0.4: iudisseq += 'D'
             else: iudisseq += 'S'
 
@@ -86,5 +86,5 @@ if __name__ == '__main__':
 
         plot += 1 
 
-    plt.show()
+    plt.savefig("gcdisplotter.eps",dpi=300)
 
