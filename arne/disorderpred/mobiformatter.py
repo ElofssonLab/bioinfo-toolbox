@@ -58,11 +58,13 @@ with open('mobidata_K.pickle','rb') as f:
     data = pickle.load(f)
 
 outlist = open('formatted_list','w')
-out = h5py.File('formatted_data.h5py', 'w')
+out = h5py.File('formatted_data_GC.h5py', 'w')
 for key in data:                                                                ##### key: uniprot/MobiDB ID
     print (key)
     if 'rna' not in data[key]: continue
-
+    if 'GC%' not in data[key]: continue
+    gc=data[key]['GC%']
+    #mobidata[code.rstrip()]['GC%']
     pro = []                                                                    ##### one-hot encoded aa
     for aa in data[key]['sequence']:
         if aa in res_encode: pro.append(res_encode[aa][:])
@@ -73,6 +75,10 @@ for key in data:                                                                
         cod = data[key]['rna'][pos:pos+3]
         if cod in cod_encode: rna.append(cod_encode[cod][:])
         else: break                                                             ##### break sequences with atypical/unknown nucl
+
+    GC = []                                                                    ##### one-hot encoded nucleotides
+    for i in data[key]['sequence']:
+        GC.append(gc)
 
     if len(rna) == len(pro) and len(rna) == len(data[key]['sequence']):         ##### skip sequences with inconsistencies
 
@@ -94,6 +100,7 @@ for key in data:                                                                
         out.create_group(key)
         out[key].create_dataset('pro', data=np.array(pro, dtype=np.float32).reshape(len(pro), 21) , chunks=True, compression="gzip")
         out[key].create_dataset('rna', data=np.array(rna, dtype=np.float32).reshape(len(rna), 62), chunks=True, compression="gzip")
+        out[key].create_dataset('GC', data=np.array(GC, dtype=np.float32).reshape(len(pro), 1), chunks=True, compression="gzip")
         outlist.write(key+'\n')
 
 out.close()

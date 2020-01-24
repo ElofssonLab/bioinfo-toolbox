@@ -54,8 +54,8 @@ if __name__ == '__main__':
 
         if nounknown == 0: continue
         if mobidata[code.rstrip()]['kingdom'] not in ['A', 'B', 'E']: continue
-        GC=
-        #if mobidata[code.rstrip()]['GC%'] < 60 and mobidata[code.rstrip()]['GC%'] > 40: continue
+        #GC=
+        if mobidata[code.rstrip()]['GC%'] < 60 and mobidata[code.rstrip()]['GC%'] > 40: continue
         disxgcR[mobidata[code.rstrip()]['kingdom']]['gc'].append(mobidata[code.rstrip()]['GC%'])
         disxgcR[mobidata[code.rstrip()]['kingdom']]['dis1'].append((float(disR)/nounknown)*100)
         disxgcI[mobidata[code.rstrip()]['kingdom']]['gc'].append(mobidata[code.rstrip()]['GC%'])

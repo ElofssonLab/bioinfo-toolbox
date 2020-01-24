@@ -43,3 +43,8 @@ you run different models with the same parameters.
 /opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 dis_test.py  -t DIScv/test2 -d ./ -f pro -m logs/model_200-1-0.001_1
 
 (This works with seaborn etc..)
+
+
+------------------------------------------------------------------------
+
+For simplicity use test1-3 for training and test4-5 for testing  (Perhaps a too small set ?)

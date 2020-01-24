@@ -47,6 +47,7 @@ if __name__ == '__main__':
     parser.add_argument('-v', required= True, help='path to validation file list')
     parser.add_argument('-d', required= True, help='path to data folder')
     parser.add_argument('-f', required= True, help='feature kind (pro, rna)')
+    parser.add_argument('-gc', required= False,  help=' GC', action='store_true')
 
     parser.add_argument('-ep', required= False, default= '200', help='epoch number')
     parser.add_argument('-bs', required= False, default= '1', help='mini-batch size')
@@ -54,6 +55,10 @@ if __name__ == '__main__':
 
     parser.add_argument('-id', required= False, default= '1', help='train model id')
     ns = parser.parse_args()
+    print(ns)
+    if (ns.gc): ns.gc='GC'
+    else: ns.gc='noGC'
+    print(ns)
 
     seed = 42
     os.environ['PYTHONHASHSEED'] = '0'
@@ -67,7 +72,7 @@ if __name__ == '__main__':
     sess = tensorflow.Session(graph=tensorflow.get_default_graph(), config=session_conf)
     K.set_session(sess)
 
-    hrun_id = str(ns.ep)+'-'+str(ns.bs)+'-'+str(ns.lr)+'_'+str(ns.id)
+    hrun_id = str(ns.ep)+'-'+str(ns.bs)+'-'+str(ns.lr)+'_'+str(ns.id)+'_'+str(ns.f)+'_'+str(ns.gc)+"_"+str(seed)
 
     epochs = int(ns.ep)
     batch = int(ns.bs)
@@ -76,8 +81,11 @@ if __name__ == '__main__':
     reg = 0.000000001
     drp = 0.3
     if ns.f == 'pro': feat_len=20
-    else: feat_len=61
+    elif ns.f == 'rna': feat_len=61
+    else: sys.exit('Unknown ')
+    if ns.gc == 'GC': feat_len+=1
 
+    
     ##### Dataset #####
     print ('Loading data ...')
     data = h5py.File(ns.d,'r')
@@ -101,7 +109,13 @@ if __name__ == '__main__':
         run_id = str(n)+'-'+str(ns.bs)+'-'+str(ns.lr)+'_'+str(ns.id)
         ##### Batch formatting #####
         for protein in train_list:
-            mb.append(np.array(data[protein][ns.f], dtype=np.float64))
+            if ns.gc == 'GC':
+                #print(np.concatenate((data[protein]['GC'],data[protein][ns.f]),axis=1))
+                mb.append(np.concatenate((data[protein]['GC'],data[protein][ns.f]),axis=1))
+                #mb.append(np.array(data[protein]['GC'], dtype=np.float64))
+            else:
+                mb.append(np.array(data[protein][ns.f], dtype=np.float64))
+            
             if len(mb) > batch-1:
                 mbX = []
                 mbY = []
@@ -166,7 +180,7 @@ if __name__ == '__main__':
 
         outfile = open('logs/history_'+hrun_id,'a')
         if score >= best:
-            model.save('logs/model_'+hrun_id)
+            model.save('models/model_'+hrun_id)
             print ('Loss: '+str(acc/len(epoch_losses))+' -  Val score: '+str(score)+' >>> Partial saved!')
             outfile.write('Epoch_'+str(n)+' Loss: '+str(acc/len(epoch_losses))+' - Val score: '+str(score)+' >>> Partial saved!\n')
             best = score
