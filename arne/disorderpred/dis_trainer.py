@@ -50,7 +50,7 @@ if __name__ == '__main__':
     parser.add_argument('-gc', required= False,  help=' GC', action='store_true')
 
     parser.add_argument('-ep', required= False, default= '200', help='epoch number')
-    parser.add_argument('-bs', required= False, default= '1', help='mini-batch size')
+    parser.add_argument('-bs', required= False, default= '10', help='mini-batch size')
     parser.add_argument('-lr', required= False, default= '0.001', help='learning rate')
 
     parser.add_argument('-id', required= False, default= '1', help='train model id')
@@ -61,6 +61,7 @@ if __name__ == '__main__':
     print(ns)
 
     seed = 42
+    seed = random.randint(1,99)
     os.environ['PYTHONHASHSEED'] = '0'
     np.random.seed(seed)
     random.seed(seed)
