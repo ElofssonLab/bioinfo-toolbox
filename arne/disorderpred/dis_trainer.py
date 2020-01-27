@@ -152,7 +152,10 @@ if __name__ == '__main__':
         for thr in nl.thrlist: test_cm[thr] = test_cm.get(thr, {'PP':{'TP':0,'FP':0},'PN':{'TN':0,'FN':0}})
 
         for protein in val_list:
-            sample = np.array(data[protein][ns.f], dtype=np.float64)
+            if ns.gc == 'GC':
+                sample = np.concatenate((data[protein]['GC'],data[protein][ns.f]),axis=1)
+            else:
+                sample = np.array(data[protein][ns.f], dtype=np.float64)
             X = sample[:,:-1].reshape(1, len(sample), len(sample[0])-1)
             Y = sample[:,-1]
             prediction = model.predict_on_batch(X)
