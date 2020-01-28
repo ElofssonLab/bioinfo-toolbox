@@ -8,7 +8,7 @@ import numpy as np
 import datetime as day
 import nnlab as nl
 from argparse import RawTextHelpFormatter
-import tensorflow 
+import tensorflow as tf
 from keras import losses
 from keras.layers import *
 from keras import backend as K
@@ -55,22 +55,22 @@ if __name__ == '__main__':
 
     parser.add_argument('-id', required= False, default= '1', help='train model id')
     ns = parser.parse_args()
-    print(ns)
     if (ns.gc): ns.gc='GC'
     else: ns.gc='noGC'
-    print(ns)
 
     seed = 42
     seed = random.randint(1,99)
     os.environ['PYTHONHASHSEED'] = '0'
     np.random.seed(seed)
     random.seed(seed)
-    config = tensorflow.ConfigProto()
+    config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
-    tensorflow.keras.backend.set_session(tensorflow.Session(config=config))
-    session_conf = tensorflow.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
-    tensorflow.set_random_seed(seed)
-    sess = tensorflow.Session(graph=tensorflow.get_default_graph(), config=session_conf)
+    config.log_device_placement=True
+    tf.keras.backend.set_session(tf.Session(config=config))
+    session_conf = tf.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
+    session_conf.log_device_placement=True
+    tf.set_random_seed(seed)
+    sess = tf.Session(graph=tf.get_default_graph(), config=session_conf)
     K.set_session(sess)
 
     hrun_id = str(ns.ep)+'-'+str(ns.bs)+'-'+str(ns.lr)+'_'+str(ns.id)+'_'+str(ns.f)+'_'+str(ns.gc)+"_"+str(seed)
