@@ -68,8 +68,8 @@ if __name__ == '__main__':
     i=0
 
     for protein in test_list:
-        i+=1
-        if i>10: continue
+        #i+=1
+        #if i>10: continue
         if ns.gc == 'GC':
             sample=np.concatenate((data[protein]['GC'],data[protein][ns.f]),axis=1)
         else:
