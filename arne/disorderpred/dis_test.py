@@ -152,7 +152,7 @@ if __name__ == '__main__':
     #print (disxgc)
     #print (test_cm.keys())
     #print (test_cm.values())
-    print (test_cm)
+    #print (test_cm)
     rockeys=[['Thr','TP','FP','TN','TPR','FPR','Spec','PPV','F1','MCC']]
     with open('predictions/outpred_'+model+'.roc','w',newline="") as f:
         w = csv.writer(f)
