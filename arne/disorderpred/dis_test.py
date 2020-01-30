@@ -1,9 +1,11 @@
+#!/usr/bin/env python3 
 import os
 import h5py
 import pickle
 import random
+import re
 import argparse
-import tensorflow
+import tensorflow as tf
 import numpy as np
 import pandas as pd
 import seaborn as sb
@@ -13,6 +15,7 @@ from keras import backend as K
 import matplotlib.pyplot as plt
 from argparse import RawTextHelpFormatter
 from keras.models import load_model, Model
+import csv
 
 if __name__ == '__main__':
 
@@ -23,27 +26,32 @@ if __name__ == '__main__':
     parser.add_argument('-d', required= True, help='path to data folder')
     parser.add_argument('-f', required= True, help='feature kind (pro, rna)')
     parser.add_argument('-m', required= True, help='model')
-
+    parser.add_argument('-gc', required= False,  help=' GC', action='store_true')
     ns = parser.parse_args()
-
+    if (ns.gc): ns.gc='GC'
+    else: ns.gc='noGC'
+    cutoff =0.4 # Prediction cutoff.
     seed = 42
+    tiny=1.e-20
     os.environ['PYTHONHASHSEED'] = '0'
     np.random.seed(seed)
     random.seed(seed)
-    config = tensorflow.ConfigProto()
+    config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
-    tensorflow.keras.backend.set_session(tensorflow.Session(config=config))
-    session_conf = tensorflow.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
-    tensorflow.set_random_seed(seed)
-    sess = tensorflow.Session(graph=tensorflow.get_default_graph(), config=session_conf)
+    tf.keras.backend.set_session(tf.Session(config=config))
+    session_conf = tf.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
+    tf.set_random_seed(seed)
+    sess = tf.Session(graph=tf.get_default_graph(), config=session_conf)
     K.set_session(sess)
 
     if ns.f == 'pro': feat_len=20
-    else: feat_len=61
+    elif ns.f == 'rna': feat_len=61
+    else: sys.exit('Unknown ')
+    if ns.gc == 'GC': feat_len+=1
 
     ##### Dataset #####
     print ('Loading data ...')
-    data = h5py.File(ns.d+'formatted_data.h5py','r')
+    data = h5py.File(ns.d+'formatted_data_GC.h5py','r')
     with open(ns.d+'mobidata_K.pickle','rb') as f:
         gc = pickle.load(f)
     test_list = []
@@ -55,9 +63,17 @@ if __name__ == '__main__':
     for thr in nl.thrlist: test_cm[thr] = test_cm.get(thr, {'PP':{'TP':0,'FP':0},'PN':{'TN':0,'FN':0}})
 
     ##### Prediction #####
-    disxgc = {'A':{'dis1':[], 'gc':[]}, 'B':{'dis1':[], 'gc':[]}, 'E':{'dis1':[], 'gc':[]}}
+    #pred = {'Name':[], 'kingdom':[], 'gc':[], 'TP':[], 'FP':[], 'FN':[], 'TN':[], 'Pred':[], 'Diso':[]}
+    pred = {}
+    i=0
+
     for protein in test_list:
-        sample = np.array(data[protein][ns.f], dtype=np.float64)
+        i+=1
+        if i>10: continue
+        if ns.gc == 'GC':
+            sample=np.concatenate((data[protein]['GC'],data[protein][ns.f]),axis=1)
+        else:
+            sample = np.array(data[protein][ns.f], dtype=np.float64)
         X = sample[:,:-1].reshape(1, len(sample), len(sample[0])-1)
         Y = sample[:,-1]
         #print (protein,X,Y)
@@ -76,19 +92,95 @@ if __name__ == '__main__':
 
     ##### Data selection #####
         if gc[protein]['kingdom'] not in ['A', 'B', 'E']: continue
-        if gc[protein]['GC%'] < 60 and gc[protein]['GC%'] > 40: continue 
+        if (not gc[protein]['GC%']): continue 
         
-        acc1 = 0
+        #acc1 = 0
+        TP=0
+        FP=0
+        FN=0
+        TN=0
         nounknown = 0
         for pos in range(len(prediction[0])):
             if Y[pos] == 0.5: continue
-            if prediction[0][pos][0] >= 0.4: acc1 += 1
+            #if prediction[0][pos][0] >= cutoff: acc1 += 1
+            if prediction[0][pos][0] >= cutoff:
+                if Y[pos] == 1: TP += 1
+                else: FP += 1
+            else:
+                if Y[pos] == 1: FN += 1
+                else: TN += 1
             nounknown += 1
-
         if nounknown == 0: continue
-        else: disxgc[gc[protein]['kingdom']]['dis1'].append((acc1/nounknown)*100)
-        disxgc[gc[protein]['kingdom']]['gc'].append(gc[protein]['GC%'])
+        else:
+            pred[protein]=[]
+            pred[protein].append(protein)
+            pred[protein].append(gc[protein]['kingdom'])
+            pred[protein].append(gc[protein]['GC%'])
+            pred[protein].append(TP/nounknown)
+            pred[protein].append(FP/nounknown)
+            pred[protein].append(FN/nounknown)
+            pred[protein].append(TN/nounknown)
+            TPR=TP/(tiny+TP+FN)
+            FPR=FP/(tiny+FP+TN)
+            Spec=TN/(tiny+FP+TN)
+            PPV=TP/(tiny+FP+TP)
+            F1=2*TP/(tiny+2*TP+FP+FN)
+            MCC=((TP*TN)-FP*FN)/np.sqrt(tiny+(TP+FP)*(TP+FN)*(TN+FP)*(TN+FN))
+            pred[protein].append(TPR)
+            pred[protein].append(FPR)
+            pred[protein].append(Spec)
+            pred[protein].append(PPV)
+            pred[protein].append(F1)
+            pred[protein].append(MCC)
+            pred[protein].append((TP+FP)/nounknown)
+            pred[protein].append((TP+FN)/nounknown)
 
-    with open('outpred_'+ns.f+'.pickle','wb') as f:
-        pickle.dump(disxgc, f)
+    model=re.sub(r'.*\/','',ns.m)
 
+    with open('predictions/outpred_'+model+'.pickle','wb') as f:
+        pickle.dump(pred, f)
+    #print (pred)
+    keys=[['Name', 'kingdom', 'gc', 'TP', 'FP', 'FN', 'TN','TPR','FPR','Spec','PPV','F1','MCC', 'Pred', 'Diso']]
+    
+    with open('predictions/outpred_'+model+'.csv','w',newline="") as f:
+        w = csv.writer(f)
+        w.writerows(keys)
+        for prot in pred:
+            print (prot)
+            print (pred[prot])
+            w.writerows([pred[prot]])
+    #print (disxgc)
+    #print (test_cm.keys())
+    #print (test_cm.values())
+    print (test_cm)
+    rockeys=[['Thr','TP','FP','TN','TPR','FPR','Spec','PPV','F1','MCC']]
+    with open('predictions/outpred_'+model+'.roc','w',newline="") as f:
+        w = csv.writer(f)
+        w.writerows(rockeys)
+        for thr in test_cm.keys():
+            line=[]
+            line.append(thr)
+            for k in ["TP","FP"]:
+                line.append(test_cm[thr]['PP'][k])
+            for k in ["TN","FN"]:
+                line.append(test_cm[thr]['PN'][k])
+
+            TP=test_cm[thr]['PP']['TP']
+            FP=test_cm[thr]['PP']['FP']
+            TN=test_cm[thr]['PN']['TN']
+            FN=test_cm[thr]['PN']['FN']
+            TPR=TP/(tiny+TP+FN)
+            FPR=FP/(tiny+FP+TN)
+            Spec=TN/(tiny+FP+TN)
+            PPV=TP/(tiny+FP+TP)
+            F1=2*TP/(tiny+2*TP+FP+FN)
+            MCC=((TP*TN)-FP*FN)/np.sqrt(tiny+(TP+FP)*(TP+FN)*(TN+FP)*(TN+FN))
+            line.append(TPR)
+            line.append(FPR)
+            line.append(Spec)
+            line.append(PPV)
+            line.append(F1)
+            line.append(MCC)
+            #print (line)    
+            w.writerows([line])
+    print (test_cm)
