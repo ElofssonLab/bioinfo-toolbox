@@ -66,7 +66,18 @@ if __name__ == '__main__':
     #pred = {'Name':[], 'kingdom':[], 'gc':[], 'TP':[], 'FP':[], 'FN':[], 'TN':[], 'Pred':[], 'Diso':[]}
     pred = {}
     i=0
-
+    #read in iupred
+    #iudis = {}
+    #
+    #for code in test_list:
+    #    iudis = open('disorder_IUpred/'+code.rstrip(),'r')
+    #    iudis.append(code)
+    #    for fline in iudis:
+    #        if fline.startswith('#'): continue
+    #        iudis[code].append(float(fline.rstrip().split('\t')[2]))
+    #        #if float(fline.rstrip().split('\t')[2]) >= 0.4: iudisseq += 'D'
+    #        #else: iudisseq += 'S'
+    
     for protein in test_list:
         #i+=1
         #if i>10: continue
@@ -136,25 +147,26 @@ if __name__ == '__main__':
             pred[protein].append((TP+FN)/nounknown)
 
     model=re.sub(r'.*\/','',ns.m)
+    set=re.sub(r'.*\/','',ns.t)
 
-    with open('predictions/outpred_'+model+'.pickle','wb') as f:
+    with open('predictions/outpred_'+model+"-"+set+'.pickle','wb') as f:
         pickle.dump(pred, f)
     #print (pred)
     keys=[['Name', 'kingdom', 'gc', 'TP', 'FP', 'FN', 'TN','TPR','FPR','Spec','PPV','F1','MCC', 'Pred', 'Diso']]
     
-    with open('predictions/outpred_'+model+'.csv','w',newline="") as f:
+    with open('predictions/outpred_'+model+"-"+set+'.csv','w',newline="") as f:
         w = csv.writer(f)
         w.writerows(keys)
         for prot in pred:
-            print (prot)
-            print (pred[prot])
+            #print (prot)
+            #print (pred[prot])
             w.writerows([pred[prot]])
     #print (disxgc)
     #print (test_cm.keys())
     #print (test_cm.values())
     #print (test_cm)
     rockeys=[['Thr','TP','FP','TN','TPR','FPR','Spec','PPV','F1','MCC']]
-    with open('predictions/outpred_'+model+'.roc','w',newline="") as f:
+    with open('predictions/outpred_'+model+"-"+set+'.roc','w',newline="") as f:
         w = csv.writer(f)
         w.writerows(rockeys)
         for thr in test_cm.keys():

@@ -17,10 +17,28 @@
 
 
 # Testing.
-/opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test.py  -t DIScv/test4-5 -d ./ -f pro -m models/model_200-10-0.001_1_pro_noGC_85
-/opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test.py  -t DIScv/test4-5 -d ./ -f pro -m models/model_200-10-0.001_1_pro_noGC_72
-/opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test.py  -t DIScv/test4-5 -d ./ -f rna -m models/model_200-10-0.001_1_rna_noGC_65  
 
-/opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test.py  -t DIScv/test4-5 -d ./ -gc -f pro -m models/model_200-1-0.001_1_pro_GC_42
-/opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test.py  -t DIScv/test4-5 -d ./ -gc -f rna -m models/model_200-1-0.001_1_rna_GC_42
+for i in models/model*rna*noGC*
+do
+    /opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test.py  -t DIScv/test4-5 -d ./ -f rna -m $i
+    /opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test.py  -t DIScv/formatted_list -d ./ -f rna -m $i
+done
 
+for i in models/model*pro*noGC*
+do
+    /opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test.py  -t DIScv/test4-5 -d ./ -f pro -m $i
+    /opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test.py  -t DIScv/formatted_list -d ./ -f pro -m $i
+done
+
+
+for i in models/model*rna*_GC*
+do
+    /opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test.py  -t DIScv/test4-5 -d ./ -f rna -gc -m $i
+    /opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test.py  -t DIScv/formatted_list -d ./ -f rna -gc -m $i
+done
+
+for i in models/model*pro*_GC*
+do
+    /opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test.py  -t DIScv/test4-5 -d ./ -f pro -gc -m $i
+    /opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test.py  -t DIScv/formatted_list -d ./ -f pro -gc -m $i
+done
