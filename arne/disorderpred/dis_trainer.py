@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import h5py
+import re
 import pickle
 import random
 import argparse
@@ -17,6 +18,7 @@ from keras.optimizers import Adam
 from keras.models import load_model, Model
 from keras.engine.topology import Input, Layer
 from keras.layers.advanced_activations import ELU
+from multiprocessing.pool import ThreadPool
 
 def model_set(feat_len, units, act, reg, drp, bn=False):
 
@@ -49,7 +51,7 @@ if __name__ == '__main__':
     parser.add_argument('-f', required= True, help='feature kind (pro, rna)')
     parser.add_argument('-gc', required= False,  help=' GC', action='store_true')
 
-    parser.add_argument('-ep', required= False, default= '200', help='epoch number')
+    parser.add_argument('-ep', required= False, default= '100', help='epoch number')
     parser.add_argument('-bs', required= False, default= '10', help='mini-batch size')
     parser.add_argument('-lr', required= False, default= '0.001', help='learning rate')
 
@@ -58,6 +60,7 @@ if __name__ == '__main__':
     if (ns.gc): ns.gc='GC'
     else: ns.gc='noGC'
 
+    testset=re.sub(r'.*\/','',ns.t)
     seed = 42
     seed = random.randint(1,99)
     os.environ['PYTHONHASHSEED'] = '0'
@@ -73,7 +76,7 @@ if __name__ == '__main__':
     sess = tf.Session(graph=tf.get_default_graph(), config=session_conf)
     K.set_session(sess)
 
-    hrun_id = str(ns.ep)+'-'+str(ns.bs)+'-'+str(ns.lr)+'_'+str(ns.id)+'_'+str(ns.f)+'_'+str(ns.gc)+"_"+str(seed)
+    hrun_id = str(ns.ep)+"-"+testset+"-"+str(ns.bs)+'-'+str(ns.lr)+'_'+str(ns.id)+'_'+str(ns.f)+'_'+str(ns.gc)+"_"+str(seed)
 
     epochs = int(ns.ep)
     batch = int(ns.bs)
@@ -140,12 +143,36 @@ if __name__ == '__main__':
                 mbX = np.array(mbX, dtype=np.float64).reshape(batch, timesteps, len(X[0]))
                 mbY = np.array(mbY, dtype=np.float64).reshape(batch, timesteps, 1)
                 mbZ = np.array(mbZ, dtype=np.float64).reshape(batch, timesteps, 1)
+                #def worker(sample):
+                #    while len(sample) < timesteps: 
+                #        sample = np.append(sample, np.zeros(len(sample[0])).reshape(1,len(sample[0])), axis=0)
+                #        sample[-1][-1] = 0.5
+                #    X = sample[:,:-1]
+                #    mbX.append(X)
+                #    Y = sample[:,-1]
+                #    mbY.append(Y)
+                #    Z = []
+                #    for value in Y: 
+                #        if value == 1: Z.append(10)
+                #        if value == 0: Z.append(1)
+                #        if value == 0.5: Z.append(0)
+                #    mbZ.append(Z)
+                #    return()
+                #p = ThreadPool()
+                #p.map(worker, sample)
+                #mbPX = np.array(mbX, dtype=np.float64).reshape(batch, timesteps, len(X[0]))
+                #mbPY = np.array(mbY, dtype=np.float64).reshape(batch, timesteps, 1)
+                #mbPZ = np.array(mbZ, dtype=np.float64).reshape(batch, timesteps, 1)
 
+                #print (mbX,mbY,mbZ)
+                #print (mbPX,mbPY,mbPZ)
+                #sys.exit
                 ##### Model train #####
                 loss = model.train_on_batch(mbX, mbY)
                 epoch_losses.append(loss)
                 mb = []
 
+                
         ##### Prediction/evaluation over validation set #####
         print ('Epoch '+str(n)+' complete! Evaluation...')
 
@@ -182,9 +209,9 @@ if __name__ == '__main__':
         acc = 0
         for el in epoch_losses: acc += el
 
-        outfile = open('logs/history_'+hrun_id,'a')
+        outfile = open('logs/history_'+hrun_id+".log",'a')
         if score >= best:
-            model.save('models/model_'+hrun_id)
+            model.save('models/model_'+hrun_id+".ann")
             print ('Loss: '+str(acc/len(epoch_losses))+' -  Val score: '+str(score)+' >>> Partial saved!')
             outfile.write('Epoch_'+str(n)+' Loss: '+str(acc/len(epoch_losses))+' - Val score: '+str(score)+' >>> Partial saved!\n')
             best = score
