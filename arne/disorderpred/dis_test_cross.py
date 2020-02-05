@@ -200,7 +200,7 @@ if __name__ == '__main__':
     #print (pred)
     keys=[['Name', 'kingdom', 'gc', 'TP', 'FP', 'FN', 'TN','TPR','FPR','Spec','PPV','F1','MCC', 'Pred', 'Diso']]
     
-    with open('predictions/outpred_'+model+"-"+set+'.csv','w',newline="") as f:
+    with open('predictions/outpred_'+mod+"-"+set+'.csv','w',newline="") as f:
         w = csv.writer(f)
         w.writerows(keys)
         for prot in pred:
@@ -212,7 +212,7 @@ if __name__ == '__main__':
     #print (test_cm.values())
     #print (test_cm)
     rockeys=[['Thr','TP','FP','TN','TPR','FPR','Spec','PPV','F1','MCC']]
-    with open('predictions/outpred_'+model+"-"+set+'.roc','w',newline="") as f:
+    with open('predictions/outpred_'+mod+"-"+set+'.roc','w',newline="") as f:
         w = csv.writer(f)
         w.writerows(rockeys)
         for thr in test_cm.keys():

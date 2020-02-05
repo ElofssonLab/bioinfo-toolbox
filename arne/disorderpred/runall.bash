@@ -42,3 +42,7 @@ do
     /opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test.py  -t DIScv/test4-5 -d ./ -f pro -gc -m $i
     /opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test.py  -t DIScv/formatted_list -d ./ -f pro -gc -m $i
 done
+
+
+/opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test_cross.py  -d ./ -f pro -gc
+/opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test_cross.py  -d ./ -f rna -gc
