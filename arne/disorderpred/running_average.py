@@ -23,7 +23,7 @@ dic_colors = {"E":"#004D40", "B":"#D81B60","A":"#1E88E5",
               "E2":"lightgreen","B2":"pink", "A2":"lightblue"}
 dic_markers = {"E":"o", "B":"x", "A":"o"}
 
-
+factor=30
 for f in os.listdir(dir):
     if f.endswith(".csv"):
         file=re.sub(r'.csv','',f)
@@ -32,10 +32,10 @@ for f in os.listdir(dir):
 
         fig, ax = plt.subplots(figsize=(6,6))
     
-        for kingdom in ["B","E"]: #,"A"]:
+        for kingdom in ["B","E","A"]:
             d=df.loc[(df.kingdom == kingdom) ].sort_values('gc').dropna()
             #print(d)
-            numave=int(10*math.sqrt(len(d)))
+            numave=int(factor*math.sqrt(len(d)))
             x=(moving_average(d.gc.to_list(),numave))
             pred=(moving_average(d.Pred.to_list(),numave))
             diso=(moving_average(d.Diso.to_list(),numave))
@@ -71,11 +71,11 @@ for f in os.listdir(dir):
                             df1=pd.read_csv(dir+file1+".csv", sep=',',header=0)
                             df2=pd.read_csv(dir+file2+".csv", sep=',',header=0)
                             fig, ax = plt.subplots(figsize=(6,6))
-                            for kingdom in ["B","E"]: #,"A"]:
+                            for kingdom in ["B","E","A"]:
                                 d1=df1.loc[(df1.kingdom == kingdom) ].sort_values('gc').dropna()
                                 d2=df2.loc[(df2.kingdom == kingdom) ].sort_values('gc').dropna()
                                 #print(d)
-                                numave=int(10*math.sqrt(len(d1)))
+                                numave=int(factor*math.sqrt(len(d1)))
                                 x1=(moving_average(d1.gc.to_list(),numave))
                                 x2=(moving_average(d2.gc.to_list(),numave))
                                 pred1=(moving_average(d1.Pred.to_list(),numave))
@@ -102,11 +102,11 @@ for f in os.listdir(dir):
                             fig.savefig(fig_dir+file1+"-"+file2+"-comparison.eps",rasterized=True)
                             plt.close()
                             fig, ax = plt.subplots(figsize=(6,6))
-                            for kingdom in ["B","E"]: #,"A"]:
+                            for kingdom in ["B","E","A"]:
                                 d1=df1.loc[(df1.kingdom == kingdom) ].sort_values('gc').dropna()
                                 d2=df2.loc[(df2.kingdom == kingdom) ].sort_values('gc').dropna()
                                 #print(d)
-                                numave=int(10*math.sqrt(len(d1)))
+                                numave=int(factor*math.sqrt(len(d1)))
                                 x1=(moving_average(d1.gc.to_list(),numave))
                                 x2=(moving_average(d2.gc.to_list(),numave))
                                 pred1=(moving_average(d1.Pred.to_list(),numave))
