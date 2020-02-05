@@ -89,6 +89,8 @@ if __name__ == '__main__':
                     "models/model_100-test2345-10-0.001_1_rna_noGC_45.ann":"DIScv/test1"
             }
             
+    pred = {}
+    i=0
     for m in models:
         #print (m,models[m])
         
@@ -102,8 +104,6 @@ if __name__ == '__main__':
 
         ##### Prediction #####
         #pred = {'Name':[], 'kingdom':[], 'gc':[], 'TP':[], 'FP':[], 'FN':[], 'TN':[], 'Pred':[], 'Diso':[]}
-        pred = {}
-        i=0
         #read in iupred
         #iudis = {}
         #
