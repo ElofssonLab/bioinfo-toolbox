@@ -2,43 +2,60 @@
 import sys
 import numpy as np
 
+def get_separator(c_filename):
+    """ Return a string separator.
+    Guessing separator of constraint file. """
+
+#    line = c_filename.readline()
+    with open(c_filename, "r") as contact_filename:
+        for line in contact_filename:
+            if len(line.split(",")) != 1:
+                sep = ","
+            elif len(line.split(" ")) != 1:
+                sep = " "
+            else:
+                sep = "\t"
+    return sep
 
 def parse(afile, sep=' ', min_dist=5):
     
     """Parse contact file (PconsCX, plmDCA, PSICOV, PhyCMAP).
-    @param  afile   contact file
-    @param  sep     separator of contact file (default=' ')
+    @param  afile       contact file path                            // string
+    @param  sep         separator of contact file (default=' ')        // string
+    @param  min_dist    minimal dist between residues (default=5)    // int
     Ensures: Output is sorted by confidence score.
     @return [(score, residue a, residue b)]
     """
     contacts = []
-    for aline in afile:
-        if aline.strip() != '':
-            # exclude comments
-            if aline.startswith('#'):
-                continue
-            # exclude PhyCmap header/tail lines
-            if aline.strip()[0].isalpha():
-                continue
-            # ignore CASP RR format headers
-            if len(aline.strip().split(sep)) < 3:
-                continue
-            line_arr = list(filter(None, aline.strip().split(sep)))
-            if line_arr[0].startswith('E'):
-                continue
-            # parse MISTIC output (i res_i j res_j score)
-            #print (line_arr)
-            if line_arr[1].isalpha():
-                i = int(line_arr[0])
-                j = int(line_arr[2])
-            else:
-                i = int(line_arr[0])
-                j = int(line_arr[1])
-            score = float(line_arr[-1])
-            if abs(i - j) >= min_dist:
-                contacts.append((score, i, j))
-    afile.close()
-    contacts.sort(key=lambda x: x[0], reverse=True)
+    with open(afile, "r") as c_filename:
+        for aline in c_filename:
+            if aline.strip() != '':
+                # exclude comments
+                if aline.startswith('#'):
+                    continue
+                # exclude PhyCmap header/tail lines
+                if aline.strip()[0].isalpha():
+                    continue
+                # ignore CASP RR format headers
+                if len(aline.strip().split(sep)) < 3:
+                    continue
+                # remove falses
+                line_arr = list(filter(None, aline.strip().split(sep)))
+                if line_arr[0].startswith('E'):
+                    continue
+                # parse MISTIC output (i res_i j res_j score)
+                #print (line_arr)
+                if line_arr[1].isalpha():
+                    i = int(line_arr[0])
+                    j = int(line_arr[2])
+                else:
+                    i = int(line_arr[0])
+                    j = int(line_arr[1])
+                score = float(line_arr[-1])
+                if abs(i - j) >= min_dist:
+                    contacts.append((score, i, j))
+#        afile.close()
+        contacts.sort(key=lambda x: x[0], reverse=True)
     return contacts
 
 
@@ -82,15 +99,17 @@ if __name__ == "__main__":
     c_filename = sys.argv[1]
 
     # guessing separator of constraint file
-    line = open(c_filename,'r').readline()
-    if len(line.split(',')) != 1:
-        sep = ','
-    elif len(line.split(' ')) != 1:
-        sep = ' '
-    else:
-        sep = '\t'
+#    line = open(c_filename,'r').readline()
+#    if len(line.split(',')) != 1:
+#        sep = ','
+#    elif len(line.split(' ')) != 1:
+#        sep = ' '
+#    else:
+#        sep = '\t'
 
-    cm = parse(open(c_filename), sep=sep)
+    sep = get_separator(c_filename)
+
+    cm = parse(c_filename, sep=sep)
 
     for c in cm:
         print(c[1], c[2], c[0])

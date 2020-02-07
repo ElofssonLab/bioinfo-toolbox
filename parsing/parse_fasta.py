@@ -6,8 +6,8 @@ import sys
 def read_fasta(afile, query_id=''):
 
     """Parses any fasta, a2m, a3m file, sequence or alignment file.
-    @param  afile       input file
-    @param  query_id    ID of query sequence (default='')
+    @param  afile       input a file path                    // string
+    @param  query_id    ID of query sequence (default='')    // string
     Ensures: key of a given query ID only contains its ID, not the full header
     @return {header: [sequence_1, sequence_2, ...]} 
     """
@@ -16,35 +16,38 @@ def read_fasta(afile, query_id=''):
     header = ''
     seq = ''
 
-    for aline in afile:
-        aline = aline.strip()
+    with open(afile, "r") as fasta_file:
+        for aline in fasta_file:
+            aline = aline.strip()
 
-        # check for header
-        if aline.startswith('>'):
-            if header != '' and seq != '':
-                if header in seq_dict:
-                    seq_dict[header].append(seq)
+            # check for header
+            if aline.startswith('>'):
+                if header != '' and seq != '':
+                    if header in seq_dict:
+                        seq_dict[header].append(seq)
+                    else:
+                        seq_dict[header] = [seq]
+                seq = ''
+                if aline.startswith('>%s' % query_id) and query_id !='':
+                    header = query_id
                 else:
-                    seq_dict[header] = [seq]
-            seq = ''
-            if aline.startswith('>%s' % query_id) and query_id !='':
-                header = query_id
+            #This takes the full header.
+            #Maybe this could be fixed with a function that guess the ID from the line.
+                    header = aline[1:]
+
+            # otherwise concatenate sequence
             else:
-                header = aline[1:]
+                #aline_seq = aline.translate(None, '.-').upper()
+                seq += aline
 
-        # otherwise concatenate sequence
+        # add last entry
+        if header != '':
+            if header in seq_dict:
+                seq_dict[header].append(seq)
+            else:
+                seq_dict[header] = [seq]
         else:
-            #aline_seq = aline.translate(None, '.-').upper()
-            seq += aline
-
-    # add last entry
-    if header != '':
-        if header in seq_dict:
-            seq_dict[header].append(seq)
-        else:
-            seq_dict[header] = [seq]
-    else:
-        sys.stderr.write('ERROR: file empty or wrong file format')
+            sys.stderr.write('ERROR: file empty or wrong file format')
 
     return seq_dict
 
@@ -62,35 +65,37 @@ def read_fasta_pdb(afile, query_id=''):
     header = ''
     seq = ''
 
-    for aline in afile:
-        aline = aline.strip()
+    with open(afile, "r") as fasta_file:
+        for aline in fasta_file:
+            aline = aline.strip()
 
-        # check for header
-        if aline.startswith('>'):
-            if header != '' and seq != '':
-                if header in seq_dict:
-                    seq_dict[header].append(seq)
+            # check for header
+            if aline.startswith('>'):
+                if header != '' and seq != '':
+                    if header in seq_dict:
+
+                        seq_dict[header].append(seq)
+                    else:
+                        seq_dict[header] = [seq]
+                seq = ''
+                if aline.startswith('>%s' % query_id) and query_id !='':
+                    header = query_id
                 else:
-                    seq_dict[header] = [seq]
-            seq = ''
-            if aline.startswith('>%s' % query_id) and query_id !='':
-                header = query_id
+                    header = aline[1:].split()[0]
+
+            # otherwise concatenate sequence
             else:
-                header = aline[1:].split()[0]
+                #aline_seq = aline.translate(None, '.-').upper()
+                seq += aline
 
-        # otherwise concatenate sequence
+        # add last entry
+        if header != '':
+            if header in seq_dict:
+                seq_dict[header].append(seq)
+            else:
+                seq_dict[header] = [seq]
         else:
-            #aline_seq = aline.translate(None, '.-').upper()
-            seq += aline
-
-    # add last entry
-    if header != '':
-        if header in seq_dict:
-            seq_dict[header].append(seq)
-        else:
-            seq_dict[header] = [seq]
-    else:
-        sys.stderr.write('ERROR: file empty or wrong file format')
+            sys.stderr.write('ERROR: file empty or wrong file format')
 
     return seq_dict
 
@@ -122,12 +127,12 @@ def get_residue_dict(afile):
 
 if __name__ == "__main__":
 
-    afile = open(sys.argv[1], 'r')
+#    afile = open(sys.argv[1], 'r')
     if len(sys.argv) == 3:
         query_id = sys.argv[2]
     else:
         query_id = ''
     seq_dict = read_fasta(afile, query_id)
-    afile.close()
+#    afile.close()
     #print 'There are %d entries with unique headers in your file.' % len(seq_dict)
     print(sys.argv[1] + ' ' + str(len(seq_dict.values()[0][0])))
