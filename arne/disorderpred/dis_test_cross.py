@@ -73,22 +73,23 @@ if __name__ == '__main__':
                     "models/model_100-test2345-10-0.001_1_pro_noGC_45.ann":"DIScv/test1"
             }
     elif(ns.f=='rna'):
-        sys.exit()
         if (ns.gc=='GC'):
-            models={"models/model_100-test1234-10-0.001_1_rna_GC_60.ann":"DIScv/test5",
-                    "models/model_100-test1235-10-0.001_1_rna_GC_90.ann":"DIScv/test4",
-                    "models/model_100-test1245-10-0.001_1_rna_GC_50.ann":"DIScv/test3",
-                    "models/model_100-test1345-10-0.001_1_rna_GC_22.ann":"DIScv/test2",
-                    "models/model_100-test2345-10-0.001_1_rna_GC_1.ann":"DIScv/test1"
+            models={"models/model_100-test1234-10-0.001_1_rna_GC_41.ann":"DIScv/test5",
+                    "models/model_100-test1235-10-0.001_1_rna_GC_29.ann":"DIScv/test4",
+                    "models/model_100-test1245-10-0.001_1_rna_GC_88.ann":"DIScv/test3",
+                    "models/model_100-test1345-10-0.001_1_rna_GC_76.ann":"DIScv/test2",
+                    "models/model_100-test2345-10-0.001_1_rna_GC_60.ann":"DIScv/test1"
             }
         else:
-            models={"models/model_100-test1234-10-0.001_1_rna_noGC_55.ann":"DIScv/test5",
-                    "models/model_100-test1235-10-0.001_1_rna_noGC_55.ann":"DIScv/test4",
-                    "models/model_100-test1245-10-0.001_1_rna_noGC_4.ann":"DIScv/test3",
-                    "models/model_100-test1345-10-0.001_1_rna_noGC_53.ann":"DIScv/test2",
-                    "models/model_100-test2345-10-0.001_1_rna_noGC_45.ann":"DIScv/test1"
+            models={"models/model_100-test1234-10-0.001_1_rna_noGC_57.ann":"DIScv/test5",
+                    "models/model_100-test1235-10-0.001_1_rna_noGC_20.ann":"DIScv/test4",
+                    "models/model_100-test1245-10-0.001_1_rna_noGC_27.ann":"DIScv/test3",
+                    "models/model_100-test1345-10-0.001_1_rna_noGC_16.ann":"DIScv/test2",
+                    "models/model_100-test2345-10-0.001_1_rna_noGC_1.ann":"DIScv/test1"
             }
-            
+
+
+
     pred = {}
     i=0
     for m in models:
@@ -158,7 +159,7 @@ if __name__ == '__main__':
                 else:
                     if Y[pos] == 1: FN += 1
                     else: TN += 1
-                    nounknown += 1
+                nounknown += 1
             if nounknown == 0: continue
             else:
                 pred[protein]=[]
@@ -241,4 +242,4 @@ if __name__ == '__main__':
             line.append(MCC)
             #print (line)    
             w.writerows([line])
-    print (test_cm)
+    #print (test_cm)
