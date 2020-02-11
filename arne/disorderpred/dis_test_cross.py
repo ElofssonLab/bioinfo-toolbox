@@ -31,6 +31,7 @@ if __name__ == '__main__':
     if (ns.gc): ns.gc='GC'
     else: ns.gc='noGC'
     cutoff =0.4 # Prediction cutoff.
+    iupredcutoff =0.4 # Prediction cutoff.
     seed = 42
     tiny=1.e-20
     os.environ['PYTHONHASHSEED'] = '0'
@@ -114,10 +115,20 @@ if __name__ == '__main__':
         #    for fline in iudis:
         #        if fline.startswith('#'): continue
         #        iudis[code].append(float(fline.rstrip().split('\t')[2]))
-        #        #if float(fline.rstrip().split('\t')[2]) >= 0.4: iudisseq += 'D'
+        #        #if float(fline.rstrip().split('\t')[2]) >= iupredcutoff: iudisseq += 'D'
         #        #else: iudisseq += 'S'
     
         for protein in test_list:
+            iudis = open('disorder_IUpred/'+protein.rstrip(),'r')
+            iupred=[]
+            for fline in iudis:
+                if fline.startswith('#'): continue
+                #if float(fline.rstrip().split('\t')[2]) >= iupredcutoff:
+                #    iupred += 1
+                #else:
+                #    iupred += 0
+                iupred.append( float(fline.rstrip().split('\t')[2]))
+            iudis.close()
             #i+=1
             #if i>10: continue
             if ns.gc == 'GC':
@@ -150,6 +161,7 @@ if __name__ == '__main__':
             FN=0
             TN=0
             nounknown = 0
+            iudiso=0
             for pos in range(len(prediction[0])):
                 if Y[pos] == 0.5: continue
                 #if prediction[0][pos][0] >= cutoff: acc1 += 1
@@ -160,6 +172,8 @@ if __name__ == '__main__':
                     if Y[pos] == 1: FN += 1
                     else: TN += 1
                 nounknown += 1
+                if iupred[pos] > iupredcutoff:
+                    iudiso+=1
             if nounknown == 0: continue
             else:
                 pred[protein]=[]
@@ -184,6 +198,7 @@ if __name__ == '__main__':
                 pred[protein].append(MCC)
                 pred[protein].append((TP+FP)/nounknown)
                 pred[protein].append((TP+FN)/nounknown)
+                pred[protein].append(iudiso/nounknown)
 
     #mod=re.sub(r'.*\/','',m)
     #set=re.sub(r'.*\/','',ns.t)
@@ -199,7 +214,7 @@ if __name__ == '__main__':
     with open('predictions/outpred_'+mod+"-"+set+'.pickle','wb') as f:
         pickle.dump(pred, f)
     #print (pred)
-    keys=[['Name', 'kingdom', 'gc', 'TP', 'FP', 'FN', 'TN','TPR','FPR','Spec','PPV','F1','MCC', 'Pred', 'Diso']]
+    keys=[['Name', 'kingdom', 'gc', 'TP', 'FP', 'FN', 'TN','TPR','FPR','Spec','PPV','F1','MCC', 'Pred', 'Diso','IUPRED']]
     
     with open('predictions/outpred_'+mod+"-"+set+'.csv','w',newline="") as f:
         w = csv.writer(f)

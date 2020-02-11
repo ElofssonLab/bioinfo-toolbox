@@ -58,12 +58,20 @@ with open('mobidata_K.pickle','rb') as f:
     data = pickle.load(f)
 
 outlist = open('formatted_list','w')
-out = h5py.File('formatted_data_GC.h5py', 'w')
+out = h5py.File('formatted_data_GC_kingdom.h5py', 'w')
 for key in data:                                                                ##### key: uniprot/MobiDB ID
     print (key)
     if 'rna' not in data[key]: continue
     if 'GC%' not in data[key]: continue
     gc=data[key]['GC%']
+    if data[key]['kingdom']=='A':
+        k=[1,0,0]
+    elif data[key]['kingdom']=='B':
+        k=[0,1,0]
+    elif data[key]['kingdom']=='E':
+        k=[0,0,1]
+    else:
+        k=[0,0,0]
     #mobidata[code.rstrip()]['GC%']
     pro = []                                                                    ##### one-hot encoded aa
     for aa in data[key]['sequence']:
@@ -76,10 +84,15 @@ for key in data:                                                                
         if cod in cod_encode: rna.append(cod_encode[cod][:])
         else: break                                                             ##### break sequences with atypical/unknown nucl
 
-    GC = []                                                                    ##### one-hot encoded nucleotides
+    GC = []                                                                    ##### GC-frequency (real number=
     for i in data[key]['sequence']:
         GC.append(gc)
 
+
+    kingdom = []                                                                    ##### one-hot encoded kingdom
+    for i in data[key]['sequence']:
+        kingdom.append(k)
+        
     if len(rna) == len(pro) and len(rna) == len(data[key]['sequence']):         ##### skip sequences with inconsistencies
 
         firstpos = data[key]['disorder'][0][0]                                  ##### disordered region format of mobiDB: [[firstpos, lastpos, label],[firstpos,lastpos,label],...]
@@ -101,6 +114,7 @@ for key in data:                                                                
         out[key].create_dataset('pro', data=np.array(pro, dtype=np.float32).reshape(len(pro), 21) , chunks=True, compression="gzip")
         out[key].create_dataset('rna', data=np.array(rna, dtype=np.float32).reshape(len(rna), 62), chunks=True, compression="gzip")
         out[key].create_dataset('GC', data=np.array(GC, dtype=np.float32).reshape(len(pro), 1), chunks=True, compression="gzip")
+        out[key].create_dataset('kingdom', data=np.array(kingdom, dtype=np.float32).reshape(len(pro), 3), chunks=True, compression="gzip")
         outlist.write(key+'\n')
 
 out.close()

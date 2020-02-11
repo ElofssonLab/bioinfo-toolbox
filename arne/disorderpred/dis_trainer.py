@@ -50,6 +50,7 @@ if __name__ == '__main__':
     parser.add_argument('-d', required= True, help='path to data folder')
     parser.add_argument('-f', required= True, help='feature kind (pro, rna)')
     parser.add_argument('-gc', required= False,  help=' GC', action='store_true')
+    parser.add_argument('-kingdom', required= False,  help=' Kingdom', action='store_true')
 
     parser.add_argument('-ep', required= False, default= '100', help='epoch number')
     parser.add_argument('-bs', required= False, default= '10', help='mini-batch size')
@@ -59,6 +60,9 @@ if __name__ == '__main__':
     ns = parser.parse_args()
     if (ns.gc): ns.gc='GC'
     else: ns.gc='noGC'
+
+    if (ns.kingdom): ns.kingdom='KINGDOM_'
+    else: ns.kingdom=''
 
     testset=re.sub(r'.*\/','',ns.t)
     seed = 42
@@ -76,7 +80,7 @@ if __name__ == '__main__':
     sess = tf.Session(graph=tf.get_default_graph(), config=session_conf)
     K.set_session(sess)
 
-    hrun_id = str(ns.ep)+"-"+testset+"-"+str(ns.bs)+'-'+str(ns.lr)+'_'+str(ns.id)+'_'+str(ns.f)+'_'+str(ns.gc)+"_"+str(seed)
+    hrun_id = str(ns.ep)+"-"+testset+"-"+str(ns.bs)+'-'+str(ns.lr)+'_'+str(ns.id)+'_'+str(ns.f)+'_'+str(ns.gc)+"_"+str(ns.kingdom)+str(seed)
 
     epochs = int(ns.ep)
     batch = int(ns.bs)
@@ -88,6 +92,7 @@ if __name__ == '__main__':
     elif ns.f == 'rna': feat_len=61
     else: sys.exit('Unknown ')
     if ns.gc == 'GC': feat_len+=1
+    if ns.kingdom == 'KINGDOM_': feat_len+=3
 
     
     ##### Dataset #####
@@ -114,12 +119,19 @@ if __name__ == '__main__':
         ##### Batch formatting #####
         for protein in train_list:
             if ns.gc == 'GC':
-                #print(np.concatenate((data[protein]['GC'],data[protein][ns.f]),axis=1))
-                mb.append(np.concatenate((data[protein]['GC'],data[protein][ns.f]),axis=1))
-                #mb.append(np.array(data[protein]['GC'], dtype=np.float64))
+                if (ns.kingdom == 'KINGDOM_'):
+                    mb.append(np.concatenate((data[protein]['kingdom'],data[protein]['GC'],data[protein][ns.f]),axis=1))
+                else:
+                    #print(np.concatenate((data[protein]['GC'],data[protein][ns.f]),axis=1))
+                    mb.append(np.concatenate((data[protein]['GC'],data[protein][ns.f]),axis=1))
+                    #mb.append(np.array(data[protein]['GC'], dtype=np.float64))
+                    
             else:
-                mb.append(np.array(data[protein][ns.f], dtype=np.float64))
-            
+                if (ns.kingdom == 'KINGDOM_'):
+                    mb.append(np.concatenate((data[protein]['kingdom'],data[protein][ns.f]),axis=1))
+                else:
+                    mb.append(np.array(data[protein][ns.f], dtype=np.float64))
+                
             if len(mb) > batch-1:
                 mbX = []
                 mbY = []
@@ -181,9 +193,15 @@ if __name__ == '__main__':
 
         for protein in val_list:
             if ns.gc == 'GC':
-                sample = np.concatenate((data[protein]['GC'],data[protein][ns.f]),axis=1)
+                if (ns.kingdom == 'KINGDOM_'):
+                    sample=np.concatenate((data[protein]['kingdom'],data[protein]['GC'],data[protein][ns.f]),axis=1)
+                else:
+                    sample = np.concatenate((data[protein]['GC'],data[protein][ns.f]),axis=1)
             else:
-                sample = np.array(data[protein][ns.f], dtype=np.float64)
+                if (ns.kingdom == 'KINGDOM_'):
+                    sample=np.concatenate((data[protein]['kingdom'],data[protein][ns.f]),axis=1)
+                else:
+                    sample = np.array(data[protein][ns.f], dtype=np.float64)
             X = sample[:,:-1].reshape(1, len(sample), len(sample[0])-1)
             Y = sample[:,-1]
             prediction = model.predict_on_batch(X)

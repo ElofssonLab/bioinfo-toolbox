@@ -24,6 +24,12 @@ dic_colors = {"E":"#004D40", "B":"#D81B60","A":"#1E88E5",
 dic_markers = {"E":"o", "B":"x", "A":"o"}
 
 factor=10
+
+flist = open('formatted_list','r')
+
+
+
+
 for f in os.listdir(dir):
     if f.endswith(".csv"):
         file=re.sub(r'.csv','',f)
@@ -38,15 +44,18 @@ for f in os.listdir(dir):
             numave=int(factor*math.sqrt(len(d)))
             x=(moving_average(d.gc.to_list(),numave))
             pred=(moving_average(d.Pred.to_list(),numave))
+            iupred=(moving_average(d.IUPRED.to_list(),numave))
             diso=(moving_average(d.Diso.to_list(),numave))
             err=pred-diso
+            iuerr=iupred-diso
             ppv=(moving_average(d.PPV.to_list(),numave))
             mcc=(moving_average(d.MCC.to_list(),numave))
             f1=(moving_average(d.F1.to_list(),numave))
             #plt.plot(x,diso,label="Diso-"+kingdom,color=dic_colors[kingdom],lw=2)
             #plt.plot(x,pred,'--',label="Pred-"+kingdom,color=dic_colors[kingdom],lw=0.5)
 
-            plt.plot(x,err,'.',label="Error-"+kingdom,color=dic_colors[kingdom],lw=0.5)
+            plt.plot(x,err,label="Error-Diso-"+kingdom,color=dic_colors[kingdom],lw=0.5)
+            plt.plot(x,iuerr,label="Error-IUpred-"+kingdom,color=dic_colors[kingdom],lw=2)
             
             #plt.plot(d.gc,d.Diso,'.',label="Diso-"+kingdom,color=dic_colors[kingdom])
             #plt.plot(d.gc,d.Pred,'.',label="Pred-"+kingdom,color=dic_colors[kingdom])
