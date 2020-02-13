@@ -18,9 +18,9 @@ dir="predictions/"
 fig_dir="figures/"
 
 
-dic_colors = {"E":"#004D40", "B":"#D81B60","A":"#1E88E5",
-              "E1":"green", "B1":"red", "A1":"blue",
-              "E2":"lightgreen","B2":"pink", "A2":"lightblue"}
+dic_colors = {"E":"#004D40", "B":"#D81B60","A":"#1E88E5","All":"black",
+              "E1":"green", "B1":"red", "A1":"blue","All1":"grey",
+              "E2":"lightgreen","B2":"pink", "A2":"lightblue","All2":"lightgrey"}
 dic_markers = {"E":"o", "B":"x", "A":"o"}
 
 factor=10
@@ -38,8 +38,11 @@ for f in os.listdir(dir):
 
         fig, ax = plt.subplots(figsize=(6,6))
     
-        for kingdom in ["B","E","A"]:
-            d=df.loc[(df.kingdom == kingdom) ].sort_values('gc').dropna()
+        for kingdom in ["All","B","E","A"]:
+            if kingdom=="All":
+                d=df.sort_values('gc').dropna()
+            else:
+                d=df.loc[(df.kingdom == kingdom) ].sort_values('gc').dropna()
             #print(d)
             numave=int(factor*math.sqrt(len(d)))
             x=(moving_average(d.gc.to_list(),numave))
@@ -63,8 +66,9 @@ for f in os.listdir(dir):
             #plt.plot(x,mcc,'.',label="MCC-"+kingdom,color=dic_colors[kingdom],lw=1)
             #plt.plot(x,f1,'-',label="F1-"+kingdom,color=dic_colors[kingdom],lw=1)
             #plt.plot(x,ppv,'--',label="PPV-"+kingdom,color=dic_colors[kingdom],lw=1)
-            ax.legend()
-        ax.set_title=file
+        ax.set_title="Error in fraction disorder per protein"
         ax.set_xlabel("GC")
-        ax.set_ylabel("Disorder")
+        ax.set_ylabel("Error in Disorder")
+        ax.legend()
+        
         fig.savefig(fig_dir+file+"-running-average.eps",rasterized=True)
