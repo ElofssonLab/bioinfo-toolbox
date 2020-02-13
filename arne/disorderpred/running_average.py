@@ -38,7 +38,7 @@ for f in os.listdir(dir):
 
         fig, ax = plt.subplots(figsize=(6,6))
     
-        for kingdom in ["All","B","E","A"]:
+        for kingdom in ["B","E","A"]:
             if kingdom=="All":
                 d=df.sort_values('gc').dropna()
             else:
@@ -58,7 +58,7 @@ for f in os.listdir(dir):
             #plt.plot(x,pred,'--',label="Pred-"+kingdom,color=dic_colors[kingdom],lw=0.5)
 
             plt.plot(x,err,label="Error-Diso-"+kingdom,color=dic_colors[kingdom],lw=0.5)
-            plt.plot(x,iuerr,label="Error-IUpred-"+kingdom,color=dic_colors[kingdom],lw=2)
+            #plt.plot(x,iuerr,'.',label="Error-IUpred-"+kingdom,color=dic_colors[kingdom],lw=2)
             
             #plt.plot(d.gc,d.Diso,'.',label="Diso-"+kingdom,color=dic_colors[kingdom])
             #plt.plot(d.gc,d.Pred,'.',label="Pred-"+kingdom,color=dic_colors[kingdom])

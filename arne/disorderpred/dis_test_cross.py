@@ -27,9 +27,9 @@ if __name__ == '__main__':
     parser.add_argument('-f', required= True, help='feature kind (pro, rna)')
     #parser.add_argument('-m', required= True, help='model')
     parser.add_argument('-gc', required= False,  help=' GC', action='store_true')
+    parser.add_argument('-kingdom', required= False,  help=' Kingdom', action='store_true')
     ns = parser.parse_args()
-    if (ns.gc): ns.gc='GC'
-    else: ns.gc='noGC'
+
     cutoff =0.4 # Prediction cutoff.
     iupredcutoff =0.4 # Prediction cutoff.
     seed = 42
@@ -48,24 +48,32 @@ if __name__ == '__main__':
     if ns.f == 'pro': feat_len=20
     elif ns.f == 'rna': feat_len=61
     else: sys.exit('Unknown ')
-    if ns.gc == 'GC': feat_len+=1
+    if ns.gc : feat_len+=1
+    if ns.kingdom : feat_len+=3
 
     ##### Dataset #####
     print ('Loading data ...')
-    data = h5py.File(ns.d+'formatted_data_GC.h5py','r')
+    data = h5py.File(ns.d+'formatted_data_GC_kingdom.h5py','r')
     with open(ns.d+'mobidata_K.pickle','rb') as f:
         gc = pickle.load(f)
     #test_list = []
     #for line in open(ns.t, 'r'): test_list.append(line.rstrip())
 
     if (ns.f =='pro'):
-        if (ns.gc=='GC'):
-            models={"models/model_100-test1234-10-0.001_1_pro_GC_60.ann":"DIScv/test5",
-                    "models/model_100-test1235-10-0.001_1_pro_GC_90.ann":"DIScv/test4",
-                    "models/model_100-test1245-10-0.001_1_pro_GC_50.ann":"DIScv/test3",
-                    "models/model_100-test1345-10-0.001_1_pro_GC_22.ann":"DIScv/test2",
-                    "models/model_100-test2345-10-0.001_1_pro_GC_1.ann":"DIScv/test1"
-            }
+        if (ns.gc):
+            if (ns.kingdom):
+                models={"models/model_100-test1234-10-0.001_1_pro_GC_KINGDOM_36.ann":"DIScv/test5",
+                        "models/model_100-test1235-10-0.001_1_pro_GC_KINGDOM_85.ann":"DIScv/test4",
+                        "models/model_100-test1245-10-0.001_1_pro_GC_KINGDOM_45.ann":"DIScv/test3",
+                        "models/model_100-test1345-10-0.001_1_pro_GC_KINGDOM_92.ann":"DIScv/test2",
+                        "models/model_100-test2345-10-0.001_1_pro_GC_KINGDOM_15.ann":"DIScv/test1"}
+            else:
+                models={"models/model_100-test1234-10-0.001_1_pro_GC_60.ann":"DIScv/test5",
+                        "models/model_100-test1235-10-0.001_1_pro_GC_90.ann":"DIScv/test4",
+                        "models/model_100-test1245-10-0.001_1_pro_GC_50.ann":"DIScv/test3",
+                        "models/model_100-test1345-10-0.001_1_pro_GC_22.ann":"DIScv/test2",
+                        "models/model_100-test2345-10-0.001_1_pro_GC_1.ann":"DIScv/test1"
+                }
         else:
             models={"models/model_100-test1234-10-0.001_1_pro_noGC_55.ann":"DIScv/test5",
                     "models/model_100-test1235-10-0.001_1_pro_noGC_55.ann":"DIScv/test4",
@@ -74,7 +82,7 @@ if __name__ == '__main__':
                     "models/model_100-test2345-10-0.001_1_pro_noGC_45.ann":"DIScv/test1"
             }
     elif(ns.f=='rna'):
-        if (ns.gc=='GC'):
+        if (ns.gc):
             models={"models/model_100-test1234-10-0.001_1_rna_GC_41.ann":"DIScv/test5",
                     "models/model_100-test1235-10-0.001_1_rna_GC_29.ann":"DIScv/test4",
                     "models/model_100-test1245-10-0.001_1_rna_GC_88.ann":"DIScv/test3",
@@ -131,10 +139,16 @@ if __name__ == '__main__':
             iudis.close()
             #i+=1
             #if i>10: continue
-            if ns.gc == 'GC':
-                sample=np.concatenate((data[protein]['GC'],data[protein][ns.f]),axis=1)
+            if ns.gc :
+                if (ns.kingdom ):
+                    sample=np.concatenate((data[protein]['kingdom'],data[protein]['GC'],data[protein][ns.f]),axis=1)
+                else:
+                    sample=np.concatenate((data[protein]['GC'],data[protein][ns.f]),axis=1)
             else:
-                sample = np.array(data[protein][ns.f], dtype=np.float64)
+                if (ns.kingdom ):
+                    sample=np.concatenate((data[protein]['kingdom'],data[protein]['GC'],data[protein][ns.f]),axis=1)
+                else:
+                    sample = np.array(data[protein][ns.f], dtype=np.float64)
             X = sample[:,:-1].reshape(1, len(sample), len(sample[0])-1)
             Y = sample[:,-1]
             #print (protein,X,Y)
@@ -203,10 +217,16 @@ if __name__ == '__main__':
     #mod=re.sub(r'.*\/','',m)
     #set=re.sub(r'.*\/','',ns.t)
 
-    if (ns.gc=='GC'):
-        mod="GC-cross"
+    if (ns.gc):
+        if (ns.kingdom):
+            mod="GC-cross-kingdom"
+        else:
+            mod="GC-cross"
     else:
-        mod="noGC-cross"
+        if (ns.kingdom):
+            mod="noGC-cross-kingdom"
+        else:
+            mod="noGC-cross"
     if (ns.f=='pro'):
         set="pro"
     elif(ns.f=='rna'):
