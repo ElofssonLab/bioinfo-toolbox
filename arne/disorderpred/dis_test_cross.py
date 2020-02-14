@@ -84,12 +84,19 @@ if __name__ == '__main__':
             }
     elif(ns.f=='rna'):
         if (ns.gc):
-            models={"models/model_100-test1234-10-0.001_1_rna_GC_41.ann":"DIScv/test5",
-                    "models/model_100-test1235-10-0.001_1_rna_GC_29.ann":"DIScv/test4",
-                    "models/model_100-test1245-10-0.001_1_rna_GC_88.ann":"DIScv/test3",
-                    "models/model_100-test1345-10-0.001_1_rna_GC_76.ann":"DIScv/test2",
-                    "models/model_100-test2345-10-0.001_1_rna_GC_60.ann":"DIScv/test1"
-            }
+            if (ns.kingdom):
+                models={"models/model_100-test1234-10-0.001_1_rna_GC_KINGDOM_97.ann":"DIScv/test5",
+                        "models/model_100-test1235-10-0.001_1_rna_GC_KINGDOM_63.ann":"DIScv/test4",
+                        "models/model_100-test1245-10-0.001_1_rna_GC_KINGDOM_12.ann":"DIScv/test3",
+                        "models/model_100-test1345-10-0.001_1_rna_GC_KINGDOM_60.ann":"DIScv/test2",
+                        "models/model_100-test2345-10-0.001_1_rna_GC_KINGDOM_94.ann":"DIScv/test1"}
+            else:
+                models={"models/model_100-test1234-10-0.001_1_rna_GC_41.ann":"DIScv/test5",
+                        "models/model_100-test1235-10-0.001_1_rna_GC_29.ann":"DIScv/test4",
+                        "models/model_100-test1245-10-0.001_1_rna_GC_88.ann":"DIScv/test3",
+                        "models/model_100-test1345-10-0.001_1_rna_GC_76.ann":"DIScv/test2",
+                        "models/model_100-test2345-10-0.001_1_rna_GC_60.ann":"DIScv/test1"
+                }
         else:
             models={"models/model_100-test1234-10-0.001_1_rna_noGC_57.ann":"DIScv/test5",
                     "models/model_100-test1235-10-0.001_1_rna_noGC_20.ann":"DIScv/test4",
@@ -97,7 +104,6 @@ if __name__ == '__main__':
                     "models/model_100-test1345-10-0.001_1_rna_noGC_16.ann":"DIScv/test2",
                     "models/model_100-test2345-10-0.001_1_rna_noGC_1.ann":"DIScv/test1"
             }
-
 
 
     pred = {}

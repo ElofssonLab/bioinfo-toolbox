@@ -29,19 +29,17 @@ flist = open('formatted_list','r')
 
 
 
+fig, ax = plt.subplots(figsize=(6,6))
 
 for f in os.listdir(dir):
     if f.endswith(".roc"):
         file=re.sub(r'.roc','',f)
         df=pd.read_csv(dir+file+".roc", sep=',',header=0)
         #print (df)
-
-        fig, ax = plt.subplots(figsize=(6,6))
-    
         plt.plot(df.FPR,df.TPR,label=file,lw=0.5)
-        ax.set_title=file
-        ax.set_xlabel("FPR")
-        ax.set_ylabel("TPR")
-        ax.legend()
+ax.set_title=file
+ax.set_xlabel("FPR")
+ax.set_ylabel("TPR")
+ax.legend()
         
-        fig.savefig(fig_dir+file+"-ROC.eps",rasterized=True)
+fig.savefig(fig_dir+"ROC.eps",rasterized=True)
