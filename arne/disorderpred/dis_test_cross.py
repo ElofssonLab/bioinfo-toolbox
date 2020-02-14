@@ -120,6 +120,8 @@ if __name__ == '__main__':
         #test_cm = {}
         positive=np.zeros(101)
         negative=np.zeros(101)
+        iupositive=np.zeros(101)
+        iunegative=np.zeros(101)
         
         #for thr in np.arange(0.,1.,rocstep): test_cm[thr] = test_cm.get(thr, {'PP':{'TP':0,'FP':0},'PN':{'TN':0,'FN':0}})
 
@@ -180,12 +182,15 @@ if __name__ == '__main__':
             for pos in range(len(prediction[0])):
                 if Y[pos] == 0.5: continue
                 thr=int(tiny+prediction[0][pos][0]/rocstep)
+                iuthr=int(tiny+iupred[pos]/rocstep)
                 if Y[pos] == 1:
                     positive[thr]+=1
+                    iupositive[iuthr]+=1
                 else:
                     negative[thr]+=1
+                    iunegative[iuthr]+=1
 
-            ##### Data selection #####
+                    ##### Data selection #####
             if gc[protein]['kingdom'] not in ['A', 'B', 'E']: continue
             if (not gc[protein]['GC%']): continue 
         
@@ -270,7 +275,8 @@ if __name__ == '__main__':
 
     #print(positive,negative)
     
-    rockeys=[['Thr','TP','FP','FN','TN','TPR','FPR','Spec','PPV','F1','MCC']]
+    rockeys=[['Thr','TP','FP','FN','TN','TPR','FPR','Spec','PPV','F1','MCC',
+              'iuTP','iuFP','iuFN','iuTN','iuTPR','iuFPR','iuSpec','iuPPV','iuF1','iuMCC',]]
     with open('predictions/outpred_'+mod+"-"+set+'.roc','w',newline="") as f:
         w = csv.writer(f)
         w.writerows(rockeys)
@@ -278,6 +284,10 @@ if __name__ == '__main__':
         FP=np.sum(negative)
         TN=0
         FN=0
+        iuTP=np.sum(positive)
+        iuFP=np.sum(negative)
+        iuTN=0
+        iuFN=0
         for thr in np.arange(0.,1.+tiny,rocstep):
             line=[]
             line.append(thr)
@@ -304,6 +314,31 @@ if __name__ == '__main__':
             line.append(PPV)
             line.append(F1)
             line.append(MCC)
+
+
+            iuTP-=iupositive[index]
+            iuFP-=iunegative[index]
+            iuTN+=iunegative[index]
+            iuFN+=iupositive[index]
+            line.append(iuTP)            
+            line.append(iuFP)            
+            line.append(iuFN)            
+            line.append(iuTN)            
+            iuTPR=iuTP/(tiny+iuTP+iuFN)
+            iuFPR=iuFP/(tiny+iuFP+iuTN)
+            iuSpec=iuTN/(tiny+iuFP+iuTN)
+            iuPPV=iuTP/(tiny+iuFP+iuTP)
+            iuF1=2*iuTP/(tiny+2*iuTP+iuFP+iuFN)
+            #print (thr,index,positive[index],negative[index],TP,FP,FN,TN,TP+FP,np.sum(positive),
+            #       np.sum(positive[0:index]),TN+FN,np.sum(negative),np.sum(negative[0:index]))
+            MCC=((TP*TN)-FP*FN)/np.sqrt(tiny+(TP+FP)*(TP+FN)*(TN+FP)*(TN+FN))
+            line.append(TPR)
+            line.append(FPR)
+            line.append(Spec)
+            line.append(PPV)
+            line.append(F1)
+            line.append(MCC)
+
             #print (line)    
             w.writerows([line])
     #print (test_cm)
