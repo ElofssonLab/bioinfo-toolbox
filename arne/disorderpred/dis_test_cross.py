@@ -30,10 +30,11 @@ if __name__ == '__main__':
     parser.add_argument('-kingdom', required= False,  help=' Kingdom', action='store_true')
     ns = parser.parse_args()
 
+    rocstep=0.01
     cutoff =0.4 # Prediction cutoff.
     iupredcutoff =0.4 # Prediction cutoff.
     seed = 42
-    tiny=1.e-20
+    tiny=1.e-10
     os.environ['PYTHONHASHSEED'] = '0'
     np.random.seed(seed)
     random.seed(seed)
@@ -101,6 +102,7 @@ if __name__ == '__main__':
 
     pred = {}
     i=0
+    
     for m in models:
         #print (m,models[m])
         
@@ -109,8 +111,11 @@ if __name__ == '__main__':
    
         model = load_model(m)
 
-        test_cm = {}
-        for thr in nl.thrlist: test_cm[thr] = test_cm.get(thr, {'PP':{'TP':0,'FP':0},'PN':{'TN':0,'FN':0}})
+        #test_cm = {}
+        positive=np.zeros(101)
+        negative=np.zeros(101)
+        
+        #for thr in np.arange(0.,1.,rocstep): test_cm[thr] = test_cm.get(thr, {'PP':{'TP':0,'FP':0},'PN':{'TN':0,'FN':0}})
 
         ##### Prediction #####
         #pred = {'Name':[], 'kingdom':[], 'gc':[], 'TP':[], 'FP':[], 'FN':[], 'TN':[], 'Pred':[], 'Diso':[]}
@@ -154,16 +159,25 @@ if __name__ == '__main__':
             #print (protein,X,Y)
             prediction = model.predict_on_batch(X)
 
-            ##### Confusion Matrix #####
-            for thr in test_cm:
-                for pos in range(len(prediction[0])):
-                    if Y[pos] == 0.5: continue
-                    if prediction[0][pos][0] >= thr:
-                        if Y[pos] == 1: test_cm[thr]['PP']['TP'] += 1
-                        else: test_cm[thr]['PP']['FP'] += 1
-                    else:
-                        if Y[pos] == 1: test_cm[thr]['PN']['FN'] += 1
-                        else: test_cm[thr]['PN']['TN'] += 1
+            ##### Confusion Matrix #####  (This is way too slow to implement)..
+            #for thr in test_cm:
+            #    for pos in range(len(prediction[0])):
+            #        if Y[pos] == 0.5: continue
+            #        if prediction[0][pos][0] >= thr:
+            #            if Y[pos] == 1: test_cm[thr]['PP']['TP'] += 1
+            #            else: test_cm[thr]['PP']['FP'] += 1
+            #        else:
+            #            if Y[pos] == 1: test_cm[thr]['PN']['FN'] += 1
+            #            else: test_cm[thr]['PN']['TN'] += 1
+            
+
+            for pos in range(len(prediction[0])):
+                if Y[pos] == 0.5: continue
+                thr=int(tiny+prediction[0][pos][0]/rocstep)
+                if Y[pos] == 1:
+                    positive[thr]+=1
+                else:
+                    negative[thr]+=1
 
             ##### Data selection #####
             if gc[protein]['kingdom'] not in ['A', 'B', 'E']: continue
@@ -247,27 +261,36 @@ if __name__ == '__main__':
     #print (test_cm.keys())
     #print (test_cm.values())
     #print (test_cm)
-    rockeys=[['Thr','TP','FP','TN','TPR','FPR','Spec','PPV','F1','MCC']]
+
+    #print(positive,negative)
+    
+    rockeys=[['Thr','TP','FP','FN','TN','TPR','FPR','Spec','PPV','F1','MCC']]
     with open('predictions/outpred_'+mod+"-"+set+'.roc','w',newline="") as f:
         w = csv.writer(f)
         w.writerows(rockeys)
-        for thr in test_cm.keys():
+        TP=np.sum(positive)
+        FP=np.sum(negative)
+        TN=0
+        FN=0
+        for thr in np.arange(0.,1.+tiny,rocstep):
             line=[]
             line.append(thr)
-            for k in ["TP","FP"]:
-                line.append(test_cm[thr]['PP'][k])
-            for k in ["TN","FN"]:
-                line.append(test_cm[thr]['PN'][k])
-
-            TP=test_cm[thr]['PP']['TP']
-            FP=test_cm[thr]['PP']['FP']
-            TN=test_cm[thr]['PN']['TN']
-            FN=test_cm[thr]['PN']['FN']
+            index=int(tiny+thr/rocstep)
+            TP-=positive[index]
+            FP-=negative[index]
+            TN+=negative[index]
+            FN+=positive[index]
+            line.append(TP)            
+            line.append(FP)            
+            line.append(FN)            
+            line.append(TN)            
             TPR=TP/(tiny+TP+FN)
             FPR=FP/(tiny+FP+TN)
             Spec=TN/(tiny+FP+TN)
             PPV=TP/(tiny+FP+TP)
             F1=2*TP/(tiny+2*TP+FP+FN)
+            #print (thr,index,positive[index],negative[index],TP,FP,FN,TN,TP+FP,np.sum(positive),
+            #       np.sum(positive[0:index]),TN+FN,np.sum(negative),np.sum(negative[0:index]))
             MCC=((TP*TN)-FP*FN)/np.sqrt(tiny+(TP+FP)*(TP+FN)*(TN+FP)*(TN+FN))
             line.append(TPR)
             line.append(FPR)
