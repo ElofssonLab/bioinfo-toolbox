@@ -124,27 +124,7 @@ if __name__ == '__main__':
         ##### Batch formatting #####
         for protein in train_list:
             # This is actually too slow...
-            if ns.gc == 'GCgenomic':
-                if (ns.kingdom == 'KINGDOM_'):
-                    mb.append(np.concatenate((data[protein]['kingdom'],data[protein]['GCgenomic'],data[protein][ns.f]),axis=1))
-                else:
-                    #print(np.concatenate((data[protein]['GC'],data[protein][ns.f]),axis=1))
-                    mb.append(np.concatenate((data[protein]['GCgenomic'],data[protein][ns.f]),axis=1))
-                    #mb.append(np.array(data[protein]['GC'], dtype=np.float64))
-                    
-            elif ns.gc == 'GC':
-                if (ns.kingdom == 'KINGDOM_'):
-                    mb.append(np.concatenate((data[protein]['kingdom'],data[protein]['GC'],data[protein][ns.f]),axis=1))
-                else:
-                    #print(np.concatenate((data[protein]['GC'],data[protein][ns.f]),axis=1))
-                    mb.append(np.concatenate((data[protein]['GC'],data[protein][ns.f]),axis=1))
-                    #mb.append(np.array(data[protein]['GC'], dtype=np.float64))
-                    
-            else:
-                if (ns.kingdom == 'KINGDOM_'):
-                    mb.append(np.concatenate((data[protein]['kingdom'],data[protein][ns.f]),axis=1))
-                else:
-                    mb.append(np.array(data[protein][ns.f], dtype=np.float64))
+            mb.append(np.array(data[protein][ns.f], dtype=np.float64))
                 
             if len(mb) > batch-1:
                 mbX = []
@@ -206,21 +186,7 @@ if __name__ == '__main__':
         for thr in nl.thrlist: test_cm[thr] = test_cm.get(thr, {'PP':{'TP':0,'FP':0},'PN':{'TN':0,'FN':0}})
 
         for protein in val_list:
-            if ns.gc == 'GC':
-                if (ns.kingdom == 'KINGDOM_'):
-                    sample=np.concatenate((data[protein]['kingdom'],data[protein]['GC'],data[protein][ns.f]),axis=1)
-                else:
-                    sample = np.concatenate((data[protein]['GC'],data[protein][ns.f]),axis=1)
-            elif ns.gc == 'GCgenomic':
-                if (ns.kingdom == 'KINGDOM_'):
-                    sample=np.concatenate((data[protein]['kingdom'],data[protein]['GCgenomic'],data[protein][ns.f]),axis=1)
-                else:
-                    sample = np.concatenate((data[protein]['GCgenomic'],data[protein][ns.f]),axis=1)
-            else:
-                if (ns.kingdom == 'KINGDOM_'):
-                    sample=np.concatenate((data[protein]['kingdom'],data[protein][ns.f]),axis=1)
-                else:
-                    sample = np.array(data[protein][ns.f], dtype=np.float64)
+            sample = np.array(data[protein][ns.f], dtype=np.float64)
             X = sample[:,:-1].reshape(1, len(sample), len(sample[0])-1)
             Y = sample[:,-1]
             prediction = model.predict_on_batch(X)

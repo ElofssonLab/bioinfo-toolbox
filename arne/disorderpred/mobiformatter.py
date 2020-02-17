@@ -10,6 +10,39 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import IUPAC
 
+import argparse
+from argparse import RawTextHelpFormatter
+
+parser = argparse.ArgumentParser(description =
+                                 '- format h5py file  -',
+                                 formatter_class=RawTextHelpFormatter)
+parser.add_argument('-f', required= True, help='Input file')
+parser.add_argument('-gc', required= False, help='GC', action='store_true')
+parser.add_argument('-rna', required= False, help='RNA', action='store_true')
+parser.add_argument('-pro', required= False, help='Protein', action='store_true')
+parser.add_argument('-gcgenomic', required= False, help='GCgenomic', action='store_true')
+parser.add_argument('-kingdom', required= False, help='Kingdom', action='store_true')
+ns = parser.parse_args()
+
+type=''
+extra=0
+if ns.pro:
+    type+="pro"
+elif ns.rna:
+    type+="rna"
+
+if ns.gc:
+    type+="_GC"
+    extra+=1
+elif ns.gcgenomic:
+    type+="_GCgenomic"
+    extra+=1
+
+if ns.kingdom:
+    type+="_kingdom"
+    extra+=3
+
+    
 codons = [
 'ATA', 'ATC', 'ATT', 'ATG', 'ACA', 'ACC', 'ACG', 'ACT', 
 'AAC', 'AAT', 'AAA', 'AAG', 'AGC', 'AGT', 'AGA', 'AGG',                  
@@ -74,7 +107,7 @@ taxid2gc = df_reference.set_index("TaxID").to_dict()["GC%"]
 
 
 fasta_dir="uniprot/"
-with open('mobidata_K.pickle','rb') as f:
+with open(ns.f,'rb') as f:
     data = pickle.load(f)
 
 memo2taxid={}
@@ -88,21 +121,29 @@ with open(data_dir+'speclist.txt') as fp:
 
     
 outlist = open('formatted_list','w')
-out = h5py.File('formatted_data_GC_GCgenomic_kingdom.h5py', 'w')
+
+
+out = h5py.File('formatted_data_'+type+'.h5py', 'w')
+skipped=[]
 for key in data:                                                                ##### key: uniprot/MobiDB ID
     #print (key)
     fastafile=fasta_dir+key+".fasta"
     GCgenomic=0.0
-    for record in SeqIO.parse(fastafile, "fasta"):
-        #print("%s %i" % (record.id, len(record)))
-        bar,id,name=record.id.split("|") 
-        #print (record.id,id,name)
-        prot,taxname=name.split("_") 
-        try:
-            GCgenomic=float(taxid2gc[int(memo2taxid[taxname])])
-        except:
-            continue
-    print (key,name,taxname,GCgenomic)
+    try:
+        for record in SeqIO.parse(fastafile, "fasta"):
+            #print("%s %i" % (record.id, len(record)))
+            bar,id,name=record.id.split("|") 
+            #print (record.id,id,name)
+            prot,taxname=name.split("_") 
+            try:
+                GCgenomic=float(taxid2gc[int(memo2taxid[taxname])])
+            except:
+                skipped+=[key]
+                continue
+    except: 
+        skipped+=[key]
+        continue
+    #print (key,name,taxname,GCgenomic)
     if not GCgenomic>0:continue
     if 'rna' not in data[key]: continue
     if 'GC%' not in data[key]: continue
@@ -116,25 +157,35 @@ for key in data:                                                                
     else:
         k=[0,0,0]
     #mobidata[code.rstrip()]['GC%']
+    # WE need to speed up things
     pro = []                                                                    ##### one-hot encoded aa
     for aa in data[key]['sequence']:
-        if aa in res_encode: pro.append(res_encode[aa][:])
-        else: break                                                             ##### break sequences with atypical/unknown aa
-
+        if aa in res_encode:
+            code=res_encode[aa][:]
+            if ns.gc:
+                code.append(gc)
+            elif ns.gcgenomic:
+                code.append(GCgenomic)
+            if ns.kingdom:
+                code.append(k)
+            #print (aa,code)
+            pro.append(code)
+        else:
+            break                                                             ##### break sequences with atypical/unknown aa
     rna = []                                                                    ##### one-hot encoded nucleotides
     for pos in range(0, len(data[key]['rna']), 3):
         cod = data[key]['rna'][pos:pos+3]
-        if cod in cod_encode: rna.append(cod_encode[cod][:])
-        else: break                                                             ##### break sequences with atypical/unknown nucl
-
-    GC = []                                                                    ##### GC-frequency (real number=
-    for i in data[key]['sequence']:
-        GC.append(gc)
-
-
-    kingdom = []                                                                    ##### one-hot encoded kingdom
-    for i in data[key]['sequence']:
-        kingdom.append(k)
+        if cod in cod_encode:
+            code=cod_encode[cod][:]
+            if ns.gc:
+                code.append(gc)
+            elif ns.gcgenomic:
+                code.append(GCgenomic)
+            if ns.kingdom:
+                code.append(k)
+            rna.append(code)
+        else:
+            break                                                             ##### break sequences with atypical/unknown nucl
         
     if len(rna) == len(pro) and len(rna) == len(data[key]['sequence']):         ##### skip sequences with inconsistencies
 
@@ -150,16 +201,25 @@ for key in data:                                                                
                     pro[pos].append(label[el[-1]])
                     rna[pos].append(label[el[-1]])
         for pos in range(len(rna)):                                             ##### fills incomplete positions with 'unknown' label
-            if len(pro[pos])<21: pro[pos].append(0.5)
-            if len(rna[pos])<62: rna[pos].append(0.5)
+            if len(pro[pos])<21+extra: pro[pos].append(0.5)
+            if len(rna[pos])<62+extra: rna[pos].append(0.5)
 
         out.create_group(key)
-        out[key].create_dataset('pro', data=np.array(pro, dtype=np.float32).reshape(len(pro), 21) , chunks=True, compression="gzip")
-        out[key].create_dataset('rna', data=np.array(rna, dtype=np.float32).reshape(len(rna), 62), chunks=True, compression="gzip")
-        out[key].create_dataset('GC', data=np.array(GC, dtype=np.float32).reshape(len(pro), 1), chunks=True, compression="gzip")
-        out[key].create_dataset('kingdom', data=np.array(kingdom, dtype=np.float32).reshape(len(pro), 3), chunks=True, compression="gzip")
+        if ns.pro:
+            out[key].create_dataset('pro', data=np.array(pro, dtype=np.float32).reshape(len(pro), 21+extra) , chunks=True, compression="gzip")
+        elif ns.rna:
+            out[key].create_dataset('rna', data=np.array(rna, dtype=np.float32).reshape(len(rna), 62+extra), chunks=True, compression="gzip")
+        #out[key].create_dataset('GC', data=np.array(GC, dtype=np.float32).reshape(len(pro), 1), chunks=True, compression="gzip")
+        #out[key].create_dataset('GCgenomic', data=np.array(GCgen, dtype=np.float32).reshape(len(pro), 1), chunks=True, compression="gzip")
+        #out[key].create_dataset('kingdom', data=np.array(kingdom, dtype=np.float32).reshape(len(pro), 3), chunks=True, compression="gzip")
         outlist.write(key+'\n')
 
+
+skiplist = open('skipped_list','w')
+for key in skipped:
+    skiplist.write(key+"\n")
+    
 out.close()
 outlist.close()
+skiplist.close()
 

@@ -17,8 +17,8 @@ with open(file,'rb') as f:
 
 for key in data:
     line=key
-    if 'rna' not in data[key]: continue
-    if 'GC%' not in data[key]: continue
+    #if 'rna' not in data[key]: continue
+    #if 'GC%' not in data[key]: continue
     for field in data[key]:
         line+=","+str(data[key][field])
     print (line)

@@ -1,7 +1,14 @@
 #!/bin/bash -x
 
-/opt/singularity3/bin/singularity exec --nv tf_image.sif python3 bin/dis_trainer.py -t DIScv/test1234 -v DIScv/test5 -d formatted_data_GC_kingdom.h5py -f rna -gc -kingdom -bs 10  &
-/opt/singularity3/bin/singularity exec --nv tf_image.sif python3 bin/dis_trainer.py -t DIScv/test1235 -v DIScv/test4 -d formatted_data_GC_kingdom.h5py -f rna -gc -kingdom -bs 10 
-/opt/singularity3/bin/singularity exec --nv tf_image.sif python3 bin/dis_trainer.py -t DIScv/test1245 -v DIScv/test3 -d formatted_data_GC_kingdom.h5py -f rna -gc -kingdom  -bs 10 &
-/opt/singularity3/bin/singularity exec --nv tf_image.sif python3 bin/dis_trainer.py -t DIScv/test1345 -v DIScv/test2 -d formatted_data_GC_kingdom.h5py -f rna -gc -kingdom -bs 10
-/opt/singularity3/bin/singularity exec --nv tf_image.sif python3 bin/dis_trainer.py -t DIScv/test2345 -v DIScv/test1 -d formatted_data_GC_kingdom.h5py -f rna -gc -kingdom  -bs 10
+/opt/singularity3/bin/singularity exec --nv tf_image.sif python3 bin/dis_trainer2.py -t DIScv/test1234.sorted.GCgenomic -v DIScv/test5.sorted.GCgenomic -d formatted_data_GCgenomic.h5py -f pro -gcgenomic  -bs 10  &
+/opt/singularity3/bin/singularity exec --nv tf_image.sif python3 bin/dis_trainer2.py -t DIScv/test1235.sorted.GCgenomic -v DIScv/test4.sorted.GCgenomic -d formatted_data_GCgenomic.h5py -f pro -gcgenomic  -bs 10 
+/opt/singularity3/bin/singularity exec --nv tf_image.sif python3 bin/dis_trainer2.py -t DIScv/test1245.sorted.GCgenomic -v DIScv/test3.sorted.GCgenomic -d formatted_data_GCgenomic.h5py -f pro -gcgenomic   -bs 10 &
+/opt/singularity3/bin/singularity exec --nv tf_image.sif python3 bin/dis_trainer2.py -t DIScv/test1345.sorted.GCgenomic -v DIScv/test2.sorted.GCgenomic -d formatted_data_GCgenomic.h5py -f pro -gcgenomic  -bs 10
+/opt/singularity3/bin/singularity exec --nv tf_image.sif python3 bin/dis_trainer2.py -t DIScv/test2345.sorted.GCgenomic -v DIScv/test1.sorted.GCgenomic -d formatted_data_GCgenomic.h5py -f pro -gcgenomic   -bs 10 &
+
+
+/opt/singularity3/bin/singularity exec --nv tf_image.sif python3 bin/dis_trainer2.py -t DIScv/test1234.sorted.GCgenomic -v DIScv/test5.sorted.GCgenomic -d formatted_data_GC.h5py -f pro -gc  -bs 10  
+/opt/singularity3/bin/singularity exec --nv tf_image.sif python3 bin/dis_trainer2.py -t DIScv/test1235.sorted.GCgenomic -v DIScv/test4.sorted.GCgenomic -d formatted_data_GC.h5py -f pro -gc  -bs 10 &
+/opt/singularity3/bin/singularity exec --nv tf_image.sif python3 bin/dis_trainer2.py -t DIScv/test1245.sorted.GCgenomic -v DIScv/test3.sorted.GCgenomic -d formatted_data_GC.h5py -f pro -gc   -bs 10 
+/opt/singularity3/bin/singularity exec --nv tf_image.sif python3 bin/dis_trainer2.py -t DIScv/test1345.sorted.GCgenomic -v DIScv/test2.sorted.GCgenomic -d formatted_data_GC.h5py -f pro -gc  -bs 10 &
+/opt/singularity3/bin/singularity exec --nv tf_image.sif python3 bin/dis_trainer2.py -t DIScv/test2345.sorted.GCgenomic -v DIScv/test1.sorted.GCgenomic -d formatted_data_GC.h5py -f pro -gc   -bs 10
