@@ -2,6 +2,13 @@
 import pickle
 import h5py
 import numpy as np
+import os
+from Bio import SeqIO
+import re
+import pandas as pd
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
+from Bio.Alphabet import IUPAC
 
 codons = [
 'ATA', 'ATC', 'ATT', 'ATG', 'ACA', 'ACC', 'ACG', 'ACT', 
@@ -54,13 +61,49 @@ for codon in codons:
     pos += 1
 #####
 
+data_dir = "/home/arnee/git/paper_proks_vs_euks_proteins/data/"
+
+df_reference_file = data_dir  + "df_reference.csv"
+df_reference = pd.read_csv(df_reference_file)
+taxid2gc = df_reference.set_index("TaxID").to_dict()["GC%"]
+
+
+
+#            try:
+#                gc=float(taxid2gc[int(tax_id)])
+
+
+fasta_dir="uniprot/"
 with open('mobidata_K.pickle','rb') as f:
     data = pickle.load(f)
 
+memo2taxid={}
+with open(data_dir+'speclist.txt') as fp:
+    for line in fp:
+        if re.match('.*:\sN=',line):
+            s=line.split()
+            taxid=s[2].replace(':','')
+            mnemonic=s[0]
+            memo2taxid[mnemonic]=taxid
+
+    
 outlist = open('formatted_list','w')
-out = h5py.File('formatted_data_GC_kingdom.h5py', 'w')
+out = h5py.File('formatted_data_GC_GCgenomic_kingdom.h5py', 'w')
 for key in data:                                                                ##### key: uniprot/MobiDB ID
-    print (key)
+    #print (key)
+    fastafile=fasta_dir+key+".fasta"
+    GCgenomic=0.0
+    for record in SeqIO.parse(fastafile, "fasta"):
+        #print("%s %i" % (record.id, len(record)))
+        bar,id,name=record.id.split("|") 
+        #print (record.id,id,name)
+        prot,taxname=name.split("_") 
+        try:
+            GCgenomic=float(taxid2gc[int(memo2taxid[taxname])])
+        except:
+            continue
+    print (key,name,taxname,GCgenomic)
+    if not GCgenomic>0:continue
     if 'rna' not in data[key]: continue
     if 'GC%' not in data[key]: continue
     gc=data[key]['GC%']

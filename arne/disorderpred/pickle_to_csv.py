@@ -1,22 +1,25 @@
-#/usr/bin/env python3
+#!/usr/bin/env python3
+
+import pickle
+import argparse
+from argparse import RawTextHelpFormatter
+
+parser = argparse.ArgumentParser(description =
+                                 '- Pickle to CSV  -',
+                                 formatter_class=RawTextHelpFormatter)
+parser.add_argument('-f', required= True, help='Input file')
+ns = parser.parse_args()
+
+file=ns.f
+with open(file,'rb') as f:
+    data = pickle.load(f)
 
 
-
-with open('outpred_rna.pickle','rb') as f:
-    rnadata = pickle.load(f)
-
-with open('outpred_pro.pickle','rb') as f:
-    prodata = pickle.load(f)
-
-with open('mobidata_K.pickle','rb') as f:
-    mobidata = pickle.load(f)
-
-
-
-with open(self.file_path, 'a') as csv_file:
-        wr = csv.writer(csv_file, delimiter='|')
-        row = ['klines', symbol]
-        row.extend(pickle.dumps(object))
-        wr.writerow(row)
-
+for key in data:
+    line=key
+    if 'rna' not in data[key]: continue
+    if 'GC%' not in data[key]: continue
+    for field in data[key]:
+        line+=","+str(data[key][field])
+    print (line)
     
