@@ -37,6 +37,8 @@ for f in os.listdir(dir):
         df=pd.read_csv(dir+file+".roc", sep=',',header=0)
         #print (df)
         plt.plot(df.FPR,df.TPR,label=file,lw=0.5)
+        if file == "outpred_GC-cross-rna":
+            plt.plot(df.iuFPR,df.iuTPR,label="IUpred",lw=1)
 ax.set_title=file
 ax.set_xlabel("FPR")
 ax.set_ylabel("TPR")
