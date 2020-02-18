@@ -63,46 +63,46 @@ if __name__ == '__main__':
     if (ns.f =='pro'):
         if (ns.gc):
             if (ns.kingdom):
-                models={"models/model_100-test1234-10-0.001_1_pro_GC_KINGDOM_36.ann":"DIScv/test5",
-                        "models/model_100-test1235-10-0.001_1_pro_GC_KINGDOM_85.ann":"DIScv/test4",
-                        "models/model_100-test1245-10-0.001_1_pro_GC_KINGDOM_45.ann":"DIScv/test3",
-                        "models/model_100-test1345-10-0.001_1_pro_GC_KINGDOM_92.ann":"DIScv/test2",
-                        "models/model_100-test2345-10-0.001_1_pro_GC_KINGDOM_15.ann":"DIScv/test1"}
+                models={"models/model_100-test1234-10-0.001_1_pro_GC_KINGDOM_36.ann":"DIScv/test5.sorted.GCgenomic",
+                        "models/model_100-test1235-10-0.001_1_pro_GC_KINGDOM_85.ann":"DIScv/test4.sorted.GCgenomic",
+                        "models/model_100-test1245-10-0.001_1_pro_GC_KINGDOM_45.ann":"DIScv/test3.sorted.GCgenomic",
+                        "models/model_100-test1345-10-0.001_1_pro_GC_KINGDOM_92.ann":"DIScv/test2.sorted.GCgenomic",
+                        "models/model_100-test2345-10-0.001_1_pro_GC_KINGDOM_15.ann":"DIScv/test1.sorted.GCgenomic"}
             else:
-                models={"models/model_100-test1234-10-0.001_1_pro_GC_60.ann":"DIScv/test5",
-                        "models/model_100-test1235-10-0.001_1_pro_GC_90.ann":"DIScv/test4",
-                        "models/model_100-test1245-10-0.001_1_pro_GC_50.ann":"DIScv/test3",
-                        "models/model_100-test1345-10-0.001_1_pro_GC_22.ann":"DIScv/test2",
-                        "models/model_100-test2345-10-0.001_1_pro_GC_1.ann":"DIScv/test1"
+                models={"models/model_100-test1234-10-0.001_1_pro_GC_60.ann":"DIScv/test5.sorted.GCgenomic",
+                        "models/model_100-test1235-10-0.001_1_pro_GC_90.ann":"DIScv/test4.sorted.GCgenomic",
+                        "models/model_100-test1245-10-0.001_1_pro_GC_50.ann":"DIScv/test3.sorted.GCgenomic",
+                        "models/model_100-test1345-10-0.001_1_pro_GC_22.ann":"DIScv/test2.sorted.GCgenomic",
+                        "models/model_100-test2345-10-0.001_1_pro_GC_1.ann":"DIScv/test1.sorted.GCgenomic"
                 }
         else:
-            models={"models/model_100-test1234-10-0.001_1_pro_noGC_55.ann":"DIScv/test5",
-                    "models/model_100-test1235-10-0.001_1_pro_noGC_55.ann":"DIScv/test4",
-                    "models/model_100-test1245-10-0.001_1_pro_noGC_4.ann":"DIScv/test3",
-                    "models/model_100-test1345-10-0.001_1_pro_noGC_53.ann":"DIScv/test2",
-                    "models/model_100-test2345-10-0.001_1_pro_noGC_45.ann":"DIScv/test1"
+            models={"models/model_100-test1234-10-0.001_1_pro_noGC_55.ann":"DIScv/test5.sorted.GCgenomic",
+                    "models/model_100-test1235-10-0.001_1_pro_noGC_55.ann":"DIScv/test4.sorted.GCgenomic",
+                     "models/model_100-test1245-10-0.001_1_pro_noGC_4.ann":"DIScv/test3.sorted.GCgenomic",
+                    "models/model_100-test1345-10-0.001_1_pro_noGC_53.ann":"DIScv/test2.sorted.GCgenomic",
+                    "models/model_100-test2345-10-0.001_1_pro_noGC_45.ann":"DIScv/test1.sorted.GCgenomic"
             }
     elif(ns.f=='rna'):
         if (ns.gc):
             if (ns.kingdom):
-                models={"models/model_100-test1234-10-0.001_1_rna_GC_KINGDOM_97.ann":"DIScv/test5",
-                        "models/model_100-test1235-10-0.001_1_rna_GC_KINGDOM_63.ann":"DIScv/test4",
-                        "models/model_100-test1245-10-0.001_1_rna_GC_KINGDOM_12.ann":"DIScv/test3",
-                        "models/model_100-test1345-10-0.001_1_rna_GC_KINGDOM_60.ann":"DIScv/test2",
-                        "models/model_100-test2345-10-0.001_1_rna_GC_KINGDOM_94.ann":"DIScv/test1"}
+                models={"models/model_100-test1234-10-0.001_1_rna_GC_KINGDOM_97.ann":"DIScv/test5.sorted.GCgenomic",
+                        "models/model_100-test1235-10-0.001_1_rna_GC_KINGDOM_63.ann":"DIScv/test4.sorted.GCgenomic",
+                        "models/model_100-test1245-10-0.001_1_rna_GC_KINGDOM_12.ann":"DIScv/test3.sorted.GCgenomic",
+                        "models/model_100-test1345-10-0.001_1_rna_GC_KINGDOM_60.ann":"DIScv/test2.sorted.GCgenomic",
+                        "models/model_100-test2345-10-0.001_1_rna_GC_KINGDOM_94.ann":"DIScv/test1.sorted.GCgenomic"}
             else:
-                models={"models/model_100-test1234-10-0.001_1_rna_GC_41.ann":"DIScv/test5",
-                        "models/model_100-test1235-10-0.001_1_rna_GC_29.ann":"DIScv/test4",
-                        "models/model_100-test1245-10-0.001_1_rna_GC_88.ann":"DIScv/test3",
-                        "models/model_100-test1345-10-0.001_1_rna_GC_76.ann":"DIScv/test2",
-                        "models/model_100-test2345-10-0.001_1_rna_GC_60.ann":"DIScv/test1"
+                models={"models/model_100-test1234-10-0.001_1_rna_GC_41.ann":"DIScv/test5.sorted.GCgenomic",
+                        "models/model_100-test1235-10-0.001_1_rna_GC_29.ann":"DIScv/test4.sorted.GCgenomic",
+                        "models/model_100-test1245-10-0.001_1_rna_GC_88.ann":"DIScv/test3.sorted.GCgenomic",
+                        "models/model_100-test1345-10-0.001_1_rna_GC_76.ann":"DIScv/test2.sorted.GCgenomic",
+                        "models/model_100-test2345-10-0.001_1_rna_GC_60.ann":"DIScv/test1.sorted.GCgenomic"
                 }
         else:
-            models={"models/model_100-test1234-10-0.001_1_rna_noGC_57.ann":"DIScv/test5",
-                    "models/model_100-test1235-10-0.001_1_rna_noGC_20.ann":"DIScv/test4",
-                    "models/model_100-test1245-10-0.001_1_rna_noGC_27.ann":"DIScv/test3",
-                    "models/model_100-test1345-10-0.001_1_rna_noGC_16.ann":"DIScv/test2",
-                    "models/model_100-test2345-10-0.001_1_rna_noGC_1.ann":"DIScv/test1"
+            models={"models/model_100-test1234-10-0.001_1_rna_noGC_57.ann":"DIScv/test5.sorted.GCgenomic",
+                    "models/model_100-test1235-10-0.001_1_rna_noGC_20.ann":"DIScv/test4.sorted.GCgenomic",
+                    "models/model_100-test1245-10-0.001_1_rna_noGC_27.ann":"DIScv/test3.sorted.GCgenomic",
+                    "models/model_100-test1345-10-0.001_1_rna_noGC_16.ann":"DIScv/test2.sorted.GCgenomic",
+                     "models/model_100-test2345-10-0.001_1_rna_noGC_1.ann":"DIScv/test1.sorted.GCgenomic"
             }
 
 

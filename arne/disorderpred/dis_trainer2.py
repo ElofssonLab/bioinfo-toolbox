@@ -126,6 +126,7 @@ if __name__ == '__main__':
             # This is actually too slow...
             mb.append(np.array(data[protein][ns.f], dtype=np.float64))
                 
+            # Z is not used - skip
             if len(mb) > batch-1:
                 mbX = []
                 mbY = []
@@ -140,39 +141,15 @@ if __name__ == '__main__':
                     mbX.append(X)
                     Y = sample[:,-1]
                     mbY.append(Y)
-                    Z = []
-                    for value in Y: 
-                        if value == 1: Z.append(10)
-                        if value == 0: Z.append(1)
-                        if value == 0.5: Z.append(0)
-                    mbZ.append(Z)
+                    #Z = []
+                    #for value in Y: 
+                    #    if value == 1: Z.append(10)
+                    #    if value == 0: Z.append(1)
+                    #    if value == 0.5: Z.append(0)
+                    #mbZ.append(Z)
                 mbX = np.array(mbX, dtype=np.float64).reshape(batch, timesteps, len(X[0]))
                 mbY = np.array(mbY, dtype=np.float64).reshape(batch, timesteps, 1)
-                mbZ = np.array(mbZ, dtype=np.float64).reshape(batch, timesteps, 1)
-                #def worker(sample):
-                #    while len(sample) < timesteps: 
-                #        sample = np.append(sample, np.zeros(len(sample[0])).reshape(1,len(sample[0])), axis=0)
-                #        sample[-1][-1] = 0.5
-                #    X = sample[:,:-1]
-                #    mbX.append(X)
-                #    Y = sample[:,-1]
-                #    mbY.append(Y)
-                #    Z = []
-                #    for value in Y: 
-                #        if value == 1: Z.append(10)
-                #        if value == 0: Z.append(1)
-                #        if value == 0.5: Z.append(0)
-                #    mbZ.append(Z)
-                #    return()
-                #p = ThreadPool()
-                #p.map(worker, sample)
-                #mbPX = np.array(mbX, dtype=np.float64).reshape(batch, timesteps, len(X[0]))
-                #mbPY = np.array(mbY, dtype=np.float64).reshape(batch, timesteps, 1)
-                #mbPZ = np.array(mbZ, dtype=np.float64).reshape(batch, timesteps, 1)
-
-                #print (mbX,mbY,mbZ)
-                #print (mbPX,mbPY,mbPZ)
-                #sys.exit
+                #mbZ = np.array(mbZ, dtype=np.float64).reshape(batch, timesteps, 1)
                 ##### Model train #####
                 loss = model.train_on_batch(mbX, mbY)
                 epoch_losses.append(loss)
@@ -183,13 +160,21 @@ if __name__ == '__main__':
         print ('Epoch '+str(n)+' complete! Evaluation...')
 
         test_cm = {}
-        for thr in nl.thrlist: test_cm[thr] = test_cm.get(thr, {'PP':{'TP':0,'FP':0},'PN':{'TN':0,'FN':0}})
+        for thr in [0.5]: test_cm[thr] = test_cm.get(thr, {'PP':{'TP':0,'FP':0},'PN':{'TN':0,'FN':0}})
 
         for protein in val_list:
             sample = np.array(data[protein][ns.f], dtype=np.float64)
             X = sample[:,:-1].reshape(1, len(sample), len(sample[0])-1)
             Y = sample[:,-1]
             prediction = model.predict_on_batch(X)
+            #for pos in range(len(prediction[0])):
+            #    if Y[pos] == 0.5: continue
+            #    thr=int(tiny+prediction[0][pos][0]/rocstep)
+            #    if Y[pos] == 1:
+            #        positive[thr]+=1
+            #    else:
+            #        negative[thr]+=1
+
             for thr in test_cm:
                 for pos in range(len(prediction[0])):
                     if Y[pos] == 0.5: continue
@@ -202,7 +187,7 @@ if __name__ == '__main__':
 
         TPR = []
         FPR = []
-        for thr in nl.thrlist:
+        for thr in [0.5]:
             statslist = nl.metrics(test_cm[thr])
             TPR = [statslist[2]]+TPR
             FPR = [1-statslist[4]]+FPR
