@@ -31,7 +31,7 @@ flist = open('formatted_list','r')
 
 GCfile={"outpred_noGC-cross-pro.csv":"outpred_GC-cross-pro.csv",
         "outpred_GC-cross-rna.csv":"outpred_noGC-cross-rna.csv",
-        "outpred_GCgenomic-pro.csv":"outpred_GC-cross-pro.csv",
+        "outpred_pro_GCgenomic.csv":"outpred_GC-cross-pro.csv",
         "outpred_GC-cross-pro.csv":"outpred_GC-cross-rna.csv",
         "outpred_noGC-cross-rna.csv":"outpred_noGC-cross-pro.csv"}
 

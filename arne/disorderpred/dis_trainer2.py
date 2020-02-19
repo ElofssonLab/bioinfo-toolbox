@@ -21,23 +21,14 @@ from keras.layers.advanced_activations import ELU
 from multiprocessing.pool import ThreadPool
 
 def model_set(feat_len, units, act, reg, drp, bn=False):
-
     inlayer = Input(shape=(None, feat_len))
-
     a = nl.bi_LSTM(units, reg, drp, True, bn, inlayer)
-
     a = nl.bi_LSTM(units, reg, drp, True, bn, a)
-
     out = Dense(1, activation='sigmoid', use_bias='True')(a)
-
     model = Model(inputs=inlayer, outputs=out)
-
     adam = Adam(lr=0, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0, amsgrad=False)
-
     model.summary()
-
     model.compile(loss='binary_crossentropy', optimizer = adam, sample_weight_mode='temporal')
-
     return model
 
 if __name__ == '__main__':
@@ -68,9 +59,10 @@ if __name__ == '__main__':
 
     if (ns.kingdom): ns.kingdom='KINGDOM_'
     else: ns.kingdom=''
-
+    tiny=1.e-10
     testset=re.sub(r'.*\/','',ns.t)
     seed = 42
+    thr=0.4
     seed = random.randint(1,99)
     os.environ['PYTHONHASHSEED'] = '0'
     np.random.seed(seed)
@@ -158,10 +150,10 @@ if __name__ == '__main__':
                 
         ##### Prediction/evaluation over validation set #####
         print ('Epoch '+str(n)+' complete! Evaluation...')
-
-        test_cm = {}
-        #for thr in [0.1,0.5,0.9]: test_cm[thr] = test_cm.get(thr, {'PP':{'TP':0,'FP':0},'PN':{'TN':0,'FN':0}})
-
+        TP=0
+        FP=0
+        TN=0
+        FN=0
         for protein in val_list:
             sample = np.array(data[protein][ns.f], dtype=np.float64)
             X = sample[:,:-1].reshape(1, len(sample), len(sample[0])-1)
@@ -169,29 +161,22 @@ if __name__ == '__main__':
             prediction = model.predict_on_batch(X)
             for pos in range(len(prediction[0])):
                 if Y[pos] == 0.5: continue
-                thr=int(tiny+prediction[0][pos][0]/rocstep)
-                if Y[pos] == 1:
-                    positive[thr]+=1
+                if prediction[0][pos][0] >= thr: 
+                    if Y[pos] == 1:
+                        TP+=1
+                    else:
+                        FP+=1
                 else:
-                    negative[thr]+=1
+                    if Y[pos] == 1:
+                        FN+=1
+                    else:
+                        TN+=1
 
-            #for thr in test_cm:
-            #    for pos in range(len(prediction[0])):
-            #        if Y[pos] == 0.5: continue
-            #        if prediction[0][pos][0] >= thr: 
-            #            if Y[pos] == 1: test_cm[thr]['PP']['TP'] += 1
-            #            else: test_cm[thr]['PP']['FP'] += 1
-            #        else:
-            #            if Y[pos] == 1: test_cm[thr]['PN']['FN'] += 1
-            #            else: test_cm[thr]['PN']['TN'] += 1
-
-        TPR = []
-        FPR = []
-        for thr in [0.1,0.5,0.9]:
-            statslist = nl.metrics(test_cm[thr])
-            TPR = [statslist[2]]+TPR
-            FPR = [1-statslist[4]]+FPR
-        score = np.trapz(TPR,FPR)
+        #TPR=TP/(tiny+TP+FN)
+        #FPR=FP/(tiny+FP+TN)
+        F1=2*TP/(tiny+2*TP+FP+FN)
+        #score = np.trapz(TPR,FPR)
+        score = F1
 
         ##### Model save, stats display #####
         acc = 0
@@ -208,4 +193,8 @@ if __name__ == '__main__':
             outfile.write('Epoch_'+str(n)+' Loss: '+str(acc/len(epoch_losses))+' - Val score: '+str(score)+'\n')
             K.set_value(model.optimizer.lr, K.get_value(model.optimizer.lr)*0.9)
         outfile.close()
+    model.save('models/model_final_'+hrun_id+".ann")
+    print ('Loss: '+str(acc/len(epoch_losses))+' -  Val score: '+str(score))
+    outfile.write('Epoch_'+str(n)+' Loss: '+str(acc/len(epoch_losses))+' - Val score: '+str(score)+'\n')
+    outfile.close()
 
