@@ -160,34 +160,34 @@ if __name__ == '__main__':
         print ('Epoch '+str(n)+' complete! Evaluation...')
 
         test_cm = {}
-        for thr in [0.5]: test_cm[thr] = test_cm.get(thr, {'PP':{'TP':0,'FP':0},'PN':{'TN':0,'FN':0}})
+        #for thr in [0.1,0.5,0.9]: test_cm[thr] = test_cm.get(thr, {'PP':{'TP':0,'FP':0},'PN':{'TN':0,'FN':0}})
 
         for protein in val_list:
             sample = np.array(data[protein][ns.f], dtype=np.float64)
             X = sample[:,:-1].reshape(1, len(sample), len(sample[0])-1)
             Y = sample[:,-1]
             prediction = model.predict_on_batch(X)
-            #for pos in range(len(prediction[0])):
-            #    if Y[pos] == 0.5: continue
-            #    thr=int(tiny+prediction[0][pos][0]/rocstep)
-            #    if Y[pos] == 1:
-            #        positive[thr]+=1
-            #    else:
-            #        negative[thr]+=1
+            for pos in range(len(prediction[0])):
+                if Y[pos] == 0.5: continue
+                thr=int(tiny+prediction[0][pos][0]/rocstep)
+                if Y[pos] == 1:
+                    positive[thr]+=1
+                else:
+                    negative[thr]+=1
 
-            for thr in test_cm:
-                for pos in range(len(prediction[0])):
-                    if Y[pos] == 0.5: continue
-                    if prediction[0][pos][0] >= thr: 
-                        if Y[pos] == 1: test_cm[thr]['PP']['TP'] += 1
-                        else: test_cm[thr]['PP']['FP'] += 1
-                    else:
-                        if Y[pos] == 1: test_cm[thr]['PN']['FN'] += 1
-                        else: test_cm[thr]['PN']['TN'] += 1
+            #for thr in test_cm:
+            #    for pos in range(len(prediction[0])):
+            #        if Y[pos] == 0.5: continue
+            #        if prediction[0][pos][0] >= thr: 
+            #            if Y[pos] == 1: test_cm[thr]['PP']['TP'] += 1
+            #            else: test_cm[thr]['PP']['FP'] += 1
+            #        else:
+            #            if Y[pos] == 1: test_cm[thr]['PN']['FN'] += 1
+            #            else: test_cm[thr]['PN']['TN'] += 1
 
         TPR = []
         FPR = []
-        for thr in [0.5]:
+        for thr in [0.1,0.5,0.9]:
             statslist = nl.metrics(test_cm[thr])
             TPR = [statslist[2]]+TPR
             FPR = [1-statslist[4]]+FPR
