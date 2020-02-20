@@ -7,3 +7,4 @@
 /opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test_cross.py  -d ./ -f rna
 
 /opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test_cross2.py -gcgenomic -f pro -d ./
+/opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test_cross2.py -gc -f pro -d ./

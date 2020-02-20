@@ -34,7 +34,7 @@ elif ns.rna:
 if ns.gc:
     type+="_GC"
     extra+=1
-elif ns.gcgenomic:
+if ns.gcgenomic:
     type+="_GCgenomic"
     extra+=1
 
@@ -164,7 +164,7 @@ for key in data:                                                                
             code=res_encode[aa][:]
             if ns.gc:
                 code.append(gc)
-            elif ns.gcgenomic:
+            if ns.gcgenomic:
                 code.append(GCgenomic)
             if ns.kingdom:
                 code.append(k)
@@ -179,7 +179,7 @@ for key in data:                                                                
             code=cod_encode[cod][:]
             if ns.gc:
                 code.append(gc)
-            elif ns.gcgenomic:
+            if ns.gcgenomic:
                 code.append(GCgenomic)
             if ns.kingdom:
                 code.append(k)

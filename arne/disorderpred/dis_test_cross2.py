@@ -61,7 +61,7 @@ if __name__ == '__main__':
         field='_rna'
     if (ns.gc):
         field+="_GC"
-    elif(ns.gcgenomic):
+    if(ns.gcgenomic):
         field+="_GCgenomic"
     if (ns.kingdom):
         field+="_kingdom"
@@ -82,7 +82,11 @@ if __name__ == '__main__':
                     "model_100-test2345.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_6.ann" :"DIScv/test1.sorted.GCgenomic"
             }
         elif (ns.gc):
-            models={
+            models={"model_100-test1234.sorted.GCgenomic-10-0.001_1_pro_GC_16.ann":"DIScv/test5.sorted.GCgenomic",
+                    "model_100-test1235.sorted.GCgenomic-10-0.001_1_pro_GC_21.ann":"DIScv/test4.sorted.GCgenomic",
+                    "model_100-test1245.sorted.GCgenomic-10-0.001_1_pro_GC_86.ann":"DIScv/test3.sorted.GCgenomic",
+                    "model_100-test1345.sorted.GCgenomic-10-0.001_1_pro_GC_68.ann":"DIScv/test2.sorted.GCgenomic",
+                    "model_100-test2345.sorted.GCgenomic-10-0.001_1_pro_GC_93.ann":"DIScv/test1.sorted.GCgenomic"
             }
         else:
             models={

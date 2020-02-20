@@ -50,12 +50,11 @@ if __name__ == '__main__':
 
     parser.add_argument('-id', required= False, default= '1', help='train model id')
     ns = parser.parse_args()
+    type=''
     if (ns.gc):
-        ns.gc='GC'
-    elif(ns.gcgenomic):
-        ns.gc='GCgenomic'
-    else:
-        ns.gc='noGC'
+        type+='_GC'
+    if(ns.gcgenomic):
+        type+='_GCgenomic'
 
     if (ns.kingdom): ns.kingdom='KINGDOM_'
     else: ns.kingdom=''
@@ -77,7 +76,7 @@ if __name__ == '__main__':
     sess = tf.Session(graph=tf.get_default_graph(), config=session_conf)
     K.set_session(sess)
 
-    hrun_id = str(ns.ep)+"-"+testset+"-"+str(ns.bs)+'-'+str(ns.lr)+'_'+str(ns.id)+'_'+str(ns.f)+'_'+str(ns.gc)+"_"+str(ns.kingdom)+str(seed)
+    hrun_id = str(ns.ep)+"-"+testset+"-"+str(ns.bs)+'-'+str(ns.lr)+'_'+str(ns.id)+'_'+str(ns.f)+str(type)+"_"+str(ns.kingdom)+str(seed)
 
     epochs = int(ns.ep)
     batch = int(ns.bs)
@@ -88,7 +87,8 @@ if __name__ == '__main__':
     if ns.f == 'pro': feat_len=20
     elif ns.f == 'rna': feat_len=61
     else: sys.exit('Unknown ')
-    if (ns.gc == 'GC'  or ns.gc == "GCgenomic"): feat_len+=1
+    if (ns.gc): feat_len+=1
+    if (ns.gcgenomic): feat_len+=1
     if ns.kingdom == 'KINGDOM_': feat_len+=3
 
     
