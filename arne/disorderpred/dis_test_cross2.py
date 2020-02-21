@@ -26,6 +26,7 @@ if __name__ == '__main__':
     parser.add_argument('-d', required= True, help='path to data folder')
     parser.add_argument('-f', required= True, help='feature kind (pro, rna)')
     #parser.add_argument('-m', required= True, help='model')
+    parser.add_argument('-final', required= False,  help=' Use Final Model', action='store_true')
     parser.add_argument('-gc', required= False,  help=' GC', action='store_true')
     parser.add_argument('-gcgenomic', required= False,  help=' GCgenomic', action='store_true')
     parser.add_argument('-kingdom', required= False,  help=' Kingdom', action='store_true')
@@ -75,12 +76,25 @@ if __name__ == '__main__':
     anndir="models/"
     if (ns.f =='pro'):
         if (ns.gcgenomic):
-            models={"model_100-test1234.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_83.ann":"DIScv/test5.sorted.GCgenomic",
-                    "model_100-test1235.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_95.ann":"DIScv/test4.sorted.GCgenomic",
-                    "model_100-test1245.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_25.ann":"DIScv/test3.sorted.GCgenomic",
-                    "model_100-test1345.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_80.ann":"DIScv/test2.sorted.GCgenomic",
+            #models={"model_100-test1234.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_83.ann":"DIScv/test5.sorted.GCgenomic",
+            #        "model_100-test1235.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_95.ann":"DIScv/test4.sorted.GCgenomic",
+            #        "model_100-test1245.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_25.ann":"DIScv/test3.sorted.GCgenomic",
+            #        "model_100-test1345.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_80.ann":"DIScv/test2.sorted.GCgenomic",
+            #        "model_100-test2345.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_6.ann" :"DIScv/test1.sorted.GCgenomic"
+            #}
+            models={"model_100-test1234.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_95.ann":"DIScv/test5.sorted.GCgenomic",
+                    "model_100-test1235.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_4.ann":"DIScv/test4.sorted.GCgenomic",
+                    "model_100-test1245.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_34.ann":"DIScv/test3.sorted.GCgenomic",
+                    "model_100-test1345.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_18.ann":"DIScv/test2.sorted.GCgenomic",
                     "model_100-test2345.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_6.ann" :"DIScv/test1.sorted.GCgenomic"
             }
+            if (ns.final):
+                models={"model_final_100-test1234.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_95.ann":"DIScv/test5.sorted.GCgenomic",
+                        "model_final_100-test1235.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_4.ann":"DIScv/test4.sorted.GCgenomic",
+                        "model_final_100-test1245.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_34.ann":"DIScv/test3.sorted.GCgenomic",
+                        "model_final_100-test1345.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_18.ann":"DIScv/test2.sorted.GCgenomic",
+                        "model_final_100-test2345.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_XX.ann" :"DIScv/test1.sorted.GCgenomic"
+                }
         elif (ns.gc):
             models={"model_100-test1234.sorted.GCgenomic-10-0.001_1_pro_GC_16.ann":"DIScv/test5.sorted.GCgenomic",
                     "model_100-test1235.sorted.GCgenomic-10-0.001_1_pro_GC_21.ann":"DIScv/test4.sorted.GCgenomic",
@@ -88,8 +102,19 @@ if __name__ == '__main__':
                     "model_100-test1345.sorted.GCgenomic-10-0.001_1_pro_GC_68.ann":"DIScv/test2.sorted.GCgenomic",
                     "model_100-test2345.sorted.GCgenomic-10-0.001_1_pro_GC_93.ann":"DIScv/test1.sorted.GCgenomic"
             }
+            if (ns.final):
+                models={"model_final_100-test1234.sorted.GCgenomic-10-0.001_1_pro_GC_16.ann":"DIScv/test5.sorted.GCgenomic",
+                        "model_final_100-test1235.sorted.GCgenomic-10-0.001_1_pro_GC_21.ann":"DIScv/test4.sorted.GCgenomic",
+                        "model_final_100-test1245.sorted.GCgenomic-10-0.001_1_pro_GC_86.ann":"DIScv/test3.sorted.GCgenomic",
+                        "model_final_100-test1345.sorted.GCgenomic-10-0.001_1_pro_GC_68.ann":"DIScv/test2.sorted.GCgenomic",
+                        "model_final_100-test2345.sorted.GCgenomic-10-0.001_1_pro_GC_93.ann":"DIScv/test1.sorted.GCgenomic"
+                }
         else:
-            models={
+            models={"model_100-test1234.sorted.GCgenomic-10-0.001_1_pro_54.ann":"DIScv/test5.sorted.GCgenomic",
+                    "model_100-test1235.sorted.GCgenomic-10-0.001_1_pro_50.ann":"DIScv/test4.sorted.GCgenomic",
+                    "model_100-test1245.sorted.GCgenomic-10-0.001_1_pro_11.ann":"DIScv/test3.sorted.GCgenomic",
+                    "model_100-test1345.sorted.GCgenomic-10-0.001_1_pro_49.ann":"DIScv/test2.sorted.GCgenomic",
+                    "model_100-test2345.sorted.GCgenomic-10-0.001_1_pro_26.ann":"DIScv/test1.sorted.GCgenomic" 
             }
     elif(ns.f=='rna'):
         if (ns.gcgenomic):
@@ -206,7 +231,7 @@ if __name__ == '__main__':
                 pred[protein]=[]
                 pred[protein].append(protein)
                 pred[protein].append(gc[protein]['kingdom'])
-                pred[protein].append(gc[protein]['GC%'])
+                pred[protein].append(gc[protein]['GC%'])  # Replace with GC genomic?
                 pred[protein].append(TP/nounknown)
                 pred[protein].append(FP/nounknown)
                 pred[protein].append(FN/nounknown)
