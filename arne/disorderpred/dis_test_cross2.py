@@ -67,7 +67,7 @@ if __name__ == '__main__':
     if (ns.kingdom):
         field+="_kingdom"
 
-        
+    print (field)
     data = h5py.File(ns.d+'formatted_data'+field+".h5py",'r')
     with open(ns.d+'mobidata_K.pickle','rb') as f:
         gc = pickle.load(f)
@@ -86,14 +86,21 @@ if __name__ == '__main__':
                     "model_100-test1235.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_4.ann":"DIScv/test4.sorted.GCgenomic",
                     "model_100-test1245.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_34.ann":"DIScv/test3.sorted.GCgenomic",
                     "model_100-test1345.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_18.ann":"DIScv/test2.sorted.GCgenomic",
-                    "model_100-test2345.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_6.ann" :"DIScv/test1.sorted.GCgenomic"
+                    "model_100-test2345.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_43.ann" :"DIScv/test1.sorted.GCgenomic"
             }
             if (ns.final):
                 models={"model_final_100-test1234.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_95.ann":"DIScv/test5.sorted.GCgenomic",
                         "model_final_100-test1235.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_4.ann":"DIScv/test4.sorted.GCgenomic",
                         "model_final_100-test1245.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_34.ann":"DIScv/test3.sorted.GCgenomic",
                         "model_final_100-test1345.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_18.ann":"DIScv/test2.sorted.GCgenomic",
-                        "model_final_100-test2345.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_XX.ann" :"DIScv/test1.sorted.GCgenomic"
+                        "model_final_100-test2345.sorted.GCgenomic-10-0.001_1_pro_GCgenomic_43.ann" :"DIScv/test1.sorted.GCgenomic"
+                }
+            if (ns.gc):
+                models={"model_100-test1234.sorted.GCgenomic-10-0.001_1_pro_GC_GCgenomic_62.ann":"DIScv/test5.sorted.GCgenomic",
+                        "model_100-test1235.sorted.GCgenomic-10-0.001_1_pro_GC_GCgenomic_75.ann":"DIScv/test4.sorted.GCgenomic",
+                        "model_100-test1245.sorted.GCgenomic-10-0.001_1_pro_GC_GCgenomic_63.ann":"DIScv/test3.sorted.GCgenomic",
+                        "model_100-test1345.sorted.GCgenomic-10-0.001_1_pro_GC_GCgenomic_53.ann":"DIScv/test2.sorted.GCgenomic",
+                        "model_100-test2345.sorted.GCgenomic-10-0.001_1_pro_GC_GCgenomic_88.ann" :"DIScv/test1.sorted.GCgenomic"
                 }
         elif (ns.gc):
             models={"model_100-test1234.sorted.GCgenomic-10-0.001_1_pro_GC_16.ann":"DIScv/test5.sorted.GCgenomic",
