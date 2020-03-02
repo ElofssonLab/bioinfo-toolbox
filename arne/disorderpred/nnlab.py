@@ -929,7 +929,7 @@ def conv1D(out, ks, act, reg, drp, bn, inl):
                kernel_size=(ks), 
                activation=act, 
                strides=1, 
-               padding='valid', 
+               padding='same',  # Changed from "valid" to get the same input and output shapes (Don't know a better way)
                use_bias='True', 
                kernel_regularizer=l2(reg))(inl)
 
