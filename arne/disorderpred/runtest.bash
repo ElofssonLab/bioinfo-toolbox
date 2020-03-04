@@ -15,3 +15,9 @@
 /opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test_cross2.py -final -gcgenomic -f pro -d ./
 /opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test_cross2.py -final -gc -f pro -d ./
 /opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test_cross2.py -final -f pro -d ./
+
+
+/opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test_cross4.py -final -gc -gcgenomic -f pro -d ./
+/opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test_cross4.py -final -gcgenomic -f pro -d ./
+/opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test_cross4.py -final -gc -f pro -d ./
+/opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_test_cross4.py -final -f pro -d ./
