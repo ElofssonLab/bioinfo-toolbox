@@ -1,7 +1,15 @@
 #!/bin/bash -x
 
 
-#python3 bin/mobiformatter.py
+#python3 bin/mobiformatter.py -pro -f mobidata_K.pickly
+#python3 bin/mobiformatter.py -pro -gc -f mobidata_K.pickly
+#python3 bin/mobiformatter.py -pro -gcgenomic -f mobidata_K.pickly
+#python3 bin/mobiformatter.py -pro -gc -gcgenomic -f mobidata_K.pickly
+
+#python3 bin/mobiformatter.py -rna -f mobidata_K.pickly
+#python3 bin/mobiformatter.py -rna -gc -f mobidata_K.pickly
+#python3 bin/mobiformatter.py -rna -gcgenomic -f mobidata_K.pickly
+#python3 bin/mobiformatter.py -rna -gc -gcgenomic -f mobidata_K.pickly
 
 #For simplicity use test1-3 for training and test4-5 for testing  (Perhaps a too small set ?)
 
