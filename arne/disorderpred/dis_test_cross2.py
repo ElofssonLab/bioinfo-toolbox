@@ -221,6 +221,7 @@ if __name__ == '__main__':
             TN=0
             nounknown = 0
             iudiso=0
+            protlength=len(prediction[0])
             for pos in range(len(prediction[0])):
                 if Y[pos] == 0.5: continue
                 #if prediction[0][pos][0] >= cutoff: acc1 += 1
@@ -258,7 +259,7 @@ if __name__ == '__main__':
                 pred[protein].append((TP+FP)/nounknown)
                 pred[protein].append((TP+FN)/nounknown)
                 pred[protein].append(iudiso/nounknown)
-
+                pred[protein].append(protlength)
     #mod=re.sub(r'.*\/','',m)
     #set=re.sub(r'.*\/','',ns.t)
 
@@ -266,7 +267,7 @@ if __name__ == '__main__':
     with open('predictions/outpred'+field+'.pickle','wb') as f:
         pickle.dump(pred, f)
     #print (pred)
-    keys=[['Name', 'kingdom', 'gc', 'TP', 'FP', 'FN', 'TN','TPR','FPR','Spec','PPV','F1','MCC', 'Pred', 'Diso','IUPRED']]
+    keys=[['Name', 'kingdom', 'gc', 'TP', 'FP', 'FN', 'TN','TPR','FPR','Spec','PPV','F1','MCC', 'Pred', 'Diso','IUPRED','Length']]
     
     with open('predictions/outpred'+field+'.csv','w',newline="") as f:
         w = csv.writer(f)
