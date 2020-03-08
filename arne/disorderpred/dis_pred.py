@@ -152,28 +152,34 @@ if __name__ == '__main__':
 
     fastafile=ns.fasta
     dnafile=ns.dna
-    GCgenomic=ns.GCgenomic    
-    try:
-        for record in SeqIO.parse(fastafile, "fasta"):
-            #print("%s %i" % (record.id, len(record)))
-            bar,id,name=record.id.split("|") 
-            #print (record.id,id,name)
-            prot,taxname=name.split("_") 
-            try:
-                GCgenomic=float(taxid2gc[int(memo2taxid[taxname])])
-            except:
-                skipped+=[key]
+    GCgenomic=ns.GCgenomic
+
+    dataset=np.array()
+
+    
+    
+    for record in SeqIO.parse(fastafile, "fasta"):
+        #print("%s %i" % (record.id, len(record)))
+        bar,id,name=record.id.split("|") 
+        #print (record.id,id,name)
+        prot,taxname=name.split("_") 
+        if ns.GCgenomic:
+            if ns.GCgenomic=0:
+                try:
+                    GCgenomic=float(taxid2gc[int(memo2taxid[taxname])])
+                except:
+                    skipped+=[key]
                 continue
-        for record in SeqIO.parse(fastafile, "fasta"):
-            #print("%s %i" % (record.id, len(record)))
-            bar,id,name=record.id.split("|") 
-            #print (record.id,id,name)
-            prot,taxname=name.split("_") 
-            try:
-                GCgenomic=float(taxid2gc[int(memo2taxid[taxname])])
-            except:
-                skipped+=[key]
-                continue
+            else:
+                GCgenomic=ns.GCgenomic
+        if ns.GC:
+            # This assumes we read a DNA file.
+            if ns.f="pro":
+                # This assumed we translat RNA to AA
+                
+        else:
+
+
 
 
     #------------------------------------------------------------------------            
@@ -329,6 +335,7 @@ skiplist.close()
 
 
     for protein in test_list:
+        if ns.gc:
             sample=np.concatenate((data[protein]['GC'],data[protein][ns.f]),axis=1)
         else:
             sample = np.array(data[protein][ns.f], dtype=np.float64)
