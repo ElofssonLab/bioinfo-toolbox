@@ -102,7 +102,7 @@ if __name__ == '__main__':
     #parser.add_argument('-kingdom', required= False, help='Kingdom', action='store_true')
     ns = parser.parse_args()
 
-    print ("ARGs: ",ns)
+    #print ("ARGs: ",ns)
     
     if ns.gc or ns.rna: ns.rnafile=True
     
