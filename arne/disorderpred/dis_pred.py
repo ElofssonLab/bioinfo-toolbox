@@ -92,7 +92,7 @@ if __name__ == '__main__':
                                          '- Running disorder prediction -',
         formatter_class=RawTextHelpFormatter)
     parser.add_argument('-f', required= True, help='Input file')
-    #parser.add_argument('-m', required= True, help='Model file')
+    parser.add_argument('-m', required= True, help='Model file')
     parser.add_argument('-gc', required= False, help='GC', action='store_true')
     parser.add_argument('-rna', required= False, help='RNA', action='store_true')
     parser.add_argument('-pro', required= False, help='Protein', action='store_true')
@@ -210,11 +210,13 @@ if __name__ == '__main__':
             for n in record.seq:
                 if n in ["G","C"]:
                     GC+=1.
-            print ("GCTEST",GC,len(record.seq))
+            #print ("GCTEST",GC,len(record.seq))
             GC=GC/len(record.seq)
+            #for pos in range(0, len(data[key]['rna']), 3):
+            #    cod = data[key]['rna'][pos:pos+3]
             for i in range(0,len(record.seq), 3):
                 triplett=record.seq[i]+record.seq[i+1]+record.seq[i+2]
-                print ("TRIPLETT",i,triplett)
+                #print ("TRIPLETT",i,triplett)
                 # This assumes we read a DNA file.
                 if ns.pro:
                     # This assumed we translat RNA to AA
@@ -230,9 +232,9 @@ if __name__ == '__main__':
                     #if ns.kingdom:
                     #    code.append(kingdom)
                 seq.append(code)
-            print ("RNA: ",seq)
+            #print ("RNA: ",seq)
         else:
-            print("PRORECORD",record)
+            #print("PRORECORD",record)
 
             for aa in record.seq:
                 code=res_encode[aa][:]
@@ -241,12 +243,17 @@ if __name__ == '__main__':
                 #if ns.kingdom:
                 #    code.append(kingdom)
                 seq.append(code)
-            print ("PRO: ",seq)    
-        print ("FINAL",seq)
+            #print ("PRO: ",seq)    
+        #print ("FINAL",seq)
         sample = np.array(seq, dtype=np.float64)
-        X = sample[:,:-1].reshape(1, len(sample), len(sample[0])-1)
-        Y = sample[:,-1]
-        #print (protein,X,Y)
+        #print (sample.shape)
+        #X = sample[:,:-1].reshape(1, len(sample), len(sample[0])-1)
+        X = sample[:,:].reshape(1, len(sample), len(sample[0]))
+        #Y = sample[:,-1]
+        #X=sample
+        #print ("X",X.shape)
+        #print ("Y",X)
+        model = load_model(ns.m)
         prediction = model.predict_on_batch(X)
         print(prediction)
 

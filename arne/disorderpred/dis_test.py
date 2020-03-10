@@ -89,7 +89,7 @@ if __name__ == '__main__':
             sample = np.array(data[protein][ns.f], dtype=np.float64)
         X = sample[:,:-1].reshape(1, len(sample), len(sample[0])-1)
         Y = sample[:,-1]
-        #print (protein,X,Y)
+        print (X,Y)
         prediction = model.predict_on_batch(X)
 
     ##### Confusion Matrix #####
