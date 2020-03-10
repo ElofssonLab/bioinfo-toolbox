@@ -249,7 +249,7 @@ if __name__ == '__main__':
     with open('predictions/outpred-conv1d'+field+'.pickle','wb') as f:
         pickle.dump(pred, f)
     #print (pred)
-    keys=[['Name', 'kingdom', 'gc', 'TP', 'FP', 'FN', 'TN','TPR','FPR','Spec','PPV','F1','MCC', 'Pred', 'Diso','IUPRED']]
+    keys=[['Name', 'kingdom', 'gc', 'TP', 'FP', 'FN', 'TN','TPR','FPR','Spec','PPV','F1','MCC', 'Pred', 'Diso','IUPRED','Length']]
     
     with open('predictions/outpred-conv1d'+field+'.csv','w',newline="") as f:
         w = csv.writer(f)

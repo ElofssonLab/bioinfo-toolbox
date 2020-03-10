@@ -106,8 +106,6 @@ if __name__ == '__main__':
     
     if ns.gc or ns.rna: ns.rnafile=True
     
-    if (ns.gc): ns.gc='GC'
-    else: ns.gc='noGC'
 
     cutoff =0.4 # Prediction cutoff.
     seed = 42
@@ -187,9 +185,10 @@ if __name__ == '__main__':
     #    k=[0,0,1]
     #else:
     #    k=[0,0,0]
+    model = load_model(ns.m)
     
-    seq=[]
     for record in SeqIO.parse(fastafile, "fasta"):
+        seq=[]
         #print("%s %i" % (record.id, len(record)))
         bar,id,name=record.id.split("|") 
         #print (record.id,id,name)
@@ -206,16 +205,16 @@ if __name__ == '__main__':
             GCgenomic=0.50
         if ns.rnafile:
             GC=0.
-            print("RNARECORD",record)
+            #print("RNARECORD",record)
             for n in record.seq:
                 if n in ["G","C"]:
                     GC+=1.
             #print ("GCTEST",GC,len(record.seq))
-            GC=GC/len(record.seq)
+            GC=100*GC/len(record.seq)
             #for pos in range(0, len(data[key]['rna']), 3):
             #    cod = data[key]['rna'][pos:pos+3]
             for i in range(0,len(record.seq), 3):
-                triplett=record.seq[i]+record.seq[i+1]+record.seq[i+2]
+                triplett=record.seq[i:i+3]
                 #print ("TRIPLETT",i,triplett)
                 # This assumes we read a DNA file.
                 if ns.pro:
@@ -224,7 +223,6 @@ if __name__ == '__main__':
                     code=res_encode[aa][:]
                 else:
                     code=cod_encode[triplett][:]
-                    print ("TEST",triplett,code)
                 if ns.gc:
                     code.append(GC)
                 if ns.gcgenomic:
@@ -253,8 +251,14 @@ if __name__ == '__main__':
         #X=sample
         #print ("X",X.shape)
         #print ("Y",X)
-        model = load_model(ns.m)
         prediction = model.predict_on_batch(X)
-        print(prediction)
-
+        #print(prediction)
+        string="> "+record.id+"\n"
+        for s in prediction:
+            for d in s:
+                if d>cutoff:
+                    string+="D"
+                else:
+                    string+="o"
+            print(string)
 
