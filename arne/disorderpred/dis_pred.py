@@ -189,8 +189,13 @@ if __name__ == '__main__':
     
     for record in SeqIO.parse(fastafile, "fasta"):
         seq=[]
+        sequence=str(record.seq).replace("-","")
+
         #print("%s %i" % (record.id, len(record)))
-        bar,id,name=record.id.split("|") 
+        try:
+            bar,id,name=record.id.split("|") 
+        except:
+            name,foo=record.id.split("/") # This is for Pfam entries
         #print (record.id,id,name)
         # try:
         if ns.gcvalue:
@@ -206,15 +211,15 @@ if __name__ == '__main__':
         if ns.rnafile:
             GC=0.
             #print("RNARECORD",record)
-            for n in record.seq:
+            for n in sequence:
                 if n in ["G","C"]:
                     GC+=1.
-            #print ("GCTEST",GC,len(record.seq))
-            GC=100*GC/len(record.seq)
+            #print ("GCTEST",GC,len(sequence))
+            GC=100*GC/len(sequence)
             #for pos in range(0, len(data[key]['rna']), 3):
             #    cod = data[key]['rna'][pos:pos+3]
-            for i in range(0,len(record.seq), 3):
-                triplett=record.seq[i:i+3]
+            for i in range(0,len(sequence), 3):
+                triplett=sequence[i:i+3]
                 #print ("TRIPLETT",i,triplett)
                 # This assumes we read a DNA file.
                 if ns.pro:
@@ -234,7 +239,7 @@ if __name__ == '__main__':
         else:
             #print("PRORECORD",record)
 
-            for aa in record.seq:
+            for aa in sequence:
                 code=res_encode[aa][:]
                 if ns.gcgenomic:
                     code.append(GCgenomic)
