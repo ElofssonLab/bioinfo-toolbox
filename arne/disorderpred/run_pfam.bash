@@ -1,6 +1,6 @@
 #!/bin/bash -x
 
-for dir in pfam/*/.
+for dir in Pfam-32/*/.
  
 do
     for i in $dir/*mingap*.fa
