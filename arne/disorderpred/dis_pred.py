@@ -258,7 +258,7 @@ if __name__ == '__main__':
         #print ("Y",X)
         prediction = model.predict_on_batch(X)
         #print(prediction)
-        string="> "+record.id+"\n"
+        string="> "+record.id+"GC: "+GC++"GC: "+GCgenomic+ "\n"
         for s in prediction:
             for d in s:
                 if d>cutoff:
