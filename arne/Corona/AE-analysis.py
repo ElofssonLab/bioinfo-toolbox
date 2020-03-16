@@ -109,7 +109,6 @@ linreg={}
 #sys.exit()
 # This is all countries 
 countries=merged_df['country'].drop_duplicates()
-
 firstdate={}
 startdate={}
 # Now we need to get the first date for each country (if <100 case last date)
@@ -165,7 +164,7 @@ def nations_trend_line(tmp_df, name, col, col2, col3,col4,col5,slope,intercept):
     #fig = plt.subplots()
     #ax=plt.subplot(2,1,1)
     tmp_df.groupby(['date'])[[col, col2, col3]].sum().plot(ax=ax1, marker='o')
-    #ax.set_yscale('log')
+    ax.set_yscale('log')
     #tmp_df.groupby(['date'])[[col4]].sum().plot.bar()
     tmp = tmp_df.groupby(['date'])[[col4]].sum()
     tmp.plot.bar(ax=ax1,width=0.4, rot=45, color="green")
@@ -175,12 +174,15 @@ def nations_trend_line(tmp_df, name, col, col2, col3,col4,col5,slope,intercept):
     #ax.set(xlabel="Days since > " + str(cutoff) + "cases")
     ax1.set(ylabel="Number of cases")
     ax1.set(Title="Covid-19 cases in " + name)
-    print (tmp_df[col5],intercept,slope)
+    #print (tmp_df[col5],intercept,slope)
     x=[]
     y=[]
+    j=0
     for i in tmp_df[col5]:
-        x+=[i]
+        x+=[j]
+        j+=1
         y+=[np.exp(intercept+slope*i)]
+        #print (i,np.exp(intercept+slope*i))
     ax1.plot(x, y, 'b', label="Exponential curve fit")
 
     fig = ax1.get_figure()
@@ -293,7 +295,7 @@ for country in countries:
 
 fig, (ax1, ax2) = plt.subplots(2,1,gridspec_kw={'height_ratios': [1, 3]},figsize=(20,15))
 tmplist=sorted(list.items() , reverse=True, key=lambda x: x[1])
-print (tmplist)
+#print (tmplist)
 x=[]
 y=[]
 z=[]
@@ -419,6 +421,7 @@ ax3.set(Title="Slope of Covid-19 log(cases) in differnt countries" )
 #yerr=linreg.stderr
 #print (x,y,yerr)
 ax3.bar(x,y,yerr=yerr,color=colorlist)
+ax3.tick_params(axis='x', labelrotation=45 )
 fig2 = ax3.get_figure()
 plt.xticks(rotation=45, ha='right')
 fig2.savefig(os.path.join(image_dir, 'slope.png'))
@@ -447,6 +450,7 @@ for country in countries:
     tempdf['increased_deaths']=tempdf['new_deaths'].diff()
     tempdf['increased_recoveries']=tempdf['new_recoveries'].diff()
     try:
+        #print(tempdf)
         nations_trend_line(tempdf, country,  'confirmed', 'deaths', 'recovered',"new_confirmed_cases","Days",linreg[country].slope,linreg[country].intercept)
     except:
         print("Skipping",country)
