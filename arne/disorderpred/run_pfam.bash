@@ -16,8 +16,14 @@ do
 	fi
 	# Protein + GC  (we do not have dna)
 	#    
+	#if [ ! -s  $i.fasta.model_pro_GC ]
+	#then
 	#    /opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_pred.py -rnafile -pro -gc -f $i -m models/model_100-test1234.sorted.GCgenomic-10-0.001_1_pro_GC_16.ann >$i.model_pro_GC
+	#fi
+	#if [ ! -s  $i.fasta.model_pro_GC ]
+	#then
 	#    /opt/singularity3/bin/singularity exec --nv tf_sandbox/ python3 bin/dis_pred.py -rnafile -pro -gc -f $i -m models/model_conv1d_100-test1234.sorted.GCgenomic-10-0.001_1_pro_GC_78.ann >$i.model_conv1d_pro_GC
+	#fi
 	
 	# Protein + GCgenomic
 	
