@@ -102,8 +102,8 @@ markers = [ '.', ',', 'o', 'v', '^', '<', '>', '1', '2',
 colours=['blue','green','red','cyan','magenta','yellow','black','grey','pink','brown']
 
 # first we need to sort on slope
-mindeaths=5
-maxdeaths=5000
+mindeaths=10
+maxdeaths=1000
 minnum=100
 maxnum=10000
 countrylist={}
@@ -196,15 +196,56 @@ print (merged_df,sortedcountries,deathscountries)
 ##### Define Graphs #####
 
 # Plot and save trendlinae graph
-def nations_trend_line(tmp_df, name, col, col2, col3,col4,col5,slope,intercept):
+def nations_trend_line(tmp_df, name, col, col2, col3,col4,col7,col5,slope,intercept,col6,deathsslope,deathsintercept):
     f, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]},figsize=(20,15))
     #fig = plt.subplots()
     #ax=plt.subplot(2,1,1)
-    tmp_df.groupby(['date'])[[col, col2, col3]].sum().plot(ax=ax1, marker='o')
+    tmp_df.groupby(['date'])[[col, col2]].sum().plot(ax=ax1, marker='o')
     ax1.set_yscale('log')
+    ax1.set(ylim=(0.5,100000))
+    ax1.tick_params(axis='x', labelrotation=45 )
+    #ax1.set_xticklabels(labels=tmp_df.groupby(['date'])['date'], rotation=45 )
     #tmp_df.groupby(['date'])[[col4]].sum().plot.bar()
     tmp = tmp_df.groupby(['date'])[[col4]].sum()
-    tmp.plot.bar(ax=ax1,width=0.4, rot=45, color="green")
+    x=[]
+    y=[]
+    j=0
+    #print (tmp)
+    for i in tmp[col4].keys():
+        x+=[j]
+        j+=1
+        y+=[tmp[col4][i]]
+        #print (i,np.exp(intercept+slope*i))
+    if tmp_df[col4].max()>0:
+        ax1.bar(np.arange(0,len(x))-0.2,y,width=0.4, color="red")
+
+
+    
+    # We need to check if we have any deaths
+    if tmp_df[col7].max()>0:
+        tmp = tmp_df.groupby(['date'])[[col7]].sum()
+        x=[]
+        y=[]
+        j=0
+        for i in tmp[col7].keys():
+            x+=[j]
+            j+=1
+            y+=[tmp[col7][i]]
+            #print (i,np.exp(intercept+slope*i))
+        ax1.bar(np.arange(0,len(x))+0.2,y,width=0.4, color="blue")
+        x=[]
+        y=[]
+        j=0
+        for i in tmp_df[col5]:
+            x+=[j]
+            j+=1
+            y+=[np.exp(deathsintercept+deathsslope*i)]
+            #print (i,np.exp(intercept+slope*i))
+        ax1.plot(x, y, 'blue', label="Exponential curve fit")
+        ax1.legend()
+
+
+        
     tiny=1
     
     
@@ -220,83 +261,41 @@ def nations_trend_line(tmp_df, name, col, col2, col3,col4,col5,slope,intercept):
         j+=1
         y+=[np.exp(intercept+slope*i)]
         #print (i,np.exp(intercept+slope*i))
-    ax1.plot(x, y, 'b', label="Exponential curve fit")
-
-    fig = ax1.get_figure()
-
-    #ax=plt.subplot(2,1,2)
-
-    ratio=[]
-    npa=tmp.to_numpy()
-    for i in range(1,len(npa-1)):
-        #print (i,npa[i][0],npa[i-1][0])
-        if (npa[i][0]<tiny or npa[i-1][0]<tiny):
-            ratio+=[1]
-        else:
-            ratio+=[max(npa[i][0],tiny)/max(npa[i-1][0],tiny)]
-    #print (ratio)
-    x=np.arange(1,len(npa))
-    #ax2.set(xlim=(-10, 25), ylim=(5, 750000))
-    ax2.set(ylim=(0, 3))
-    ax2.plot(x,ratio, color="green",label="Ratio")
-    fig.savefig(os.path.join(image_dir, name+'_trendline.png'.format(col)))
-    plt.close()
-    #sys.exit()
-def nations_trend_line(tmp_df, name, col, col2, col3,col4,col5,slope,intercept,col6,deathsslope,deathsintercept):
-    f, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]},figsize=(20,15))
-    #fig = plt.subplots()
-    #ax=plt.subplot(2,1,1)
-    tmp_df.groupby(['date'])[[col, col2, col3]].sum().plot(ax=ax1, marker='o')
-    ax1.set_yscale('log')
-    ax2.set_yscale('log')
-    ax1.set(ylim=(1,100000))
-    #tmp_df.groupby(['date'])[[col4]].sum().plot.bar()
-    tmp = tmp_df.groupby(['date'])[[col4]].sum()
-    tmp.plot.bar(ax=ax1,width=0.4, rot=45, color="green")
-    tiny=1
-    
-    
-    #ax.set(xlabel="Days since > " + str(cutoff) + "cases")
-    ax1.set(ylabel="Number of cases")
-    ax1.set(Title="Covid-19 cases in " + name)
-    #print (tmp_df[col5],intercept,slope)
-    x=[]
-    y=[]
-    j=0
-    for i in tmp_df[col5]:
-        x+=[j]
-        j+=1
-        y+=[np.exp(intercept+slope*i)]
-        #print (i,np.exp(intercept+slope*i))
-    ax1.plot(x, y, 'b', label="Exponential curve fit")
-    x=[]
-    y=[]
-    j=0
-    for i in tmp_df[col6]:
-        x+=[j]
-        j+=1
-        y+=[np.exp(deathsintercept+deathsslope*i)]
-        #print (i,np.exp(intercept+slope*i))
-    ax1.plot(x, y, 'r', label="Exponential curve fit (deaths)")
-    ax1.legend()
+    ax1.plot(x, y, 'red', label="Exponential curve fit")
     
     fig = ax1.get_figure()
 
     #ax=plt.subplot(2,1,2)
 
-    ratio=[]
-    npa=tmp.to_numpy()
-    for i in range(1,len(npa-1)):
-        #print (i,npa[i][0],npa[i-1][0])
-        if (npa[i][0]<tiny or npa[i-1][0]<tiny):
-            ratio+=[1]
-        else:
-            ratio+=[max(npa[i][0],tiny)/max(npa[i-1][0],tiny)]
+    #ratio=[]
+    #npa=tmp.to_numpy()
+    #for i in range(1,len(npa-1)):
+    #    #print (i,npa[i][0],npa[i-1][0])
+    #    if (npa[i][0]<tiny or npa[i-1][0]<tiny):
+    #        ratio+=[1]
+    #    else:
+    #        ratio+=[max(npa[i][0],tiny)/max(npa[i-1][0],tiny)]
     #print (ratio)
-    x=np.arange(1,len(npa))
+    #x=np.arange(1,len(npa))
+    #ax2.set_yscale('log')
     #ax2.set(xlim=(-10, 25), ylim=(5, 750000))
-    ax2.set(ylim=(0.1, 3))
-    ax2.plot(x,ratio, color="green",label="Ratio")
+    #ax2.set(ylim=(0., 0.1))
+    x=tmp_df['date']
+    #def Division(x,y):
+    #    return (x/y)
+    #y=tmp_df.apply(lambda x:Division(x.deaths,x.confirmed))
+    j=0
+    y=[]
+    for i in tmp_df[col].keys():
+        j+=1
+        y+=[tmp_df[col2][i]/(tmp_df[col][i]+tiny)]
+        #print (i,np.exp(intercept+slope*i))
+    ax2.bar(x,y,width=0.8, color="green")
+    ax2.tick_params(axis='x', labelrotation=45 )
+    plt.xticks(rotation=45, ha='right')
+    #y=tmp_df.apply(lambda x:Division(x.deaths,x.confirmed))
+    #ax2.bar(x,y, color="green",label="Ratio")
+    ax2.set(ylabel="Ratio of death")
     fig.savefig(os.path.join(image_dir, name+'_trendline.png'.format(col)))
     plt.close()
     #sys.exit()
@@ -487,7 +486,7 @@ for country in sortedcountries:
     fig = ax.get_figure()
     ax.legend()
     #plt.xticks(rotation=45, ha='right')
-    fig.savefig(os.path.join(image_dir, country+'-slope.png'))
+    #fig.savefig(os.path.join(image_dir, country+'-slope.png'))
 
     ax2.plot(newdf['Days'], np.exp(linreg[country].intercept +
                 linreg[country].slope*newdf['Days']),color=colours[col]) #, label='fitted line'+str(linreg[country])
@@ -545,11 +544,11 @@ for country in countries:
     tempdf['increased_deaths']=tempdf['new_deaths'].diff()
     tempdf['increased_recoveries']=tempdf['new_recoveries'].diff()
     try:
-    #    #print(tempdf)
-        nations_trend_line(tempdf, country,  'confirmed', 'deaths', 'recovered',"new_confirmed_cases","Days",linreg[country].slope,linreg[country].intercept,'DeathsDays',deathsreg[country].slope,deathsreg[country].intercept,)
+        #    #print(tempdf)
+        nations_trend_line(tempdf, country,  'confirmed', 'deaths', 'recovered',"new_confirmed_cases","new_deaths","Days",linreg[country].slope,linreg[country].intercept,'DeathsDays',deathsreg[country].slope,deathsreg[country].intercept)
     except:
-        nations_trend_line(tempdf, country,  'confirmed', 'deaths', 'recovered',"new_confirmed_cases","Days",0.,0.,'DeathsDays',0.,0.,)
-        print("Skipping",country)
+        nations_trend_line(tempdf, country,  'confirmed', 'deaths', 'recovered',"new_confirmed_cases","new_deaths","Days",0.,0.,'DeathsDays',0.,0.)
+    #print("Skipping",country)
 
         
 # Trend line for new cases
