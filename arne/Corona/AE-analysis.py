@@ -164,7 +164,7 @@ def nations_trend_line(tmp_df, name, col, col2, col3,col4,col5,slope,intercept):
     #fig = plt.subplots()
     #ax=plt.subplot(2,1,1)
     tmp_df.groupby(['date'])[[col, col2, col3]].sum().plot(ax=ax1, marker='o')
-    ax.set_yscale('log')
+    ax1.set_yscale('log')
     #tmp_df.groupby(['date'])[[col4]].sum().plot.bar()
     tmp = tmp_df.groupby(['date'])[[col4]].sum()
     tmp.plot.bar(ax=ax1,width=0.4, rot=45, color="green")
