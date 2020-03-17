@@ -185,6 +185,12 @@ deathscountries=[]
 for i in range(0,len(tmplist)):
     deathscountries+=[tmplist[i][0]]
 
+
+newdf=linfit_df.groupby(['date']).sum()
+linreg["All"]=linregress(newdf['Days'],newdf['LogCases'])
+newdf=deathsfit_df.groupby(['date']).sum()
+deathsreg["All"]=linregress(newdf['DeathsDays'],newdf['LogDeaths'])
+    
 print (merged_df,sortedcountries,deathscountries)
 
 #
@@ -206,7 +212,9 @@ def nations_trend_line(tmp_df, name, col, col2, col3,col4,col7,col5,slope,interc
     ax1.tick_params(axis='x', labelrotation=45 )
     #ax1.set_xticklabels(labels=tmp_df.groupby(['date'])['date'], rotation=45 )
     #tmp_df.groupby(['date'])[[col4]].sum().plot.bar()
+    days = tmp_df.groupby(['date'])[[col5]].max()
     tmp = tmp_df.groupby(['date'])[[col4]].sum()
+    tmp2 = tmp_df.groupby(['date'])[[col7]].sum()
     x=[]
     y=[]
     j=0
@@ -215,7 +223,6 @@ def nations_trend_line(tmp_df, name, col, col2, col3,col4,col7,col5,slope,interc
         x+=[j]
         j+=1
         y+=[tmp[col4][i]]
-        #print (i,np.exp(intercept+slope*i))
     if tmp_df[col4].max()>0:
         ax1.bar(np.arange(0,len(x))-0.2,y,width=0.4, color="red")
 
@@ -223,20 +230,19 @@ def nations_trend_line(tmp_df, name, col, col2, col3,col4,col7,col5,slope,interc
     
     # We need to check if we have any deaths
     if tmp_df[col7].max()>0:
-        tmp = tmp_df.groupby(['date'])[[col7]].sum()
         x=[]
         y=[]
         j=0
-        for i in tmp[col7].keys():
+        for i in tmp2[col7].keys():
             x+=[j]
             j+=1
-            y+=[tmp[col7][i]]
+            y+=[tmp2[col7][i]]
             #print (i,np.exp(intercept+slope*i))
         ax1.bar(np.arange(0,len(x))+0.2,y,width=0.4, color="blue")
         x=[]
         y=[]
         j=0
-        for i in tmp_df[col5]:
+        for i in days[col5]:
             x+=[j]
             j+=1
             y+=[np.exp(deathsintercept+deathsslope*i)]
@@ -256,7 +262,7 @@ def nations_trend_line(tmp_df, name, col, col2, col3,col4,col7,col5,slope,interc
     x=[]
     y=[]
     j=0
-    for i in tmp_df[col5]:
+    for i in days[col5]:
         x+=[j]
         j+=1
         y+=[np.exp(intercept+slope*i)]
@@ -534,6 +540,17 @@ for col, rgb in zip(daily_figures_cols, ['tomato', 'lightblue', 'mediumpurple', 
 
 print('... Country Figures')
 # Ratio plots
+tempdf=merged_df
+#print (country,y.diff())
+tempdf["new_confirmed_cases"]=tempdf['confirmed'].diff()
+tempdf['new_deaths']=tempdf['deaths'].diff()
+tempdf['new_recoveries']=tempdf['recovered'].diff()
+tempdf["increased_confirmed_cases"]=tempdf['new_confirmed_cases'].diff()
+tempdf['increased_deaths']=tempdf['new_deaths'].diff()
+tempdf['increased_recoveries']=tempdf['new_recoveries'].diff()
+#    #print(tempdf)
+nations_trend_line(tempdf, "ALL",  'confirmed', 'deaths', 'recovered',"new_confirmed_cases","new_deaths","Days",linreg["All"].slope,linreg["All"].intercept,'DeathsDays',deathsreg["All"].slope,deathsreg["All"].intercept)
+
 for country in countries:
     tempdf=merged_df.loc[merged_df['country'] == country]
     #print (country,y.diff())
