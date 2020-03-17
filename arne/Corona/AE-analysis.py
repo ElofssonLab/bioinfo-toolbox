@@ -102,8 +102,8 @@ markers = [ '.', ',', 'o', 'v', '^', '<', '>', '1', '2',
 colours=['blue','green','red','cyan','magenta','yellow','black','grey','pink','brown']
 
 # first we need to sort on slope
-mindeaths=10
-maxdeaths=1000
+mindeaths=5
+maxdeaths=5000
 minnum=100
 maxnum=10000
 countrylist={}
@@ -158,9 +158,8 @@ merged_df['LogCases']=merged_df['confirmed'].apply(lambda x:(math.log(x+tiny)))
 merged_df['LogDeaths']=merged_df['deaths'].apply(lambda x:(math.log(x+tiny)))
 
 
-linfit_df=merged_df.loc[(merged_df['confirmed']>minnum) & (merged_df['confirmed']<maxnum)]
-for country in linfit_df['country'].drop_duplicates():
-    newdf=linfit_df.loc[linfit_df['country'] == country]
+for country in merged_df['country'].drop_duplicates():
+    newdf=merged_df.loc[(merged_df['confirmed']>minnum) & (merged_df['confirmed']<maxnum) &(merged_df['country'] == country)]
     #print (country,newdf)
     if (len(newdf)<4): continue
     linreg[country]=linregress(newdf['Days'],newdf['LogCases'])
@@ -173,9 +172,9 @@ for i in range(0,len(tmplist)):
 
 countrylist={}
 deathsreg={}
-deathsfit_df=merged_df.loc[(merged_df['confirmed']>minnum) & (merged_df['confirmed']<maxnum)]
-for country in deathsfit_df['country'].drop_duplicates():
-    newdf=deathsfit_df.loc[deathsfit_df['country'] == country]
+
+for country in merged_df['country'].drop_duplicates():
+    newdf=merged_df.loc[(merged_df['confirmed']>minnum) & (merged_df['confirmed']<maxnum) & (merged_df['country'] == country)]
     #print (country,newdf)
     if (len(newdf)<4): continue
     deathsreg[country]=linregress(newdf['DeathsDays'],newdf['LogDeaths'])
@@ -185,7 +184,8 @@ deathscountries=[]
 for i in range(0,len(tmplist)):
     deathscountries+=[tmplist[i][0]]
 
-
+linfit_df=merged_df.loc[(merged_df['confirmed']>minnum) & (merged_df['confirmed']<maxnum)]
+deathsfit_df=merged_df.loc[(merged_df['confirmed']>minnum) & (merged_df['confirmed']<maxnum)]    
 newdf=linfit_df.groupby(['date']).sum()
 linreg["All"]=linregress(newdf['Days'],newdf['LogCases'])
 newdf=deathsfit_df.groupby(['date']).sum()
@@ -252,7 +252,7 @@ def nations_trend_line(tmp_df, name, col, col2, col3,col4,col7,col5,slope,interc
 
 
         
-    tiny=1
+    #tiny=1
     
     
     #ax.set(xlabel="Days since > " + str(cutoff) + "cases")
@@ -286,18 +286,28 @@ def nations_trend_line(tmp_df, name, col, col2, col3,col4,col7,col5,slope,interc
     #ax2.set_yscale('log')
     #ax2.set(xlim=(-10, 25), ylim=(5, 750000))
     #ax2.set(ylim=(0., 0.1))
-    x=tmp_df['date']
+    x=tmp_df.groupby(['date'])['date'].first()
     #def Division(x,y):
     #    return (x/y)
     #y=tmp_df.apply(lambda x:Division(x.deaths,x.confirmed))
     j=0
     y=[]
-    for i in tmp_df[col].keys():
-        j+=1
-        y+=[tmp_df[col2][i]/(tmp_df[col][i]+tiny)]
+    z=[]
+    tmp = tmp_df.groupby(['date'])[[col]].sum()
+    tmp2 = tmp_df.groupby(['date'])[[col2]].sum()
+    #print (tmp,tmp2)
+    for i in tmp[col].keys():
+        y+=[tmp[col][i]]
+    for i in tmp2[col2].keys():
+        z+=[tmp2[col2][i]]
+    for i in range(0,len(y)):
+        y[i]=z[i]/(y[i]+tiny)
+        
         #print (i,np.exp(intercept+slope*i))
+    print (x,y)
     ax2.bar(x,y,width=0.8, color="green")
     ax2.tick_params(axis='x', labelrotation=45 )
+    ax2.set(ylim=(0.,0.1))
     plt.xticks(rotation=45, ha='right')
     #y=tmp_df.apply(lambda x:Division(x.deaths,x.confirmed))
     #ax2.bar(x,y, color="green",label="Ratio")
