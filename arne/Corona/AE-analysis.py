@@ -506,10 +506,11 @@ col=0
 colorlist=[]
 
     
-
+minconfirmed=1000
 fig2, (ax2, ax3) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]},figsize=(20,15))
 for country in sortedcountries:
     newdf=merged_df.loc[merged_df['country'] == country]
+    if newdf['confirmed']<minconfirmed: continue
     x+=[country]
     y+=[linreg[country].slope]
     yerr+=[linreg[country].stderr]
@@ -567,8 +568,10 @@ mark=0
 col=0
 colorlist=[]
 fig2, (ax2, ax3) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]},figsize=(20,15))
+mindeaths=0
 for country in deathscountries:
     newdf=merged_df.loc[merged_df['country'] == country]
+    if newdf['deaths']<mindeaths: continue
     x+=[country]
     y+=[deathsreg[country].slope]
     yerr+=[deathsreg[country].stderr]
