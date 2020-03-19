@@ -584,8 +584,8 @@ for country in deathscountries:
                 deathsreg[country].slope*newdf['DeathsDays']), 'r',
                 label=str(deathsreg[country]))
     ax.set_yscale('log')
-    ax.set(xlim=(-10, 25), ylim=(1, 5000))
-    ax2.set(xlim=(-10, 25), ylim=(1, 5000))
+    ax.set(xlim=(-10, 50), ylim=(1, 5000))
+    ax2.set(xlim=(-10, 50), ylim=(1, 5000))
     #ax.set(ylim=(75, 80000))
     #ax2.set(ylim=(75, 80000))
 
