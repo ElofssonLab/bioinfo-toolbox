@@ -261,13 +261,13 @@ if __name__ == '__main__':
         #print ("Y",X)
         prediction = model.predict_on_batch(X)
         #print(prediction)
-        string="> "+record.id+"GC: "+GC++"GCgenomic: "+GCgenomic+ "\n"
+        string="> "+record.id+" GC: "+str(GC)+" GCgenomic: "+str(GCgenomic)+ "\n"
         for s in prediction:
             for d in s:
                 if d>cutoff:
                     string+="D"
                 else:
                     string+="o"
-        if (len(string>0):
+        if (len(prediction)>0):
             print(string)
 
