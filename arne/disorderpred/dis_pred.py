@@ -193,7 +193,7 @@ if __name__ == '__main__':
         seq=[]
         sequence=str(record.seq).replace("-","")
 
-        print("%s %i" % (record.id, len(record)))
+        #print("%s %i" % (record.id, len(record)))
         try:
             bar,id,name=record.id.split("|") 
         except:
@@ -207,7 +207,7 @@ if __name__ == '__main__':
                 prot,taxname=name.split("_") 
                 GCgenomic=float(taxid2gc[int(memo2taxid[taxname])])
             except:
-                print ("Skipping",taxname)
+                #print ("Skipping",taxname)
                 continue
         else:
             GCgenomic=50
@@ -240,7 +240,7 @@ if __name__ == '__main__':
                 seq.append(code)
             #print ("RNA: ",seq)
         else:
-            print("PRORECORD",record)
+            #print("PRORECORD",record)
 
             for aa in sequence:
                 code=res_encode[aa][:]
@@ -249,7 +249,7 @@ if __name__ == '__main__':
                 #if ns.kingdom:
                 #    code.append(kingdom)
                 seq.append(code)
-            print ("PRO: ",seq)    
+            #print ("PRO: ",seq)    
         #print ("FINAL",seq)
         sample = np.array(seq, dtype=np.float64)
         #print (sample.shape)
@@ -257,10 +257,10 @@ if __name__ == '__main__':
         X = sample[:,:].reshape(1, len(sample), len(sample[0]))
         #Y = sample[:,-1]
         #X=sample
-        print ("X",X.shape)
+        #print ("X",X.shape)
         #print ("Y",X)
         prediction = model.predict_on_batch(X)
-        print(prediction)
+        #print(prediction)
         string="> "+record.id+"GC: "+GC++"GCgenomic: "+GCgenomic+ "\n"
         for s in prediction:
             for d in s:
@@ -268,5 +268,6 @@ if __name__ == '__main__':
                     string+="D"
                 else:
                     string+="o"
+        if (len(string>0):
             print(string)
 
