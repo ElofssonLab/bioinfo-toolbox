@@ -302,20 +302,18 @@ def nations_trend_line(tmp_df, name, cumconfirmed, cumdeath, ncases,ndeath,cdays
     deathdays = tmp_df.groupby(['date'])[[ddays]].max()
     tmp = tmp_df.groupby(['date'])[[ncases]].sum()
     tmp2 = tmp_df.groupby(['date'])[[ndeath]].sum()
-    tmp3 = tmp_df.groupby(['date'])[[lindeaths]].sum()
-    tmp4 = tmp_df.groupby(['date'])[[lincases]].sum()
     tmp5 = tmp_df.groupby(['date'])[[cumconfirmed]].sum()
     tmp6 = tmp_df.groupby(['date'])[[cumdeath]].sum()
     ratio = tmp6[cumdeath]/tmp5[cumconfirmed]
-    ax1.bar(tmp.index,tmp[ncases], color="red",width=0.4)
+    if tmp[ncases].max()>0:
+        ax1.bar(tmp.index,tmp[ncases], color="red",width=0.4)
 
         
     
     # We need to check if we have any deaths
     #print (tmp_df[ndeath])
-    ax1.bar(tmp2.index,tmp2[ndeath], color="blue",width=0.9)
-    #ax1.plot(tmp3.index, tmp3[lindeaths], 'blue', label="Exponential curve fit death")
-    print (tmp3)
+    if tmp2[ndeath].max()>0:
+        ax1.bar(tmp2.index,tmp2[ndeath], color="blue",width=0.9)
     #ax.set(xlabel="Days since > " + str(cutoff) + "cases")
     ax1.set(ylabel="Number of cases")
     ax1.set(Title="Covid-19 cases in " + name)
