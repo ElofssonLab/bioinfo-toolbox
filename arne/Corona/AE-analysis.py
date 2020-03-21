@@ -17,10 +17,12 @@ import numpy as np
 import os
 import glob
 import math
+import wget
 import docopt
 import pickle
 import os.path
-from datetime import datetime
+from dateutil.parser import parse
+from datetime import datetime,date,time, timedelta
 #from datetime import timedelta
 from dateutil import parser
 import pyarrow
@@ -32,6 +34,23 @@ font = {'weight' : 'bold',
         'size'   : 22}
 plt.rc('font', **font)
 
+def fix_country_names(df):
+    translations = {'United_States_of_America':'USA',
+                    'United_Kingdom':'UK',
+                    'Central_African_Republic':'CAR',
+                    'United_Arab_Emirates':'UAE',
+                    'United_Republic_of_Tanzania':'Tanzania',
+                    'Democratic_Republic_of_the_Congo':'Congo',
+                    'Others':'Cruise Ship',
+                    'Iran (Islamic Republic of)':"Iran",
+                    'Mainland China':'China',
+                    'Korea, South':'South Korea',
+                    'Republic of Korea':'South Korea',
+                    'Cases_on_an_international_conveyance_Japan':'Cruise Ship'}
+    df.replace(translations, inplace=True)
+
+
+
 
 #set ggplot style
 plt.style.use('ggplot')
@@ -40,16 +59,62 @@ args = docopt.docopt(__doc__)
 out = args['--output_folder']
 
 # Dynamic parameters
-data_dir  = os.path.join(out, 'data', str(datetime.date(datetime.now())))
+data_dir  = os.path.join(out, 'data'  )+"/" # , str(datetime.date(datetime.now())))
 agg_file  = 'agg_data_{}.parquet.gzip'.format(datetime.date(datetime.now()))
 trend_file  = 'trend_{}.csv'.format(datetime.date(datetime.now()))
-report  = 'report_{}.xlsx'.format(datetime.date(datetime.now()))
+#report  = 'report_{}.xlsx'.format(datetime.date(datetime.now()))
+
+ECDC = "https://www.ecdc.europa.eu/sites/default/files/documents/"  # +2020-03-20+".xlsx
+
+today=date.today()
+#print (today)
+yesterday=date.today() - timedelta(1)
+#print (yesterday)
+#date = parse(today).strftime("%Y-%m-%d")
+excelfile="COVID-19-geographic-disbtribution-worldwide-"+str(today)+".xlsx"
+URL=ECDC+excelfile
+infile=data_dir+"/"+excelfile
+
+#print(infile)
+if not os.path.isfile(infile):
+    try:
+        #os.sys("wget -c " + URL + " -O " + infile )
+        excelfile=wget.download(URL, out=data_dir)
+    except:
+        excelfile="COVID-19-geographic-disbtribution-worldwide-"+str(yesterday)+".xlsx"
+        infile=data_dir+"/"+excelfile
+
+print("Using: ",infile)
+# 
+
+
+df= pd.read_excel(infile)
+
+fix_country_names(df)
+agg_df = pd.DataFrame([])
+
+countries=df['Countries and territories'].drop_duplicates()
+for country in countries:
+    country_df=df.loc[df['Countries and territories'] == country].sort_values(by='DateRep')
+    country_df['Cumulative deaths'] = country_df['Deaths'].cumsum()
+    country_df['Cumulative cases'] = country_df['Cases'].cumsum()
+    #print (country_df)
+    #tempdf=country_df["DateRep","Countries and territories",'Cumulative cases','Cumulative deaths']
+    agg_df=pd.concat([agg_df, country_df[["DateRep","Countries and territories",'Cumulative cases','Cumulative deaths']]], ignore_index=True)
+
+merged_df=agg_df.rename(columns={"DateRep": "date","Countries and territories":"country",'Cumulative cases':"confirmed",'Cumulative deaths':"deaths"})
+# Remove a few dupliaed names
+#print ("Orginal",merged_df)
+merged_df=merged_df.drop_duplicates(['country','date'], keep='last')
+#print ("Dropped",merged_df)
+    
+#merged_df = pd.DataFrame(data=merged,columns=columns),
 
 
 # import data
 print('Importing Data...')
-agg_df = pd.read_parquet(os.path.join(data_dir, agg_file))
-daily_df = pd.read_csv(os.path.join(data_dir, trend_file))
+#agg_df = pd.read_parquet(os.path.join(data_dir, agg_file))
+#daily_df = pd.read_csv(os.path.join(data_dir, trend_file))
 
 
 #Create place to save diagrams
@@ -58,39 +123,44 @@ reports_dir =  os.path.join(out,'reports')
 
 # Some remapping
 #agg_df['newcountry']=agg_df['country'].apple x:re("United Kingdom"].#
-agg_df.loc[agg_df['country'] == 'Others', 'country'] = "Cruise Ship"
-agg_df.loc[agg_df['country'] == 'United Kingdom', 'country'] = "UK"
-agg_df.loc[agg_df['country'] == 'Iran (Islamic Republic of)', 'country'] = "Iran"
-agg_df.loc[agg_df['country'] == 'Mainland China', 'country'] = "China"
-agg_df.loc[agg_df['country'] == 'Korea, South', 'country'] = "South Korea"
-agg_df.loc[agg_df['country'] == 'Republic of Korea', 'country'] = "South Korea"
+#agg_df.loc[agg_df['country'] == 'Others', 'country'] = "Cruise Ship"
+#agg_df.loc[agg_df['country'] == 'United Kingdom', 'country'] = "UK"
+#agg_df.loc[agg_df['country'] == 'Iran (Islamic Republic of)', 'country'] = "Iran"
+#agg_df.loc[agg_df['country'] == 'Mainland China', 'country'] = "China"
+#agg_df.loc[agg_df['country'] == 'Korea, South', 'country'] = "South Korea"
+#agg_df.loc[agg_df['country'] == 'Republic of Korea', 'country'] = "South Korea"
 
 
 
 #print (agg_df)
 # Merge to country..
 # Convert types
-for col in ['confirmed', 'deaths', 'recovered']:
-    agg_df[col] = agg_df[col].replace('', 0).astype(int)
+#for col in ['confirmed', 'deaths']: # , 'recovered'
+#    agg_df[col] = agg_df[col].replace('', 0).astype(int)
 
-sum_df=agg_df.groupby(['date','country'])[['confirmed', 'deaths', 'recovered']].sum()
-first_df=agg_df.groupby(['date','country'])['date','country'].first()
+#sum_df=agg_df.groupby(['date','country'])[['confirmed', 'deaths']].sum()
+#first_df=agg_df.groupby(['date','country'])['date','country'].first()
 
 
 #print(sum_df,first_df)
 
 
 
-merged=np.concatenate((first_df.to_numpy(),sum_df.to_numpy()),axis=1)
-columns=['date','country','confirmed', 'deaths', 'recovered']
+#merged=np.concatenate((first_df.to_numpy(),sum_df.to_numpy()),axis=1)
+#columns=['date','country','confirmed', 'deaths']
 #merged_df = pd.DataFrame(data=merged,columns=columns),
-merged_df = pd.DataFrame({'date': merged[:, 0], 'country': merged[:, 1], 'confirmed': merged[:, 2], 'deaths': merged[:, 3], 'recovered': merged[:, 4]})
+#merged_df = pd.DataFrame({'date': merged[:, 0], 'country': merged[:, 1], 'confirmed': merged[:, 2], 'deaths': merged[:, 3], 'recovered': merged[:, 4]})
+
+# Here we start with merged.
+
 
 # We shoudl complete the database with all missing dates.
 first=merged_df["date"].to_list()[0]
-firstdate=parser.parse(first)
+#firstdate=parser.parse(str(first))
+firstdate=first
 last=merged_df["date"].to_list()[-1]
-lastdate=parser.parse(last)
+#lastdate=parser.parse(str(last))
+lastdate=last
 
 #print (firstdate,lastdate)
 #
@@ -129,41 +199,50 @@ startdate={}
 firstdeaths={}
 startdeaths={}
 # Now we nedeathed to get the first date for each country (if <100 case last date)
-for country in countries:
+for country in countries: # ["Afghanistan","Sweden","China"]: #countries:
     tempdf=merged_df.loc[merged_df['country'] == country]
     first[country]=tempdf["date"].to_list()[0]
-    firstdate[country]=parser.parse(first[country])
+    firstdate[country]=first[country]
+    x=5
+    #print ("TEST",country,tempdf[tempdf.confirmed > minnum].iloc[0].date)
+    #print ("TEST2",tempdf.date.tail(1).to_list()[0])
+    #print ("TEST3",tempdf[tempdf.deaths > mindeaths].iloc[0].date)
     try:
-        start=tempdf[tempdf.confirmed > minnum].iloc[0]
+        start=tempdf[tempdf.confirmed > minnum].iloc[0].date
     except:
         start=tempdf.date.tail(1).to_list()[0]
     try:
-        deathsstart=tempdf[tempdf.deaths > mindeaths].iloc[0]
+        deathsstart=tempdf[tempdf.deaths > mindeaths].iloc[0].date
     except:
         deathsstart=tempdf.date.tail(1).to_list()[0]
         #continue
-    try:
-        startdate[country]=parser.parse(start.date)
-    except:
-        startdate[country]=parser.parse(first[country])
-    try:
-        startdeaths[country]=parser.parse(deathsstart.date)
-    except:
-        startdeaths[country]=parser.parse(first[country])
-    
-tiny=0.0000000001
+    #try:
+    startdate[country]=start
+    #except:
+    #    startdate[country]=parser.parse(str(first[country]))
+    #try:
+    startdeaths[country]=deathsstart
+    #except:
+    #    startdeaths[country]=parser.parse(str(first[country]))
+
+#print (startdeaths,startdate)
+tiny=0.001
 def Days(x,y):
-    return (parser.parse(x)-startdate[y]).days
+    return (x-startdate[y]).days
 def DeathsDays(x,y):
-    return (parser.parse(x)-startdeaths[y]).days
+    return (x-startdeaths[y]).days
+
 
 merged_df['Days']=merged_df.apply(lambda x:Days(x.date,x.country), axis=1)
 merged_df['DeathsDays']=merged_df.apply(lambda x:DeathsDays(x.date,x.country), axis=1)
+#print(merged_df['Days'])
 #merged_df['DeathsDate']=merged_df.apply(lambda x:startdeaths[x.country], axis=1)
 #merged_df['StartDate']=merged_df.apply(lambda x:startdate[x.country], axis=1)
 #merged_df['FirstDate']=merged_df.apply(lambda x:firstdate[x.country], axis=1)
-merged_df['LogCases']=merged_df['confirmed'].apply(lambda x:(math.log(x+tiny)))
-merged_df['LogDeaths']=merged_df['deaths'].apply(lambda x:(math.log(x+tiny)))
+#merged_df.to_csv(reports_dir+"/temp.csv", sep=',')
+#print (merged_df)
+merged_df['LogCases']=merged_df['confirmed'].apply(lambda x:(math.log(max(x,tiny))))
+merged_df['LogDeaths']=merged_df['deaths'].apply(lambda x:(math.log(max(x,tiny))))
 
 
 
@@ -179,9 +258,9 @@ for country in countries:
                  "country":country,
                  "confirmed":c,
                  "deaths":d,
-                 "recovered":r,
-                      "Days":(parser.parse(date)-startdate[country]).days,
-                      "DeathsDays":(parser.parse(date)-startdeaths[country]).days,
+                 #"recovered":r,
+                      "Days":(date-startdate[country]).days,
+                      "DeathsDays":(date-startdeaths[country]).days,
                       #DeathsDate,
                       #StartDate,
                       #"FirstDate":first[country],
@@ -190,9 +269,11 @@ for country in countries:
                                             ignore_index=True)
             #merged_df.append(data, ignore_index=True)
         else:
+            
+            #print (country,date,merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)]['confirmed'])
             c=int(merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)]['confirmed'])
             d=int(merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)]['deaths'])
-            r=int(merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)]['recovered'])
+            #r=int(merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)]['recovered'])
 
 countrylist={}
 linreg={}
@@ -233,7 +314,7 @@ merged_df=merged_df.sort_values(by=['country', 'date'])
 merged_df.to_csv(reports_dir+"/merged.csv", sep=',')
 #sys.exit()    
 
-
+# ------------------------------------------------------------------------
 
 #
 #sys.exit()
@@ -244,7 +325,7 @@ merged_df.to_csv(reports_dir+"/merged.csv", sep=',')
 ##### Define Graphs #####
 
 # Plot and save trendlinae graph
-def nations_trend_line(tmp_df, name, col, col2, col3,col4,col7,col5,slope,intercept,col6,deathsslope,deathsintercept):
+def nations_trend_line(tmp_df, name, col, col2, col4,col7,col5,slope,intercept,col6,deathsslope,deathsintercept):
     f, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]},figsize=(20,15))
     #print (tmp_df)
     #fig = plt.subplots()
@@ -394,17 +475,17 @@ minsize=10
 for country in sortedcountries:
     tempdf=merged_df.loc[merged_df['country'] == country]
     first=tempdf["date"].to_list()[0]
-    firstdate=parser.parse(first)
+    firstdate=first
 
     if tempdf["confirmed"].size<minsize: continue
     s=tempdf["confirmed"].max()
     try:
         start=tempdf[tempdf.confirmed > cutoff].iloc[0]
-        startdate=parser.parse(start.date)
+        startdate=start.date
     except:
         continue
     if s>cutoff:
-        x=tempdf["date"].apply(lambda x:(parser.parse(x)-startdate).days)
+        x=tempdf["date"].apply(lambda x:(x-startdate).days)
         y=tempdf['confirmed']
         #tempdf.groupby(['days'])[['confirmed']].sum().plot(ax=ax, marker='o')
         #ax.legend=([country])
@@ -428,7 +509,7 @@ r=[]
 list={}
 for country in countries:
     tempdf=merged_df.loc[merged_df['country'] == country]
-    y=tempdf[['confirmed','deaths','recovered']].max()
+    y=tempdf[['confirmed','deaths']].max()
     if (y.deaths>1 or y.confirmed>100):
         c+=[country]
         r+=[y.deaths/y.confirmed]
@@ -461,39 +542,6 @@ fig = ax2.get_figure()
 fig.savefig(os.path.join(image_dir, 'ratio_bar.png'.format(col)))
 
 
-# Data for predictions
-mindays=20
-#x=pd.DataFrame([])
-file = open("daily-data.csv","w")  
-string=''
-for j in range(mindays,0,-1):
-    string+= "-"+str(j)+","
-string+="Deaths\n"
-file.write(string)
-
-for country in countries:
-    tempdf=merged_df.loc[merged_df['country'] == country]
-    if (len(tempdf) < mindays): continue
-    tempdf["new_confirmed_cases"]=tempdf['confirmed'].diff()
-    tempdf['new_deaths']=tempdf['deaths'].diff()
-    tempdf['new_recoveries']=tempdf['recovered'].diff()
-    tempdf["increased_confirmed_cases"]=tempdf['new_confirmed_cases'].diff()
-    tempdf['increased_deaths']=tempdf['new_deaths'].diff()
-    tempdf['increased_recoveries']=tempdf['new_recoveries'].diff()
-    e=tempdf.increased_confirmed_cases.to_list()
-    c=tempdf.new_confirmed_cases.to_list()
-    d=tempdf.new_deaths.to_list()
-    string=''
-    for i in range(mindays+1,len(d)):
-        #x=c[i-mindays:i-1],d[i])
-        for j in range(i-mindays,i):
-            string+= str(c[j])+","
-        string+=str(d[i])+"\n"
-    file.write(string)
-    #x.append(y, ignore_index=True)
-#x.to_csv("daily-data.csv")
-file.close()
-#sys.exit()
 
 # regression data for countr
 #newdf=agg_df.loc[(agg_df['confirmed']>100) & (agg_df['confirmed']<10000)]
@@ -629,9 +677,9 @@ fig2.savefig(os.path.join(image_dir, 'deathslope.png'))
 
 print('... Daily Figures')
 # Daily Figures Data Plots
-daily_figures_cols = ['new_confirmed_cases', 'new_deaths', 'new_recoveries', 'currently_infected']
-for col, rgb in zip(daily_figures_cols, ['tomato', 'lightblue', 'mediumpurple', 'green']):
-    create_bar(daily_df, col, rgb)    
+#daily_figures_cols = ['new_confirmed_cases', 'new_deaths', 'new_recoveries', 'currently_infected']
+#for col, rgb in zip(daily_figures_cols, ['tomato', 'lightblue', 'mediumpurple', 'green']):
+#    create_bar(daily_df, col, rgb)    
 
 print('... Country Figures')
 # Ratio plots
@@ -639,83 +687,41 @@ tempdf=merged_df.loc[merged_df['country'] != "China"]
 #print (country,y.diff())
 tempdf["new_confirmed_cases"]=tempdf['confirmed'].diff()
 tempdf['new_deaths']=tempdf['deaths'].diff()
-tempdf['new_recoveries']=tempdf['recovered'].diff()
+#tempdf['new_recoveries']=tempdf['recovered'].diff()
 tempdf["increased_confirmed_cases"]=tempdf['new_confirmed_cases'].diff()
 tempdf['increased_deaths']=tempdf['new_deaths'].diff()
-tempdf['increased_recoveries']=tempdf['new_recoveries'].diff()
-nations_trend_line(tempdf, "RestOfWorld",  'confirmed', 'deaths', 'recovered',"new_confirmed_cases","new_deaths","Days",linreg["RoW"].slope,linreg["RoW"].intercept,'DeathsDays',deathsreg["RoW"].slope,deathsreg["RoW"].intercept)
+#tempdf['increased_recoveries']=tempdf['new_recoveries'].diff()
+nations_trend_line(tempdf, "RestOfWorld",  'confirmed', 'deaths', "new_confirmed_cases","new_deaths","Days",linreg["RoW"].slope,linreg["RoW"].intercept,'DeathsDays',deathsreg["RoW"].slope,deathsreg["RoW"].intercept)
 
 for country in countries:
     tempdf=merged_df.loc[merged_df['country'] == country]
     tempdf["new_confirmed_cases"]=tempdf['confirmed'].diff()
     tempdf['new_deaths']=tempdf['deaths'].diff()
-    tempdf['new_recoveries']=tempdf['recovered'].diff()
+    #tempdf['new_recoveries']=tempdf['recovered'].diff()
     tempdf["increased_confirmed_cases"]=tempdf['new_confirmed_cases'].diff()
     tempdf['increased_deaths']=tempdf['new_deaths'].diff()
-    tempdf['increased_recoveries']=tempdf['new_recoveries'].diff()
+    #tempdf['increased_recoveries']=tempdf['new_recoveries'].diff()
     try:
         print(country,linreg[country])
-        nations_trend_line(tempdf, country,  'confirmed', 'deaths', 'recovered',"new_confirmed_cases","new_deaths","Days",linreg[country].slope,linreg[country].intercept,'DeathsDays',deathsreg[country].slope,deathsreg[country].intercept)
+        nations_trend_line(tempdf, country,  'confirmed', 'deaths', "new_confirmed_cases","new_deaths","Days",linreg[country].slope,linreg[country].intercept,'DeathsDays',deathsreg[country].slope,deathsreg[country].intercept)
     except:
         try:
-            nations_trend_line(tempdf, country,  'confirmed', 'deaths', 'recovered',"new_confirmed_cases","new_deaths","Days",linreg[country].slope,linreg[country].intercept,'DeathsDays',0.,0.)
+            nations_trend_line(tempdf, country,  'confirmed', 'deaths', "new_confirmed_cases","new_deaths","Days",linreg[country].slope,linreg[country].intercept,'DeathsDays',0.,0.)
         except:
-            nations_trend_line(tempdf, country,  'confirmed', 'deaths', 'recovered',"new_confirmed_cases","new_deaths","Days",0.,0.,'DeathsDays',0.,0.)
+            nations_trend_line(tempdf, country,  'confirmed', 'deaths', "new_confirmed_cases","new_deaths","Days",0.,0.,'DeathsDays',0.,0.)
 
         
 # Trend line for new cases
-create_trend_line(daily_df, 'new_confirmed_cases', 'new_deaths', 'new_recoveries')
+#create_trend_line(daily_df, 'new_confirmed_cases', 'new_deaths', 'new_recoveries')
     
     
 #print('... Daily New Infections Differences')
-new_df = pd.DataFrame([])
-new_df['date'] = daily_df['date']
-new_df['confirmed_cases'] = merged_df.confirmed - daily_df.new_confirmed_cases
-new_df['new_confirmed_cases'] = daily_df.new_confirmed_cases
-create_stacked_bar(new_df, 'new_confirmed_cases', 'confirmed_cases', "Stacked bar of confirmed and new cases by day")
+#new_df = pd.DataFrame([])
+#new_df['date'] = daily_df['date']
+#new_df['confirmed_cases'] = merged_df.confirmed - daily_df.new_confirmed_cases
+#new_df['new_confirmed_cases'] = daily_df.new_confirmed_cases
+#create_stacked_bar(new_df, 'new_confirmed_cases', 'confirmed_cases', "Stacked bar of confirmed and new cases by day")
 
 
-
-#print('Creating excel spreadsheet report...')
-workbook_writer = pd.ExcelWriter(os.path.join(reports_dir, report), engine='xlsxwriter')
-
-# Add daily summary to spreadsheet
-daily_df.to_excel(workbook_writer, sheet_name='daily figures')  
-
-
-workbook = workbook_writer.book
-
-def get_image_types(path):
-    # get all the possible types of images in
-    # the passed directory path
-    types = []
-    for fn in glob.glob(os.path.join(path, '*.png')):
-        types.append(fn.split('_',)[-1].split('.')[0])
-    
-    return types
-
-# Get all images for each type
-def read_images(path, graph_type):
-    image_list = []
-    for fn in glob.glob(os.path.join(path, '*_{}.png'.format(graph_type))):
-        image_list.append(fn)    
-    images = {graph_type : image_list}
-    return dict(images)
-
-image_types = get_image_types(image_dir)
-
-padding = 1 # Set padding for images in spreadsheet
-for types in set(image_types):
-    print('... reading images for:', types)
-    type_dict = read_images(image_dir, types)
-    
-    # Add image to the worksheet
-    worksheet = workbook.add_worksheet(name='{}_graphs'.format(types))
-    for image in type_dict[types]:
-        worksheet.insert_image('A' +str(padding), image) 
-        padding += 50
-    padding = 1
-    
-workbook.close()
 
 print('Done!')
