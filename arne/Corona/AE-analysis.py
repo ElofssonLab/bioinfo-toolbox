@@ -23,7 +23,6 @@ import pickle
 import os.path
 from dateutil.parser import parse
 from datetime import datetime,date,time, timedelta
-#from datetime import timedelta
 from dateutil import parser
 import pyarrow
 import matplotlib.pyplot as plt
@@ -54,7 +53,25 @@ def fix_country_names(df):
 
 #set ggplot style
 plt.style.use('ggplot')
- 
+markers = [ '.', ',', 'o', 'v', '^', '<', '>', '1', '2',
+    '3', '4', '8', 's', 'p', '*', 'h', 'H', '+', 'x', 'D', 'd', '|',
+    '_', 'P', 'X' ,1,2,3,4,5,6,7,8,9]
+
+colours=['blue','green','red','cyan','magenta','yellow','black','grey','pink','brown']
+
+# Parameters for linreg
+mindeaths=5
+maxdeaths=1000
+minnum=50
+maxnum=10000
+# Plotting parameters
+daysbefore=-10
+daysafter=45
+mincases=5
+maxcases=125000
+mindeathcases=1
+maxdeathcases=7500
+
 args = docopt.docopt(__doc__)
 out = args['--output_folder']
 
@@ -63,14 +80,10 @@ data_dir  = os.path.join(out, 'data'  )+"/" # , str(datetime.date(datetime.now()
 agg_file  = 'agg_data_{}.parquet.gzip'.format(datetime.date(datetime.now()))
 trend_file  = 'trend_{}.csv'.format(datetime.date(datetime.now()))
 #report  = 'report_{}.xlsx'.format(datetime.date(datetime.now()))
-
 ECDC = "https://www.ecdc.europa.eu/sites/default/files/documents/"  # +2020-03-20+".xlsx
 
 today=date.today()
-#print (today)
 yesterday=date.today() - timedelta(1)
-#print (yesterday)
-#date = parse(today).strftime("%Y-%m-%d")
 excelfile="COVID-19-geographic-disbtribution-worldwide-"+str(today)+".xlsx"
 URL=ECDC+excelfile
 infile=data_dir+"/"+excelfile
@@ -84,10 +97,8 @@ if not os.path.isfile(infile):
         excelfile="COVID-19-geographic-disbtribution-worldwide-"+str(yesterday)+".xlsx"
         infile=data_dir+"/"+excelfile
 
+print('Importing Data...')
 print("Using: ",infile)
-# 
-
-
 df= pd.read_excel(infile)
 
 fix_country_names(df)
@@ -98,75 +109,23 @@ for country in countries:
     country_df=df.loc[df['Countries and territories'] == country].sort_values(by='DateRep')
     country_df['Cumulative deaths'] = country_df['Deaths'].cumsum()
     country_df['Cumulative cases'] = country_df['Cases'].cumsum()
-    #print (country_df)
-    #tempdf=country_df["DateRep","Countries and territories",'Cumulative cases','Cumulative deaths']
-    agg_df=pd.concat([agg_df, country_df[["DateRep","Countries and territories",'Cumulative cases','Cumulative deaths']]], ignore_index=True)
+    agg_df=pd.concat([agg_df, country_df], ignore_index=True)
 
-merged_df=agg_df.rename(columns={"DateRep": "date","Countries and territories":"country",'Cumulative cases':"confirmed",'Cumulative deaths':"deaths"})
+merged_df=agg_df.rename(columns={
+    "DateRep": "date",
+    "Countries and territories":"country",
+    'Cumulative cases':"confirmed",
+    'Cases':"new_confirmed_cases",
+    'Deaths':"new_deaths",
+    'Cumulative deaths':"deaths"
+    })
 # Remove a few dupliaed names
-#print ("Orginal",merged_df)
 merged_df=merged_df.drop_duplicates(['country','date'], keep='last')
-#print ("Dropped",merged_df)
-    
-#merged_df = pd.DataFrame(data=merged,columns=columns),
-
 
 # import data
-print('Importing Data...')
-#agg_df = pd.read_parquet(os.path.join(data_dir, agg_file))
-#daily_df = pd.read_csv(os.path.join(data_dir, trend_file))
-
-
 #Create place to save diagrams
 image_dir =  os.path.join(out,'reports', 'images')
 reports_dir =  os.path.join(out,'reports')
-
-# Some remapping
-#agg_df['newcountry']=agg_df['country'].apple x:re("United Kingdom"].#
-#agg_df.loc[agg_df['country'] == 'Others', 'country'] = "Cruise Ship"
-#agg_df.loc[agg_df['country'] == 'United Kingdom', 'country'] = "UK"
-#agg_df.loc[agg_df['country'] == 'Iran (Islamic Republic of)', 'country'] = "Iran"
-#agg_df.loc[agg_df['country'] == 'Mainland China', 'country'] = "China"
-#agg_df.loc[agg_df['country'] == 'Korea, South', 'country'] = "South Korea"
-#agg_df.loc[agg_df['country'] == 'Republic of Korea', 'country'] = "South Korea"
-
-
-
-#print (agg_df)
-# Merge to country..
-# Convert types
-#for col in ['confirmed', 'deaths']: # , 'recovered'
-#    agg_df[col] = agg_df[col].replace('', 0).astype(int)
-
-#sum_df=agg_df.groupby(['date','country'])[['confirmed', 'deaths']].sum()
-#first_df=agg_df.groupby(['date','country'])['date','country'].first()
-
-
-#print(sum_df,first_df)
-
-
-
-#merged=np.concatenate((first_df.to_numpy(),sum_df.to_numpy()),axis=1)
-#columns=['date','country','confirmed', 'deaths']
-#merged_df = pd.DataFrame(data=merged,columns=columns),
-#merged_df = pd.DataFrame({'date': merged[:, 0], 'country': merged[:, 1], 'confirmed': merged[:, 2], 'deaths': merged[:, 3], 'recovered': merged[:, 4]})
-
-# Here we start with merged.
-
-
-# We shoudl complete the database with all missing dates.
-first=merged_df["date"].to_list()[0]
-#firstdate=parser.parse(str(first))
-firstdate=first
-last=merged_df["date"].to_list()[-1]
-#lastdate=parser.parse(str(last))
-lastdate=last
-
-#print (firstdate,lastdate)
-#
-
-
-
 if not os.path.exists(image_dir):
     print('Creating reports folder...')
     os.system('mkdir -p ' + image_dir)
@@ -175,18 +134,17 @@ if not os.path.exists(reports_dir):
     print('Creating reports folder...')
     os.system('mkdir -p ' + reports_dir)
 
-    # We need to make two lists of countries
-markers = [ '.', ',', 'o', 'v', '^', '<', '>', '1', '2',
-    '3', '4', '8', 's', 'p', '*', 'h', 'H', '+', 'x', 'D', 'd', '|',
-    '_', 'P', 'X' ,1,2,3,4,5,6,7,8,9]
+# We shoudl complete the database with all missing dates.
+first=merged_df["date"].to_list()[0]
+firstdate=first
+last=merged_df["date"].to_list()[-1]
+lastdate=last
 
-colours=['blue','green','red','cyan','magenta','yellow','black','grey','pink','brown']
 
-# first we need to sort on slope
-mindeaths=5
-maxdeaths=1000
-minnum=50
-maxnum=10000
+
+# We need to make two lists of countries
+# Some parameters
+
 countrylist={}
 linreg={}
 linregdeaths={}
@@ -204,9 +162,6 @@ for country in countries: # ["Afghanistan","Sweden","China"]: #countries:
     first[country]=tempdf["date"].to_list()[0]
     firstdate[country]=first[country]
     x=5
-    #print ("TEST",country,tempdf[tempdf.confirmed > minnum].iloc[0].date)
-    #print ("TEST2",tempdf.date.tail(1).to_list()[0])
-    #print ("TEST3",tempdf[tempdf.deaths > mindeaths].iloc[0].date)
     try:
         start=tempdf[tempdf.confirmed > minnum].iloc[0].date
     except:
@@ -215,15 +170,8 @@ for country in countries: # ["Afghanistan","Sweden","China"]: #countries:
         deathsstart=tempdf[tempdf.deaths > mindeaths].iloc[0].date
     except:
         deathsstart=tempdf.date.tail(1).to_list()[0]
-        #continue
-    #try:
     startdate[country]=start
-    #except:
-    #    startdate[country]=parser.parse(str(first[country]))
-    #try:
     startdeaths[country]=deathsstart
-    #except:
-    #    startdeaths[country]=parser.parse(str(first[country]))
 
 #print (startdeaths,startdate)
 tiny=0.001
@@ -243,6 +191,7 @@ merged_df['DeathsDays']=merged_df.apply(lambda x:DeathsDays(x.date,x.country), a
 #print (merged_df)
 merged_df['LogCases']=merged_df['confirmed'].apply(lambda x:(math.log(max(x,tiny))))
 merged_df['LogDeaths']=merged_df['deaths'].apply(lambda x:(math.log(max(x,tiny))))
+merged_df['Ratio'] = merged_df["deaths"]/merged_df["confirmed"]
 
 
 
@@ -276,13 +225,15 @@ for country in countries:
             #r=int(merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)]['recovered'])
 
 countrylist={}
-linreg={}
 for country in countries:
     newdf=merged_df.loc[(merged_df['confirmed']>minnum) & (merged_df['confirmed']<maxnum) &(merged_df['country'] == country)]
     if (len(newdf)<4):
+        linreg[country]=linregress([0.0,1.0],[0.0,0.0])
         continue
     linreg[country]=linregress(newdf['Days'],newdf['LogCases'])
+    #print (linreg[country])
     countrylist[country]=linreg[country].slope
+    
 tmplist = sorted(countrylist.items() , reverse=True, key=lambda x: x[1])
 sortedcountries=[]
 for i in range(0,len(tmplist)):
@@ -294,9 +245,11 @@ deathsreg={}
 for country in merged_df['country'].drop_duplicates():
     newdf=merged_df.loc[(merged_df['deaths']>mindeaths) & (merged_df['deaths']<maxdeaths) & (merged_df['country'] == country)]
     if (len(newdf)<4):
+        deathsreg[country]=linregress([0.0,1.0],[0.0,0.0])
         continue
     deathsreg[country]=linregress(newdf['DeathsDays'],newdf['LogDeaths'])
-    countrylist[country]=deathsreg[country].slope
+    #print(deathsreg[country])
+countrylist[country]=deathsreg[country].slope
 tmplist = sorted(countrylist.items() , reverse=True, key=lambda x: x[1])
 deathscountries=[]
 for i in range(0,len(tmplist)):
@@ -309,10 +262,19 @@ linreg["RoW"]=linregress(newdf['Days'],newdf['LogCases'])
 newdf=deathsfit_df.groupby(['date']).sum()
 deathsreg["RoW"]=linregress(newdf['DeathsDays'],newdf['LogDeaths'])
 
+
+def LinExp(x,y):
+    return np.exp(linreg[y].intercept+linreg[y].slope*x)
+
+def DeathsExp(x,y):
+    return np.exp(deathsreg[y].intercept+deathsreg[y].slope*x)
+
+merged_df['LinCases']=merged_df.apply(lambda x:LinExp(x.Days,x.country), axis=1)
+merged_df['LinDeaths']=merged_df.apply(lambda x:DeathsExp(x.DeathsDays,x.country), axis=1)
+
 merged_df=merged_df.sort_values(by=['country', 'date'])
             
 merged_df.to_csv(reports_dir+"/merged.csv", sep=',')
-#sys.exit()    
 
 # ------------------------------------------------------------------------
 
@@ -325,114 +287,51 @@ merged_df.to_csv(reports_dir+"/merged.csv", sep=',')
 ##### Define Graphs #####
 
 # Plot and save trendlinae graph
-def nations_trend_line(tmp_df, name, col, col2, col4,col7,col5,slope,intercept,col6,deathsslope,deathsintercept):
+def nations_trend_line(tmp_df, name, cumconfirmed, cumdeath, ncases,ndeath,cdays,lincases,ddays,lindeaths):
     f, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]},figsize=(20,15))
     #print (tmp_df)
     #fig = plt.subplots()
     #ax=plt.subplot(2,1,1)
-    tmp_df.groupby(['date'])[[col, col2]].sum().plot(ax=ax1, marker='o')
+    tmp_df.groupby(['date'])[[cumconfirmed, cumdeath,lincases,lindeaths]].sum().plot(ax=ax1, marker='o')
     ax1.set_yscale('log')
-    ax1.set(ylim=(0.5,100000))
+    ax1.set(ylim=(0.5,maxcases))
     ax1.tick_params(axis='x', labelrotation=45 )
     #ax1.set_xticklabels(labels=tmp_df.groupby(['date'])['date'], rotation=45 )
-    #tmp_df.groupby(['date'])[[col4]].sum().plot.bar()
-    days = tmp_df.groupby(['date'])[[col5]].max()
-    deathdays = tmp_df.groupby(['date'])[[col6]].max()
-    tmp = tmp_df.groupby(['date'])[[col4]].sum()
-    tmp2 = tmp_df.groupby(['date'])[[col7]].sum()
-    x=[]
-    y=[]
-    j=0
-    for i in tmp[col4].keys():
-        x+=[j]
-        j+=1
-        y+=[tmp[col4][i]]
-    if tmp_df[col4].max()>0:
-        ax1.bar(np.arange(0,len(x))-0.2,y,width=0.4, color="red")
-
-
-    
-    # We need to check if we have any deaths
-    #print (tmp_df[col7])
-    if tmp_df[col7].max()>0:
-        x=[]
-        y=[]
-        j=0
-        for i in tmp2[col7].keys():
-            #print (i,j,tmp2[col7][i])
-            x+=[j]
-            j+=1
-            y+=[tmp2[col7][i]]
-        ax1.bar(np.arange(0,len(x))+0.2,y,width=0.4, color="blue")
-        x=[]
-        y=[]
-        j=0
-        if  (deathsslope>0):
-            for i in deathdays[col6]:
-                x+=[j]
-                j+=1
-                y+=[np.exp(deathsintercept+deathsslope*i)]
-            #print (x,y,deathsintercept,deathsslope)
-            ax1.plot(x, y, 'blue', label="Exponential curve fit death, Intercept:  ") # + str("%.5f" % deathsintercept) + " Slope: " + str("%.5" % deathsslope)   )
-
+    #tmp_df.groupby(['date'])[[ncases]].sum().plot.bar()
+    days = tmp_df.groupby(['date'])[[cdays]].max()
+    deathdays = tmp_df.groupby(['date'])[[ddays]].max()
+    tmp = tmp_df.groupby(['date'])[[ncases]].sum()
+    tmp2 = tmp_df.groupby(['date'])[[ndeath]].sum()
+    tmp3 = tmp_df.groupby(['date'])[[lindeaths]].sum()
+    tmp4 = tmp_df.groupby(['date'])[[lincases]].sum()
+    tmp5 = tmp_df.groupby(['date'])[[cumconfirmed]].sum()
+    tmp6 = tmp_df.groupby(['date'])[[cumdeath]].sum()
+    ratio = tmp6[cumdeath]/tmp5[cumconfirmed]
+    ax1.bar(tmp.index,tmp[ncases], color="red",width=0.4)
 
         
-    #tiny=1
     
-    
+    # We need to check if we have any deaths
+    #print (tmp_df[ndeath])
+    ax1.bar(tmp2.index,tmp2[ndeath], color="blue",width=0.9)
+    #ax1.plot(tmp3.index, tmp3[lindeaths], 'blue', label="Exponential curve fit death")
+    print (tmp3)
     #ax.set(xlabel="Days since > " + str(cutoff) + "cases")
     ax1.set(ylabel="Number of cases")
     ax1.set(Title="Covid-19 cases in " + name)
-    x=[]
-    y=[]
-    j=0
-    if (slope>0):
-        for i in days[col5]:
-            x+=[j]
-            j+=1
-            y+=[np.exp(intercept+slope*i)]
-        ax1.plot(x, y, 'red', label="Exponential curve fit cases. Intercept: ") # + str("%.5f" % intercept) + " Slope: " + str("%.5f" % slope) )
-        ax1.legend()
+    #ax1.plot(tmp4.index, tmp4[lincases], 'red', label="Exponential curve fit cases")
+    ax1.legend()
     
     fig = ax1.get_figure()
-
-    #ax=plt.subplot(2,1,2)
-
-    #ratio=[]
-    #npa=tmp.to_numpy()
-    #for i in range(1,len(npa-1)):
-    #    if (npa[i][0]<tiny or npa[i-1][0]<tiny):
-    #        ratio+=[1]
-    #    else:
-    #        ratio+=[max(npa[i][0],tiny)/max(npa[i-1][0],tiny)]
-    #x=np.arange(1,len(npa))
-    #ax2.set_yscale('log')
-    #ax2.set(xlim=(-10, 25), ylim=(5, 750000))
-    #ax2.set(ylim=(0., 0.1))
     x=tmp_df.groupby(['date'])['date'].first()
-    #def Division(x,y):
-    #    return (x/y)
-    #y=tmp_df.apply(lambda x:Division(x.deaths,x.confirmed))
-    j=0
-    y=[]
-    z=[]
-    tmp = tmp_df.groupby(['date'])[[col]].sum()
-    tmp2 = tmp_df.groupby(['date'])[[col2]].sum()
-    for i in tmp[col].keys():
-        y+=[tmp[col][i]]
-    for i in tmp2[col2].keys():
-        z+=[tmp2[col2][i]]
-    for i in range(0,len(y)):
-        y[i]=z[i]/(y[i]+tiny)
-        
-    ax2.bar(x,y,width=0.8, color="green")
+    ax2.bar(ratio.index,ratio,width=0.8, color="green")
     ax2.tick_params(axis='x', labelrotation=45 )
     ax2.set(ylim=(0.,0.1))
     plt.xticks(rotation=45, ha='right')
     #y=tmp_df.apply(lambda x:Division(x.deaths,x.confirmed))
     #ax2.bar(x,y, color="green",label="Ratio")
     ax2.set(ylabel="Ratio of death")
-    fig.savefig(os.path.join(image_dir, name+'_trendline.png'.format(col)))
+    fig.savefig(os.path.join(image_dir, name+'_trendline.png'.format(cumconfirmed)))
     plt.close()
     #sys.exit()
 
@@ -487,14 +386,12 @@ for country in sortedcountries:
     if s>cutoff:
         x=tempdf["date"].apply(lambda x:(x-startdate).days)
         y=tempdf['confirmed']
-        #tempdf.groupby(['days'])[['confirmed']].sum().plot(ax=ax, marker='o')
-        #ax.legend=([country])
         ax.plot(x,y,label=country,marker=markers[mark])
         mark+=1
-        if mark>28: mark=0
+        if mark>=len(markers): mark=0
         col+=1
-        if col>10: col=0
-ax.set(xlim=(-10, 25), ylim=(5, 75000))
+        if col>=len(colours): col=0
+ax.set(xlim=(daysbefore, daysafter), ylim=(mincases, maxcases))
 ax.set(xlabel="Days since > " + str(cutoff) + "cases")
 ax.set(ylabel="Number of cases")
 ax.set(Title="Covid-19 in countries")
@@ -571,24 +468,20 @@ for country in sortedcountries:
                 linreg[country].slope*newdf['Days']), 'r',
                 label=str(linreg[country]))
     ax.set_yscale('log')
-    ax.set(xlim=(-10, 25), ylim=(5, 75000))
-    ax2.set(xlim=(-10, 25), ylim=(5, 75000))
-    #ax.set(ylim=(75, 80000))
-    #ax2.set(ylim=(75, 80000))
+    ax.set(xlim=(daysbefore, daysafter), ylim=(mincases, maxcases))
+    ax2.set(xlim=(daysbefore, daysafter), ylim=(mincases, maxcases))
 
     fig = ax.get_figure()
     ax.legend()
-    #plt.xticks(rotation=45, ha='right')
-    #fig.savefig(os.path.join(image_dir, country+'-slope.png'))
 
     ax2.plot(newdf['Days'], np.exp(linreg[country].intercept +
                 linreg[country].slope*newdf['Days']),color=colours[col]) #, label='fitted line'+str(linreg[country])
     ax2.scatter(newdf['Days'],newdf['confirmed'],label=country,marker=markers[mark],color=colours[col])
     colorlist+=[colours[col]]
     mark+=1
-    if mark>28: mark=0
+    if mark>=len(markers): mark=0
     col+=1
-    if col>9: col=0
+    if col>=len(colours): col=0
         
     #plt.close()
 
@@ -599,7 +492,7 @@ fig2 = ax2.get_figure()
 ax2.legend()
 #plt.xticks(rotation=45, ha='right')
 ax3.set(ylabel="Slope")
-ax3.set(Title="Slope of Covid-19 log(cases) in differnt countries" )
+ax3.set(Title="Slope of Covid-19 log(cases) in different countries" )
 #x=linreg.keys()
 #y=linreg.slope
 #yerr=linreg.stderr
@@ -632,10 +525,8 @@ for country in deathscountries:
                 deathsreg[country].slope*newdf['DeathsDays']), 'r',
                 label=str(deathsreg[country]))
     ax.set_yscale('log')
-    ax.set(xlim=(-10, 50), ylim=(1, 5000))
-    ax2.set(xlim=(-10, 50), ylim=(1, 5000))
-    #ax.set(ylim=(75, 80000))
-    #ax2.set(ylim=(75, 80000))
+    ax.set(xlim=(daysbefore, daysafter), ylim=(mindeathcases, maxdeathcases))
+    ax2.set(xlim=(daysbefore, daysafter), ylim=(mindeathcases, maxdeathcases))
 
     fig = ax.get_figure()
     ax.legend()
@@ -647,9 +538,9 @@ for country in deathscountries:
     ax2.scatter(newdf['DeathsDays'],newdf['deaths'],label=country,marker=markers[mark],color=colours[col])
     colorlist+=[colours[col]]
     mark+=1
-    if mark>28: mark=0
+    if mark>=len(markers): mark=0
     col+=1
-    if col>9: col=0
+    if col>=len(colours): col=0
         
     #plt.close()
 
@@ -660,7 +551,7 @@ fig2 = ax2.get_figure()
 ax2.legend()
 #plt.xticks(rotation=45, ha='right')
 ax3.set(ylabel="Slope")
-ax3.set(Title="Slope of Covid-19 log(deaths) in differnt countries" )
+ax3.set(Title="Slope of Covid-19 log(deaths) in different countries" )
 #x=linreg.keys()
 #y=linreg.slope
 #yerr=linreg.stderr
@@ -676,43 +567,21 @@ fig2.savefig(os.path.join(image_dir, 'deathslope.png'))
 
 
 print('... Daily Figures')
-# Daily Figures Data Plots
-#daily_figures_cols = ['new_confirmed_cases', 'new_deaths', 'new_recoveries', 'currently_infected']
-#for col, rgb in zip(daily_figures_cols, ['tomato', 'lightblue', 'mediumpurple', 'green']):
-#    create_bar(daily_df, col, rgb)    
 
 print('... Country Figures')
 # Ratio plots
 tempdf=merged_df.loc[merged_df['country'] != "China"]
-#print (country,y.diff())
-tempdf["new_confirmed_cases"]=tempdf['confirmed'].diff()
-tempdf['new_deaths']=tempdf['deaths'].diff()
-#tempdf['new_recoveries']=tempdf['recovered'].diff()
-tempdf["increased_confirmed_cases"]=tempdf['new_confirmed_cases'].diff()
-tempdf['increased_deaths']=tempdf['new_deaths'].diff()
-#tempdf['increased_recoveries']=tempdf['new_recoveries'].diff()
-nations_trend_line(tempdf, "RestOfWorld",  'confirmed', 'deaths', "new_confirmed_cases","new_deaths","Days",linreg["RoW"].slope,linreg["RoW"].intercept,'DeathsDays',deathsreg["RoW"].slope,deathsreg["RoW"].intercept)
+nations_trend_line(tempdf, "RestOfWorld",  'confirmed', 'deaths', "new_confirmed_cases","new_deaths","Days","LinCases",'DeathsDays',"LinDeaths")
+
+tempdf=merged_df.loc[merged_df['country'] == "China"]
+nations_trend_line(tempdf, "CHINA",  'confirmed', 'deaths', "new_confirmed_cases","new_deaths","Days","LinCases",'DeathsDays',"LinDeaths")
 
 for country in countries:
     tempdf=merged_df.loc[merged_df['country'] == country]
-    tempdf["new_confirmed_cases"]=tempdf['confirmed'].diff()
-    tempdf['new_deaths']=tempdf['deaths'].diff()
-    #tempdf['new_recoveries']=tempdf['recovered'].diff()
-    tempdf["increased_confirmed_cases"]=tempdf['new_confirmed_cases'].diff()
-    tempdf['increased_deaths']=tempdf['new_deaths'].diff()
-    #tempdf['increased_recoveries']=tempdf['new_recoveries'].diff()
-    try:
-        print(country,linreg[country])
-        nations_trend_line(tempdf, country,  'confirmed', 'deaths', "new_confirmed_cases","new_deaths","Days",linreg[country].slope,linreg[country].intercept,'DeathsDays',deathsreg[country].slope,deathsreg[country].intercept)
-    except:
-        try:
-            nations_trend_line(tempdf, country,  'confirmed', 'deaths', "new_confirmed_cases","new_deaths","Days",linreg[country].slope,linreg[country].intercept,'DeathsDays',0.,0.)
-        except:
-            nations_trend_line(tempdf, country,  'confirmed', 'deaths', "new_confirmed_cases","new_deaths","Days",0.,0.,'DeathsDays',0.,0.)
+    nations_trend_line(tempdf, country,  'confirmed', 'deaths', "new_confirmed_cases","new_deaths","Days","LinCases",'DeathsDays',"LinDeaths")
 
-        
 # Trend line for new cases
-#create_trend_line(daily_df, 'new_confirmed_cases', 'new_deaths', 'new_recoveries')
+#create_trend_line(merged_df, 'new_confirmed_cases', 'new_deaths', 'new_recoveries')
     
     
 #print('... Daily New Infections Differences')
@@ -720,7 +589,7 @@ for country in countries:
 #new_df['date'] = daily_df['date']
 #new_df['confirmed_cases'] = merged_df.confirmed - daily_df.new_confirmed_cases
 #new_df['new_confirmed_cases'] = daily_df.new_confirmed_cases
-#create_stacked_bar(new_df, 'new_confirmed_cases', 'confirmed_cases', "Stacked bar of confirmed and new cases by day")
+#create_stacked_bar(merged_df, 'new_confirmed_cases', 'confirmed_cases', "Stacked bar of confirmed and new cases by day")
 
 
 
