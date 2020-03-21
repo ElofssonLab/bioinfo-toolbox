@@ -507,32 +507,14 @@ mark=0
 col=0
 colorlist=[]
 fig2, (ax2, ax3) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]},figsize=(20,15))
-mindeaths=0
+mindeaths=5
 for country in deathscountries:
     newdf=merged_df.loc[merged_df['country'] == country]
     if newdf['deaths'].max()<mindeaths: continue
     x+=[country]
     y+=[deathsreg[country].slope]
     yerr+=[deathsreg[country].stderr]
-    fig, ax = plt.subplots(figsize=(20,10))
-    ax.set(ylabel="Log(Commulative deaths)")
-    ax.set(xlabel="Days from "+str(mindeaths)+" to "+str(maxdeaths) + " days")
-    ax.set(Title=" Covid-19 log (deaths) in different countries" )
-    ax.scatter(newdf['DeathsDays'],newdf['deaths'],label=country)
-    ax.plot(newdf['DeathsDays'], np.exp(deathsreg[country].intercept +
-                deathsreg[country].slope*newdf['DeathsDays']), 'r',
-                label=str(deathsreg[country]))
-    ax.set_yscale('log')
-    ax.set(xlim=(daysbefore, daysafter), ylim=(mindeathcases, maxdeathcases))
-    ax2.set(xlim=(daysbefore, daysafter), ylim=(mindeathcases, maxdeathcases))
-
-    fig = ax.get_figure()
-    ax.legend()
-    #plt.xticks(rotation=45, ha='right')
-    #fig.savefig(os.path.join(image_dir, country+'-slope.png'))
-
-    ax2.plot(newdf['DeathsDays'], np.exp(deathsreg[country].intercept +
-                deathsreg[country].slope*newdf['DeathsDays']),color=colours[col]) #, label='fitted line'+str(linreg[country])
+    ax2.plot(newdf['DeathsDays'],newdf['LinDeaths'],color=colours[col]) #, label='fitted line'+str(linreg[country])
     ax2.scatter(newdf['DeathsDays'],newdf['deaths'],label=country,marker=markers[mark],color=colours[col])
     colorlist+=[colours[col]]
     mark+=1
@@ -550,9 +532,6 @@ ax2.legend()
 #plt.xticks(rotation=45, ha='right')
 ax3.set(ylabel="Slope")
 ax3.set(Title="Slope of Covid-19 log(deaths) in different countries" )
-#x=linreg.keys()
-#y=linreg.slope
-#yerr=linreg.stderr
 ax3.bar(x,y,yerr=yerr,color=colorlist)
 ax3.tick_params(axis='x', labelrotation=45 )
 fig2 = ax3.get_figure()
