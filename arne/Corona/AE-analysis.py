@@ -145,6 +145,8 @@ mincases=5
 maxcases=125000
 mindeathcases=1
 maxdeathcases=7500
+ddaysbefore=-5
+ddaysafter=20
 
 
 args = docopt.docopt(__doc__)
@@ -317,12 +319,23 @@ for country in countries:
         continue
     weekreg[country]=linregress(newdf['Days'],newdf['LogCases'])
     weeklist[country]=weekreg[country].slope
-    
 tmplist = sorted(weeklist.items() , reverse=True, key=lambda x: x[1])
 #print (weekreg)
 
-countrylist={}
-#linregdeaths={}
+weekdeathslist={}
+weekdeaths={}
+for country in merged_df['country'].drop_duplicates():
+    newdf=merged_df.loc[(merged_df['date']>aweekago) & (merged_df['country'] == country)]
+    if (len(newdf)<4):
+        weekdeaths[country]=linregress([0.0,1.0],[0.0,0.0])
+        continue
+    weekdeaths[country]=linregress(newdf['DeathsDays'],newdf['LogDeaths'])
+    #print(deathsreg[country])
+    weekdeathslist[country]=weekdeaths[country].slope
+tmplist = sorted(weeklist.items() , reverse=True, key=lambda x: x[1])
+
+
+deathslist={}
 deathsreg={}
 for country in merged_df['country'].drop_duplicates():
     newdf=merged_df.loc[(merged_df['deaths']>mindeaths) & (merged_df['deaths']<maxdeaths) & (merged_df['country'] == country)]
@@ -331,12 +344,13 @@ for country in merged_df['country'].drop_duplicates():
         continue
     deathsreg[country]=linregress(newdf['DeathsDays'],newdf['LogDeaths'])
     #print(deathsreg[country])
-countrylist[country]=deathsreg[country].slope
-tmplist = sorted(countrylist.items() , reverse=True, key=lambda x: x[1])
+    deathslist[country]=deathsreg[country].slope
+tmplist = sorted(deathslist.items() , reverse=True, key=lambda x: x[1])
 deathscountries=[]
 for i in range(0,len(tmplist)):
     deathscountries+=[tmplist[i][0]]
-
+    
+    
 linfit_df=merged_df.loc[(merged_df['confirmed']>minnum) & (merged_df['confirmed']<maxnum) & (merged_df['country'] != "China")]
 deathsfit_df=merged_df.loc[(merged_df['deaths']>mindeaths) & (merged_df['deaths']<maxdeaths) & (merged_df['country'] != "China") ]    
 newdf=linfit_df.groupby(['date']).sum()
@@ -497,7 +511,7 @@ fig2 = ax2.get_figure()
 ax2.legend()
 #plt.xticks(rotation=45, ha='right')
 ax3.set(ylabel="Slope")
-ax3.set(Title="Slope of Covid-19 log(cases) in different countries(last week in transparent)" )
+ax3.set(Title="Slope of Covid-19 log(cases) in different countries (last week in transparent)" )
 #x=linreg.keys()
 #y=linreg.slope
 #yerr=linreg.stderr
@@ -513,6 +527,8 @@ plt.close('all')
 x=[]
 y=[]
 yerr=[]
+z=[]
+zerr=[]
 mark=0
 col=0
 colorlist=[]
@@ -523,6 +539,8 @@ for country in deathscountries:
     x+=[country]
     y+=[deathsreg[country].slope]
     yerr+=[deathsreg[country].stderr]
+    z+=[weekdeaths[country].slope]
+    zerr+=[weekdeaths[country].stderr]
     ax2.plot(newdf['DeathsDays'],newdf['LinDeaths'],color=colours[col]) #, label='fitted line'+str(linreg[country])
     ax2.scatter(newdf['DeathsDays'],newdf['deaths'],label=country,marker=markers[mark],color=colours[col])
     colorlist+=[colours[col]]
@@ -532,16 +550,18 @@ for country in deathscountries:
     if col>=len(colours): col=0
         
     #plt.close('all')
+ax2.set(xlim=(ddaysbefore, ddaysafter),ylim=(mindeathcases, maxdeathcases))
 
 ax2.set_yscale('log')
 ax2.set(ylabel="Log(Commulative deaths)")
-ax2.set(Title=" Covid-19 log (deaths) in different countries" )
+ax2.set(Title=" Covid-19 log (deaths) in different countries  (last week in transparent)" )
 fig2 = ax2.get_figure()
 ax2.legend()
 #plt.xticks(rotation=45, ha='right')
 ax3.set(ylabel="Slope")
 ax3.set(Title="Slope of Covid-19 log(deaths) in different countries" )
-ax3.bar(x,y,yerr=yerr,color=colorlist)
+ax3.bar(x,y,yerr=yerr,color=colorlist,width=0.4, ls='dashed', lw=2 )
+ax3.bar(x,z,yerr=zerr,color=colorlist,width=0.8,alpha = 0.5, ls='dotted', lw=2 )
 ax3.tick_params(axis='x', labelrotation=45 )
 fig2 = ax3.get_figure()
 plt.xticks(rotation=45, ha='right')
