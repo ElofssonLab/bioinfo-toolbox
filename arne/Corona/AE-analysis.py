@@ -28,6 +28,8 @@ from dateutil import parser
 import matplotlib.pyplot as plt
 # %matplotlib inline
 from scipy.stats import linregress
+import matplotlib as mpl
+mpl.rc('figure', max_open_warning = 0)
 
 def fix_country_names(df):
     translations = {'United_States_of_America':'USA',
@@ -61,14 +63,14 @@ def nations_trend_line(tmp_df, name, cumconfirmed, cumdeath, ncases,ndeath,cdays
     tmp6 = tmp_df.groupby(['date'])[[cumdeath]].sum()
     ratio = tmp6[cumdeath]/tmp5[cumconfirmed]
     if tmp[ncases].max()>0:
-        ax1.bar(tmp.index,tmp[ncases], color="red",width=0.4)
+        ax1.bar(tmp.index,tmp[ncases], color="red",width=0.4, ls='dashed', lw=2)
 
         
     
     # We need to check if we have any deaths
     #print (tmp_df[ndeath])
     if tmp2[ndeath].max()>0:
-        ax1.bar(tmp2.index,tmp2[ndeath], color="blue",width=0.9)
+        ax1.bar(tmp2.index,tmp2[ndeath], color="blue",width=0.8,alpha = 0.5, ls='dotted', lw=2  )
     #ax.set(xlabel="Days since > " + str(cutoff) + "cases")
     ax1.set(ylabel="Number of cases")
     ax1.set(Title="Covid-19 cases in " + name)
@@ -127,11 +129,12 @@ colours=['blue','green','red','cyan','magenta','yellow','black','grey','pink','b
 # Parameters for linreg
 mindeaths=5
 maxdeaths=1000
-minnum=50
-maxnum=10000
+minnum=100
+maxnum=5000
 
 # Countries to select
 minconfirmed=1000
+mindeaths=10
 
 # Cutoff to select startdate for expinential vurved
 cutoff=500
@@ -165,6 +168,8 @@ if not os.path.exists(reports_dir):
 
 today=date.today()
 yesterday=date.today() - timedelta(1)
+aweekago=date.today() - timedelta(7)
+
 excelfile="COVID-19-geographic-disbtribution-worldwide-"+str(today)+".xlsx"
 URL=ECDC+excelfile
 infile=data_dir+"/"+excelfile
@@ -219,8 +224,6 @@ lastdate=last
 # Some parameters
 
 countrylist={}
-linreg={}
-linregdeaths={}
 #sys.exit()
 # This is all countries 
 countries=merged_df['country'].drop_duplicates()
@@ -289,6 +292,7 @@ for country in countries:
             d=int(merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)]['deaths'])
             #r=int(merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)]['recovered'])
 
+linreg={}
 countrylist={}
 for country in countries:
     newdf=merged_df.loc[(merged_df['confirmed']>minnum) & (merged_df['confirmed']<maxnum) &(merged_df['country'] == country)]
@@ -303,8 +307,22 @@ sortedcountries=[]
 for i in range(0,len(tmplist)):
     sortedcountries+=[tmplist[i][0]]
 
+# This is to get the corrent (last week) linregression in cases
+weeklist={}
+weekreg={}
+for country in countries:
+    newdf=merged_df.loc[(merged_df['date']>aweekago) &(merged_df['country'] == country)]
+    if (len(newdf)<4):
+        weekreg[country]=linregress([0.0,1.0],[0.0,0.0])
+        continue
+    weekreg[country]=linregress(newdf['Days'],newdf['LogCases'])
+    weeklist[country]=weekreg[country].slope
+    
+tmplist = sorted(weeklist.items() , reverse=True, key=lambda x: x[1])
+#print (weekreg)
 
 countrylist={}
+#linregdeaths={}
 deathsreg={}
 for country in merged_df['country'].drop_duplicates():
     newdf=merged_df.loc[(merged_df['deaths']>mindeaths) & (merged_df['deaths']<maxdeaths) & (merged_df['country'] == country)]
@@ -427,11 +445,14 @@ plt.close('all')
 x=[]
 y=[]
 yerr=[]
+z=[]
+zerr=[]
 
 mark=0
 col=0
 colorlist=[]
 
+plt.close('all')
 print('... Time Series Trend Line')
 fig2, (ax2, ax3) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]},figsize=(20,15))
 for country in sortedcountries:
@@ -440,14 +461,17 @@ for country in sortedcountries:
     x+=[country]
     y+=[linreg[country].slope]
     yerr+=[linreg[country].stderr]
+    z+=[weekreg[country].slope]
+    zerr+=[weekreg[country].stderr]
     fig, ax = plt.subplots(figsize=(20,10))
     ax.set(ylabel="Log(Commulative cases)")
     ax.set(xlabel="Days from "+str(minnum)+" to "+str(maxnum) + " days")
     ax.set(Title=" Covid-19 log (cases) in different countries" )
     ax.scatter(newdf['Days'],newdf['confirmed'],label=country)
-    ax.plot(newdf['Days'], np.exp(linreg[country].intercept +
-                linreg[country].slope*newdf['Days']), 'r',
-                label=str(linreg[country]))
+    #ax.plot(newdf['Days'], np.exp(linreg[country].intercept +
+    #            linreg[country].slope*newdf['Days']), 'r',
+    #            label=str(linreg[country]))
+    ax.plot(newdf['Days'], newdf['LinCases'],label=str(linreg[country]))
     ax.set_yscale('log')
     ax.set(xlim=(daysbefore, daysafter), ylim=(mincases, maxcases))
     ax2.set(xlim=(daysbefore, daysafter), ylim=(mincases, maxcases))
@@ -468,21 +492,23 @@ for country in sortedcountries:
 
 ax2.set_yscale('log')
 ax2.set(ylabel="Log(Commulative cases)")
-ax2.set(Title=" Covid-19 log (cases) in different countries" )
+ax2.set(Title=" Covid-19 log (cases) in different countries " )
 fig2 = ax2.get_figure()
 ax2.legend()
 #plt.xticks(rotation=45, ha='right')
 ax3.set(ylabel="Slope")
-ax3.set(Title="Slope of Covid-19 log(cases) in different countries" )
+ax3.set(Title="Slope of Covid-19 log(cases) in different countries(last week in transparent)" )
 #x=linreg.keys()
 #y=linreg.slope
 #yerr=linreg.stderr
-ax3.bar(x,y,yerr=yerr,color=colorlist)
+ax3.bar(x,y,yerr=yerr,color=colorlist,width=0.4, ls='dashed', lw=2 )
+ax3.bar(x,z,yerr=zerr,color=colorlist,width=0.8,alpha = 0.5, ls='dotted', lw=2 )
 ax3.tick_params(axis='x', labelrotation=45 )
 fig2 = ax3.get_figure()
 plt.xticks(rotation=45, ha='right')
 fig2.savefig(os.path.join(image_dir, 'slope.png'))
 plt.close('all')
+
 
 x=[]
 y=[]
@@ -491,7 +517,6 @@ mark=0
 col=0
 colorlist=[]
 fig2, (ax2, ax3) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]},figsize=(20,15))
-mindeaths=5
 for country in deathscountries:
     newdf=merged_df.loc[merged_df['country'] == country]
     if newdf['deaths'].max()<mindeaths: continue
