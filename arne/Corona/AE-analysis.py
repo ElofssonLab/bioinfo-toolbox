@@ -19,19 +19,15 @@ import glob
 import math
 import wget
 import docopt
-import pickle
+#import pickle
 import os.path
 from dateutil.parser import parse
 from datetime import datetime,date,time, timedelta
 from dateutil import parser
-import pyarrow
+#import pyarrow
 import matplotlib.pyplot as plt
 # %matplotlib inline
 from scipy.stats import linregress
-
-font = {'weight' : 'bold',
-        'size'   : 22}
-plt.rc('font', **font)
 
 def fix_country_names(df):
     translations = {'United_States_of_America':'USA',
@@ -50,6 +46,75 @@ def fix_country_names(df):
 
 
 
+# Plot and save trendlinae graph
+def nations_trend_line(tmp_df, name, cumconfirmed, cumdeath, ncases,ndeath,cdays,lincases,ddays,lindeaths):
+    f, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]},figsize=(20,15))
+    tmp_df.groupby(['date'])[[cumconfirmed, cumdeath,lincases,lindeaths]].sum().plot(ax=ax1, marker='o')
+    ax1.set_yscale('log')
+    ax1.set(ylim=(0.5,maxcases))
+    ax1.tick_params(axis='x', labelrotation=45 )
+    days = tmp_df.groupby(['date'])[[cdays]].max()
+    deathdays = tmp_df.groupby(['date'])[[ddays]].max()
+    tmp = tmp_df.groupby(['date'])[[ncases]].sum()
+    tmp2 = tmp_df.groupby(['date'])[[ndeath]].sum()
+    tmp5 = tmp_df.groupby(['date'])[[cumconfirmed]].sum()
+    tmp6 = tmp_df.groupby(['date'])[[cumdeath]].sum()
+    ratio = tmp6[cumdeath]/tmp5[cumconfirmed]
+    if tmp[ncases].max()>0:
+        ax1.bar(tmp.index,tmp[ncases], color="red",width=0.4)
+
+        
+    
+    # We need to check if we have any deaths
+    #print (tmp_df[ndeath])
+    if tmp2[ndeath].max()>0:
+        ax1.bar(tmp2.index,tmp2[ndeath], color="blue",width=0.9)
+    #ax.set(xlabel="Days since > " + str(cutoff) + "cases")
+    ax1.set(ylabel="Number of cases")
+    ax1.set(Title="Covid-19 cases in " + name)
+    #ax1.plot(tmp4.index, tmp4[lincases], 'red', label="Exponential curve fit cases")
+    ax1.legend()
+    
+    fig = ax1.get_figure()
+    x=tmp_df.groupby(['date'])['date'].first()
+    ax2.bar(ratio.index,ratio,width=0.8, color="green")
+    ax2.tick_params(axis='x', labelrotation=45 )
+    ax2.set(ylim=(0.,0.1))
+    plt.xticks(rotation=45, ha='right')
+    ax2.set(ylabel="Ratio of death")
+    fig.savefig(os.path.join(image_dir, name+'_trendline.png'.format(cumconfirmed)))
+    plt.close(fig)
+    plt.close('all')
+    #sys.exit()
+
+def create_trend_line(tmp_df, col, col2, col3):
+    fig, ax = plt.subplots(figsize=(20,10))
+    tmp_df.groupby(['date'])[[col, col2, col3]].sum().plot(ax=ax, marker='o')
+    fig = ax.get_figure()
+    fig.savefig(os.path.join(image_dir, '{}_trendline.png'.format(col)))
+
+def create_bar(tmp_df, col, rgb):
+    fig, ax = plt.subplots(figsize=(20,10))
+    tmp = tmp_df.groupby(['date'])[[col]].sum()
+    tmp.plot.bar(ax=ax, rot=45, color=rgb)
+    fig = ax.get_figure()
+    fig.savefig(os.path.join(image_dir, '{}_bar.png'.format(col)))
+    
+def create_stacked_bar(tmp_df, col1, col2, fig_title):
+    tmp_df = tmp_df.set_index('date')
+    fig, ax = plt.subplots(figsize=(20,10))
+    tmp_df[[col2, col1]].plot.bar(ax=ax,
+                                  rot=45,
+                                  stacked=True,
+                                  title=fig_title);
+    fig = ax.get_figure()
+    fig.savefig(os.path.join(image_dir, '{}_stacked_bar.png'.format(col2)))
+    
+
+    
+# Set fonts etc.
+font = {'weight' : 'bold',   'size'   : 22}
+plt.rc('font', **font)
 
 #set ggplot style
 plt.style.use('ggplot')
@@ -64,6 +129,12 @@ mindeaths=5
 maxdeaths=1000
 minnum=50
 maxnum=10000
+
+# Countries to select
+minconfirmed=1000
+
+# Cutoff to select startdate for expinential vurved
+cutoff=500
 # Plotting parameters
 daysbefore=-10
 daysafter=45
@@ -72,15 +143,25 @@ maxcases=125000
 mindeathcases=1
 maxdeathcases=7500
 
+
 args = docopt.docopt(__doc__)
-out = args['--output_folder']
+out_dir = args['--output_folder']
 
 # Dynamic parameters
-data_dir  = os.path.join(out, 'data'  )+"/" # , str(datetime.date(datetime.now())))
-agg_file  = 'agg_data_{}.parquet.gzip'.format(datetime.date(datetime.now()))
-trend_file  = 'trend_{}.csv'.format(datetime.date(datetime.now()))
-#report  = 'report_{}.xlsx'.format(datetime.date(datetime.now()))
+data_dir  = out_dir # os.path.join(out, 'data'  )+"/" # , str(datetime.date(datetime.now())))
 ECDC = "https://www.ecdc.europa.eu/sites/default/files/documents/"  # +2020-03-20+".xlsx
+# import data
+image_dir =  out_dir #os.path.join(out,'reports', 'images')
+reports_dir = out_dir  #os.path.join(out,'reports')
+if not os.path.exists(image_dir):
+    print('Creating reports folder...')
+    os.system('mkdir -p ' + image_dir)
+if not os.path.exists(data_dir):
+    print('Creating reports folder...')
+    os.system('mkdir -p ' + data_dir)
+if not os.path.exists(reports_dir):
+    print('Creating reports folder...')
+    os.system('mkdir -p ' + reports_dir)
 
 today=date.today()
 yesterday=date.today() - timedelta(1)
@@ -96,6 +177,9 @@ if not os.path.isfile(infile):
     except:
         excelfile="COVID-19-geographic-disbtribution-worldwide-"+str(yesterday)+".xlsx"
         infile=data_dir+"/"+excelfile
+        if not os.path.isfile(infile):
+            URL=ECDC+excelfile
+            excelfile=wget.download(URL, out=data_dir)
 
 print('Importing Data...')
 print("Using: ",infile)
@@ -122,17 +206,6 @@ merged_df=agg_df.rename(columns={
 # Remove a few dupliaed names
 merged_df=merged_df.drop_duplicates(['country','date'], keep='last')
 
-# import data
-#Create place to save diagrams
-image_dir =  os.path.join(out,'reports', 'images')
-reports_dir =  os.path.join(out,'reports')
-if not os.path.exists(image_dir):
-    print('Creating reports folder...')
-    os.system('mkdir -p ' + image_dir)
-
-if not os.path.exists(reports_dir):
-    print('Creating reports folder...')
-    os.system('mkdir -p ' + reports_dir)
 
 # We shoudl complete the database with all missing dates.
 first=merged_df["date"].to_list()[0]
@@ -175,20 +248,14 @@ for country in countries: # ["Afghanistan","Sweden","China"]: #countries:
 
 #print (startdeaths,startdate)
 tiny=0.001
+
 def Days(x,y):
     return (x-startdate[y]).days
 def DeathsDays(x,y):
     return (x-startdeaths[y]).days
 
-
 merged_df['Days']=merged_df.apply(lambda x:Days(x.date,x.country), axis=1)
 merged_df['DeathsDays']=merged_df.apply(lambda x:DeathsDays(x.date,x.country), axis=1)
-#print(merged_df['Days'])
-#merged_df['DeathsDate']=merged_df.apply(lambda x:startdeaths[x.country], axis=1)
-#merged_df['StartDate']=merged_df.apply(lambda x:startdate[x.country], axis=1)
-#merged_df['FirstDate']=merged_df.apply(lambda x:firstdate[x.country], axis=1)
-#merged_df.to_csv(reports_dir+"/temp.csv", sep=',')
-#print (merged_df)
 merged_df['LogCases']=merged_df['confirmed'].apply(lambda x:(math.log(max(x,tiny))))
 merged_df['LogDeaths']=merged_df['deaths'].apply(lambda x:(math.log(max(x,tiny))))
 merged_df['Ratio'] = merged_df["deaths"]/merged_df["confirmed"]
@@ -218,8 +285,6 @@ for country in countries:
                                             ignore_index=True)
             #merged_df.append(data, ignore_index=True)
         else:
-            
-            #print (country,date,merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)]['confirmed'])
             c=int(merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)]['confirmed'])
             d=int(merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)]['deaths'])
             #r=int(merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)]['recovered'])
@@ -231,7 +296,6 @@ for country in countries:
         linreg[country]=linregress([0.0,1.0],[0.0,0.0])
         continue
     linreg[country]=linregress(newdf['Days'],newdf['LogCases'])
-    #print (linreg[country])
     countrylist[country]=linreg[country].slope
     
 tmplist = sorted(countrylist.items() , reverse=True, key=lambda x: x[1])
@@ -277,93 +341,12 @@ merged_df=merged_df.sort_values(by=['country', 'date'])
 merged_df.to_csv(reports_dir+"/merged.csv", sep=',')
 
 # ------------------------------------------------------------------------
-
-#
-#sys.exit()
-
-
-#merged_df['StartDate']=merged_df.loc[merged_df['country'] == country]["date"].apply(lambda x:startdate)
-#merged_df['FirstDate']=merged_df.loc[merged_df['country'] == country]["date"].apply(lambda x:firstdate)
-##### Define Graphs #####
-
-# Plot and save trendlinae graph
-def nations_trend_line(tmp_df, name, cumconfirmed, cumdeath, ncases,ndeath,cdays,lincases,ddays,lindeaths):
-    f, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]},figsize=(20,15))
-    #print (tmp_df)
-    #fig = plt.subplots()
-    #ax=plt.subplot(2,1,1)
-    tmp_df.groupby(['date'])[[cumconfirmed, cumdeath,lincases,lindeaths]].sum().plot(ax=ax1, marker='o')
-    ax1.set_yscale('log')
-    ax1.set(ylim=(0.5,maxcases))
-    ax1.tick_params(axis='x', labelrotation=45 )
-    #ax1.set_xticklabels(labels=tmp_df.groupby(['date'])['date'], rotation=45 )
-    #tmp_df.groupby(['date'])[[ncases]].sum().plot.bar()
-    days = tmp_df.groupby(['date'])[[cdays]].max()
-    deathdays = tmp_df.groupby(['date'])[[ddays]].max()
-    tmp = tmp_df.groupby(['date'])[[ncases]].sum()
-    tmp2 = tmp_df.groupby(['date'])[[ndeath]].sum()
-    tmp5 = tmp_df.groupby(['date'])[[cumconfirmed]].sum()
-    tmp6 = tmp_df.groupby(['date'])[[cumdeath]].sum()
-    ratio = tmp6[cumdeath]/tmp5[cumconfirmed]
-    if tmp[ncases].max()>0:
-        ax1.bar(tmp.index,tmp[ncases], color="red",width=0.4)
-
-        
-    
-    # We need to check if we have any deaths
-    #print (tmp_df[ndeath])
-    if tmp2[ndeath].max()>0:
-        ax1.bar(tmp2.index,tmp2[ndeath], color="blue",width=0.9)
-    #ax.set(xlabel="Days since > " + str(cutoff) + "cases")
-    ax1.set(ylabel="Number of cases")
-    ax1.set(Title="Covid-19 cases in " + name)
-    #ax1.plot(tmp4.index, tmp4[lincases], 'red', label="Exponential curve fit cases")
-    ax1.legend()
-    
-    fig = ax1.get_figure()
-    x=tmp_df.groupby(['date'])['date'].first()
-    ax2.bar(ratio.index,ratio,width=0.8, color="green")
-    ax2.tick_params(axis='x', labelrotation=45 )
-    ax2.set(ylim=(0.,0.1))
-    plt.xticks(rotation=45, ha='right')
-    #y=tmp_df.apply(lambda x:Division(x.deaths,x.confirmed))
-    #ax2.bar(x,y, color="green",label="Ratio")
-    ax2.set(ylabel="Ratio of death")
-    fig.savefig(os.path.join(image_dir, name+'_trendline.png'.format(cumconfirmed)))
-    plt.close()
-    #sys.exit()
-
-def create_trend_line(tmp_df, col, col2, col3):
-    fig, ax = plt.subplots(figsize=(20,10))
-    tmp_df.groupby(['date'])[[col, col2, col3]].sum().plot(ax=ax, marker='o')
-    fig = ax.get_figure()
-    fig.savefig(os.path.join(image_dir, '{}_trendline.png'.format(col)))
-
-def create_bar(tmp_df, col, rgb):
-    fig, ax = plt.subplots(figsize=(20,10))
-    tmp = tmp_df.groupby(['date'])[[col]].sum()
-    tmp.plot.bar(ax=ax, rot=45, color=rgb)
-    fig = ax.get_figure()
-    fig.savefig(os.path.join(image_dir, '{}_bar.png'.format(col)))
-    
-def create_stacked_bar(tmp_df, col1, col2, fig_title):
-    tmp_df = tmp_df.set_index('date')
-    fig, ax = plt.subplots(figsize=(20,10))
-    tmp_df[[col2, col1]].plot.bar(ax=ax,
-                                  rot=45,
-                                  stacked=True,
-                                  title=fig_title);
-    fig = ax.get_figure()
-    fig.savefig(os.path.join(image_dir, '{}_stacked_bar.png'.format(col2)))
-    
-    
 ##### Create Graphs #####
     
 print('Creating graphs...')
 print('... Time Series Trend Line')
 
 
-cutoff=500
 fig, ax = plt.subplots(figsize=(20,10))
 ax.set_yscale('log')
 mark=0
@@ -396,8 +379,9 @@ ax.set(Title="Covid-19 in countries")
 ax.legend()
 fig = ax.get_figure()
 fig.savefig(os.path.join(image_dir, 'COUNTRIES_trendline.png'.format(col)))
-plt.close()
-
+#plt.show(block=False)
+#time.sleep(5)
+plt.close('all')
 
 c=[]
 r=[]
@@ -435,7 +419,7 @@ ax1.set_yscale('log')
 fig = ax1.get_figure()
 fig = ax2.get_figure()
 fig.savefig(os.path.join(image_dir, 'ratio_bar.png'.format(col)))
-
+plt.close('all')
 
 
 # regression data for countr
@@ -448,8 +432,7 @@ mark=0
 col=0
 colorlist=[]
 
-    
-minconfirmed=1000
+print('... Time Series Trend Line')
 fig2, (ax2, ax3) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]},figsize=(20,15))
 for country in sortedcountries:
     newdf=merged_df.loc[merged_df['country'] == country]
@@ -481,7 +464,7 @@ for country in sortedcountries:
     col+=1
     if col>=len(colours): col=0
         
-    #plt.close()
+    #plt.close('all')
 
 ax2.set_yscale('log')
 ax2.set(ylabel="Log(Commulative cases)")
@@ -499,6 +482,7 @@ ax3.tick_params(axis='x', labelrotation=45 )
 fig2 = ax3.get_figure()
 plt.xticks(rotation=45, ha='right')
 fig2.savefig(os.path.join(image_dir, 'slope.png'))
+plt.close('all')
 
 x=[]
 y=[]
@@ -522,7 +506,7 @@ for country in deathscountries:
     col+=1
     if col>=len(colours): col=0
         
-    #plt.close()
+    #plt.close('all')
 
 ax2.set_yscale('log')
 ax2.set(ylabel="Log(Commulative deaths)")
@@ -537,6 +521,7 @@ ax3.tick_params(axis='x', labelrotation=45 )
 fig2 = ax3.get_figure()
 plt.xticks(rotation=45, ha='right')
 fig2.savefig(os.path.join(image_dir, 'deathslope.png'))
+plt.close('all')
 
 #sys.exit()
 
