@@ -451,7 +451,7 @@ plt.xticks(rotation=45, ha='right')
 ax1.legend()
 ax2.bar(x,y,color="blue",width=0.8,alpha=0.5,lw=2)
 #ax2.bar(x,v,color="red",width=0.4,lw=2)  # This is actually confusing
-ax2.set(ylim=(0.,0.25))
+#ax2.set(ylim=(0.,0.25))
 plt.xticks(rotation=45, ha='right')
 #ax.set(xlabel="Days since > " + str(cutoff) + "cases")
 ax1.set(ylabel="Fraction of cases that are dead")
