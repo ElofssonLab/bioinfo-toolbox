@@ -265,8 +265,8 @@ def DeathsDays(x,y):
 
 merged_df['Days']=merged_df.apply(lambda x:Days(x.date,x.country), axis=1)
 merged_df['DeathsDays']=merged_df.apply(lambda x:DeathsDays(x.date,x.country), axis=1)
-merged_df['LogCases']=merged_df['confirmed'].apply(lambda x:(math.log(max(x,tiny))))
-merged_df['LogDeaths']=merged_df['deaths'].apply(lambda x:(math.log(max(x,tiny))))
+merged_df['LogCases']=merged_df['confirmed'].apply(lambda x:(np.log2(max(x,tiny))))
+merged_df['LogDeaths']=merged_df['deaths'].apply(lambda x:(np.log2(max(x,tiny))))
 merged_df['Ratio'] = merged_df["deaths"]/merged_df["confirmed"]
 
 
@@ -289,8 +289,8 @@ for country in countries:
                       #DeathsDate,
                       #StartDate,
                       #"FirstDate":first[country],
-                      "LogCases":math.log(c+tiny),
-                      "LogDeaths":math.log(d+tiny)},
+                      "LogCases":np.log2(c+tiny),
+                      "LogDeaths":np.log2(d+tiny)},
                                             ignore_index=True)
             #merged_df.append(data, ignore_index=True)
         else:
@@ -364,10 +364,10 @@ deathsreg["RoW"]=linregress(newdf['DeathsDays'],newdf['LogDeaths'])
 
 
 def LinExp(x,y):
-    return np.exp(linreg[y].intercept+linreg[y].slope*x)
+    return np.exp2(linreg[y].intercept+linreg[y].slope*x)
 
 def DeathsExp(x,y):
-    return np.exp(deathsreg[y].intercept+deathsreg[y].slope*x)
+    return np.exp2(deathsreg[y].intercept+deathsreg[y].slope*x)
 
 merged_df['LinCases']=merged_df.apply(lambda x:LinExp(x.Days,x.country), axis=1)
 merged_df['LinDeaths']=merged_df.apply(lambda x:DeathsExp(x.DeathsDays,x.country), axis=1)
@@ -501,8 +501,7 @@ for country in sortedcountries:
     fig = ax.get_figure()
     ax.legend()
 
-    ax2.plot(newdf['Days'], np.exp(linreg[country].intercept +
-                linreg[country].slope*newdf['Days']),color=colours[col]) #, label='fitted line'+str(linreg[country])
+    ax2.plot(newdf['Days'],newdf['LinCases'] ,color=colours[col]) #, label='fitted line'+str(linreg[country])
     ax2.scatter(newdf['Days'],newdf['confirmed'],label=country,marker=markers[mark],color=colours[col])
     colorlist+=[colours[col]]
     mark+=1
