@@ -62,6 +62,8 @@ def nations_trend_line(tmp_df, name, cumconfirmed, cumdeath, ncases,ndeath,cdays
     tmp5 = tmp_df.groupby(['date'])[[cumconfirmed]].sum()
     tmp6 = tmp_df.groupby(['date'])[[cumdeath]].sum()
     ratio = tmp6[cumdeath]/tmp5[cumconfirmed]
+    wratio =tmp6[cumdeath]/(tmp5[cumconfirmed].shift(7)+tiny)
+    #print (ratio,wratio)
     if tmp[ncases].max()>0:
         ax1.bar(tmp.index,tmp[ncases], color="red",width=0.4, ls='dashed', lw=2)
 
@@ -79,10 +81,12 @@ def nations_trend_line(tmp_df, name, cumconfirmed, cumdeath, ncases,ndeath,cdays
     
     fig = ax1.get_figure()
     x=tmp_df.groupby(['date'])['date'].first()
-    ax2.bar(ratio.index,ratio,width=0.8, color="green")
+    ax2.bar(ratio.index,ratio,width=0.8, alpha=0.5,lw=2, color="blue")
+    ax2.bar(wratio.index,wratio,width=0.4, color="red")
     ax2.tick_params(axis='x', labelrotation=45 )
-    ax2.set(ylim=(0.,0.1))
+    #ax2.set(ylim=(0.,0.2))
     plt.xticks(rotation=45, ha='right')
+    ax2.set(Title="Ratio of death (blue today red cmp with cases a week ago)")
     ax2.set(ylabel="Ratio of death")
     fig.savefig(os.path.join(image_dir, name+'_trendline.png'.format(cumconfirmed)))
     plt.close(fig)
@@ -252,7 +256,7 @@ for country in countries: # ["Afghanistan","Sweden","China"]: #countries:
     startdeaths[country]=deathsstart
 
 #print (startdeaths,startdate)
-tiny=0.001
+tiny=0.000001
 
 def Days(x,y):
     return (x-startdate[y]).days
@@ -313,7 +317,7 @@ for i in range(0,len(tmplist)):
 weeklist={}
 weekreg={}
 for country in countries:
-    newdf=merged_df.loc[(merged_df['date']>aweekago) &(merged_df['country'] == country)]
+    newdf=merged_df.loc[(merged_df['date']>pd.Timestamp(aweekago)) &(merged_df['country'] == country)]
     if (len(newdf)<4):
         weekreg[country]=linregress([0.0,1.0],[0.0,0.0])
         continue
@@ -325,7 +329,7 @@ tmplist = sorted(weeklist.items() , reverse=True, key=lambda x: x[1])
 weekdeathslist={}
 weekdeaths={}
 for country in merged_df['country'].drop_duplicates():
-    newdf=merged_df.loc[(merged_df['date']>aweekago) & (merged_df['country'] == country)]
+    newdf=merged_df.loc[(merged_df['date']>pd.Timestamp(pd.Timestamp(aweekago))) & (merged_df['country'] == country)]
     if (len(newdf)<4):
         weekdeaths[country]=linregress([0.0,1.0],[0.0,0.0])
         continue
@@ -420,33 +424,38 @@ r=[]
 list={}
 for country in countries:
     tempdf=merged_df.loc[merged_df['country'] == country]
+    weekdf=tempdf.loc[(tempdf['date']<pd.Timestamp(pd.Timestamp(aweekago)))]
+
     y=tempdf[['confirmed','deaths']].max()
+    q=weekdf[['confirmed','deaths']].max()
     if (y.deaths>1 or y.confirmed>100):
         c+=[country]
         r+=[y.deaths/y.confirmed]
-        list[country]=[(0.0000000001+y.deaths)/y.confirmed,y.deaths,y.confirmed]
-
-
+        list[country]=[(tiny+y.deaths)/y.confirmed,y.deaths,y.confirmed,(tiny+y.deaths)/max(tiny,q.confirmed)]
 fig, (ax1, ax2) = plt.subplots(2,1,gridspec_kw={'height_ratios': [1, 3]},figsize=(20,15))
 tmplist=sorted(list.items() , reverse=True, key=lambda x: x[1])
 x=[]
 y=[]
 z=[]
 w=[]
+v=[]
 for i in range(0,len(tmplist)):
     x+=[tmplist[i][0]]
     y+=[float(tmplist[i][1][0])]
     z+=[float(tmplist[i][1][1])]
     w+=[float(tmplist[i][1][2])]
+    v+=[float(tmplist[i][1][3])]
 ax1.bar(np.arange(0,len(x))-0.2,z,width=0.4,color="green",label="Deaths")
 ax1.bar(np.arange(0,len(x))+0.2,w,width=0.4,color="red",label="Cases")
 plt.xticks(rotation=45, ha='right')
 ax1.legend()
-ax2.bar(x,y,color="green")
+ax2.bar(x,y,color="blue",width=0.8,alpha=0.5,lw=2)
+#ax2.bar(x,v,color="red",width=0.4,lw=2)  # This is actually confusing
+ax2.set(ylim=(0.,0.25))
 plt.xticks(rotation=45, ha='right')
 #ax.set(xlabel="Days since > " + str(cutoff) + "cases")
-ax1.set(ylabel="Fraction of cases that are dead (min 5 deaths)")
-ax1.set(Title="Deaths Ration in countries")
+ax1.set(ylabel="Fraction of cases that are dead")
+ax1.set(Title="Deaths Ratios in countries")
 ax1.set_yscale('log')
 fig = ax1.get_figure()
 fig = ax2.get_figure()
@@ -461,7 +470,6 @@ y=[]
 yerr=[]
 z=[]
 zerr=[]
-
 mark=0
 col=0
 colorlist=[]
