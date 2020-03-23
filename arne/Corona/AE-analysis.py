@@ -84,7 +84,7 @@ def nations_trend_line(tmp_df, name, cumconfirmed, cumdeath, ncases,ndeath,cdays
     ax2.bar(ratio.index,ratio,width=0.8, alpha=0.5,lw=2, color="blue")
     ax2.bar(wratio.index,wratio,width=0.4, color="red")
     ax2.tick_params(axis='x', labelrotation=45 )
-    #ax2.set(ylim=(0.,0.2))
+    ax2.set(ylim=(0.,0.25))
     plt.xticks(rotation=45, ha='right')
     ax2.set(Title="Ratio of death (blue today red cmp with cases a week ago)")
     ax2.set(ylabel="Ratio of death")
