@@ -405,13 +405,13 @@ y=[]
 z=[]
 #print (sorted_td)
 maxcountries=50
-for i in range(0,min(maxcountries,len(sorted_d))):
-    x+=[sorted_d[i][0]]
-    y+=[sorted_d[i][1]]
+for i in range(0,min(maxcountries,len(sorted_td))):
+    x+=[sorted_td[i][0]]
+    z+=[sorted_td[i][1]]
     try:
-        z+=[totalcases[sorted_d[i][0]]]
+        y+=[totaldeaths[sorted_d[i][0]]]
     except:
-        z+=[0]
+        y+=[0]
 #print (x,y)
 ax.bar(x,y,width=0.8,alpha=0.5,color="red")
 ax.bar(x,z,width=0.4,color="blue")
