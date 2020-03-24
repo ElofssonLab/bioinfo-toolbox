@@ -21,6 +21,7 @@ import wget
 import docopt
 #import pickle
 import os.path
+import operator
 from dateutil.parser import parse
 from datetime import datetime,date,time, timedelta
 from dateutil import parser
@@ -28,6 +29,8 @@ from dateutil import parser
 import matplotlib.pyplot as plt
 # %matplotlib inline
 from scipy.stats import linregress
+from scipy.optimize import curve_fit
+
 import matplotlib as mpl
 mpl.rc('figure', max_open_warning = 0)
 
@@ -50,7 +53,18 @@ def fix_country_names(df):
 
 # Plot and save trendlinae graph
 def nations_trend_line(tmp_df, name, cumconfirmed, cumdeath, ncases,ndeath,cdays,lincases,ddays,lindeaths):
+    global curvefit,curvedeaths
+    xdata=tmp_df[cdays].to_numpy()
+    ydata=tmp_df[cumconfirmed].apply(lambda x:(np.log2(max(x,tiny)))).to_numpy()
     f, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]},figsize=(20,15))
+    if name in curvefit.keys():
+        yfit=sigmoidalfunction(xdata,ydata,curvefit[name][1],curvefit[name][2],curvefit[name][3],curvefit[name][4])
+        ynum=np.exp2(yfit)
+        ax1.plot(tmp_df['date'],ynum,label="sigmoidal curve fitting, max: "+str(round(np.exp2(curvefit[name][2]),0)))
+    if name in curvedeath.keys():
+        yfit=sigmoidalfunction0(xdata,ydata,curvedeath[name][1],curvedeath[name][2],curvedeath[name][3]) # ,curvedeath[name][4])
+        ynum=np.exp2(yfit)
+        ax1.plot(tmp_df['date'],ynum,label="sigmoidal death, max: "+str(round(np.exp2(curvedeath[name][2]),0)))
     tmp_df.groupby(['date'])[[cumconfirmed, cumdeath,lincases,lindeaths]].sum().plot(ax=ax1, marker='o')
     ax1.set_yscale('log')
     ax1.set(ylim=(0.5,maxcases))
@@ -298,20 +312,116 @@ for country in countries:
             d=int(merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)]['deaths'])
             #r=int(merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)]['recovered'])
 
+        
 linreg={}
 countrylist={}
 for country in countries:
     newdf=merged_df.loc[(merged_df['confirmed']>minnum) & (merged_df['confirmed']<maxnum) &(merged_df['country'] == country)]
-    if (len(newdf)<4):
+    if (len(newdf)<4): # We need 6 points to fit a curve to the sigmoidal function.
         linreg[country]=linregress([0.0,1.0],[0.0,0.0])
         continue
     linreg[country]=linregress(newdf['Days'],newdf['LogCases'])
     countrylist[country]=linreg[country].slope
-    
+
 tmplist = sorted(countrylist.items() , reverse=True, key=lambda x: x[1])
 sortedcountries=[]
 for i in range(0,len(tmplist)):
     sortedcountries+=[tmplist[i][0]]
+
+    # Sigmoidal (in log) funcion fit
+def sigmoidalfunction(x,y,k,m,a,b):
+    f=[]
+    for i in x:
+        f+=[(m-b) / (1 + np.exp(-k*(i-a))) + b ]
+    return f
+def sigmoidalfunction0(x,y,k,m,a):
+    f=[]
+    b=0
+    for i in x:
+        f+=[(m-b) / (1 + np.exp(-k*(i-a))) + b ]
+    return f
+
+
+curvefit={}
+totalcases={}
+for country in countries:
+    for test in [10,5,2,1,0]:
+        newdf=merged_df.loc[(merged_df['country'] == country) & (merged_df['confirmed'] >test )]
+        #print (country,mincases)
+        xdata=newdf['Days'].to_numpy()
+        ydata=newdf['LogCases'].to_numpy()
+        try:
+            curvefit[country], pcov = curve_fit(sigmoidalfunction,xdata,ydata) #,bounds=par_bounds)
+            if curvefit[country][2]<22:
+                totalcases[country]=np.exp2(curvefit[country][2])
+                break
+        except:
+            continue
+            #print ("error with ",country)
+#sys.exit()
+#print (totalcases)
+fig, ax = plt.subplots(figsize=(20,10))
+sorted_td = sorted(totalcases.items(), key=operator.itemgetter(1),reverse=True)
+x=[]
+y=[]
+#print (sorted_td)
+#maxcountries=50
+#for i in range(0,min(maxcountries,len(sorted_td))):
+#    x+=[sorted_td[i][0]]
+#    y+=[sorted_td[i][1]]
+#print (x,y)
+#ax.bar(x,y,width=0.4)
+#ax.set_yscale('log')
+#ax.set(ylabel="Number of cases")
+#ax.set(title="Predicted total number of cases")
+#plt.xticks(rotation=45, ha='right')
+#fig = ax.get_figure()
+#fig.savefig(os.path.join(image_dir, 'total_bar.png'))
+
+
+
+curvedeath={}
+totaldeaths={}
+for country in countries:
+    for test in [1,2,5,0,10,20,100]:
+        newdf=merged_df.loc[(merged_df['country'] == country) & (merged_df['deaths'] >test )]
+        #print (country,mincases)
+        xdata=newdf['Days'].to_numpy()
+        ydata=newdf['LogDeaths'].to_numpy()
+        try:
+            curvedeath[country], pcov = curve_fit(sigmoidalfunction0,xdata,ydata) #,bounds=par_bounds)
+            if curvedeath[country][2]<18:
+                totaldeaths[country]=np.exp2(curvedeath[country][2])
+                break
+        except:
+            continue
+            #print ("error with ",country)
+#sys.exit()
+#print (totaldeaths)
+fig, ax = plt.subplots(figsize=(20,10))
+sorted_d = sorted(totaldeaths.items(), key=operator.itemgetter(1),reverse=True)
+x=[]
+y=[]
+z=[]
+#print (sorted_td)
+maxcountries=50
+for i in range(0,min(maxcountries,len(sorted_d))):
+    x+=[sorted_d[i][0]]
+    y+=[sorted_d[i][1]]
+    try:
+        z+=[totalcases[sorted_d[i][0]]]
+    except:
+        z+=[0]
+#print (x,y)
+ax.bar(x,y,width=0.8,alpha=0.5,color="red")
+ax.bar(x,z,width=0.4,color="blue")
+ax.set_yscale('log')
+ax.set(ylabel="Number of Cases/Deaths")
+ax.set(title="Predicted total number of cases (blue) /deaths (red)")
+plt.xticks(rotation=45, ha='right')
+fig = ax.get_figure()
+fig.savefig(os.path.join(image_dir, 'total_bar.png'))
+
 
 # This is to get the corrent (last week) linregression in cases
 weeklist={}
@@ -371,6 +481,9 @@ def DeathsExp(x,y):
 
 merged_df['LinCases']=merged_df.apply(lambda x:LinExp(x.Days,x.country), axis=1)
 merged_df['LinDeaths']=merged_df.apply(lambda x:DeathsExp(x.DeathsDays,x.country), axis=1)
+
+
+#optimized2_ydata = my_func(xdata, ydata, est2_w, est2_k)
 
 merged_df=merged_df.sort_values(by=['country', 'date'])
             
@@ -588,7 +701,9 @@ tempdf=merged_df.loc[merged_df['country'] != "China"]
 nations_trend_line(tempdf, "RestOfWorld",  'confirmed', 'deaths', "new_confirmed_cases","new_deaths","Days","LinCases",'DeathsDays',"LinDeaths")
 
 tempdf=merged_df.loc[merged_df['country'] == "China"]
-nations_trend_line(tempdf, "CHINA",  'confirmed', 'deaths', "new_confirmed_cases","new_deaths","Days","LinCases",'DeathsDays',"LinDeaths")
+nations_trend_line(tempdf, "China",  'confirmed', 'deaths', "new_confirmed_cases","new_deaths","Days","LinCases",'DeathsDays',"LinDeaths")
+
+#sys.exit()
 
 for country in countries:
     tempdf=merged_df.loc[merged_df['country'] == country]
