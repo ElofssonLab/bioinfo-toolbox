@@ -15,6 +15,7 @@ from __future__ import print_function
 import pandas as pd
 import numpy as np
 import os
+import re
 import glob
 import math
 import wget
@@ -726,42 +727,39 @@ for country in countries:
 #
 print ('Makeing HTML file')
 
-allplots = glob.glob(out_dir+'/*.png')
+        
+#topcountries=merged_df['country'].drop_duplicates()
 
-topcountries=merged_df['country'].drop_duplicates()
 
-selectedcountries=["China","Italy","USA","UK","South_Korea","Gemany","Sweden","Norway","Spain","Denmark","Finland"]
-
+selectedcountries="China|Italy|USA|UK|South_Korea|Germany|Sweden|Norway|Spain|Denmark|Finland"
+overviewfiles="merged|slope|deaths|total"
+allplots=[]
 plots=[]
-for country in selectedcountries:
-    plots+=glob.glob(out_dir+'/'+country+'*.png')
+overview=[]
+for f in os.listdir(out_dir):
+    if (f.endswith(".png")):
+        allplots +=[f]
+    if (re.match(selectedcountries, f)):
+        plots +=[f]
+    if (re.match(overviewfiles, f)):
+        overview +=[f]
 
-summaryplots=[]
-for p in ["merged","slope","deaths","total"]:
-    summaryplots+=glob.glob(out_dir+'/'+p+'*.png')
+#cvs = glob.glob(out_dir+'/*.csv')
 
-cvs = glob.glob(out_dir+'/*.csv')
-
-with document(title='Arne Elofsson Corona') as index:
+with document(title='Arne Elofsson Corona') as doc:
     h1('Corona Data')
-
-    for path in summaryplots:
+    for path in overview:
         div(img(src=path), _class='photo')
 
     h3('Selected countries')
-    for path in summaryplots:
+    for path in plots:
         div(img(src=path), _class='photo')
             
-with open(out_dir+'/index.html', 'w') as f:
-    f.write(index.render())
-
-    
-with document(title='Plots') as doc:
-    h1('Plots')
+    h3('All countries')
     for path in allplots:
         div(img(src=path), _class='photo')
     
-with open(out_dir+'/all.html', 'w') as f:
+with open(out_dir+'/corona.html', 'w') as f:
     f.write(doc.render())
 
 print('Done!')
