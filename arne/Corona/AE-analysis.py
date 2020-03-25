@@ -1,20 +1,14 @@
 #!/usr/bin/env python3
 
-"""
-data_exploration.py - Extract data from date range and create models
-Usage:
-    data_exploration.py [options]
-    data_exploration.py -h | --help
-
-Options:
-    -h --help             Show this message.
-    --output_folder=OUT   Output folder for the data and reports to be saved
-"""
 
 from __future__ import print_function
 import pandas as pd
 import numpy as np
 import os
+import sys, traceback
+from pathlib import Path
+import argparse
+from argparse import RawTextHelpFormatter
 import re
 import glob
 import math
@@ -171,8 +165,21 @@ ddaysbefore=-5
 ddaysafter=20
 
 
-args = docopt.docopt(__doc__)
-out_dir = args['--output_folder']
+##args = docopt.docopt(__doc__)
+#out_dir = args['--output_folder']
+
+
+p = argparse.ArgumentParser(description = 
+                                     '- AE-analysis.py - Extract data from date range and create models -',
+            formatter_class=RawTextHelpFormatter)
+p.add_argument('-f','--force', required= False, help='Force', action='store_true')
+p.add_argument('-out','--output_folder', required= False, help='output folder')
+ns = p.parse_args()
+
+if ns.output_folder:
+    out_dir = ns.output_folder
+else:
+    out_dir=home = str(Path.home())+"/Desktop/Corona/"
 
 # Dynamic parameters
 data_dir  = out_dir # os.path.join(out, 'data'  )+"/" # , str(datetime.date(datetime.now())))
@@ -204,11 +211,18 @@ if not os.path.isfile(infile):
         #os.sys("wget -c " + URL + " -O " + infile )
         excelfile=wget.download(URL, out=data_dir)
     except:
+        if not ns.force:
+            print ("Exiting as there is no new data yet, use --force to rerun on yesterdays data")
+            sys.exit(0)
         excelfile="COVID-19-geographic-disbtribution-worldwide-"+str(yesterday)+".xlsx"
         infile=data_dir+"/"+excelfile
         if not os.path.isfile(infile):
             URL=ECDC+excelfile
             excelfile=wget.download(URL, out=data_dir)
+else:
+    print ("Exiting as todays date is already run, use --force to rerun")
+    sys.exit(0)
+    
 
 print('Importing Data...')
 print("Using: ",infile)
