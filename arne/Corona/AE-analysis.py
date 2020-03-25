@@ -22,6 +22,9 @@ import docopt
 #import pickle
 import os.path
 import operator
+from dominate import document
+from dominate.tags import *
+
 from dateutil.parser import parse
 from datetime import datetime,date,time, timedelta
 from dateutil import parser
@@ -720,6 +723,45 @@ for country in countries:
 #new_df['new_confirmed_cases'] = daily_df.new_confirmed_cases
 #create_stacked_bar(merged_df, 'new_confirmed_cases', 'confirmed_cases', "Stacked bar of confirmed and new cases by day")
 
+#
+print ('Makeing HTML file')
 
+allplots = glob.glob(out_dir+'/*.png')
+
+topcountries=merged_df['country'].drop_duplicates()
+
+selectedcountries=["China","Italy","USA","UK","South_Korea","Gemany","Sweden","Norway","Spain","Denmark","Finland"]
+
+plots=[]
+for country in selectedcountries:
+    plots+=glob.glob(out_dir+'/'+country+'*.png')
+
+summaryplots=[]
+for p in ["merged","slope","deaths","total"]:
+    summaryplots+=glob.glob(out_dir+'/'+p+'*.png')
+
+cvs = glob.glob(out_dir+'/*.csv')
+
+with document(title='Arne Elofsson Corona') as index:
+    h1('Corona Data')
+
+    for path in summaryplots:
+        div(img(src=path), _class='photo')
+
+    h3('Selected countries')
+    for path in summaryplots:
+        div(img(src=path), _class='photo')
+            
+with open(out_dir+'/index.html', 'w') as f:
+    f.write(index.render())
+
+    
+with document(title='Plots') as doc:
+    h1('Plots')
+    for path in allplots:
+        div(img(src=path), _class='photo')
+    
+with open(out_dir+'/all.html', 'w') as f:
+    f.write(doc.render())
 
 print('Done!')
