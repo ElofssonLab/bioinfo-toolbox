@@ -140,12 +140,15 @@ markers = [ '.', ',', 'o', 'v', '^', '<', '>', '1', '2',
     '3', '4', '8', 's', 'p', '*', 'h', 'H', '+', 'x', 'D', 'd', '|',
     '_', 'P', 'X' ,1,2,3,4,5,6,7,8,9]
 
-#colours=['blue','green','red','cyan','magenta','yellow','black','grey','pink','brown']
+#colours=['blue','green','red','cyan','magenta','yellow','black','grey','pink','brown','magenta']
 colours=[]
 for name, hex in mpl.colors.cnames.items():
     #print(name, hex)
-    colours+=[name]
-    
+    rc = hex[1:3]  # red      
+    gc = hex[3:5]  # blue      
+    bc = hex[5:7]  # green 
+    if (int(rc,16)+int(gc,16)+int(bc,16)<512):
+        colours+=[name]    
 # Parameters for linreg
 mindeaths=5
 maxdeaths=1000
@@ -747,7 +750,7 @@ for country in slopelist.keys():
     if (len(slopelist[country])>minslopedays):
         ax.plot(np.arange(len(slopelist[country])),slopelist[country],label=country,lw=2,marker=markers[mark],color=colours[col])
         colorlist+=[colours[col]]
-        markerlist+=[markers[col]]
+        markerlist+=[markers[mark]]
         mark+=1
         if mark>=len(markers): mark=0
         col+=1
@@ -770,7 +773,7 @@ for country in deathslopelist.keys():
     if (len(deathslopelist[country])>minslopeddays):
         ax.plot(np.arange(len(deathslopelist[country])),deathslopelist[country],lw=3,label=country,marker=markers[mark],color=colours[col])
         colorlist+=[colours[col]]
-        markerlist+=[markers[col]]
+        markerlist+=[markers[mark]]
         mark+=1
         if mark>=len(markers): mark=0
         col+=1
