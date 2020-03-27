@@ -100,7 +100,7 @@ def nations_trend_line(tmp_df, name, cumconfirmed, cumdeath, ncases,ndeath,cdays
     plt.xticks(rotation=45, ha='right')
     ax2.set(Title="Ratio of death (blue today red cmp with cases a week ago)")
     ax2.set(ylabel="Ratio of death")
-    fig.savefig(os.path.join(image_dir, name+'_trendline.png'.format(cumconfirmed)))
+    fig.savefig(os.path.join(nation_dir, name+'_trendline.png'.format(cumconfirmed)))
     plt.close(fig)
     plt.close('all')
     #sys.exit()
@@ -163,7 +163,8 @@ mindeathcases=1
 maxdeathcases=7500
 ddaysbefore=-5
 ddaysafter=20
-
+minslopedays=10
+minslopeddays=5
 
 ##args = docopt.docopt(__doc__)
 #out_dir = args['--output_folder']
@@ -186,10 +187,15 @@ data_dir  = out_dir # os.path.join(out, 'data'  )+"/" # , str(datetime.date(date
 ECDC = "https://www.ecdc.europa.eu/sites/default/files/documents/"  # +2020-03-20+".xlsx
 # import data
 image_dir =  out_dir #os.path.join(out,'reports', 'images')
-reports_dir = out_dir  #os.path.join(out,'reports')
+nation_dir =  os.path.join(out_dir,'nations')
+reports_dir = os.path.join(out_dir,'data')
+
 if not os.path.exists(image_dir):
     print('Creating reports folder...')
     os.system('mkdir -p ' + image_dir)
+if not os.path.exists(nation_dir):
+    print('Creating nation folder...')
+    os.system('mkdir -p ' + nation_dir)
 if not os.path.exists(data_dir):
     print('Creating reports folder...')
     os.system('mkdir -p ' + data_dir)
@@ -359,6 +365,7 @@ def sigmoidalfunction0(x,y,k,m,a):
         f+=[(m-b) / (1 + np.exp(-k*(i-a))) + b ]
     return f
 
+print ("Plotting sigmoidal fit")
 
 curvefit={}
 totalcases={}
@@ -378,26 +385,11 @@ for country in countries:
             #print ("error with ",country)
 #sys.exit()
 #print (totalcases)
-fig, ax = plt.subplots(figsize=(20,10))
+#fig, ax = plt.subplots(figsize=(20,10))
 sorted_td = sorted(totalcases.items(), key=operator.itemgetter(1),reverse=True)
 x=[]
 y=[]
-#print (sorted_td)
-#maxcountries=50
-#for i in range(0,min(maxcountries,len(sorted_td))):
-#    x+=[sorted_td[i][0]]
-#    y+=[sorted_td[i][1]]
-#print (x,y)
-#ax.bar(x,y,width=0.4)
-#ax.set_yscale('log')
-#ax.set(ylabel="Number of cases")
-#ax.set(title="Predicted total number of cases")
-#plt.xticks(rotation=45, ha='right')
-#fig = ax.get_figure()
-#fig.savefig(os.path.join(image_dir, 'total_bar.png'))
-
-
-
+#
 curvedeath={}
 totaldeaths={}
 for country in countries:
@@ -441,6 +433,32 @@ fig = ax.get_figure()
 fig.savefig(os.path.join(image_dir, 'total_bar.png'))
 
 
+# This is to get the change in slope
+slopelist={}
+for country in countries:
+    ctoday=merged_df.loc[(merged_df['country']==country)]['Days'].max()
+    if ctoday>7:
+        slopelist[country]=[]
+    for days in range(7,ctoday):
+        newdf=merged_df.loc[(merged_df['Days']>days-7) &(merged_df['Days']<=days) &(merged_df['country'] == country)]
+        lr=linregress(newdf['Days'],newdf['LogCases'])
+        slopelist[country]+=[lr.slope]
+
+#print (slopelist)
+#sys.exit()
+# This is to get the change in slope
+deathslopelist={}
+for country in countries:
+    dtoday=merged_df.loc[(merged_df['country']==country)]['DeathsDays'].max()
+    if dtoday>7:
+        deathslopelist[country]=[]
+    for days in range(7,dtoday):
+        newdf=merged_df.loc[(merged_df['DeathsDays']>days-7) &(merged_df['DeathsDays']<=days) &(merged_df['country'] == country)]
+        lr=linregress(newdf['DeathsDays'],newdf['LogCases'])
+        deathslopelist[country]+=[lr.slope]
+
+#print (slopelist)
+
 # This is to get the corrent (last week) linregression in cases
 weeklist={}
 weekreg={}
@@ -456,7 +474,7 @@ tmplist = sorted(weeklist.items() , reverse=True, key=lambda x: x[1])
 
 weekdeathslist={}
 weekdeaths={}
-for country in merged_df['country'].drop_duplicates():
+for country in countries:
     newdf=merged_df.loc[(merged_df['date']>pd.Timestamp(pd.Timestamp(aweekago))) & (merged_df['country'] == country)]
     if (len(newdf)<4):
         weekdeaths[country]=linregress([0.0,1.0],[0.0,0.0])
@@ -469,7 +487,7 @@ tmplist = sorted(weeklist.items() , reverse=True, key=lambda x: x[1])
 
 deathslist={}
 deathsreg={}
-for country in merged_df['country'].drop_duplicates():
+for country in countries:
     newdf=merged_df.loc[(merged_df['deaths']>mindeaths) & (merged_df['deaths']<maxdeaths) & (merged_df['country'] == country)]
     if (len(newdf)<4):
         deathsreg[country]=linregress([0.0,1.0],[0.0,0.0])
@@ -511,6 +529,8 @@ merged_df.to_csv(reports_dir+"/merged.csv", sep=',')
 ##### Create Graphs #####
     
 print('Creating graphs...')
+
+
 print('... Time Series Trend Line')
 
 
@@ -549,6 +569,8 @@ fig.savefig(os.path.join(image_dir, 'COUNTRIES_trendline.png'.format(col)))
 #plt.show(block=False)
 #time.sleep(5)
 plt.close('all')
+
+
 
 c=[]
 r=[]
@@ -711,7 +733,51 @@ plt.close('all')
 # Time Series Data Plots
 
 
-print('... Daily Figures')
+print('... Slope figures')
+colorlist=[]
+markerlist=[]
+col=0
+mark=0
+fig, ax = plt.subplots(figsize=(20,10))
+for country in slopelist.keys():
+    if (len(slopelist[country])>minslopedays):
+        ax.plot(np.arange(len(slopelist[country])),slopelist[country],label=country,lw=2,marker=markers[mark],color=colours[col])
+    colorlist+=[colours[col]]
+    markerlist+=[markers[col]]
+    mark+=1
+    if mark>=len(markers): mark=0
+    col+=1
+    if col>=len(colours): col=0
+ax.legend() 
+ax.set(title="Changes in slope from onset")
+ax.set(ylabel="Slope (log2 base)")
+ax.set(xlabel="Days")
+ax.set(xlim=[0,daysafter])
+#fig.show()
+fig.savefig(os.path.join(image_dir, 'slope-evol.png'))
+
+
+colorlist=[]
+markerlist=[]
+col=0
+mark=0
+fig, ax = plt.subplots(figsize=(20,10))
+for country in deathslopelist.keys():
+    if (len(deathslopelist[country])>minslopeddays):
+        ax.plot(np.arange(len(deathslopelist[country])),deathslopelist[country],lw=3,label=country,marker=markers[mark],color=colours[col])
+    colorlist+=[colours[col]]
+    markerlist+=[markers[col]]
+    mark+=1
+    if mark>=len(markers): mark=0
+    col+=1
+    if col>=len(colours): col=0
+ax.legend() 
+ax.set(title="Changes in death slope from onset")
+ax.set(ylabel="Slope (log2 base)")
+ax.set(xlabel="Days")
+ax.set(xlim=[0,daysafter])
+#fig.show()
+fig.savefig(os.path.join(image_dir, 'deathslope-evol.png'))
 
 print('... Country Figures')
 # Ratio plots
