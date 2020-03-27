@@ -25,11 +25,11 @@ from datetime import datetime,date,time, timedelta
 from dateutil import parser
 #import pyarrow
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 # %matplotlib inline
 from scipy.stats import linregress
 from scipy.optimize import curve_fit
 
-import matplotlib as mpl
 mpl.rc('figure', max_open_warning = 0)
 
 def fix_country_names(df):
@@ -142,7 +142,7 @@ markers = [ '.', ',', 'o', 'v', '^', '<', '>', '1', '2',
 
 #colours=['blue','green','red','cyan','magenta','yellow','black','grey','pink','brown']
 colours=[]
-for name, hex in matplotlib.colors.cnames.items():
+for name, hex in mpl.colors.cnames.items():
     #print(name, hex)
     colours+=[name]
     
