@@ -140,8 +140,12 @@ markers = [ '.', ',', 'o', 'v', '^', '<', '>', '1', '2',
     '3', '4', '8', 's', 'p', '*', 'h', 'H', '+', 'x', 'D', 'd', '|',
     '_', 'P', 'X' ,1,2,3,4,5,6,7,8,9]
 
-colours=['blue','green','red','cyan','magenta','yellow','black','grey','pink','brown']
-
+#colours=['blue','green','red','cyan','magenta','yellow','black','grey','pink','brown']
+colours=[]
+for name, hex in matplotlib.colors.cnames.items():
+    #print(name, hex)
+    colours+=[name]
+    
 # Parameters for linreg
 mindeaths=5
 maxdeaths=1000
@@ -164,7 +168,7 @@ maxdeathcases=7500
 ddaysbefore=-5
 ddaysafter=20
 minslopedays=10
-minslopeddays=5
+minslopeddays=-1
 
 ##args = docopt.docopt(__doc__)
 #out_dir = args['--output_folder']
@@ -742,12 +746,12 @@ fig, ax = plt.subplots(figsize=(20,10))
 for country in slopelist.keys():
     if (len(slopelist[country])>minslopedays):
         ax.plot(np.arange(len(slopelist[country])),slopelist[country],label=country,lw=2,marker=markers[mark],color=colours[col])
-    colorlist+=[colours[col]]
-    markerlist+=[markers[col]]
-    mark+=1
-    if mark>=len(markers): mark=0
-    col+=1
-    if col>=len(colours): col=0
+        colorlist+=[colours[col]]
+        markerlist+=[markers[col]]
+        mark+=1
+        if mark>=len(markers): mark=0
+        col+=1
+        if col>=len(colours): col=0
 ax.legend() 
 ax.set(title="Changes in slope from onset")
 ax.set(ylabel="Slope (log2 base)")
@@ -765,12 +769,12 @@ fig, ax = plt.subplots(figsize=(20,10))
 for country in deathslopelist.keys():
     if (len(deathslopelist[country])>minslopeddays):
         ax.plot(np.arange(len(deathslopelist[country])),deathslopelist[country],lw=3,label=country,marker=markers[mark],color=colours[col])
-    colorlist+=[colours[col]]
-    markerlist+=[markers[col]]
-    mark+=1
-    if mark>=len(markers): mark=0
-    col+=1
-    if col>=len(colours): col=0
+        colorlist+=[colours[col]]
+        markerlist+=[markers[col]]
+        mark+=1
+        if mark>=len(markers): mark=0
+        col+=1
+        if col>=len(colours): col=0
 ax.legend() 
 ax.set(title="Changes in death slope from onset")
 ax.set(ylabel="Slope (log2 base)")
