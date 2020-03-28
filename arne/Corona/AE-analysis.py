@@ -32,6 +32,7 @@ from scipy.optimize import curve_fit
 
 mpl.rc('figure', max_open_warning = 0)
 
+
 def fix_country_names(df):
     translations = {'United_States_of_America':'USA',
                     'United_Kingdom':'UK',
@@ -190,7 +191,7 @@ else:
     out_dir=home = str(Path.home())+"/Desktop/Corona/"
 
 # Dynamic parameters
-data_dir  = out_dir # os.path.join(out, 'data'  )+"/" # , str(datetime.date(datetime.now())))
+data_dir  = os.path.join(out_dir,'data') # os.path.join(out, 'data'  )+"/" # , str(datetime.date(datetime.now())))
 ECDC = "https://www.ecdc.europa.eu/sites/default/files/documents/"  # +2020-03-20+".xlsx
 # import data
 image_dir =  out_dir #os.path.join(out,'reports', 'images')
@@ -214,53 +215,74 @@ today=date.today()
 yesterday=date.today() - timedelta(1)
 aweekago=date.today() - timedelta(7)
 
-excelfile="COVID-19-geographic-disbtribution-worldwide-"+str(today)+".xlsx"
-URL=ECDC+excelfile
-infile=data_dir+"/"+excelfile
+#excelfile="COVID-19-geographic-disbtribution-worldwide-"+str(today)+".xlsx"
+#URL=ECDC+excelfile
+#infile=data_dir+"/"+excelfile
+#
+##print(infile)
+#if not os.path.isfile(infile):
+#    try:
+#        #os.sys("wget -c " + URL + " -O " + infile )
+#        excelfile=wget.download(URL, out=data_dir)
+#    except:
+#        if not ns.force:
+#            print ("Exiting as there is no new data yet, use --force to rerun on yesterdays data")
+#            sys.exit(0)
+#        excelfile="COVID-19-geographic-disbtribution-worldwide-"+str(yesterday)+".xlsx"
+#        infile=data_dir+"/"+excelfile
+#        if not os.path.isfile(infile):
+#            URL=ECDC+excelfile
+#            excelfile=wget.download(URL, out=data_dir)
+#else:
+#    print ("Exiting as todays date is already run, use --force to rerun")
+#    sys.exit(0)
 
-#print(infile)
-if not os.path.isfile(infile):
-    try:
-        #os.sys("wget -c " + URL + " -O " + infile )
-        excelfile=wget.download(URL, out=data_dir)
-    except:
-        if not ns.force:
-            print ("Exiting as there is no new data yet, use --force to rerun on yesterdays data")
-            sys.exit(0)
-        excelfile="COVID-19-geographic-disbtribution-worldwide-"+str(yesterday)+".xlsx"
-        infile=data_dir+"/"+excelfile
-        if not os.path.isfile(infile):
-            URL=ECDC+excelfile
-            excelfile=wget.download(URL, out=data_dir)
-else:
-    print ("Exiting as todays date is already run, use --force to rerun")
-    sys.exit(0)
+
+infile=Path(data_dir+"/ECDC-data-"+str(today)+".csv")
+if infile.is_file():
+    print('Removing CVS file..')
+    os.system('rm -f ' + str(infile))
+
+URL="https://opendata.ecdc.europa.eu/covid19/casedistribution/csv"
+csvfile=wget.download(URL, out=str(infile))
     
-
 print('Importing Data...')
 print("Using: ",infile)
-df= pd.read_excel(infile)
+df=pd.read_csv(csvfile,encoding='iso8859_16')
+#df= pd.read_excel(infile)
 
-fix_country_names(df)
-agg_df = pd.DataFrame([])
 
-countries=df['Countries and territories'].drop_duplicates()
-for country in countries:
-    country_df=df.loc[df['Countries and territories'] == country].sort_values(by='DateRep')
-    country_df['Cumulative deaths'] = country_df['Deaths'].cumsum()
-    country_df['Cumulative cases'] = country_df['Cases'].cumsum()
-    agg_df=pd.concat([agg_df, country_df], ignore_index=True)
+merged_df = pd.DataFrame([])
 
-merged_df=agg_df.rename(columns={
-    "DateRep": "date",
+agg_df=df.rename(columns={
+    #"DateRep": "date",
+    "dateRep": "DateRep",
     "Countries and territories":"country",
-    'Cumulative cases':"confirmed",
+    "countriesAndTerritories":"country",
     'Cases':"new_confirmed_cases",
+    'cases':"new_confirmed_cases",
     'Deaths':"new_deaths",
-    'Cumulative deaths':"deaths"
+    'deaths':"new_deaths",
     })
+
+# We need to turn date to right type (datetime.
+
+def FormatDate(x):
+    #return (parser.parse(x))
+    return (datetime.strptime(x,"%d/%m/%Y"))
+
+#try:
+agg_df['date']=agg_df.apply(lambda x:FormatDate(x.DateRep), axis=1)
+
+countries=agg_df['country'].drop_duplicates()
+for country in countries:
+    country_df=agg_df.loc[agg_df['country'] == country].sort_values(by=['year','month','day'], ascending=True)
+    country_df['deaths'] = country_df['new_deaths'].cumsum()
+    country_df['confirmed'] = country_df['new_confirmed_cases'].cumsum()
+    merged_df=pd.concat([merged_df, country_df], ignore_index=True,sort=False)
+
 # Remove a few dupliaed names
-merged_df=merged_df.drop_duplicates(['country','date'], keep='last')
+merged_df=merged_df.drop_duplicates(['country','date'], keep='last').dropna()
 
 
 # We shoudl complete the database with all missing dates.
@@ -297,6 +319,10 @@ for country in countries: # ["Afghanistan","Sweden","China"]: #countries:
         deathsstart=tempdf[tempdf.deaths > mindeaths].iloc[0].date
     except:
         deathsstart=tempdf.date.tail(1).to_list()[0]
+    #if (type(start) is int):
+    #    startdate[country]=parser.parse(start)
+    #    startdeaths[country]=parser.parse(deathsstart)
+    #else:
     startdate[country]=start
     startdeaths[country]=deathsstart
 
@@ -314,14 +340,19 @@ merged_df['LogCases']=merged_df['confirmed'].apply(lambda x:(np.log2(max(x,tiny)
 merged_df['LogDeaths']=merged_df['deaths'].apply(lambda x:(np.log2(max(x,tiny))))
 merged_df['Ratio'] = merged_df["deaths"]/merged_df["confirmed"]
 
+#print (merged_df)
 
+dates=merged_df.groupby(['date'])['date'].first().dropna()
 
-dates=merged_df.groupby(['date'])['date'].first()
+print ("Adding missing rows...")
 for country in countries:
     c=0
     r=0
     d=0
     for date in dates:
+        if date=='' : continue
+        if date>today:continue
+        #print ("TEST",date)
         if merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)].empty:
             merged_df=merged_df.append(
             {'date':date,
@@ -343,7 +374,9 @@ for country in countries:
             d=int(merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)]['deaths'])
             #r=int(merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)]['recovered'])
 
-        
+merged_df.to_csv(reports_dir+"/merged1.csv", sep=',')
+
+
 linreg={}
 countrylist={}
 for country in countries:
@@ -442,6 +475,7 @@ fig.savefig(os.path.join(image_dir, 'total_bar.png'))
 
 # This is to get the change in slope
 slopelist={}
+newslopelist={}
 for country in countries:
     ctoday=merged_df.loc[(merged_df['country']==country)]['Days'].max()
     if ctoday>7:
@@ -450,6 +484,9 @@ for country in countries:
         newdf=merged_df.loc[(merged_df['Days']>days-7) &(merged_df['Days']<=days) &(merged_df['country'] == country)]
         lr=linregress(newdf['Days'],newdf['LogCases'])
         slopelist[country]+=[lr.slope]
+        dayone=merged_df.loc[(merged_df['Days']==(days-7)) &(merged_df['country'] == country)]['LogCases'].first()
+        dayseven=merged_df.loc[(merged_df['Days']==(days)) &(merged_df['country'] == country)]['LogCases'].first()
+        newslopelist[country]+=[(7*dayone)/dayseven]
 
 #print (slopelist)
 #sys.exit()
@@ -635,7 +672,7 @@ col=0
 colorlist=[]
 
 plt.close('all')
-print('... Time Series Trend Line')
+print('... Slope plots')
 fig2, (ax2, ax3) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]},figsize=(20,15))
 for country in sortedcountries:
     newdf=merged_df.loc[merged_df['country'] == country]
@@ -762,6 +799,29 @@ ax.set(xlabel="Days")
 ax.set(xlim=[0,daysafter])
 #fig.show()
 fig.savefig(os.path.join(image_dir, 'slope-evol.png'))
+
+
+colorlist=[]
+markerlist=[]
+col=0
+mark=0
+fig, ax = plt.subplots(figsize=(20,10))
+for country in newslopelist.keys():
+    if (len(newslopelist[country])>minslopedays):
+        ax.plot(np.arange(len(newslopelist[country])),newslopelist[country],label=country,lw=2,marker=markers[mark],color=colours[col])
+        colorlist+=[colours[col]]
+        markerlist+=[markers[mark]]
+        mark+=1
+        if mark>=len(markers): mark=0
+        col+=1
+        if col>=len(colours): col=0
+ax.legend() 
+ax.set(title="Changes in slope from onset")
+ax.set(ylabel="Slope (log2 base)")
+ax.set(xlabel="Days")
+ax.set(xlim=[0,daysafter])
+#fig.show()
+fig.savefig(os.path.join(image_dir, 'newslope-evol.png'))
 
 
 colorlist=[]
