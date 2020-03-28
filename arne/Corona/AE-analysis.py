@@ -872,6 +872,33 @@ ax.set(xlim=[0,daysafter])
 #fig.show()
 fig.savefig(os.path.join(image_dir, 'newdeathslope-evol.png'))
 
+
+colorlist=[]
+markerlist=[]
+col=0
+mark=0
+fig, ax = plt.subplots(figsize=(20,10))
+for country in newslopelist.keys():
+    ctoday=merged_df.loc[(merged_df['country']==country)]['Days'].max()
+    x=merged_df.loc[(merged_df['Days']==ctoday) &(merged_df['country'] == country)]['confirmed'].iloc[0]
+    y=x-merged_df.loc[(merged_df['Days']==ctoday-7) &(merged_df['country'] == country)]['confirmed'].iloc[0]
+    print (x,y)
+    ax.scatter(x,y,label=country,marker=markers[mark],color=colours[col])
+    colorlist+=[colours[col]]
+    markerlist+=[markers[mark]]
+    mark+=1
+    if mark>=len(markers): mark=0
+    col+=1
+    if col>=len(colours): col=0
+ax.legend() 
+ax.set(title="Changes in slope from onset")
+ax.set(ylabel="Increase from last week ")
+ax.set(xlabel="cases today")
+ax.set(xlim=[0,daysafter])
+#fig.show()
+fig.savefig(os.path.join(image_dir, 'weekly-increase.png'))
+
+
 plt.close('All')
 print('... Country Figures')
 # Ratio plots
