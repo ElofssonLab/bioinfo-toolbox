@@ -480,25 +480,31 @@ for country in countries:
     ctoday=merged_df.loc[(merged_df['country']==country)]['Days'].max()
     if ctoday>7:
         slopelist[country]=[]
+        newslopelist[country]=[]
     for days in range(7,ctoday):
         newdf=merged_df.loc[(merged_df['Days']>days-7) &(merged_df['Days']<=days) &(merged_df['country'] == country)]
         lr=linregress(newdf['Days'],newdf['LogCases'])
         slopelist[country]+=[lr.slope]
-        dayone=merged_df.loc[(merged_df['Days']==(days-7)) &(merged_df['country'] == country)]['LogCases'].first()
-        dayseven=merged_df.loc[(merged_df['Days']==(days)) &(merged_df['country'] == country)]['LogCases'].first()
+        dayone=merged_df.loc[(merged_df['Days']==(days-7)) &(merged_df['country'] == country)]['confirmed'].iloc[0]
+        dayseven=merged_df.loc[(merged_df['Days']==(days)) &(merged_df['country'] == country)]['confirmed'].iloc[0]
         newslopelist[country]+=[(7*dayone)/dayseven]
 
-#print (slopelist)
+#print (slopelist,newslopelist)
 #sys.exit()
 # This is to get the change in slope
+newdeathslopelist={}
 deathslopelist={}
 for country in countries:
     dtoday=merged_df.loc[(merged_df['country']==country)]['DeathsDays'].max()
     if dtoday>7:
         deathslopelist[country]=[]
+        newdeathslopelist[country]=[]
     for days in range(7,dtoday):
         newdf=merged_df.loc[(merged_df['DeathsDays']>days-7) &(merged_df['DeathsDays']<=days) &(merged_df['country'] == country)]
         lr=linregress(newdf['DeathsDays'],newdf['LogCases'])
+        dayone=merged_df.loc[(merged_df['DeathsDays']==(days-7)) &(merged_df['country'] == country)]['deaths'].iloc[0]
+        dayseven=merged_df.loc[(merged_df['DeathsDays']==(days)) &(merged_df['country'] == country)]['deaths'].iloc[0]
+        newdeathslopelist[country]+=[(7*dayone)/dayseven]
         deathslopelist[country]+=[lr.slope]
 
 #print (slopelist)
@@ -776,7 +782,6 @@ plt.close('all')
 
 # Time Series Data Plots
 
-
 print('... Slope figures')
 colorlist=[]
 markerlist=[]
@@ -800,7 +805,6 @@ ax.set(xlim=[0,daysafter])
 #fig.show()
 fig.savefig(os.path.join(image_dir, 'slope-evol.png'))
 
-
 colorlist=[]
 markerlist=[]
 col=0
@@ -817,7 +821,7 @@ for country in newslopelist.keys():
         if col>=len(colours): col=0
 ax.legend() 
 ax.set(title="Changes in slope from onset")
-ax.set(ylabel="Slope (log2 base)")
+ax.set(ylabel="Increase per day")
 ax.set(xlabel="Days")
 ax.set(xlim=[0,daysafter])
 #fig.show()
@@ -846,6 +850,29 @@ ax.set(xlim=[0,daysafter])
 #fig.show()
 fig.savefig(os.path.join(image_dir, 'deathslope-evol.png'))
 
+colorlist=[]
+markerlist=[]
+col=0
+mark=0
+fig, ax = plt.subplots(figsize=(20,10))
+for country in newdeathslopelist.keys():
+    if (len(newdeathslopelist[country])>minslopeddays):
+        ax.plot(np.arange(len(newdeathslopelist[country])),newdeathslopelist[country],lw=3,label=country,marker=markers[mark],color=colours[col])
+        colorlist+=[colours[col]]
+        markerlist+=[markers[mark]]
+        mark+=1
+        if mark>=len(markers): mark=0
+        col+=1
+        if col>=len(colours): col=0
+ax.legend() 
+ax.set(title="Changes in death slope from onset")
+ax.set(ylabel="Increase per day")
+ax.set(xlabel="Days")
+ax.set(xlim=[0,daysafter])
+#fig.show()
+fig.savefig(os.path.join(image_dir, 'newdeathslope-evol.png'))
+
+plt.close('All')
 print('... Country Figures')
 # Ratio plots
 tempdf=merged_df.loc[merged_df['country'] != "China"]
