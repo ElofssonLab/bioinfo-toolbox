@@ -502,7 +502,7 @@ for country in countries:
         slopelist[country]+=[lr.slope]
         dayone=merged_df.loc[(merged_df['Days']==(days-7)) &(merged_df['country'] == country)]['confirmed'].iloc[0]
         dayseven=merged_df.loc[(merged_df['Days']==(days)) &(merged_df['country'] == country)]['confirmed'].iloc[0]
-        newslopelist[country]+=[float(dayseven-dayone)/float(7*dayone)]
+        newslopelist[country]+=[np.power(float(dayseven)/float(dayone),(1/7))-1.0]
 
 #print (slopelist,newslopelist)
 #sys.exit()
@@ -519,7 +519,8 @@ for country in countries:
         lr=linregress(newdf['DeathsDays'],newdf['LogCases'])
         dayone=merged_df.loc[(merged_df['DeathsDays']==(days-7)) &(merged_df['country'] == country)]['deaths'].iloc[0]
         dayseven=merged_df.loc[(merged_df['DeathsDays']==(days)) &(merged_df['country'] == country)]['deaths'].iloc[0]
-        newdeathslopelist[country]+=[float(dayseven-dayone)/float(7*dayone)]
+        newdeathslopelist[country]+=[np.power(float(dayseven)/float(dayone),(1/7))-1.0]
+        
         deathslopelist[country]+=[lr.slope]
 
 #print (slopelist)
