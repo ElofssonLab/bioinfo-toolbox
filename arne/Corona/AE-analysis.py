@@ -880,14 +880,17 @@ mark=0
 fig, ax = plt.subplots(figsize=(20,10))
 for country in countries:
     ctoday=merged_df.loc[(merged_df['country']==country)]['Days'].max()
-    if ctoday<7:
+    cases=merged_df.loc[(merged_df['country']==country)]['confirmed'].max()
+    if cases<2000:
         continue
-    x=merged_df.loc[(merged_df['Days']==ctoday) &(merged_df['country'] == country)]['confirmed'].iloc[0]
-    if x<2000:
-        continue
-    y=x-merged_df.loc[(merged_df['Days']==ctoday-7) &(merged_df['country'] == country)]['confirmed'].iloc[0]
-    #print (x,y)
-    ax.scatter(x,y,label=country,marker=markers[mark],color=colours[col])
+    X=[]
+    Y=[]
+    for day in range(7,ctoday):
+        x=merged_df.loc[(merged_df['Days']==day) &(merged_df['country'] == country)]['confirmed'].iloc[0]
+        y=x-merged_df.loc[(merged_df['Days']==day-7) &(merged_df['country'] == country)]['confirmed'].iloc[0]
+        X+=[x]
+        Y+=[y]
+    ax.plot(X,Y,label=country,marker=markers[mark],color=colours[col])
     colorlist+=[colours[col]]
     markerlist+=[markers[mark]]
     mark+=1
@@ -895,11 +898,51 @@ for country in countries:
     col+=1
     if col>=len(colours): col=0
 ax.legend() 
-ax.set(title="Changes in slope from onset")
-ax.set(ylabel="Increase from last week ")
-ax.set(xlabel="cases today")
+
+ax.set(title="Fraction of all infected last week from onset")
+ax.set(ylabel="Increase from a week ago")
+ax.set(xlabel="Total number of cases today")
 #fig.show()
 fig.savefig(os.path.join(image_dir, 'weekly-increase.png'))
+ax.set_xscale('log')
+ax.set_yscale('log')
+fig.savefig(os.path.join(image_dir, 'weekly-increase-log.png'))
+
+colorlist=[]
+markerlist=[]
+col=0
+mark=0
+fig, ax = plt.subplots(figsize=(20,10))
+for country in countries:
+    ctoday=merged_df.loc[(merged_df['country']==country)]['Days'].max()
+    cases=merged_df.loc[(merged_df['country']==country)]['deaths'].max()
+    if cases<100:
+        continue
+    X=[]
+    Y=[]
+    for day in range(7,ctoday):
+        x=merged_df.loc[(merged_df['Days']==day) &(merged_df['country'] == country)]['deaths'].iloc[0]
+        y=x-merged_df.loc[(merged_df['Days']==day-7) &(merged_df['country'] == country)]['deaths'].iloc[0]
+        X+=[x]
+        Y+=[y]
+    ax.plot(X,Y,label=country,marker=markers[mark],color=colours[col])
+    colorlist+=[colours[col]]
+    markerlist+=[markers[mark]]
+    mark+=1
+    if mark>=len(markers): mark=0
+    col+=1
+    if col>=len(colours): col=0
+ax.legend() 
+
+ax.set(title="Fraction of all infected last week from onset")
+ax.set(ylabel="Increase from a week ago")
+ax.set(xlabel="Total number of cases today")
+#fig.show()
+fig.savefig(os.path.join(image_dir, 'weekly-death.png'))
+ax.set_xscale('log')
+ax.set_yscale('log')
+fig.savefig(os.path.join(image_dir, 'weekly-death-log.png'))
+
 
 
 plt.close('All')
