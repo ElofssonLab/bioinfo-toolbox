@@ -238,6 +238,15 @@ aweekago=date.today() - timedelta(7)
 #    sys.exit(0)
 
 
+# First we test if we already run the data for today:
+
+merged_df=pd.read_csv(reports_dir+"/merged.csv", sep=',')
+date=merged_df['date'].max()
+if str(date)==str(today) and (not ns.force):
+    print ("Exiting as todays plots are alredy run, use --force to rerun on yesterdays data")
+    sys.exit(0)
+
+
 infile=Path(data_dir+"/ECDC-data-"+str(today)+".csv")
 if infile.is_file():
     print('Removing CVS file..')
@@ -274,6 +283,12 @@ def FormatDate(x):
 #try:
 agg_df['date']=agg_df.apply(lambda x:FormatDate(x.DateRep), axis=1)
 
+date=agg_df['date'].max()
+if str(date.date())!=str(today) and (not ns.force):
+    print ("Exiting as there is no new data for today, use --force to rerun on yesterdays data")
+    sys.exit(0)
+
+#sys.exit()
 countries=agg_df['country'].drop_duplicates()
 for country in countries:
     country_df=agg_df.loc[agg_df['country'] == country].sort_values(by=['year','month','day'], ascending=True)
@@ -901,7 +916,7 @@ ax.legend()
 
 ax.set(title="Fraction of all infected last week from onset")
 ax.set(ylabel="Increase from a week ago")
-ax.set(xlabel="Total number of cases today")
+ax.set(xlabel="Total number of cases until today")
 #fig.show()
 fig.savefig(os.path.join(image_dir, 'weekly-increase.png'))
 ax.set_xscale('log')
@@ -934,9 +949,9 @@ for country in countries:
     if col>=len(colours): col=0
 ax.legend() 
 
-ax.set(title="Fraction of all infected last week from onset")
+ax.set(title="Fraction of all death occuring last week")
 ax.set(ylabel="Increase from a week ago")
-ax.set(xlabel="Total number of cases today")
+ax.set(xlabel="Total number of deaths until today")
 #fig.show()
 fig.savefig(os.path.join(image_dir, 'weekly-death.png'))
 ax.set_xscale('log')
