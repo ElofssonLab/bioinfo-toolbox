@@ -32,7 +32,6 @@ mpl.rc('figure', max_open_warning = 0)
 
 import preprocess as pp
 import config as cf
-import plots as pl
 
 # Plot and save trendlinae graph
 def nations_trend_line(tmp_df, name, cumconfirmed, cumdeath, ncases,ndeath,cdays,lincases,ddays,lindeaths):
