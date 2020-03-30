@@ -281,6 +281,7 @@ def FormatDate(x):
 #try:
 agg_df['date']=agg_df.apply(lambda x:FormatDate(x.DateRep), axis=1)
 
+
 date=agg_df['date'].max()
 if str(date.date())!=str(today) and (not ns.force):
     print ("Exiting as there is no new data for today, use --force to rerun on yesterdays data")
