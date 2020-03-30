@@ -9,6 +9,6 @@ python3 AE-analysis.py #  2>/dev/null 1>/dev/null
 cd  ~/Desktop/Corona/
 montage -mode concatenate -tile 3x slope.png  deathslope.png  total_bar.png nations/China_trendline.png nations/South_Korea_trendline.png  nations/Italy_trendline.png   nations/Spain_trendline.png   nations/USA_trendline.png   nations/Sweden_trendline.png ./montage.png
 cd ~/Desktop/Corona/
-tree -H '.' -L 1 --noreport --charset utf-8 -T "Corona plots from Arne Elofsson"  -n  > index.html
+tree -H '.' -L 2 --noreport --charset utf-8 -T "Corona plots from Arne Elofsson"  -n  > index.html
 rsync -ar -e "ssh -i ~/.ssh/id2_rsa" ~/Desktop/Corona/ ae.scilifelab.se:/var/www/html/archive.bioinfo.se/docroot/Corona/ 2>/dev/null
 
