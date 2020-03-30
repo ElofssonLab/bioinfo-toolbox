@@ -917,6 +917,12 @@ for country in countries:
     if mark>=len(markers): mark=0
     col+=1
     if col>=len(colours): col=0
+x=[0,100000]
+y=[0,50000]
+ax.plot(x,y,label="Doubled each week",lw=4,color="black")
+x=[0,100000]
+y=[0,99000]
+ax.plot(x,y,label="Doubled each day",lw=4,color="grey")
 ax.legend() 
 
 ax.set(title="Fraction of all infected last week from onset")
@@ -952,8 +958,14 @@ for country in countries:
     if mark>=len(markers): mark=0
     col+=1
     if col>=len(colours): col=0
-ax.legend() 
+x=[0,25000]
+y=[0,12500]
+ax.plot(x,y,label="Doubled each week",lw=4,color="black")
+x=[0,25000]
+y=[0,24000]
+ax.plot(x,y,label="Doubled each day",lw=4,color="grey")
 
+ax.legend() 
 ax.set(title="Fraction of all death occuring last week")
 ax.set(ylabel="Increase from a week ago")
 ax.set(xlabel="Total number of deaths until today")
