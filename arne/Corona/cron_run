@@ -7,7 +7,7 @@ cd /home/arnee/git/bioinfo-toolbox/arne/Corona
 #git pull 2>/dev/null
 #python3 AE-analysis.py #  2>/dev/null 1>/dev/null
 python3 get_ECDC.py
-python3 makeplots.py -i /home/arnee/git/bioinfo-toolbox/arne/Corona/data/merged_ECDC.csv
+python3 makeplots.py -i /home/arnee/Desktop/Corona/data/merged_ECDC.csv
 cd  ~/Desktop/Corona/
 montage -mode concatenate -tile 3x slope.png  deathslope.png  total_bar.png nations/China_trendline.png nations/South_Korea_trendline.png  nations/Italy_trendline.png   nations/Spain_trendline.png   nations/USA_trendline.png   nations/Sweden_trendline.png ./montage.png
 cd ~/Desktop/Corona/
