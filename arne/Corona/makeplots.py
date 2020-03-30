@@ -30,41 +30,27 @@ from scipy.optimize import curve_fit
 
 mpl.rc('figure', max_open_warning = 0)
 
-
-def fix_country_names(df):
-    translations = {'United_States_of_America':'USA',
-                    'United_Kingdom':'UK',
-                    'Central_African_Republic':'CAR',
-                    'United_Arab_Emirates':'UAE',
-                    'United_Republic_of_Tanzania':'Tanzania',
-                    'Democratic_Republic_of_the_Congo':'Congo',
-                    'Others':'Cruise Ship',
-                    'Iran (Islamic Republic of)':"Iran",
-                    'Mainland China':'China',
-                    'Korea, South':'South Korea',
-                    'Republic of Korea':'South Korea',
-                    'Cases_on_an_international_conveyance_Japan':'Cruise Ship'}
-    df.replace(translations, inplace=True)
-
-
+import preprocess as pp
+import config as cf
+import plots as pl
 
 # Plot and save trendlinae graph
 def nations_trend_line(tmp_df, name, cumconfirmed, cumdeath, ncases,ndeath,cdays,lincases,ddays,lindeaths):
     global curvefit,curvedeaths
     xdata=tmp_df[cdays].to_numpy()
-    ydata=tmp_df[cumconfirmed].apply(lambda x:(np.log2(max(x,tiny)))).to_numpy()
+    ydata=tmp_df[cumconfirmed].apply(lambda x:(np.log2(max(x,cf.tiny)))).to_numpy()
     f, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]},figsize=(20,15))
     if name in curvefit.keys():
-        yfit=sigmoidalfunction(xdata,ydata,curvefit[name][1],curvefit[name][2],curvefit[name][3],curvefit[name][4])
+        yfit=pp.sigmoidalfunction(xdata,ydata,curvefit[name][1],curvefit[name][2],curvefit[name][3],curvefit[name][4])
         ynum=np.exp2(yfit)
         ax1.plot(tmp_df['date'],ynum,label="sigmoidal curve fitting, max: "+str(round(np.exp2(curvefit[name][2]),0)))
     if name in curvedeath.keys():
-        yfit=sigmoidalfunction0(xdata,ydata,curvedeath[name][1],curvedeath[name][2],curvedeath[name][3]) # ,curvedeath[name][4])
+        yfit=pp.sigmoidalfunction0(xdata,ydata,curvedeath[name][1],curvedeath[name][2],curvedeath[name][3]) # ,curvedeath[name][4])
         ynum=np.exp2(yfit)
         ax1.plot(tmp_df['date'],ynum,label="sigmoidal death, max: "+str(round(np.exp2(curvedeath[name][2]),0)))
     tmp_df.groupby(['date'])[[cumconfirmed, cumdeath,lincases,lindeaths]].sum().plot(ax=ax1, marker='o')
     ax1.set_yscale('log')
-    ax1.set(ylim=(0.5,maxcases))
+    ax1.set(ylim=(0.5,cf.maxcases))
     ax1.tick_params(axis='x', labelrotation=45 )
     days = tmp_df.groupby(['date'])[[cdays]].max()
     deathdays = tmp_df.groupby(['date'])[[ddays]].max()
@@ -73,7 +59,7 @@ def nations_trend_line(tmp_df, name, cumconfirmed, cumdeath, ncases,ndeath,cdays
     tmp5 = tmp_df.groupby(['date'])[[cumconfirmed]].sum()
     tmp6 = tmp_df.groupby(['date'])[[cumdeath]].sum()
     ratio = tmp6[cumdeath]/tmp5[cumconfirmed]
-    wratio =tmp6[cumdeath]/(tmp5[cumconfirmed].shift(7)+tiny)
+    wratio =tmp6[cumdeath]/(tmp5[cumconfirmed].shift(7)+cf.tiny)
     #print (ratio,wratio)
     if tmp[ncases].max()>0:
         ax1.bar(tmp.index,tmp[ncases], color="red",width=0.4, ls='dashed', lw=2)
@@ -128,6 +114,7 @@ def create_stacked_bar(tmp_df, col1, col2, fig_title):
     fig.savefig(os.path.join(image_dir, '{}_stacked_bar.png'.format(col2)))
     
 
+
     
 # Set fonts etc.
 font = {'weight' : 'bold',   'size'   : 22}
@@ -148,30 +135,9 @@ for name, hex in mpl.colors.cnames.items():
     bc = hex[5:7]  # green 
     if (int(rc,16)+int(gc,16)+int(bc,16)<512):
         colours+=[name]    
-# Parameters for linreg
-mindeaths=5
-maxdeaths=1000
-minnum=100
-maxnum=5000
 
-# Countries to select
-minconfirmed=1000
-mindeaths=10
 
-# Cutoff to select startdate for expinential vurved
-cutoff=500
-# Plotting parameters
-daysbefore=-10
-daysafter=45
-mincases=5
-maxcases=250000
-mindeathcases=1
-maxdeathcases=25000
-ddaysbefore=-5
-ddaysafter=20
-minslopedays=10
-minslopeddays=-1
-
+        
 ##args = docopt.docopt(__doc__)
 #out_dir = args['--output_folder']
 
@@ -181,6 +147,7 @@ p = argparse.ArgumentParser(description =
             formatter_class=RawTextHelpFormatter)
 p.add_argument('-f','--force', required= False, help='Force', action='store_true')
 p.add_argument('-out','--output_folder', required= False, help='output folder')
+p.add_argument('-data','--input','-i', required= True, help='Inout formatted CSV file')
 ns = p.parse_args()
 
 if ns.output_folder:
@@ -188,9 +155,9 @@ if ns.output_folder:
 else:
     out_dir=home = str(Path.home())+"/Desktop/Corona/"
 
+    
 # Dynamic parameters
 data_dir  = os.path.join(out_dir,'data') # os.path.join(out, 'data'  )+"/" # , str(datetime.date(datetime.now())))
-ECDC = "https://www.ecdc.europa.eu/sites/default/files/documents/"  # +2020-03-20+".xlsx
 # import data
 image_dir =  out_dir #os.path.join(out,'reports', 'images')
 nation_dir =  os.path.join(out_dir,'nations')
@@ -213,187 +180,15 @@ today=date.today()
 yesterday=date.today() - timedelta(1)
 aweekago=date.today() - timedelta(7)
 
-#excelfile="COVID-19-geographic-disbtribution-worldwide-"+str(today)+".xlsx"
-#URL=ECDC+excelfile
-#infile=data_dir+"/"+excelfile
-#
-##print(infile)
-#if not os.path.isfile(infile):
-#    try:
-#        #os.sys("wget -c " + URL + " -O " + infile )
-#        excelfile=wget.download(URL, out=data_dir)
-#    except:
-#        if not ns.force:
-#            print ("Exiting as there is no new data yet, use --force to rerun on yesterdays data")
-#            sys.exit(0)
-#        excelfile="COVID-19-geographic-disbtribution-worldwide-"+str(yesterday)+".xlsx"
-#        infile=data_dir+"/"+excelfile
-#        if not os.path.isfile(infile):
-#            URL=ECDC+excelfile
-#            excelfile=wget.download(URL, out=data_dir)
-#else:
-#    print ("Exiting as todays date is already run, use --force to rerun")
-#    sys.exit(0)
-
-
-# First we test if we already run the data for today:
-
-merged_df=pd.read_csv(reports_dir+"/merged.csv", sep=',')
-date=merged_df['date'].max()
-if str(date)==str(today) and (not ns.force):
-    print ("Exiting as todays plots are alredy run, use --force to rerun on yesterdays data")
-    sys.exit(0)
-
-
-infile=Path(data_dir+"/ECDC-data-"+str(today)+".csv")
-if infile.is_file():
-    print('Removing CVS file..')
-    os.system('rm -f ' + str(infile))
-
-URL="https://opendata.ecdc.europa.eu/covid19/casedistribution/csv"
-csvfile=wget.download(URL, out=str(infile))
-    
-print('Importing Data...')
-print("Using: ",infile)
-df=pd.read_csv(csvfile,encoding='iso8859_16')
-#df= pd.read_excel(infile)
-
-
-merged_df = pd.DataFrame([])
-
-agg_df=df.rename(columns={
-    #"DateRep": "date",
-    "dateRep": "DateRep",
-    "Countries and territories":"country",
-    "countriesAndTerritories":"country",
-    'Cases':"new_confirmed_cases",
-    'cases':"new_confirmed_cases",
-    'Deaths':"new_deaths",
-    'deaths':"new_deaths",
-    })
-
-# We need to turn date to right type (datetime.
-
-def FormatDate(x):
-    #return (parser.parse(x))
-    return (datetime.strptime(x,"%d/%m/%Y"))
-
-#try:
-agg_df['date']=agg_df.apply(lambda x:FormatDate(x.DateRep), axis=1)
-
-date=agg_df['date'].max()
-if str(date.date())!=str(today) and (not ns.force):
-    print ("Exiting as there is no new data for today, use --force to rerun on yesterdays data")
-    sys.exit(0)
-
-#sys.exit()
-countries=agg_df['country'].drop_duplicates()
-for country in countries:
-    country_df=agg_df.loc[agg_df['country'] == country].sort_values(by=['year','month','day'], ascending=True)
-    country_df['deaths'] = country_df['new_deaths'].cumsum()
-    country_df['confirmed'] = country_df['new_confirmed_cases'].cumsum()
-    merged_df=pd.concat([merged_df, country_df], ignore_index=True,sort=False)
-
-# Remove a few dupliaed names
-merged_df=merged_df.drop_duplicates(['country','date'], keep='last').dropna()
-
-
-# We shoudl complete the database with all missing dates.
-first=merged_df["date"].to_list()[0]
-firstdate=first
-last=merged_df["date"].to_list()[-1]
-lastdate=last
-
-
-
-# We need to make two lists of countries
-# Some parameters
-
-countrylist={}
-#sys.exit()
-# This is all countries 
+print (ns)
+merged_df=pd.read_csv(ns.input, sep=',')
+# ------------------------------------------------------------------------
+# Some necessary preprocessing
 countries=merged_df['country'].drop_duplicates()
-first={}
-firstdate={}
-startdate={}
-firstdeaths={}
-startdeaths={}
-# Now we nedeathed to get the first date for each country (if <100 case last date)
-for country in countries: # ["Afghanistan","Sweden","China"]: #countries:
-    tempdf=merged_df.loc[merged_df['country'] == country]
-    first[country]=tempdf["date"].to_list()[0]
-    firstdate[country]=first[country]
-    x=5
-    try:
-        start=tempdf[tempdf.confirmed > minnum].iloc[0].date
-    except:
-        start=tempdf.date.tail(1).to_list()[0]
-    try:
-        deathsstart=tempdf[tempdf.deaths > mindeaths].iloc[0].date
-    except:
-        deathsstart=tempdf.date.tail(1).to_list()[0]
-    #if (type(start) is int):
-    #    startdate[country]=parser.parse(start)
-    #    startdeaths[country]=parser.parse(deathsstart)
-    #else:
-    startdate[country]=start
-    startdeaths[country]=deathsstart
-
-#print (startdeaths,startdate)
-tiny=0.000001
-
-def Days(x,y):
-    return (x-startdate[y]).days
-def DeathsDays(x,y):
-    return (x-startdeaths[y]).days
-
-merged_df['Days']=merged_df.apply(lambda x:Days(x.date,x.country), axis=1)
-merged_df['DeathsDays']=merged_df.apply(lambda x:DeathsDays(x.date,x.country), axis=1)
-merged_df['LogCases']=merged_df['confirmed'].apply(lambda x:(np.log2(max(x,tiny))))
-merged_df['LogDeaths']=merged_df['deaths'].apply(lambda x:(np.log2(max(x,tiny))))
-merged_df['Ratio'] = merged_df["deaths"]/merged_df["confirmed"]
-
-#print (merged_df)
-
-dates=merged_df.groupby(['date'])['date'].first().dropna()
-
-print ("Adding missing rows...")
-for country in countries:
-    c=0
-    r=0
-    d=0
-    for date in dates:
-        if date=='' : continue
-        if date>today:continue
-        #print ("TEST",date)
-        if merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)].empty:
-            merged_df=merged_df.append(
-            {'date':date,
-                 "country":country,
-                 "confirmed":c,
-                 "deaths":d,
-                 #"recovered":r,
-                      "Days":(date-startdate[country]).days,
-                      "DeathsDays":(date-startdeaths[country]).days,
-                      #DeathsDate,
-                      #StartDate,
-                      #"FirstDate":first[country],
-                      "LogCases":np.log2(c+tiny),
-                      "LogDeaths":np.log2(d+tiny)},
-                                            ignore_index=True)
-            #merged_df.append(data, ignore_index=True)
-        else:
-            c=int(merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)]['confirmed'])
-            d=int(merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)]['deaths'])
-            #r=int(merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)]['recovered'])
-
-merged_df.to_csv(reports_dir+"/merged1.csv", sep=',')
-
-
 linreg={}
 countrylist={}
 for country in countries:
-    newdf=merged_df.loc[(merged_df['confirmed']>minnum) & (merged_df['confirmed']<maxnum) &(merged_df['country'] == country)]
+    newdf=merged_df.loc[(merged_df['confirmed']>cf.minnum) & (merged_df['confirmed']<cf.maxnum) &(merged_df['country'] == country)]
     if (len(newdf)<4): # We need 6 points to fit a curve to the sigmoidal function.
         linreg[country]=linregress([0.0,1.0],[0.0,0.0])
         continue
@@ -405,18 +200,12 @@ sortedcountries=[]
 for i in range(0,len(tmplist)):
     sortedcountries+=[tmplist[i][0]]
 
-    # Sigmoidal (in log) funcion fit
-def sigmoidalfunction(x,y,k,m,a,b):
-    f=[]
-    for i in x:
-        f+=[(m-b) / (1 + np.exp(-k*(i-a))) + b ]
-    return f
-def sigmoidalfunction0(x,y,k,m,a):
-    f=[]
-    b=0
-    for i in x:
-        f+=[(m-b) / (1 + np.exp(-k*(i-a))) + b ]
-    return f
+
+
+##### Create Graphs #####
+    
+print('Creating graphs...')
+
 
 print ("Plotting sigmoidal fit")
 
@@ -429,7 +218,7 @@ for country in countries:
         xdata=newdf['Days'].to_numpy()
         ydata=newdf['LogCases'].to_numpy()
         try:
-            curvefit[country], pcov = curve_fit(sigmoidalfunction,xdata,ydata) #,bounds=par_bounds)
+            curvefit[country], pcov = curve_fit(pp.sigmoidalfunction,xdata,ydata) #,bounds=par_bounds)
             if curvefit[country][2]<22:
                 totalcases[country]=np.exp2(curvefit[country][2])
                 break
@@ -452,15 +241,14 @@ for country in countries:
         xdata=newdf['Days'].to_numpy()
         ydata=newdf['LogDeaths'].to_numpy()
         try:
-            curvedeath[country], pcov = curve_fit(sigmoidalfunction0,xdata,ydata) #,bounds=par_bounds)
+            curvedeath[country], pcov = curve_fit(pp.sigmoidalfunction0,xdata,ydata) #,bounds=par_bounds)
             if curvedeath[country][2]<18:
                 totaldeaths[country]=np.exp2(curvedeath[country][2])
                 break
         except:
             continue
             #print ("error with ",country)
-#sys.exit()
-#print (totaldeaths)
+
 fig, ax = plt.subplots(figsize=(20,10))
 sorted_d = sorted(totaldeaths.items(), key=operator.itemgetter(1),reverse=True)
 x=[]
@@ -484,116 +272,6 @@ ax.set(title="Predicted total number of cases (blue) /deaths (red)")
 plt.xticks(rotation=45, ha='right')
 fig = ax.get_figure()
 fig.savefig(os.path.join(image_dir, 'total_bar.png'))
-
-
-# This is to get the change in slope
-slopelist={}
-newslopelist={}
-for country in countries:
-    ctoday=merged_df.loc[(merged_df['country']==country)]['Days'].max()
-    if ctoday>7:
-        slopelist[country]=[]
-        newslopelist[country]=[]
-    for days in range(7,ctoday):
-        newdf=merged_df.loc[(merged_df['Days']>days-7) &(merged_df['Days']<=days) &(merged_df['country'] == country)]
-        lr=linregress(newdf['Days'],newdf['LogCases'])
-        slopelist[country]+=[lr.slope]
-        dayone=merged_df.loc[(merged_df['Days']==(days-7)) &(merged_df['country'] == country)]['confirmed'].iloc[0]
-        dayseven=merged_df.loc[(merged_df['Days']==(days)) &(merged_df['country'] == country)]['confirmed'].iloc[0]
-        newslopelist[country]+=[np.power(float(dayseven)/float(dayone),(1/7))-1.0]
-
-#print (slopelist,newslopelist)
-#sys.exit()
-# This is to get the change in slope
-newdeathslopelist={}
-deathslopelist={}
-for country in countries:
-    dtoday=merged_df.loc[(merged_df['country']==country)]['DeathsDays'].max()
-    if dtoday>7:
-        deathslopelist[country]=[]
-        newdeathslopelist[country]=[]
-    for days in range(7,dtoday):
-        newdf=merged_df.loc[(merged_df['DeathsDays']>days-7) &(merged_df['DeathsDays']<=days) &(merged_df['country'] == country)]
-        lr=linregress(newdf['DeathsDays'],newdf['LogCases'])
-        dayone=merged_df.loc[(merged_df['DeathsDays']==(days-7)) &(merged_df['country'] == country)]['deaths'].iloc[0]
-        dayseven=merged_df.loc[(merged_df['DeathsDays']==(days)) &(merged_df['country'] == country)]['deaths'].iloc[0]
-        newdeathslopelist[country]+=[np.power(float(dayseven)/float(dayone),(1/7))-1.0]
-        
-        deathslopelist[country]+=[lr.slope]
-
-#print (slopelist)
-
-# This is to get the corrent (last week) linregression in cases
-weeklist={}
-weekreg={}
-for country in countries:
-    newdf=merged_df.loc[(merged_df['date']>pd.Timestamp(aweekago)) &(merged_df['country'] == country)]
-    if (len(newdf)<4):
-        weekreg[country]=linregress([0.0,1.0],[0.0,0.0])
-        continue
-    weekreg[country]=linregress(newdf['Days'],newdf['LogCases'])
-    weeklist[country]=weekreg[country].slope
-tmplist = sorted(weeklist.items() , reverse=True, key=lambda x: x[1])
-#print (weekreg)
-
-weekdeathslist={}
-weekdeaths={}
-for country in countries:
-    newdf=merged_df.loc[(merged_df['date']>pd.Timestamp(pd.Timestamp(aweekago))) & (merged_df['country'] == country)]
-    if (len(newdf)<4):
-        weekdeaths[country]=linregress([0.0,1.0],[0.0,0.0])
-        continue
-    weekdeaths[country]=linregress(newdf['DeathsDays'],newdf['LogDeaths'])
-    #print(deathsreg[country])
-    weekdeathslist[country]=weekdeaths[country].slope
-tmplist = sorted(weeklist.items() , reverse=True, key=lambda x: x[1])
-
-
-deathslist={}
-deathsreg={}
-for country in countries:
-    newdf=merged_df.loc[(merged_df['deaths']>mindeaths) & (merged_df['deaths']<maxdeaths) & (merged_df['country'] == country)]
-    if (len(newdf)<4):
-        deathsreg[country]=linregress([0.0,1.0],[0.0,0.0])
-        continue
-    deathsreg[country]=linregress(newdf['DeathsDays'],newdf['LogDeaths'])
-    #print(deathsreg[country])
-    deathslist[country]=deathsreg[country].slope
-tmplist = sorted(deathslist.items() , reverse=True, key=lambda x: x[1])
-deathscountries=[]
-for i in range(0,len(tmplist)):
-    deathscountries+=[tmplist[i][0]]
-    
-    
-linfit_df=merged_df.loc[(merged_df['confirmed']>minnum) & (merged_df['confirmed']<maxnum) & (merged_df['country'] != "China")]
-deathsfit_df=merged_df.loc[(merged_df['deaths']>mindeaths) & (merged_df['deaths']<maxdeaths) & (merged_df['country'] != "China") ]    
-newdf=linfit_df.groupby(['date']).sum()
-linreg["RoW"]=linregress(newdf['Days'],newdf['LogCases'])
-newdf=deathsfit_df.groupby(['date']).sum()
-deathsreg["RoW"]=linregress(newdf['DeathsDays'],newdf['LogDeaths'])
-
-
-def LinExp(x,y):
-    return np.exp2(linreg[y].intercept+linreg[y].slope*x)
-
-def DeathsExp(x,y):
-    return np.exp2(deathsreg[y].intercept+deathsreg[y].slope*x)
-
-merged_df['LinCases']=merged_df.apply(lambda x:LinExp(x.Days,x.country), axis=1)
-merged_df['LinDeaths']=merged_df.apply(lambda x:DeathsExp(x.DeathsDays,x.country), axis=1)
-
-
-#optimized2_ydata = my_func(xdata, ydata, est2_w, est2_k)
-
-merged_df=merged_df.sort_values(by=['country', 'date'])
-            
-merged_df.to_csv(reports_dir+"/merged.csv", sep=',')
-
-# ------------------------------------------------------------------------
-##### Create Graphs #####
-    
-print('Creating graphs...')
-
 
 print('... Time Series Trend Line')
 
@@ -623,8 +301,8 @@ for country in sortedcountries:
         if mark>=len(markers): mark=0
         col+=1
         if col>=len(colours): col=0
-ax.set(xlim=(daysbefore, daysafter), ylim=(mincases, maxcases))
-ax.set(xlabel="Days since " + str(mincases) + " cases")
+ax.set(xlim=(cf.daysbefore, cf.daysafter), ylim=(cf.mincases, cf.maxcases))
+ax.set(xlabel="Days since " + str(cf.mincases) + " cases")
 ax.set(ylabel="Number of cases")
 ax.set(Title="Covid-19 in countries")
 ax.legend()
@@ -634,6 +312,9 @@ fig.savefig(os.path.join(image_dir, 'COUNTRIES_trendline.png'.format(col)))
 #time.sleep(5)
 plt.close('all')
 
+
+#try:
+merged_df['date']=merged_df.apply(lambda x:pp.FormatDateMerged(x.date), axis=1)
 
 
 c=[]
@@ -648,7 +329,7 @@ for country in countries:
     if (y.deaths>1 or y.confirmed>100):
         c+=[country]
         r+=[y.deaths/y.confirmed]
-        list[country]=[(tiny+y.deaths)/y.confirmed,y.deaths,y.confirmed,(tiny+y.deaths)/max(tiny,q.confirmed)]
+        list[country]=[(cf.tiny+y.deaths)/y.confirmed,y.deaths,y.confirmed,(cf.tiny+y.deaths)/max(cf.tiny,q.confirmed)]
 fig, (ax1, ax2) = plt.subplots(2,1,gridspec_kw={'height_ratios': [1, 3]},figsize=(20,15))
 tmplist=sorted(list.items() , reverse=True, key=lambda x: x[1])
 x=[]
@@ -682,6 +363,7 @@ plt.close('all')
 
 # regression data for countr
 #newdf=agg_df.loc[(agg_df['confirmed']>100) & (agg_df['confirmed']<10000)]
+
 x=[]
 y=[]
 yerr=[]
@@ -690,13 +372,54 @@ zerr=[]
 mark=0
 col=0
 colorlist=[]
+# This is to get the corrent (last week) linregression in cases
+weeklist={}
+weekreg={}
+for country in countries:
+    newdf=merged_df.loc[(merged_df['date']>pd.Timestamp(aweekago)) &(merged_df['country'] == country)]
+    if (len(newdf)<4):
+        weekreg[country]=linregress([0.0,1.0],[0.0,0.0])
+        continue
+    weekreg[country]=linregress(newdf['Days'],newdf['LogCases'])
+    weeklist[country]=weekreg[country].slope
+tmplist = sorted(weeklist.items() , reverse=True, key=lambda x: x[1])
+#print (weekreg)
+
+weekdeathslist={}
+weekdeaths={}
+for country in countries:
+    newdf=merged_df.loc[(merged_df['date']>pd.Timestamp(pd.Timestamp(aweekago))) & (merged_df['country'] == country)]
+    if (len(newdf)<4):
+        weekdeaths[country]=linregress([0.0,1.0],[0.0,0.0])
+        continue
+    weekdeaths[country]=linregress(newdf['DeathsDays'],newdf['LogDeaths'])
+    #print(deathsreg[country])
+    weekdeathslist[country]=weekdeaths[country].slope
+tmplist = sorted(weeklist.items() , reverse=True, key=lambda x: x[1])
+
+
+deathslist={}
+deathsreg={}
+for country in countries:
+    newdf=merged_df.loc[(merged_df['deaths']>cf.mindeaths) & (merged_df['deaths']<cf.maxdeaths) & (merged_df['country'] == country)]
+    if (len(newdf)<4):
+        deathsreg[country]=linregress([0.0,1.0],[0.0,0.0])
+        continue
+    deathsreg[country]=linregress(newdf['DeathsDays'],newdf['LogDeaths'])
+    #print(deathsreg[country])
+    deathslist[country]=deathsreg[country].slope
+tmplist = sorted(deathslist.items() , reverse=True, key=lambda x: x[1])
+deathscountries=[]
+for i in range(0,len(tmplist)):
+    deathscountries+=[tmplist[i][0]]
+    
 
 plt.close('all')
 print('... Slope plots')
 fig2, (ax2, ax3) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]},figsize=(20,15))
 for country in sortedcountries:
     newdf=merged_df.loc[merged_df['country'] == country]
-    if newdf['confirmed'].max()<minconfirmed: continue
+    if newdf['confirmed'].max()<cf.minconfirmed: continue
     x+=[country]
     y+=[linreg[country].slope]
     yerr+=[linreg[country].stderr]
@@ -704,7 +427,7 @@ for country in sortedcountries:
     zerr+=[weekreg[country].stderr]
     fig, ax = plt.subplots(figsize=(20,10))
     ax.set(ylabel="Log(Commulative cases)")
-    ax.set(xlabel="Days from "+str(minnum)+" to "+str(maxnum) + " days")
+    ax.set(xlabel="Days from "+str(cf.minnum)+" to "+str(cf.maxnum) + " days")
     ax.set(Title=" Covid-19 log (cases) in different countries" )
     ax.scatter(newdf['Days'],newdf['confirmed'],label=country)
     #ax.plot(newdf['Days'], np.exp(linreg[country].intercept +
@@ -712,8 +435,8 @@ for country in sortedcountries:
     #            label=str(linreg[country]))
     ax.plot(newdf['Days'], newdf['LinCases'],label=str(linreg[country]))
     ax.set_yscale('log')
-    ax.set(xlim=(daysbefore, daysafter), ylim=(mincases, maxcases))
-    ax2.set(xlim=(daysbefore, daysafter), ylim=(mincases, maxcases))
+    ax.set(xlim=(cf.daysbefore, cf.daysafter), ylim=(cf.mincases, cf.maxcases))
+    ax2.set(xlim=(cf.daysbefore, cf.daysafter), ylim=(cf.mincases, cf.maxcases))
 
     fig = ax.get_figure()
     ax.legend()
@@ -759,7 +482,7 @@ colorlist=[]
 fig2, (ax2, ax3) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]},figsize=(20,15))
 for country in deathscountries:
     newdf=merged_df.loc[merged_df['country'] == country]
-    if newdf['deaths'].max()<mindeaths: continue
+    if newdf['deaths'].max()<cf.mindeaths: continue
     x+=[country]
     y+=[deathsreg[country].slope]
     yerr+=[deathsreg[country].stderr]
@@ -774,7 +497,7 @@ for country in deathscountries:
     if col>=len(colours): col=0
         
     #plt.close('all')
-ax2.set(xlim=(ddaysbefore, ddaysafter),ylim=(mindeathcases, maxdeathcases))
+ax2.set(xlim=(cf.ddaysbefore, cf.ddaysafter),ylim=(cf.mindeathcases, cf.maxdeathcases))
 
 ax2.set_yscale('log')
 ax2.set(ylabel="Log(Commulative deaths)")
@@ -797,13 +520,47 @@ plt.close('all')
 # Time Series Data Plots
 
 print('... Slope figures')
+slopelist={}
+newslopelist={}
+for country in countries:
+    ctoday=merged_df.loc[(merged_df['country']==country)]['Days'].max()
+    if ctoday>7:
+        slopelist[country]=[]
+        newslopelist[country]=[]
+    for days in range(7,ctoday):
+        newdf=merged_df.loc[(merged_df['Days']>days-7) &(merged_df['Days']<=days) &(merged_df['country'] == country)]
+        lr=linregress(newdf['Days'],newdf['LogCases'])
+        slopelist[country]+=[lr.slope]
+        dayone=merged_df.loc[(merged_df['Days']==(days-7)) &(merged_df['country'] == country)]['confirmed'].iloc[0]
+        dayseven=merged_df.loc[(merged_df['Days']==(days)) &(merged_df['country'] == country)]['confirmed'].iloc[0]
+        newslopelist[country]+=[np.power(float(dayseven)/float(dayone),(1/7))-1.0]
+
+#print (slopelist,newslopelist)
+#sys.exit()
+# This is to get the change in slope
+newdeathslopelist={}
+deathslopelist={}
+for country in countries:
+    dtoday=merged_df.loc[(merged_df['country']==country)]['DeathsDays'].max()
+    if dtoday>7:
+        deathslopelist[country]=[]
+        newdeathslopelist[country]=[]
+    for days in range(7,dtoday):
+        newdf=merged_df.loc[(merged_df['DeathsDays']>days-7) &(merged_df['DeathsDays']<=days) &(merged_df['country'] == country)]
+        lr=linregress(newdf['DeathsDays'],newdf['LogCases'])
+        dayone=merged_df.loc[(merged_df['DeathsDays']==(days-7)) &(merged_df['country'] == country)]['deaths'].iloc[0]
+        dayseven=merged_df.loc[(merged_df['DeathsDays']==(days)) &(merged_df['country'] == country)]['deaths'].iloc[0]
+        newdeathslopelist[country]+=[np.power(float(dayseven)/float(dayone),(1/7))-1.0]
+        
+        deathslopelist[country]+=[lr.slope]
+
 colorlist=[]
 markerlist=[]
 col=0
 mark=0
 fig, ax = plt.subplots(figsize=(20,10))
 for country in slopelist.keys():
-    if (len(slopelist[country])>minslopedays):
+    if (len(slopelist[country])>cf.minslopedays):
         ax.plot(np.arange(len(slopelist[country])),slopelist[country],label=country,lw=2,marker=markers[mark],color=colours[col])
         colorlist+=[colours[col]]
         markerlist+=[markers[mark]]
@@ -814,9 +571,9 @@ for country in slopelist.keys():
 ax.legend() 
 ax.set(title="Changes in slope from onset")
 ax.set(ylabel="Slope (log2 base)")
-ax.set(xlabel="Days since " + str(mincases) + " cases")
+ax.set(xlabel="Days since " + str(cf.mincases) + " cases")
 #ax.set(xlabel="Days")
-ax.set(xlim=[0,daysafter])
+ax.set(xlim=[0,cf.daysafter])
 #fig.show()
 fig.savefig(os.path.join(image_dir, 'slope-evol.png'))
 
@@ -826,7 +583,7 @@ col=0
 mark=0
 fig, ax = plt.subplots(figsize=(20,10))
 for country in newslopelist.keys():
-    if (len(newslopelist[country])>minslopedays):
+    if (len(newslopelist[country])>cf.minslopedays):
         ax.plot(np.arange(len(newslopelist[country])),newslopelist[country],label=country,lw=2,marker=markers[mark],color=colours[col])
         colorlist+=[colours[col]]
         markerlist+=[markers[mark]]
@@ -837,9 +594,9 @@ for country in newslopelist.keys():
 ax.legend() 
 ax.set(title="Changes in slope from onset")
 ax.set(ylabel="Increase per day")
-ax.set(xlabel="Days since " + str(mincases) + " cases")
+ax.set(xlabel="Days since " + str(cf.mincases) + " cases")
 #ax.set(xlabel="Days")
-ax.set(xlim=[0,daysafter])
+ax.set(xlim=[0,cf.daysafter])
 #fig.show()
 fig.savefig(os.path.join(image_dir, 'newslope-evol.png'))
 
@@ -850,7 +607,7 @@ col=0
 mark=0
 fig, ax = plt.subplots(figsize=(20,10))
 for country in deathslopelist.keys():
-    if (len(deathslopelist[country])>minslopeddays):
+    if (len(deathslopelist[country])>cf.minslopeddays):
         ax.plot(np.arange(len(deathslopelist[country])),deathslopelist[country],lw=3,label=country,marker=markers[mark],color=colours[col])
         colorlist+=[colours[col]]
         markerlist+=[markers[mark]]
@@ -861,9 +618,9 @@ for country in deathslopelist.keys():
 ax.legend() 
 ax.set(title="Changes in death slope from onset")
 ax.set(ylabel="Slope (log2 base)")
-ax.set(xlabel="Days since " + str(mindeathcases) + " deaths")
+ax.set(xlabel="Days since " + str(cf.mindeathcases) + " deaths")
 #ax.set(xlabel="Days")
-ax.set(xlim=[0,daysafter])
+ax.set(xlim=[0,cf.daysafter])
 #fig.show()
 fig.savefig(os.path.join(image_dir, 'deathslope-evol.png'))
 
@@ -873,7 +630,7 @@ col=0
 mark=0
 fig, ax = plt.subplots(figsize=(20,10))
 for country in newdeathslopelist.keys():
-    if (len(newdeathslopelist[country])>minslopeddays):
+    if (len(newdeathslopelist[country])>cf.minslopeddays):
         ax.plot(np.arange(len(newdeathslopelist[country])),newdeathslopelist[country],lw=3,label=country,marker=markers[mark],color=colours[col])
         colorlist+=[colours[col]]
         markerlist+=[markers[mark]]
@@ -884,9 +641,9 @@ for country in newdeathslopelist.keys():
 ax.legend() 
 ax.set(title="Changes in death slope from onset")
 ax.set(ylabel="Increase per day")
-ax.set(xlabel="Days since " + str(mindeathcases) + " deaths")
+ax.set(xlabel="Days since " + str(cf.mindeathcases) + " deaths")
 #ax.set(xlabel="Days")
-ax.set(xlim=[0,daysafter])
+ax.set(xlim=[0,cf.daysafter])
 #fig.show()
 fig.savefig(os.path.join(image_dir, 'newdeathslope-evol.png'))
 
