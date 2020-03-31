@@ -139,7 +139,7 @@ agg_df=df.rename(columns={
 #try:
 #agg_df['date']=agg_df.apply(lambda x:pp.FormatDate(x.DateRep), axis=1)
 
-print (agg_df)
+#print (agg_df)
 
 date=agg_df['date'].max()
 if str(date.date())!=str(today) and (not ns.force):
@@ -234,7 +234,7 @@ for country in countries:
                  #"new_recovered_cases":0,
                  #"recovered":r,
                       "Days":(date-startdate[country]).days,
-                      "DeathsDays":(date-startdeaths[country]).days,
+                      "DeathsDays":(date-startdeaths[country]).days},
                       #DeathsDate,
                       #StartDate,
                       #"FirstDate":first[country],

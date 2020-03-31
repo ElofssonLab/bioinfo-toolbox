@@ -5,16 +5,19 @@ maxdeaths=1000
 minnum=100
 maxnum=5000
 
-# Countries to select
-minconfirmed=1000
-mindeaths=10
+# Countries to select (we try to include sweden)
+minconfirmed=3000
+mindeaths=50
+
+# Selected countries
+specialcountries=["China","USA","UK","Germany","America","Spain","Italy","Sweden","France","Denmark","Norway"]
 
 # Cutoff to select startdate for exponential curved
 cutoff=500
 
 # Plotting parameters
 daysbefore=-10
-daysafter=45
+daysafter=75
 mincases=5
 maxcases=250000
 mindeathcases=1
@@ -24,6 +27,7 @@ ddaysafter=20
 minslopedays=10
 minslopeddays=-1
 
+maxcountries=20
 
 # Misc
 tiny=0.000001

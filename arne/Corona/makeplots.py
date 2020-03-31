@@ -196,10 +196,11 @@ for country in countries:
 
 tmplist = sorted(countrylist.items() , reverse=True, key=lambda x: x[1])
 sortedcountries=[]
-for i in range(0,len(tmplist)):
+for i in range(0,min(cf.maxcountries,len(tmplist))):
     sortedcountries+=[tmplist[i][0]]
 
-
+if ns.countries:
+    sortedcountries=cv.specialcountries
 
 ##### Create Graphs #####
     
@@ -254,8 +255,7 @@ x=[]
 y=[]
 z=[]
 #print (sorted_td)
-maxcountries=50
-for i in range(0,min(maxcountries,len(sorted_td))):
+for i in range(0,min(cf.maxcountries,len(sorted_td))):
     x+=[sorted_td[i][0]]
     z+=[sorted_td[i][1]]
     try:
@@ -319,7 +319,7 @@ merged_df['date']=merged_df.apply(lambda x:pp.FormatDateMerged(x.date), axis=1)
 c=[]
 r=[]
 list={}
-for country in countries:
+for country in sortedcountries:
     tempdf=merged_df.loc[merged_df['country'] == country]
     weekdf=tempdf.loc[(tempdf['date']<pd.Timestamp(pd.Timestamp(aweekago)))]
 
@@ -374,7 +374,7 @@ colorlist=[]
 # This is to get the corrent (last week) linregression in cases
 weeklist={}
 weekreg={}
-for country in countries:
+for country in sortedcountries:
     newdf=merged_df.loc[(merged_df['date']>pd.Timestamp(aweekago)) &(merged_df['country'] == country)]
     if (len(newdf)<4):
         weekreg[country]=linregress([0.0,1.0],[0.0,0.0])
@@ -386,7 +386,7 @@ tmplist = sorted(weeklist.items() , reverse=True, key=lambda x: x[1])
 
 weekdeathslist={}
 weekdeaths={}
-for country in countries:
+for country in sortedcountries:
     newdf=merged_df.loc[(merged_df['date']>pd.Timestamp(pd.Timestamp(aweekago))) & (merged_df['country'] == country)]
     if (len(newdf)<4):
         weekdeaths[country]=linregress([0.0,1.0],[0.0,0.0])
@@ -399,7 +399,7 @@ tmplist = sorted(weeklist.items() , reverse=True, key=lambda x: x[1])
 
 deathslist={}
 deathsreg={}
-for country in countries:
+for country in sortedcountries:
     newdf=merged_df.loc[(merged_df['deaths']>cf.mindeaths) & (merged_df['deaths']<cf.maxdeaths) & (merged_df['country'] == country)]
     if (len(newdf)<4):
         deathsreg[country]=linregress([0.0,1.0],[0.0,0.0])
@@ -426,7 +426,7 @@ for country in sortedcountries:
     zerr+=[weekreg[country].stderr]
     fig, ax = plt.subplots(figsize=(20,10))
     ax.set(ylabel="Log(Commulative cases)")
-    ax.set(xlabel="Days from "+str(cf.minnum)+" to "+str(cf.maxnum) + " days")
+    ax.set(xlabel="Days from "+str(cf.minnum)+" to "+str(cf.maxnum) + " cases")
     ax.set(Title=" Covid-19 log (cases) in different countries" )
     ax.scatter(newdf['Days'],newdf['confirmed'],label=country)
     #ax.plot(newdf['Days'], np.exp(linreg[country].intercept +
@@ -479,7 +479,7 @@ mark=0
 col=0
 colorlist=[]
 fig2, (ax2, ax3) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]},figsize=(20,15))
-for country in deathscountries:
+for country in sortedcountries:
     newdf=merged_df.loc[merged_df['country'] == country]
     if newdf['deaths'].max()<cf.mindeaths: continue
     x+=[country]
@@ -521,7 +521,7 @@ plt.close('all')
 print('... Slope figures')
 slopelist={}
 newslopelist={}
-for country in countries:
+for country in sortedcountries:
     ctoday=merged_df.loc[(merged_df['country']==country)]['Days'].max()
     if ctoday>7:
         slopelist[country]=[]
@@ -539,7 +539,7 @@ for country in countries:
 # This is to get the change in slope
 newdeathslopelist={}
 deathslopelist={}
-for country in countries:
+for country in sortedcountries:
     dtoday=merged_df.loc[(merged_df['country']==country)]['DeathsDays'].max()
     if dtoday>7:
         deathslopelist[country]=[]
@@ -652,7 +652,7 @@ markerlist=[]
 col=0
 mark=0
 fig, ax = plt.subplots(figsize=(20,10))
-for country in countries:
+for country in sortedcountries:
     ctoday=merged_df.loc[(merged_df['country']==country)]['Days'].max()
     cases=merged_df.loc[(merged_df['country']==country)]['confirmed'].max()
     if cases<2000:
@@ -693,7 +693,7 @@ markerlist=[]
 col=0
 mark=0
 fig, ax = plt.subplots(figsize=(20,10))
-for country in countries:
+for country in sortedcountries:
     ctoday=merged_df.loc[(merged_df['country']==country)]['Days'].max()
     cases=merged_df.loc[(merged_df['country']==country)]['deaths'].max()
     if cases<100:

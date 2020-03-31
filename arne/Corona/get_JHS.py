@@ -156,7 +156,7 @@ del agg_df['datestring']
 del agg_df['file_date']
 
 if ns.province:
-    df["newcountry"] = df["country"] + df["province"]
+    agg_df["newcountry"] = agg_df[["country","province"]].agg('-'.join, axis=1)
     del agg_df['province']
     del agg_df['country']
     agg_df['country']=agg_df['newcountry']

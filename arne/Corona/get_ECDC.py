@@ -215,7 +215,7 @@ for country in countries:
                  #"new_recovered_cases":0,
                  #"recovered":r,
                       "Days":(date-startdate[country]).days,
-                      "DeathsDays":(date-startdeaths[country]).days,
+                      "DeathsDays":(date-startdeaths[country]).days},
                       #DeathsDate,
                       #StartDate,
                       #"FirstDate":first[country],
