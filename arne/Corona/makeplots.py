@@ -146,7 +146,8 @@ p = argparse.ArgumentParser(description =
             formatter_class=RawTextHelpFormatter)
 p.add_argument('-f','--force', required= False, help='Force', action='store_true')
 p.add_argument('-out','--output_folder', required= False, help='output folder')
-p.add_argument('-data','--input','-i', required= True, help='Inout formatted CSV file')
+p.add_argument('-data','--input','-i', required= True, help='Input formatted CSV file')
+p.add_argument('-countries','-c', required= False, help='Only include selected countries from config', action='store_true')
 ns = p.parse_args()
 
 if ns.output_folder:
@@ -734,11 +735,11 @@ fig.savefig(os.path.join(image_dir, 'weekly-death-log.png'))
 plt.close('All')
 print('... Country Figures')
 # Ratio plots
-tempdf=merged_df.loc[merged_df['country'] != "China"]
-nations_trend_line(tempdf, "RestOfWorld",  'confirmed', 'deaths', "new_confirmed_cases","new_deaths","Days","LinCases",'DeathsDays',"LinDeaths")
+#tempdf=merged_df.loc[merged_df['country'] != "China"]
+#nations_trend_line(tempdf, "RestOfWorld",  'confirmed', 'deaths', "new_confirmed_cases","new_deaths","Days","LinCases",'DeathsDays',"LinDeaths")
 
-tempdf=merged_df.loc[merged_df['country'] == "China"]
-nations_trend_line(tempdf, "China",  'confirmed', 'deaths', "new_confirmed_cases","new_deaths","Days","LinCases",'DeathsDays',"LinDeaths")
+#tempdf=merged_df.loc[merged_df['country'] == "China"]
+#nations_trend_line(tempdf, "China",  'confirmed', 'deaths', "new_confirmed_cases","new_deaths","Days","LinCases",'DeathsDays',"LinDeaths")
 
 #sys.exit()
 
