@@ -190,9 +190,6 @@ def DeathsDays(x,y):
 
 merged_df['Days']=merged_df.apply(lambda x:Days(x.date,x.country), axis=1)
 merged_df['DeathsDays']=merged_df.apply(lambda x:DeathsDays(x.date,x.country), axis=1)
-merged_df['LogCases']=merged_df['confirmed'].apply(lambda x:(np.log2(max(x,tiny))))
-merged_df['LogDeaths']=merged_df['deaths'].apply(lambda x:(np.log2(max(x,tiny))))
-merged_df['Ratio'] = merged_df["deaths"]/merged_df["confirmed"]
 
 #print (merged_df)
 
@@ -213,14 +210,17 @@ for country in countries:
                  "country":country,
                  "confirmed":c,
                  "deaths":d,
+                 "new_confirmed_cases":0,
+                 "new_deaths":0,
+                 #"new_recovered_cases":0,
                  #"recovered":r,
                       "Days":(date-startdate[country]).days,
                       "DeathsDays":(date-startdeaths[country]).days,
                       #DeathsDate,
                       #StartDate,
                       #"FirstDate":first[country],
-                      "LogCases":np.log2(c+tiny),
-                      "LogDeaths":np.log2(d+tiny)},
+                      #"LogCases":np.log2(c+tiny),
+                      #"LogDeaths":np.log2(d+tiny)},
                                             ignore_index=True)
             #merged_df.append(data, ignore_index=True)
         else:
@@ -229,6 +229,9 @@ for country in countries:
             #r=int(merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)]['recovered'])
 
 #merged_df.to_csv(reports_dir+"/merged1.csv", sep=',')
+merged_df['LogCases']=merged_df['confirmed'].apply(lambda x:(np.log2(max(x,tiny))))
+merged_df['LogDeaths']=merged_df['deaths'].apply(lambda x:(np.log2(max(x,tiny))))
+merged_df['Ratio'] = merged_df["deaths"]/merged_df["confirmed"]
 
 
 linreg={}

@@ -111,6 +111,7 @@ def get_data(cleaned_sheets):
     # Import all CSV's
     for f in tqdm(sorted(cleaned_sheets), desc='... loading data: '):
         if 'csv' in f:
+            #print (f)
             try:
                 tmp_df = pd.read_csv(os.path.join(DATA, f), index_col=None,header=0, parse_dates=['Last Update'])  
             except:
@@ -160,6 +161,6 @@ def get():
 
     # Aggregate all the data from sheets
     df = get_data(cleaned_sheets)
-    
+    #print("githubdata",df)
     #Clean the column names
     return df

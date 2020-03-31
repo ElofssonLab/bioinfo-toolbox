@@ -327,7 +327,7 @@ for country in countries:
     q=weekdf[['confirmed','deaths']].max()
     if (y.deaths>1 or y.confirmed>100):
         c+=[country]
-        r+=[y.deaths/y.confirmed]
+        r+=[y.deaths/(y.confirmed+cf.tiny)]
         list[country]=[(cf.tiny+y.deaths)/y.confirmed,y.deaths,y.confirmed,(cf.tiny+y.deaths)/max(cf.tiny,q.confirmed)]
 fig, (ax1, ax2) = plt.subplots(2,1,gridspec_kw={'height_ratios': [1, 3]},figsize=(20,15))
 tmplist=sorted(list.items() , reverse=True, key=lambda x: x[1])
@@ -532,7 +532,7 @@ for country in countries:
         slopelist[country]+=[lr.slope]
         dayone=merged_df.loc[(merged_df['Days']==(days-7)) &(merged_df['country'] == country)]['confirmed'].iloc[0]
         dayseven=merged_df.loc[(merged_df['Days']==(days)) &(merged_df['country'] == country)]['confirmed'].iloc[0]
-        newslopelist[country]+=[np.power(float(dayseven)/float(dayone),(1/7))-1.0]
+        newslopelist[country]+=[np.power(float(dayseven)/float(dayone+cf.tiny),(1/7))-1.0]
 
 #print (slopelist,newslopelist)
 #sys.exit()
@@ -549,7 +549,7 @@ for country in countries:
         lr=linregress(newdf['DeathsDays'],newdf['LogCases'])
         dayone=merged_df.loc[(merged_df['DeathsDays']==(days-7)) &(merged_df['country'] == country)]['deaths'].iloc[0]
         dayseven=merged_df.loc[(merged_df['DeathsDays']==(days)) &(merged_df['country'] == country)]['deaths'].iloc[0]
-        newdeathslopelist[country]+=[np.power(float(dayseven)/float(dayone),(1/7))-1.0]
+        newdeathslopelist[country]+=[np.power(float(dayseven)/float(dayone+cf.tiny),(1/7))-1.0]
         
         deathslopelist[country]+=[lr.slope]
 

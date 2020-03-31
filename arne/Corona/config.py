@@ -51,11 +51,18 @@ KEEP_COLS = ['country',
              'province', 
              'confirmed',
              'deaths',
-             'recovered',
-             'date',
              'datetime',
-             'file_date']
+             'file_date',
+             #'new_recovered_cases',
+             #'new_confirmed_cases',
+             #'new_deaths',
+             'recovered',
+             'date']
 
 NUMERIC_COLS = ['confirmed', 
                 'deaths', 
-                'recovered']
+             #'new_recovered_cases',
+             #'new_confirmed_cases',
+             #'new_deaths'
+                'recovered'
+                    ]

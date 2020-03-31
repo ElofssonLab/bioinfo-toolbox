@@ -1,5 +1,8 @@
 """
 data_prep.py - Extract data from date range and create models
+
+# This is just stolen from covidify - Thanks
+
 Usage:
     data_prep.py [options]
     data_prep.py -h | --help
@@ -48,7 +51,8 @@ from config import REPO, TMP_FOLDER, TMP_GIT, DATA, KEEP_COLS, NUMERIC_COLS
 
 df = github.get()
     
-    
+
+#print (df)
 
 
 ############ COUNTRY SELECTION ############
@@ -147,6 +151,11 @@ daily_cases_df['new_confirmed_cases'] = get_new_cases(df, 'confirmed')
 daily_cases_df['new_deaths'] = get_new_cases(df, 'deaths')
 daily_cases_df['new_recoveries'] = get_new_cases(df, 'recovered')
 
+# # Add this to the same DF
+#df['new_confirmed_cases'] = get_new_cases(df, 'confirmed')
+#df['new_deaths'] = get_new_cases(df, 'deaths')
+#df['new_recoveries'] = get_new_cases(df, 'recovered')
+
 
 
 #Moving average
@@ -186,9 +195,9 @@ print('Creating subdirectory for data...')
 print('...', save_dir)
 
 print('Saving...')
-file_name = 'agg_data_{}.parquet.gzip'.format(datetime.date(datetime.now()))
-df.astype(str).to_parquet(os.path.join(save_dir, file_name), compression='gzip')
-print('...', file_name)
+#file_name = 'agg_data_{}.parquet.gzip'.format(datetime.date(datetime.now()))
+#df.astype(str).to_parquet(os.path.join(save_dir, file_name), compression='gzip')
+#print('...', file_name)
 
 
 csv_file_name = 'agg_data_{}.csv'.format(datetime.date(datetime.now()))
@@ -196,8 +205,8 @@ df.astype(str).to_csv(os.path.join(save_dir, csv_file_name))
 print('...', csv_file_name)
 
 
-daily_cases_file_name = 'trend_{}.csv'.format(datetime.date(datetime.now()))
-daily_cases_df.astype(str).to_csv(os.path.join(save_dir, daily_cases_file_name))
-print('...', daily_cases_file_name)
+#daily_cases_file_name = 'trend_{}.csv'.format(datetime.date(datetime.now()))
+#daily_cases_df.astype(str).to_csv(os.path.join(save_dir, daily_cases_file_name))
+#print('...', daily_cases_file_name)
 
 print('Done!')
