@@ -15,7 +15,34 @@ def fix_country_names(df):
                     'Mainland China':'China',
                     'Korea, South':'South Korea',
                     'Republic of Korea':'South Korea',
-                    'Cases_on_an_international_conveyance_Japan':'Cruise Ship'}
+                    'Cases_on_an_international_conveyance_Japan':'Cruise Ship',
+                    'Mainland China':'China',
+                    'Korea, South':'South Korea',
+                    'Republic of Korea':'South Korea',
+                    'Hong Kong SAR':'Hong Kong',
+                    'Taipei and environs':'Taiwan',
+                    'Taiwan*':'Taiwan',
+                    'Macao SAR':'Macau',
+                        'Iran (Islamic Republic of)':'Iran',
+                        'Viet Nam':'Vietnam',
+                        'UK':'United Kingdom',
+                        ' Azerbaijan':'Azerbaijan',
+                        'Bosnia and Herzegovina':'Bosnia',
+                        'Czech Republic':'Czechia',
+                        'Republic of Ireland':'Ireland',
+                        'North Ireland':'Ireland',
+                        'Republic of Moldova':'Moldova',
+                        'Congo (Brazzaville:)':'Congo',
+                        'Congo (Kinshasa)':'Congo',
+                        'Republic of the Congo':'Congo',
+                        'Gambia, The':'Gambia',
+                        'The Gambia':'Gambia',
+                        'USA':'Unites States',
+                        'US':'United States',
+                        'Bahamas, The':'The Bahamas',
+                        'Bahamas':'The Bahamas',
+                        'Cruise Ship':'Others'
+                        }
     df.replace(translations, inplace=True)
 
 
@@ -39,3 +66,9 @@ def FormatDate(x):
 def FormatDateMerged(x):
     #return (parser.parse(x))
     return (datetime.strptime(x,"%Y-%m-%d"))
+
+def replace_arg_space(country_str):
+    return country_str.replace(' ', '_')
+
+def replace_arg_score(country_str):
+    return country_str.replace('_', ' ')
