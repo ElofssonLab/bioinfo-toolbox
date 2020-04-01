@@ -98,7 +98,8 @@ csvfile=wget.download(URL, out=str(infile))
     
 print('Importing Data...')
 print("Using: ",infile)
-df=pd.read_csv(csvfile,encoding='iso8859_16')
+#df=pd.read_csv(csvfile,encoding='iso8859_16')
+df=pd.read_csv(csvfile)
 #df= pd.read_excel(infile)
 pp.fix_country_names(df)
 
@@ -120,6 +121,7 @@ agg_df=df.rename(columns={
 
 
 #try:
+print (agg_df)
 agg_df['date']=agg_df.apply(lambda x:pp.FormatDate(x.DateRep), axis=1)
 
 date=agg_df['date'].max()
