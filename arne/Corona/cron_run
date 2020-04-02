@@ -21,7 +21,7 @@ tree -H '.' -L 1 --noreport --charset utf-8 -T "Corona plots from Arne Elofsson"
 for i in `find ./ -type d`
 do
     pushd $i
-    tree -H '.' -L 1 --noreport --charset utf-8 -T "Corona plots from Arne Elofsson"  -n  > index.html
+    tree -H '.' -L 1 --noreport --charset utf-8 -T "Corona plots from Arne Elofsson $i "  -n  > index.html
     popd
 done
 rsync -ar -e "ssh -i ~/.ssh/id2_rsa" ~/Desktop/Corona/ ae.scilifelab.se:/var/www/html/archive.bioinfo.se/docroot/Corona/ 2>/dev/null
