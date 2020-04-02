@@ -1,4 +1,3 @@
-from lxml import html
 #!/usr/bin/env python3
 
 import os

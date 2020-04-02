@@ -125,7 +125,7 @@ agg_df=df.rename(columns={
 
 
 #try:
-print (agg_df)
+#print (agg_df)
 agg_df['date']=agg_df.apply(lambda x:pp.FormatDateMerged(x.DateRep), axis=1)
 
 if ns.province:
