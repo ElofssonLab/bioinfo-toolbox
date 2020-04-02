@@ -38,7 +38,7 @@ register_matplotlib_converters()
 
 
 # Plot and save trendlinae graph
-def nations_trend_line(tmp_df, name, cumconfirmed, cumdeath, ncases,ndeath,cdays,lincases,ddays,lindeaths):
+def nations_trend_line(tmp_df, name, cumconfirmed, cumdeath, ncases,ndeath,cdays,lincases,ddays,lindeaths,nrecovered,nintensive):
     global curvefit,curvedeaths
     xdata=tmp_df[cdays].to_numpy()
     ydata=tmp_df[cumconfirmed].apply(lambda x:(np.log2(max(x,cf.tiny)))).to_numpy()
@@ -52,7 +52,12 @@ def nations_trend_line(tmp_df, name, cumconfirmed, cumdeath, ncases,ndeath,cdays
         yfit=pp.sigmoidalfunction0(xdata,ydata,curvedeath[name][1],curvedeath[name][2],curvedeath[name][3]) # ,curvedeath[name][4])
         ynum=np.exp2(yfit)
         ax1.plot(tmp_df['date'],ynum,label="sigmoidal death, max: "+str(round(np.exp2(curvedeath[name][2]),0)))
-    tmp_df.groupby(['date'])[[cumconfirmed, cumdeath,lincases,lindeaths]].sum().plot(ax=ax1, marker='o')
+    columns=[cumconfirmed, cumdeath,lincases,lindeaths]
+    if nrecovered in tmp_df.columns:
+        columns+=[nrecovered]
+    if nintensive in tmp_df.columns:
+        columns+=[nintensive]
+    tmp_df.groupby(['date'])[columns].sum().plot(ax=ax1, marker='o')
     ax1.set_yscale('log')
     ax1.set(ylim=(0.5,cf.maxcases))
     ax1.tick_params(axis='x', labelrotation=45 )
@@ -66,14 +71,19 @@ def nations_trend_line(tmp_df, name, cumconfirmed, cumdeath, ncases,ndeath,cdays
     wratio =tmp6[cumdeath]/(tmp5[cumconfirmed].shift(7)+cf.tiny)
     #print (ratio,wratio)
     if tmp[ncases].max()>0:
-        ax1.bar(tmp.index,tmp[ncases], color="red",width=0.4, ls='dashed', lw=2)
-
-        
-    
+        ax1.bar(tmp.index,tmp[ncases], color="red",width=0.2, ls='dashed', lw=2)
     # We need to check if we have any deaths
-    #print (tmp_df[ndeath])
     if tmp2[ndeath].max()>0:
-        ax1.bar(tmp2.index,tmp2[ndeath], color="blue",width=0.8,alpha = 0.5, ls='dotted', lw=2  )
+        ax1.bar(tmp2.index,tmp2[ndeath], color="blue",width=0.4,alpha = 0.5, ls='dotted', lw=2  )
+    if nrecovered in tmp_df.columns:
+        tmp7 = tmp_df.groupby(['date'])[[nrecovered]].sum()
+        if tmp7[nrecovered].max()>0:
+            ax1.bar(tmp7.index,tmp7[nrecovered], color="green",width=0.6,alpha = 0.5, ls='dotted', lw=2  )
+    if nintensive in tmp_df.columns:
+        tmp8 = tmp_df.groupby(['date'])[[nintensive]].sum()
+        if tmp8[nintensive].max()>0:
+            ax1.bar(tmp8.index,tmp8[nintensive], color="green",width=0.6,alpha = 0.5, ls='dotted', lw=2  )
+
     #ax.set(xlabel="Days since > " + str(cutoff) + " cases")
     ax1.set(ylabel="Number of cases")
     ax1.set(Title="Covid-19 cases in " + name)
@@ -766,7 +776,7 @@ print('... Country Figures')
 
 for country in countries:
     tempdf=merged_df.loc[merged_df['country'] == country]
-    nations_trend_line(tempdf, country,  'confirmed', 'deaths', "new_confirmed_cases","new_deaths","Days","LinCases",'DeathsDays',"LinDeaths")
+    nations_trend_line(tempdf, country,  'confirmed', 'deaths', "new_confirmed_cases","new_deaths","Days","LinCases",'DeathsDays',"LinDeaths","new_recovered_cases","new_IntensiveCare")
 
 # Trend line for new cases
 #create_trend_line(merged_df, 'new_confirmed_cases', 'new_deaths', 'new_recoveries')

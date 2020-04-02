@@ -219,6 +219,7 @@ for country in countries:
     c=0
     r=0
     d=0
+    i=0
     for date in dates:
         if date=='' : continue
         if date>today:continue
@@ -231,6 +232,7 @@ for country in countries:
                  "deaths":d,
                  "new_confirmed_cases":0,
                  "new_deaths":0,
+                 "new_IntensiveCare":0,
                  #"new_recovered_cases":0,
                  #"recovered":r,
                       "Days":(date-startdate[country]).days,
@@ -246,6 +248,7 @@ for country in countries:
             c=int(merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)]['confirmed'])
             d=int(merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)]['deaths'])
             #r=int(merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)]['recovered'])
+            i=int(merged_df.loc[ (merged_df['country']==country) & (merged_df['date']==date)]['IntensiveCare'])
 
 #merged_df.to_csv(reports_dir+"/merged1.csv", sep=',')
 merged_df['LogCases']=merged_df['confirmed'].apply(lambda x:(np.log2(max(x,tiny))))
