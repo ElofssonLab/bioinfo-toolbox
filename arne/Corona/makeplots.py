@@ -47,11 +47,11 @@ def nations_trend_line(tmp_df, name, cumconfirmed, cumdeath, ncases,ndeath,cdays
     if name in curvefit.keys():
         yfit=pp.sigmoidalfunction(xdata,ydata,curvefit[name][1],curvefit[name][2],curvefit[name][3],curvefit[name][4])
         ynum=np.exp2(yfit)
-        ax1.plot(tmp_df['date'],ynum,label="sigmoidal curve fitting, max: "+str(round(np.exp2(curvefit[name][2]),0)))
+        ax1.plot(tmp_df['date'],ynum,color="blue",label="sigmoidal curve fitting, max: "+str(round(np.exp2(curvefit[name][2]),0)))
     if name in curvedeath.keys():
         yfit=pp.sigmoidalfunction0(xdata,ydata,curvedeath[name][1],curvedeath[name][2],curvedeath[name][3]) # ,curvedeath[name][4])
         ynum=np.exp2(yfit)
-        ax1.plot(tmp_df['date'],ynum,label="sigmoidal death, max: "+str(round(np.exp2(curvedeath[name][2]),0)))
+        ax1.plot(tmp_df['date'],ynum,color="green",label="sigmoidal death, max: "+str(round(np.exp2(curvedeath[name][2]),0)))
     columns=[cumconfirmed, cumdeath,lincases,lindeaths]
     if recovered in tmp_df.columns:
         columns+=[recovered]
