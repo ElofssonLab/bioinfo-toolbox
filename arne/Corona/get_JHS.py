@@ -56,7 +56,7 @@ else:
 if ns.output_folder:
     out_dir = ns.output_folder
 else:
-    out_dir=home = str(Path.home())+"/Desktop/Corona/JHS/"
+    out_dir=home = str(Path.home())+"/Desktop/Corona/"
 
 
 
