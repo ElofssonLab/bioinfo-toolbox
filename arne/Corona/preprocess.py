@@ -37,8 +37,9 @@ def fix_country_names(df):
                         'Republic of the Congo':'Congo',
                         'Gambia, The':'Gambia',
                         'The Gambia':'Gambia',
-                        'USA':'Unites States',
-                        'US':'United States',
+                        'Unites States':"USA",
+                        'US':'USA',
+                        "United Kindom":'UK',
                         'Bahamas, The':'The Bahamas',
                         'Bahamas':'The Bahamas',
                         'Cruise Ship':'Others'

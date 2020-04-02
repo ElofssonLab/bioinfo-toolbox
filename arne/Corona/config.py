@@ -12,7 +12,7 @@ mindeaths=50
 # Selected countries
 specialcountries=["China","USA","UK","Germany","America","Spain","Italy","Sweden","France","Denmark","Norway"]
 
-# Cutoff to select startdate for exponential curved
+# Cutoff to select startdate for exponential curves
 cutoff=500
 
 # Plotting parameters

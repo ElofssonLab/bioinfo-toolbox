@@ -33,26 +33,32 @@ from scipy.optimize import curve_fit
 import preprocess as pp
 import config as cf
 
-datafile="merged_ECDC.csv"
+
+
 
 ##args = docopt.docopt(__doc__)
 #out_dir = args['--output_folder']
 
 
-p = argparse.ArgumentParser(description =  '- get_ECDC.py - Extract data from ECDC and format it to merged.csv -',
+p = argparse.ArgumentParser(description =  '- c19.py - Extract data from c19.se and format it to merged.csv -',
             formatter_class=RawTextHelpFormatter)
 p.add_argument('-f','--force', required= False, help='Force', action='store_true')
+p.add_argument('-','--province', required= False, help='Force', action='store_true')
 p.add_argument('-out','--output_folder', required= False, help='output folder')
 ns = p.parse_args()
+
+if ns.province:
+    datafile="merged_province_c19.csv"
+else:
+    datafile="merged_c19.csv"
 
 if ns.output_folder:
     out_dir = ns.output_folder
 else:
-    out_dir=home = str(Path.home())+"/Desktop/Corona/"
+    out_dir=home = str(Path.home())+"/Desktop/Corona/c19/"
 
 # Dynamic parameters
 data_dir  = os.path.join(out_dir,'data') # os.path.join(out, 'data'  )+"/" # , str(datetime.date(datetime.now())))
-ECDC = "https://www.ecdc.europa.eu/sites/default/files/documents/"  # +2020-03-20+".xlsx
 # import data
 image_dir =  out_dir #os.path.join(out,'reports', 'images')
 nation_dir =  os.path.join(out_dir,'nations')
@@ -88,13 +94,11 @@ if str(date)==str(today) and (not ns.force):
     print ("Exiting as todays plots are alredy run, use --force to rerun on yesterdays data")
     sys.exit(0)
 
-infile=Path(data_dir+"/ECDC-data-"+str(today)+".csv")
-if infile.is_file():
-    print('Removing CVS file..')
-    os.system('rm -f ' + str(infile))
+os.system('python3 c19.py')    
+infile=Path(data_dir+"/c19-"+str(today)+".csv")
 
-URL="https://opendata.ecdc.europa.eu/covid19/casedistribution/csv"
-csvfile=wget.download(URL, out=str(infile))
+
+csvfile=infile
     
 print('Importing Data...')
 print("Using: ",infile)
@@ -109,12 +113,12 @@ merged_df = pd.DataFrame([])
 agg_df=df.rename(columns={
     #"DateRep": "date",
     "dateRep": "DateRep",
-    "Countries and territories":"country",
-    "countriesAndTerritories":"country",
-    'Cases':"new_confirmed_cases",
-    'cases':"new_confirmed_cases",
-    'Deaths':"new_deaths",
-    'deaths':"new_deaths",
+    #"Countries and territories":"country",
+    #"countriesAndTerritories":"country",
+    #'Cases':"new_confirmed_cases",
+    #'cases':"new_confirmed_cases",
+    #'Deaths':"new_deaths",
+    #'deaths':"new_deaths",
     })
 
 # We need to turn date to right type (datetime.
@@ -122,19 +126,32 @@ agg_df=df.rename(columns={
 
 #try:
 print (agg_df)
-agg_df['date']=agg_df.apply(lambda x:pp.FormatDate(x.DateRep), axis=1)
+agg_df['date']=agg_df.apply(lambda x:pp.FormatDateMerged(x.DateRep), axis=1)
 
+if ns.province:
+    agg_df["newcountry"] = agg_df[["country","province"]].agg('-'.join, axis=1)
+    del agg_df['province']
+    del agg_df['country']
+    agg_df['country']=agg_df['newcountry']
+    agg_df['province']=agg_df['newcountry']
+    del agg_df['newcountry']
+
+del agg_df['province']
+    
 date=agg_df['date'].max()
 if str(date.date())!=str(today) and (not ns.force):
     print ("Exiting as there is no new data for today, use --force to rerun on yesterdays data")
     sys.exit(0)
 
 #sys.exit()
+
 countries=agg_df['country'].drop_duplicates()
 for country in countries:
-    country_df=agg_df.loc[agg_df['country'] == country].sort_values(by=['year','month','day'], ascending=True)
-    country_df['deaths'] = country_df['new_deaths'].cumsum()
-    country_df['confirmed'] = country_df['new_confirmed_cases'].cumsum()
+    country_df=agg_df.loc[agg_df['country'] == country].sort_values(by=['date'], ascending=True)
+    #country_df['deaths'] = country_df['new_deaths'].cumsum()
+    #country_df['confirmed'] = country_df['new_confirmed_cases'].cumsum()  # We already gave new_confirmed_cases here
+    country_df['new_deaths'] = country_df['deaths'].diff().fillna(0)
+    country_df['new_IntensiveCare'] = country_df['IntensiveCare'].diff().fillna(0)
     merged_df=pd.concat([merged_df, country_df], ignore_index=True,sort=False)
 
 # Remove a few dupliaed names

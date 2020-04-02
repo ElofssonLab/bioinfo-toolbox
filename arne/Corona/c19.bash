@@ -2,7 +2,7 @@
 
 regions=Stockholm Östergötland "Västra Götaland" Skåne Sörmland Uppsala Jönköping Örebro Dalarna Halland Gävleborg Västmanland Jämtland Norrbotten Västerbotten Västernorrland Värmland Kronoberg Kalmar Blekinge Gotland Okänt
 
-dir=~/Desktop/Corona/data/
+dir=~/Desktop/Corona/c19/data/
 
 for i in Stockholm Östergötland "Västra Götaland" Skåne Sörmland Uppsala Jönköping Örebro Dalarna Halland Gävleborg Västmanland Jämtland Norrbotten Västerbotten Västernorrland Värmland Kronoberg Kalmar Blekinge Gotland Okänt
 do

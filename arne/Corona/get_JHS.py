@@ -56,7 +56,7 @@ else:
 if ns.output_folder:
     out_dir = ns.output_folder
 else:
-    out_dir=home = str(Path.home())+"/Desktop/Corona/"
+    out_dir=home = str(Path.home())+"/Desktop/Corona/JHS/"
 
 
 
@@ -162,7 +162,7 @@ if ns.province:
     agg_df['country']=agg_df['newcountry']
     agg_df['province']=agg_df['newcountry']
     del agg_df['newcountry']
-# We have to deal with missing data in only some provnces
+# We have to deal with missing data in only some provinces
 
 
 dates=agg_df.groupby(['date'])['date'].first().dropna()
@@ -202,7 +202,7 @@ for country in countries:
 
     
 del agg_df['province']
-print (agg_df)
+#print (agg_df)
 
 
 #sys.exit()

@@ -33,11 +33,16 @@ mpl.rc('figure', max_open_warning = 0)
 import preprocess as pp
 import config as cf
 
+from pandas.plotting import register_matplotlib_converters
+register_matplotlib_converters()
+
+
 # Plot and save trendlinae graph
 def nations_trend_line(tmp_df, name, cumconfirmed, cumdeath, ncases,ndeath,cdays,lincases,ddays,lindeaths):
     global curvefit,curvedeaths
     xdata=tmp_df[cdays].to_numpy()
     ydata=tmp_df[cumconfirmed].apply(lambda x:(np.log2(max(x,cf.tiny)))).to_numpy()
+    #print (name,xdata,ydata)
     f, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]},figsize=(20,15))
     if name in curvefit.keys():
         yfit=pp.sigmoidalfunction(xdata,ydata,curvefit[name][1],curvefit[name][2],curvefit[name][3],curvefit[name][4])
@@ -145,15 +150,27 @@ p = argparse.ArgumentParser(description =
                                      '- AE-analysis.py - Extract data from date range and create models -',
             formatter_class=RawTextHelpFormatter)
 p.add_argument('-f','--force', required= False, help='Force', action='store_true')
-p.add_argument('-out','--output_folder', required= False, help='output folder')
+p.add_argument('-o','-out','--output_folder', required= False, help='output folder')
 p.add_argument('-data','--input','-i', required= True, help='Input formatted CSV file')
+p.add_argument('-cutoff', required= False, help='Change cutoff for data to be included (instead of editing config.py)')
+p.add_argument('-minconfirmed', required= False, help='Change cutoff for data to be included (instead of editing config.py)')
 p.add_argument('-countries','-c', required= False, help='Only include selected countries from config', action='store_true')
 ns = p.parse_args()
+
+if ns.cutoff:
+    cutoff=int(ns.cutoff)
+else:
+    cutoff=int(cf.cutoff)
+if ns.minconfirmed:
+    cf.minconfirmed=int(ns.minconfirmed)
 
 if ns.output_folder:
     out_dir = ns.output_folder
 else:
-    out_dir=home = str(Path.home())+"/Desktop/Corona/"
+    #out_dir=home = str(Path.home())+"/Desktop/Corona/"
+    out_dir=re.sub("data/.*","",ns.input)
+    if out_dir == ns.input:
+        out_dir=home = str(Path.home())+"/Desktop/Corona/"        
 
     
 # Dynamic parameters
@@ -180,7 +197,7 @@ today=date.today()
 yesterday=date.today() - timedelta(1)
 aweekago=date.today() - timedelta(7)
 
-print (ns)
+#print (ns)
 merged_df=pd.read_csv(ns.input, sep=',')
 # ------------------------------------------------------------------------
 # Some necessary preprocessing
@@ -204,6 +221,7 @@ if ns.countries:
     sortedcountries=cv.specialcountries
 
 ##### Create Graphs #####
+merged_df['date']=merged_df.apply(lambda x:pp.FormatDateMerged(x.date), axis=1)
     
 print('Creating graphs...')
 
@@ -249,7 +267,7 @@ for country in countries:
         except:
             continue
             #print ("error with ",country)
-
+print("Total barplot")
 fig, ax = plt.subplots(figsize=(20,10))
 sorted_d = sorted(totaldeaths.items(), key=operator.itemgetter(1),reverse=True)
 x=[]
@@ -273,20 +291,16 @@ plt.xticks(rotation=45, ha='right')
 fig = ax.get_figure()
 fig.savefig(os.path.join(image_dir, 'total_bar.png'))
 
-print('... Time Series Trend Line')
-
-
+print('... Time Series Trend Line',cutoff)
 fig, ax = plt.subplots(figsize=(20,10))
 ax.set_yscale('log')
 mark=0
 col=0
-minsize=10
+#print(sortedcountries)
 for country in sortedcountries:
     tempdf=merged_df.loc[merged_df['country'] == country]
     first=tempdf["date"].to_list()[0]
     firstdate=first
-
-    if tempdf["confirmed"].size<minsize: continue
     s=tempdf["confirmed"].max()
     try:
         start=tempdf[tempdf.confirmed > cutoff].iloc[0]
@@ -301,6 +315,7 @@ for country in sortedcountries:
         if mark>=len(markers): mark=0
         col+=1
         if col>=len(colours): col=0
+#print (col,mark)
 ax.set(xlim=(cf.daysbefore, cf.daysafter), ylim=(cf.mincases, cf.maxcases))
 ax.set(xlabel="Days since " + str(cf.mincases) + " cases")
 ax.set(ylabel="Number of cases")
@@ -314,8 +329,8 @@ plt.close('all')
 
 
 #try:
-merged_df['date']=merged_df.apply(lambda x:pp.FormatDateMerged(x.date), axis=1)
 
+print("Ratio plot")
 
 c=[]
 r=[]
@@ -360,7 +375,7 @@ fig = ax2.get_figure()
 fig.savefig(os.path.join(image_dir, 'ratio_bar.png'.format(col)))
 plt.close('all')
 
-
+print("Getting slopes")
 # regression data for countr
 #newdf=agg_df.loc[(agg_df['confirmed']>100) & (agg_df['confirmed']<10000)]
 
@@ -568,7 +583,7 @@ for country in slopelist.keys():
         if mark>=len(markers): mark=0
         col+=1
         if col>=len(colours): col=0
-ax.legend() 
+        ax.legend() 
 ax.set(title="Changes in slope from onset")
 ax.set(ylabel="Slope (log2 base)")
 ax.set(xlabel="Days since " + str(cf.mincases) + " cases")
@@ -591,7 +606,7 @@ for country in newslopelist.keys():
         if mark>=len(markers): mark=0
         col+=1
         if col>=len(colours): col=0
-ax.legend() 
+        ax.legend() 
 ax.set(title="Changes in slope from onset")
 ax.set(ylabel="Increase per day")
 ax.set(xlabel="Days since " + str(cf.mincases) + " cases")
@@ -615,7 +630,7 @@ for country in deathslopelist.keys():
         if mark>=len(markers): mark=0
         col+=1
         if col>=len(colours): col=0
-ax.legend() 
+        ax.legend() 
 ax.set(title="Changes in death slope from onset")
 ax.set(ylabel="Slope (log2 base)")
 ax.set(xlabel="Days since " + str(cf.mindeathcases) + " deaths")
@@ -623,7 +638,7 @@ ax.set(xlabel="Days since " + str(cf.mindeathcases) + " deaths")
 ax.set(xlim=[0,cf.daysafter])
 #fig.show()
 fig.savefig(os.path.join(image_dir, 'deathslope-evol.png'))
-
+plt.close('All')
 colorlist=[]
 markerlist=[]
 col=0
@@ -638,7 +653,7 @@ for country in newdeathslopelist.keys():
         if mark>=len(markers): mark=0
         col+=1
         if col>=len(colours): col=0
-ax.legend() 
+        ax.legend() 
 ax.set(title="Changes in death slope from onset")
 ax.set(ylabel="Increase per day")
 ax.set(xlabel="Days since " + str(cf.mindeathcases) + " deaths")
@@ -652,6 +667,7 @@ colorlist=[]
 markerlist=[]
 col=0
 mark=0
+xmax=0
 fig, ax = plt.subplots(figsize=(20,10))
 for country in sortedcountries:
     ctoday=merged_df.loc[(merged_df['country']==country)]['Days'].max()
@@ -665,18 +681,20 @@ for country in sortedcountries:
         y=x-merged_df.loc[(merged_df['Days']==day-7) &(merged_df['country'] == country)]['confirmed'].iloc[0]
         X+=[x]
         Y+=[y]
-    ax.plot(X,Y,label=country,marker=markers[mark],color=colours[col])
-    colorlist+=[colours[col]]
-    markerlist+=[markers[mark]]
-    mark+=1
-    if mark>=len(markers): mark=0
-    col+=1
-    if col>=len(colours): col=0
-x=[0,100000]
-y=[0,50000]
+    if (len(X)>0):
+        ax.plot(X,Y,label=country,marker=markers[mark],color=colours[col])
+        colorlist+=[colours[col]]
+        markerlist+=[markers[mark]]
+        mark+=1
+        if mark>=len(markers): mark=0
+        col+=1
+        if col>=len(colours): col=0
+        xmax=max(xmax,max(X))
+x=[0,xmax]
+y=[0,xmax/2]
 ax.plot(x,y,label="Doubled each week",lw=4,color="black")
-x=[0,100000]
-y=[0,99000]
+x=[0,xmax]
+y=[0,0.99*xmax]
 ax.plot(x,y,label="Doubled each day",lw=4,color="grey")
 ax.legend() 
 
@@ -693,6 +711,7 @@ colorlist=[]
 markerlist=[]
 col=0
 mark=0
+xmax=0
 fig, ax = plt.subplots(figsize=(20,10))
 for country in sortedcountries:
     ctoday=merged_df.loc[(merged_df['country']==country)]['Days'].max()
@@ -706,18 +725,20 @@ for country in sortedcountries:
         y=x-merged_df.loc[(merged_df['Days']==day-7) &(merged_df['country'] == country)]['deaths'].iloc[0]
         X+=[x]
         Y+=[y]
-    ax.plot(X,Y,label=country,marker=markers[mark],color=colours[col])
-    colorlist+=[colours[col]]
-    markerlist+=[markers[mark]]
-    mark+=1
-    if mark>=len(markers): mark=0
-    col+=1
-    if col>=len(colours): col=0
-x=[0,25000]
-y=[0,12500]
+    if (len(X)>0):
+        ax.plot(X,Y,label=country,marker=markers[mark],color=colours[col])
+        colorlist+=[colours[col]]
+        markerlist+=[markers[mark]]
+        mark+=1
+        if mark>=len(markers): mark=0
+        col+=1
+        if col>=len(colours): col=0
+        xmax=max(xmax,max(X))
+x=[0,xmax]
+y=[0,xmax/2]
 ax.plot(x,y,label="Doubled each week",lw=4,color="black")
-x=[0,25000]
-y=[0,24000]
+x=[0,xmax]
+y=[0,0.99*xmax]
 ax.plot(x,y,label="Doubled each day",lw=4,color="grey")
 
 ax.legend() 
