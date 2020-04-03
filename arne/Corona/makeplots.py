@@ -164,7 +164,8 @@ p.add_argument('-o','-out','--output_folder', required= False, help='output fold
 p.add_argument('-data','--input','-i', required= True, help='Input formatted CSV file')
 p.add_argument('-cutoff', required= False, help='Change cutoff for data to be included (instead of editing config.py)')
 p.add_argument('-minconfirmed', required= False, help='Change cutoff for data to be included (instead of editing config.py)')
-p.add_argument('-countries','-c', required= False, help='Only include selected countries from config', action='store_true')
+p.add_argument('-countries','-c', required= False, help='Only include selected countries from config', nargs='+')
+#parser.add_argument('--nargs', nargs='+')
 ns = p.parse_args()
 
 if ns.cutoff:
@@ -227,8 +228,9 @@ sortedcountries=[]
 for i in range(0,min(cf.maxcountries,len(tmplist))):
     sortedcountries+=[tmplist[i][0]]
 
-if ns.countries:
-    sortedcountries=cv.specialcountries
+if len(ns.countries)>0:
+    #sortedcountries=cv.specialcountries
+    sortedcountries.extend(x for x in ns.countries if x not in sortedcountries)
 
 ##### Create Graphs #####
 merged_df['date']=merged_df.apply(lambda x:pp.FormatDateMerged(x.date), axis=1)
