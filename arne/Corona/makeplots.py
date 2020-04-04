@@ -704,10 +704,10 @@ for country in sortedcountries:
         xmax=max(xmax,max(X))
 x=[0,xmax]
 y=[0,xmax/2]
-ax.plot(x,y,label="Doubled each week",lw=4,color="black")
+ax.plot(x,y,label="Doubled each week",lw=4,color="black",alpha=0.5)
 x=[0,xmax]
 y=[0,0.99*xmax]
-ax.plot(x,y,label="Doubled each day",lw=4,color="grey")
+ax.plot(x,y,label="Doubled each day",lw=4,color="grey",alpha=0.5)
 ax.legend() 
 
 ax.set(title="Fraction of all infected last week from onset")
