@@ -165,6 +165,8 @@ p.add_argument('-data','--input','-i', required= True, help='Input formatted CSV
 p.add_argument('-cutoff', required= False, help='Change cutoff for data to be included (instead of editing config.py)')
 p.add_argument('-minconfirmed', required= False, help='Change cutoff for data to be included (instead of editing config.py)')
 p.add_argument('-countries','-c', required= False, help='Only include selected countries from config', nargs='+')
+p.add_argument('-notop', required= False, help='not include selected countries from config', action='store_true')
+p.add_argument('-all', required= False, help='Include all countries', action='store_true')
 #parser.add_argument('--nargs', nargs='+')
 ns = p.parse_args()
 
@@ -230,8 +232,14 @@ for i in range(0,min(cf.maxcountries,len(tmplist))):
 
 if len(ns.countries)>0:
     #sortedcountries=cv.specialcountries
-    sortedcountries.extend(x for x in ns.countries if x not in sortedcountries)
+    if (ns.notop):
+        sortedcountries=ns.countries
+    else:
+        sortedcountries.extend(x for x in ns.countries if x not in sortedcountries)
 
+if ns.all:
+    sortedcountries=countries
+        
 ##### Create Graphs #####
 merged_df['date']=merged_df.apply(lambda x:pp.FormatDateMerged(x.date), axis=1)
     
@@ -776,7 +784,7 @@ print('... Country Figures')
 
 #sys.exit()
 
-for country in countries:
+for country in countries:   # Here we include all countries 
     tempdf=merged_df.loc[merged_df['country'] == country]
     nations_trend_line(tempdf, country,  'confirmed', 'deaths',
                            "new_confirmed_cases","new_deaths","Days","LinCases",'DeathsDays',"LinDeaths",
@@ -795,41 +803,5 @@ for country in countries:
 #create_stacked_bar(merged_df, 'new_confirmed_cases', 'confirmed_cases', "Stacked bar of confirmed and new cases by day")
 
 #
-print ('Makeing HTML file')
-
-        
-#topcountries=merged_df['country'].drop_duplicates()
-
-
-selectedcountries="China|Italy|USA|UK|South_Korea|Germany|Sweden|Norway|Spain|Denmark|Finland"
-overviewfiles="merged|slope|deaths|total"
-allplots=[]
-plots=[]
-overview=[]
-for f in os.listdir(out_dir):
-    if (f.endswith(".png")):
-        allplots +=[f]
-    if (re.match(selectedcountries, f)):
-        plots +=[f]
-    if (re.match(overviewfiles, f)):
-        overview +=[f]
-
-#cvs = glob.glob(out_dir+'/*.csv')
-
-with document(title='Arne Elofsson Corona') as doc:
-    h1('Corona Data')
-    for path in overview:
-        div(img(src=path), _class='photo')
-
-    h3('Selected countries')
-    for path in plots:
-        div(img(src=path), _class='photo')
-            
-    h3('All countries')
-    for path in allplots:
-        div(img(src=path), _class='photo')
-    
-with open(out_dir+'/corona.html', 'w') as f:
-    f.write(doc.render())
 
 print('Done!')
