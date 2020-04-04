@@ -15,7 +15,7 @@ python3 makeplots.py -i /home/arnee/Desktop/Corona/data/merged_ECDC.csv  -c Swed
 python3 makeplots.py -i ~/Desktop/Corona/data/merged_province_JHS.csv -out ~/Desktop/Corona/JHS-province  -c Sweden UK USA Norway Sweden Denmark France Spain Italy China
 python3 makeplots.py -i ~/Desktop/Corona/data/merged_JHS.csv -out ~/Desktop/Corona/JHS -c Sweden UK USA Norway Sweden Denmark France Spain Italy China
 python3 makeplots.py -i ~/Desktop/Corona/c19/data/merged_c19.csv -cutoff 5 -minconfirmed 5
-python3 makeplots.py -i ~/Desktop/Corona/c19/data/merged_province_c19.csv -cutoff 5 -minconfirmed 5
+python3 makeplots.py -i ~/Desktop/Corona/c19/data/merged_province_c19.csv -cutoff 5 -minconfirmed 5 -all
 cd  ~/Desktop/Corona/
 #montage -mode concatenate -tile 3x slope.png  deathslope.png  total_bar.png nations/China_trendline.png nations/South_Korea_trendline.png  nations/Italy_trendline.png   nations/Spain_trendline.png   nations/USA_trendline.png   nations/Sweden_trendline.png ./montage.png
 #cd ~/Desktop/Corona/
