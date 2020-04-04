@@ -230,7 +230,7 @@ sortedcountries=[]
 for i in range(0,min(cf.maxcountries,len(tmplist))):
     sortedcountries+=[tmplist[i][0]]
 
-if len(ns.countries)>0:
+if hasattr(ns.countries, 'len'):
     #sortedcountries=cv.specialcountries
     if (ns.notop):
         sortedcountries=ns.countries
