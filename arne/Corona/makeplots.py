@@ -689,6 +689,7 @@ col=0
 mark=0
 xmax=0
 fig, ax = plt.subplots(figsize=(20,10))
+fig2, ax2 = plt.subplots(figsize=(20,10))
 for country in sortedcountries:
     ctoday=merged_df.loc[(merged_df['country']==country)]['Days'].max()
     cases=merged_df.loc[(merged_df['country']==country)]['confirmed'].max()
@@ -696,13 +697,16 @@ for country in sortedcountries:
     #    continue
     X=[]
     Y=[]
+    R=[]
     for day in range(7,ctoday):
         x=merged_df.loc[(merged_df['Days']==day) &(merged_df['country'] == country)]['confirmed'].iloc[0]
         y=x-merged_df.loc[(merged_df['Days']==day-7) &(merged_df['country'] == country)]['confirmed'].iloc[0]
         X+=[x]
         Y+=[y]
+        R+=[y/x]
     if (len(X)>0):
         ax.plot(X,Y,label=country,marker=markers[mark],color=colours[col])
+        ax2.plot(X,R,label=country,marker=markers[mark],color=colours[col])
         colorlist+=[colours[col]]
         markerlist+=[markers[mark]]
         mark+=1
@@ -712,20 +716,32 @@ for country in sortedcountries:
         xmax=max(xmax,max(X))
 x=[0,xmax]
 y=[0,xmax/2]
+r=[0.5,0.5]
 ax.plot(x,y,label="Doubled each week",lw=4,color="black",alpha=0.5)
+ax2.plot(x,r,label="Doubled each week",lw=4,color="black",alpha=0.5)
 x=[0,xmax]
 y=[0,0.99*xmax]
+r=[0.99,0.99]
 ax.plot(x,y,label="Doubled each day",lw=4,color="grey",alpha=0.5)
+ax2.plot(x,r,label="Doubled each day",lw=4,color="grey",alpha=0.5)
 ax.legend() 
+ax2.legend() 
 
 ax.set(title="Fraction of all infected last week from onset")
+ax2.set(title="Fraction of all infected last week from onset")
 ax.set(ylabel="Increase from a week ago")
+ax2.set(ylabel="Fraction of all cases during last week")
 ax.set(xlabel="Total number of cases until today")
+ax2.set(xlabel="Total number of cases until today")
 #fig.show()
 fig.savefig(os.path.join(image_dir, 'weekly-increase.png'))
+fig2.savefig(os.path.join(image_dir, 'new-weekly-increase.png'))
 ax.set_xscale('log')
 ax.set_yscale('log')
+ax2.set_xscale('log')
+ax2.set_yscale('log')
 fig.savefig(os.path.join(image_dir, 'weekly-increase-log.png'))
+fig2.savefig(os.path.join(image_dir, 'new-weekly-increase-log.png'))
 
 colorlist=[]
 markerlist=[]
@@ -733,6 +749,7 @@ col=0
 mark=0
 xmax=0
 fig, ax = plt.subplots(figsize=(20,10))
+fig2, ax2 = plt.subplots(figsize=(20,10))
 for country in sortedcountries:
     ctoday=merged_df.loc[(merged_df['country']==country)]['Days'].max()
     cases=merged_df.loc[(merged_df['country']==country)]['deaths'].max()
@@ -740,13 +757,16 @@ for country in sortedcountries:
     #    continue
     X=[]
     Y=[]
+    R=[]
     for day in range(7,ctoday):
         x=merged_df.loc[(merged_df['Days']==day) &(merged_df['country'] == country)]['deaths'].iloc[0]
         y=x-merged_df.loc[(merged_df['Days']==day-7) &(merged_df['country'] == country)]['deaths'].iloc[0]
         X+=[x]
         Y+=[y]
+        R+=[y/x]
     if (len(X)>0):
         ax.plot(X,Y,label=country,marker=markers[mark],color=colours[col])
+        ax2.plot(X,R,label=country,marker=markers[mark],color=colours[col])
         colorlist+=[colours[col]]
         markerlist+=[markers[mark]]
         mark+=1
@@ -756,20 +776,32 @@ for country in sortedcountries:
         xmax=max(xmax,max(X))
 x=[0,xmax]
 y=[0,xmax/2]
+r=[0.5,0.5]
 ax.plot(x,y,label="Doubled each week",lw=4,color="black")
+ax2.plot(x,r,label="Doubled each week",lw=4,color="black")
 x=[0,xmax]
 y=[0,0.99*xmax]
+r=[0.99,0.99]
 ax.plot(x,y,label="Doubled each day",lw=4,color="grey")
+ax.plot(x,r,label="Doubled each day",lw=4,color="grey")
 
 ax.legend() 
+ax2.legend() 
 ax.set(title="Fraction of all death occuring last week")
 ax.set(ylabel="Increase from a week ago")
 ax.set(xlabel="Total number of deaths until today")
+ax2.set(title="Fraction of all death occuring last week")
+ax2.set(ylabel="Fraction of all cases last week")
+ax2.set(xlabel="Total number of deaths until today")
 #fig.show()
 fig.savefig(os.path.join(image_dir, 'weekly-death.png'))
+fig2.savefig(os.path.join(image_dir, 'new-weekly-death.png'))
 ax.set_xscale('log')
 ax.set_yscale('log')
 fig.savefig(os.path.join(image_dir, 'weekly-death-log.png'))
+ax2.set_xscale('log')
+ax2.set_yscale('log')
+fig2.savefig(os.path.join(image_dir, 'new-weekly-death-log.png'))
 
 
 
