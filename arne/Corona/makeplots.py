@@ -692,8 +692,8 @@ fig, ax = plt.subplots(figsize=(20,10))
 for country in sortedcountries:
     ctoday=merged_df.loc[(merged_df['country']==country)]['Days'].max()
     cases=merged_df.loc[(merged_df['country']==country)]['confirmed'].max()
-    if cases<2000:
-        continue
+    #if cases<2000:
+    #    continue
     X=[]
     Y=[]
     for day in range(7,ctoday):
@@ -736,8 +736,8 @@ fig, ax = plt.subplots(figsize=(20,10))
 for country in sortedcountries:
     ctoday=merged_df.loc[(merged_df['country']==country)]['Days'].max()
     cases=merged_df.loc[(merged_df['country']==country)]['deaths'].max()
-    if cases<100:
-        continue
+    #if cases<100:
+    #    continue
     X=[]
     Y=[]
     for day in range(7,ctoday):
