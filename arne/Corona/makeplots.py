@@ -741,6 +741,7 @@ ax.set_yscale('log')
 ax2.set_xscale('log')
 ax2.set_yscale('log')
 fig.savefig(os.path.join(image_dir, 'weekly-increase-log.png'))
+ax.set(ylim=(0.2, 1.1))
 fig2.savefig(os.path.join(image_dir, 'new-weekly-increase-log.png'))
 
 colorlist=[]
@@ -783,7 +784,7 @@ x=[0,xmax]
 y=[0,0.99*xmax]
 r=[0.99,0.99]
 ax.plot(x,y,label="Doubled each day",lw=4,color="grey")
-ax.plot(x,r,label="Doubled each day",lw=4,color="grey")
+ax2.plot(x,r,label="Doubled each day",lw=4,color="grey")
 
 ax.legend() 
 ax2.legend() 
@@ -801,6 +802,7 @@ ax.set_yscale('log')
 fig.savefig(os.path.join(image_dir, 'weekly-death-log.png'))
 ax2.set_xscale('log')
 ax2.set_yscale('log')
+ax2.set(ylim=(0.2, 1.1))
 fig2.savefig(os.path.join(image_dir, 'new-weekly-death-log.png'))
 
 
