@@ -323,6 +323,7 @@ mark=0
 col=0
 #print(sortedcountries)
 for country in sortedcountries:
+    print (country)
     tempdf=merged_df.loc[merged_df['country'] == country]
     first=tempdf["date"].to_list()[0]
     firstdate=first
