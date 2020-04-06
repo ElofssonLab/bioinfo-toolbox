@@ -130,9 +130,9 @@ def create_stacked_bar(tmp_df, col1, col2, fig_title):
 
 
     
-# Set fonts etc.
-font = {'weight' : 'bold',   'size'   : 22}
-plt.rc('font', **font)
+# Set fonts etc. Errrors
+#font = {'weight' : 'bold',   'size'   : 22}
+#plt.rc('font', **font)
 
 #set ggplot style
 plt.style.use('ggplot')
@@ -154,7 +154,7 @@ for name, hex in mpl.colors.cnames.items():
         
 ##args = docopt.docopt(__doc__)
 #out_dir = args['--output_folder']
-
+ 
 
 p = argparse.ArgumentParser(description = 
                                      '- AE-analysis.py - Extract data from date range and create models -',
@@ -165,6 +165,7 @@ p.add_argument('-data','--input','-i', required= True, help='Input formatted CSV
 p.add_argument('-cutoff', required= False, help='Change cutoff for data to be included (instead of editing config.py)')
 p.add_argument('-minconfirmed', required= False, help='Change cutoff for data to be included (instead of editing config.py)')
 p.add_argument('-countries','-c', required= False, help='Only include selected countries from config', nargs='+')
+p.add_argument('-top', required= False, help='Number of countries with highest slope to include default= '+str(cf.maxcountries))
 p.add_argument('-notop', required= False, help='not include selected countries from config', action='store_true')
 p.add_argument('-all', required= False, help='Include all countries', action='store_true')
 #parser.add_argument('--nargs', nargs='+')
@@ -227,10 +228,12 @@ for country in countries:
 
 tmplist = sorted(countrylist.items() , reverse=True, key=lambda x: x[1])
 sortedcountries=[]
+if ns.top:
+    cf.maxcountries=int(ns.top)
 for i in range(0,min(cf.maxcountries,len(tmplist))):
     sortedcountries+=[tmplist[i][0]]
 
-if hasattr(ns.countries, 'len'):
+if (type(ns.countries) is list):
     #sortedcountries=cv.specialcountries
     if (ns.notop):
         sortedcountries=ns.countries
@@ -239,7 +242,9 @@ if hasattr(ns.countries, 'len'):
 
 if ns.all:
     sortedcountries=countries
-        
+
+#print(sortedcountries)
+#sys.exit()    
 ##### Create Graphs #####
 merged_df['date']=merged_df.apply(lambda x:pp.FormatDateMerged(x.date), axis=1)
     
