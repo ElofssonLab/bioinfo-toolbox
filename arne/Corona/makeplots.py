@@ -724,11 +724,14 @@ y=[0,xmax/2]
 r=[0.5,0.5]
 ax.plot(x,y,label="Doubled each week",lw=4,color="black",alpha=0.5)
 ax2.plot(x,r,label="Doubled each week",lw=4,color="black",alpha=0.5)
-x=[0,xmax]
-y=[0,0.99*xmax]
-r=[0.99,0.99]
+y=[0,0.9*xmax]
+r=[0.9,0.9]
 ax.plot(x,y,label="Doubled each day",lw=4,color="grey",alpha=0.5)
 ax2.plot(x,r,label="Doubled each day",lw=4,color="grey",alpha=0.5)
+y=[0,0.17*xmax]
+r=[0.17,0.27]
+ax.plot(x,y,label="Doubled each month",lw=4,color="pink",alpha=0.5)
+ax2.plot(x,r,label="Doubled each month",lw=4,color="pink",alpha=0.5)
 ax.legend() 
 ax2.legend() 
 
@@ -786,10 +789,14 @@ r=[0.5,0.5]
 ax.plot(x,y,label="Doubled each week",lw=4,color="black")
 ax2.plot(x,r,label="Doubled each week",lw=4,color="black")
 x=[0,xmax]
-y=[0,0.99*xmax]
-r=[0.99,0.99]
+y=[0,0.9*xmax]
+r=[0.9,0.9]
 ax.plot(x,y,label="Doubled each day",lw=4,color="grey")
 ax2.plot(x,r,label="Doubled each day",lw=4,color="grey")
+y=[0,0.17*xmax]
+r=[0.17,0.27]
+ax.plot(x,y,label="Doubled each month",lw=4,color="pink",alpha=0.5)
+ax2.plot(x,r,label="Doubled each month",lw=4,color="pink",alpha=0.5)
 
 ax.legend() 
 ax2.legend() 

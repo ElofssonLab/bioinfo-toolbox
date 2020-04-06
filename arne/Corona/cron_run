@@ -11,9 +11,11 @@ python3 get_JHS.py
 python3 get_JHS.py --province
 python3 get_c19.py --force
 python3 get_c19.py --province --force
-python3 makeplots.py -i /home/arnee/Desktop/Corona/data/merged_ECDC.csv  -c Sweden UK USA Norway Sweden Denmark France Spain Italy China
-python3 makeplots.py -i ~/Desktop/Corona/data/merged_province_JHS.csv -out ~/Desktop/Corona/JHS-province  -c Sweden UK USA Norway Sweden Denmark France Spain Italy China
-python3 makeplots.py -i ~/Desktop/Corona/data/merged_JHS.csv -out ~/Desktop/Corona/JHS -c Sweden UK USA Norway Sweden Denmark France Spain Italy China
+python3 makeplots.py -i /home/arnee/Desktop/Corona/data/merged_ECDC.csv -out ~/Desktop/Corona/ECDC-morecountries  -c Sweden UK USA Norway Denmark France Spain Italy China Austria Switzerland Finland -top 50
+python3 makeplots.py -i /home/arnee/Desktop/Corona/data/merged_ECDC.csv  -c Sweden UK Norway Denmark France Spain Italy Belgium Germany -notop -out ~/Desktop/Corona/ECDC-Europe/
+python3 makeplots.py -i /home/arnee/Desktop/Corona/data/merged_ECDC.csv  -c Sweden UK USA Norway Denmark France Spain Italy China Austria Switzerland Finland 
+python3 makeplots.py -i ~/Desktop/Corona/data/merged_province_JHS.csv -out ~/Desktop/Corona/JHS-province  -c Sweden-Sweden  Norway-Norway Denmark-Denmark France-France Spain-Spain Italy-Italy Austria-Austria Switzerland-Switzerland Finland-Finland
+python3 makeplots.py -i ~/Desktop/Corona/data/merged_JHS.csv -out ~/Desktop/Corona/JHS -c Sweden UK USA Norway Denmark France Spain Italy China Austria Switzerland
 python3 makeplots.py -i ~/Desktop/Corona/c19/data/merged_c19.csv -cutoff 5 -minconfirmed 5
 python3 makeplots.py -i ~/Desktop/Corona/c19/data/merged_province_c19.csv -cutoff 5 -minconfirmed 5 -all
 cd  ~/Desktop/Corona/
