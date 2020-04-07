@@ -78,11 +78,11 @@ def nations_trend_line(tmp_df, name, cumconfirmed, cumdeath, ncases,ndeath,cdays
     if nrecovered in tmp_df.columns:
         tmp7 = tmp_df.groupby(['date'])[[nrecovered]].sum()
         if tmp7[nrecovered].max()>0:
-            ax1.bar(tmp7.index,tmp7[nrecovered], color="pink",width=0.8,alpha = 0.5, ls='dotted', lw=2  )
+            ax1.bar(tmp7.index,tmp7[nrecovered], color="yellow",width=0.8,alpha = 0.5, ls='dotted', lw=2  )
     if nintensive in tmp_df.columns:
         tmp8 = tmp_df.groupby(['date'])[[nintensive]].sum()
         if tmp8[nintensive].max()>0:
-            ax1.bar(tmp8.index,tmp8[nintensive], color="pink",width=0.8,alpha = 0.5, ls='dotted', lw=2  )
+            ax1.bar(tmp8.index,tmp8[nintensive], color="yellow",width=0.8,alpha = 0.5, ls='dotted', lw=2  )
 
     #ax.set(xlabel="Days since > " + str(cutoff) + " cases")
     ax1.set(ylabel="Number of cases")
