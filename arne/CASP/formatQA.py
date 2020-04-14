@@ -29,7 +29,11 @@ author="AUTHOR 5229-7541-3942"
 
 def convert(x):
     d0=5
-    return (d0*np.sqrt(1/x-1))
+    score=d0*np.sqrt(1/x-1)
+    if score < 15.0:
+        return (score)
+    else:
+        retnr(15.0)
 
 
 for target in targets:
