@@ -1,0 +1,10 @@
+Bootstrap: docker
+From: tensorflow/tensorflow:1.13.2-py3
+
+%files
+PyRosetta4.Release.python36.ubuntu.release-248.tar.bz2 /home
+
+%post
+pip install biopython 
+tar -vjxf /home/PyRosetta4.Release.python36.ubuntu.release-248.tar.bz2
+pip install -e PyRosetta4.Release.python36.ubuntu.release-248/setup/ 
