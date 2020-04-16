@@ -33,7 +33,7 @@ def convert(x):
     if score < 15.0:
         return (score)
     else:
-        retnr(15.0)
+        return(15.0)
 
 
 for target in targets:
