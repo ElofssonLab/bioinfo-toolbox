@@ -7,6 +7,7 @@ From: ubuntu:20.04
     apt-get -y install python3.8
     apt-get -y install python3-pip 
     pip3 install pymc3 branca folium pandas numpy scipy geopandas docopt bio wget stan plotly seaborn 
+    pip3 install dominate 
     
 %environment
     export LC_ALL=en_US.UTF-8
