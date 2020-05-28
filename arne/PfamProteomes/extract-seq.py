@@ -18,17 +18,17 @@ dir=sys.argv[2]
 # Open GenBank file
 handle = open(file, 'rU')
 
-print "opening "+ file +"\n"
+print ("opening "+ file +"\n")
 # For each record (mitochrodrial genome, in this case)...
 for record in SeqIO.parse(handle, 'fasta') :
-   print record.name
+   print (record.name)
    # Grab the entire sequence
 #   seq = str(record.seq)
    name= re.sub(r'[\<\>\/\\\|]','-',str(record.name))
-1   print record.name,name
+   print (record.name,name)
 #   record.id=str(record.name)
    # Look at all features for this record
    #   for feature in record.features:
    OutFile = open(dir + "/" + name +  '.fa', 'w')
-#   print "FILE: " + name + "\n"
+#   print ("FILE: " + name + "\n")
    SeqIO.write(record, OutFile, "fasta")
