@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+
 import sys, getopt,re
 
 from Bio import SeqIO
@@ -18,7 +20,7 @@ handleA = open(fileA, 'rU')
 dataA={}
 dataB={}
 
-#print "opening "+ fileA +"\n"
+#print ("opening "+ fileA +"\n")
 # For each record 
 first=True
 for record in SeqIO.parse(handleA, 'fasta') :
@@ -33,7 +35,7 @@ for record in SeqIO.parse(handleA, 'fasta') :
          dataA[organism]=record
 
 handleB = open(fileB, 'rU')
-#print "opening "+ fileB +"\n"        
+#print ("opening "+ fileB +"\n"        )
 first=True
 for record in SeqIO.parse(handleB, 'fasta') :
    if first:
@@ -43,16 +45,16 @@ for record in SeqIO.parse(handleB, 'fasta') :
       organism= re.sub(r'[\<\>\/\\\|a-z].*_','',record.name)
       organism= re.sub(r'\/.*','',organism)
       if (not organism in dataB.keys()):
-         #        print record.name,organism
+         #        print (record.name,organism)
          dataB[organism]=record
 
 # First we shoudl always use sequecne 1 in both files...
 
-print "> " + seqA.name + " " + seqB.name
-print seqA.seq+seqB.seq
+print ("> " + seqA.name + " " + seqB.name)
+print (seqA.seq+seqB.seq)
 
 for key in dataA.keys():
-   if (key in dataB.keys()):
-      print "> " + key 
-      print dataA[key].seq+dataB[key].seq
+   if key in dataB.keys():
+      print ("> " + key )
+      print (dataA[key].seq+dataB[key].seq)
 

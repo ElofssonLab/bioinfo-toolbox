@@ -1,5 +1,5 @@
 Bootstrap: docker
-From: tensorflow/tensorflow:1.13.2-py3
+From: tensorflow/tensorflow:1.13.2-gpu-py3
 
 %files
 PyRosetta4.Release.python36.ubuntu.release-256.tar.bz2 /home
