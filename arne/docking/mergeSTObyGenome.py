@@ -9,12 +9,13 @@ from Bio.SeqRecord import SeqRecord
 
 #from Bio.SeqFeature import SeqFeature, FeatureLocation
 
+sepseq="AAAAAAAAAAAAAAAAAAAA"
 
 fileA=sys.argv[1]
 fileB=sys.argv[2]
 
 
-handleA = open(fileA, 'rU')
+handleA = open(fileA, 'r')
 
 dataA={}
 dataB={}
@@ -60,7 +61,7 @@ for record in SeqIO.parse(handleA, 'stockholm') :
          dataA[organism]=record
 
 
-handleB = open(fileB, 'rU')
+handleB = open(fileB, 'r')
 #print ("opening "+ fileB +"\n"        )
 first=True
 for record in SeqIO.parse(handleB, 'stockholm') :
@@ -94,10 +95,10 @@ for record in SeqIO.parse(handleB, 'stockholm') :
 # First we shoudl always use sequecne 1 in both files...
 
 print ("> " + seqA.name + " AND " + seqB.name)
-print (seqA.seq+seqB.seq)
+print (seqA.seq+sepseq+seqB.seq)
 
 for key in dataA.keys():
    if (key in dataB.keys()):
       print ("> " + key )
-      print (dataA[key].seq+dataB[key].seq)
+      print (dataA[key].seq+sepseq+dataB[key].seq)
 
