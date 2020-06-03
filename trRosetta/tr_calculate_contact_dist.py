@@ -35,17 +35,27 @@ for i in range(p_len-1):
         res[i, j] = mean_dist
         res[j, i] = mean_dist
 
+
+
+#sys.exit()
+        
 fig = plt.figure()
 ax = fig.add_subplot(111)
-ax.set(title=ns.input)
+#fig, (ax1, ax2) = plt.subplots(ncols=2)
+#ax2=ax.twin()
 cax = ax.matshow(res, cmap="hot")
-print (res)
+#print (res)
 if type(ns.domain) is list:
     for cut in ns.domain:
+        #x=[0,p_len-1,cut,cut]
+        #y=[cut,cut,0,p_len-1]
         x=[0,p_len-1]
-        y=[cut,cut]
+        y=[float(cut),float(cut)]
+        #print (x,y)
         ax.plot(x,y,lw=3,c="b")
         ax.plot(y,x,lw=3,c="b")
+    #ax.set(xlim=[0,500],ylim=[0,500])
+ax.set(title=ns.input)
 fig.colorbar(cax)
 if ns.output:
     fig.savefig(ns.output)
