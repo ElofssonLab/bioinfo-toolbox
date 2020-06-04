@@ -16,3 +16,8 @@ apt install cuda -y --fix-missing
 pip install biopython 
 tar -vjxf /home/PyRosetta4.Release.python36.ubuntu.release-256.tar.bz2
 pip install -e PyRosetta4.Release.python36.ubuntu.release-256/setup/ 
+
+
+# Comments
+# THis is the command that worked for me as I run out of disk space on /tmp
+# sudo su -c "SINGULARITY_TMPDIR=/home/arnee/Downloads/tmp/  SINGULARITY_DISABLE_CACHE=true SINGULARITY_CACHE=/home/arnee/Downloads/tmp/ singularity build /home/arnee/singularity-images/trRosetta-gpu.simg sing1-gpu.def"

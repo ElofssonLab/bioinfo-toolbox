@@ -16,3 +16,7 @@
 ### it is suggested running step two for multiple times to generate multiple models and select the top models based on the energy scores, which are available at the end of the model's pdb file.
 ### More details about trRosetta can be found from the following paper:
 ###J Yang et al, Improved protein structure prediction using predicted inter-residue orientations, PNAS (2020).
+
+
+
+### # sudo su -c "SINGULARITY_TMPDIR=/home/arnee/Downloads/tmp/  SINGULARITY_DISABLE_CACHE=true SINGULARITY_CACHE=/home/arnee/Downloads/tmp/ singularity build /home/arnee/singularity-images/trRosetta-gpu.simg sing1-gpu.def"
