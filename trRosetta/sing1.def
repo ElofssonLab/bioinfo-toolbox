@@ -5,6 +5,15 @@ From: tensorflow/tensorflow:1.13.2-py3
 PyRosetta4.Release.python36.ubuntu.release-256.tar.bz2 /home
 
 %post
+apt-get update
+#apt-get upgrade -y
+apt-get autoremove
+apt-get autoclean
+DEBIAN_FRONTEND=noninteractive apt-get install keyboard-configuration -y
+#DEBIAN_FRONTEND=noninteractive apt-get update keyboard-configuration 
+#apt install cuda -y --fix-missing
+apt install ipython3 -y
 pip install biopython 
+
 tar -vjxf /home/PyRosetta4.Release.python36.ubuntu.release-256.tar.bz2
 pip install -e PyRosetta4.Release.python36.ubuntu.release-256/setup/ 
