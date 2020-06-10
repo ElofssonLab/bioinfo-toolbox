@@ -35,11 +35,14 @@ def main():
 
     # read and process restraints & sequence
     npz = np.load(args.NPZ)
-    seq1 = read_fasta(args.FASTA1)
+    seq1 = read_fasta(args.FASTA)
     seq2=read_fasta(args.FASTA2)
     seq=seq1+seq2
     L = len(seq)
     params['seq'] = seq
+    params["seqlen1"]=len(seq1)
+    params["seqlen2"]=len(seq1)
+    params["seqlen"]=len(seq)
     rst = gen_rst(npz,tmpdir,params)
     seq_polyala = 'A'*len(seq1+seq2) # Is this used ?
 
@@ -95,31 +98,33 @@ def main():
 
     set_random_dihedral(pose)
     remove_clash(sf_vdw, min_mover_vdw, pose)
-    pose.dump_pdb(args.OUT)
+    pose.dump_pdb("starting.pdb")
 
     ########################################################
     # minimization
     ########################################################
 
+    params["interchain"]=False
+    
     if args.mode == 0:
-
+        
         # short
         print('short')
-        add_rst(pose, rst, 1, 12, params)
+        add_rst_chain2(pose, rst, 1, 12, params)
         repeat_mover.apply(pose)
         min_mover_cart.apply(pose)
         remove_clash(sf_vdw, min_mover1, pose)
 
         # medium
         print('medium')
-        add_rst(pose, rst, 12, 24, params)
+        add_rst_chain2(pose, rst, 12, 24, params)
         repeat_mover.apply(pose)
         min_mover_cart.apply(pose)
         remove_clash(sf_vdw, min_mover1, pose)
 
         # long
         print('long')
-        add_rst(pose, rst, 24, len(seq), params)
+        add_rst_chain2(pose, rst, 24, len(seq), params)
         repeat_mover.apply(pose)
         min_mover_cart.apply(pose)
         remove_clash(sf_vdw, min_mover1, pose)
@@ -128,14 +133,14 @@ def main():
 
         # short + medium
         print('short + medium')
-        add_rst(pose, rst, 3, 24, params)
+        add_rst_chain2(pose, rst, 3, 24, params)
         repeat_mover.apply(pose)
         min_mover_cart.apply(pose)
         remove_clash(sf_vdw, min_mover1, pose)
 
         # long
         print('long')
-        add_rst(pose, rst, 24, len(seq), params)
+        add_rst_chain2(pose, rst, 24, len(seq), params)
         repeat_mover.apply(pose)
         min_mover_cart.apply(pose)
         remove_clash(sf_vdw, min_mover1, pose)
@@ -144,12 +149,38 @@ def main():
 
         # short + medium + long
         print('short + medium + long')
-        add_rst(pose, rst, 1, len(seq), params)
+        add_rst_chain2(pose, rst, 1, len(seq), params)
         repeat_mover.apply(pose)
         min_mover_cart.apply(pose)
         remove_clash(sf_vdw, min_mover1, pose)
 
+    pose.dump_pdb("intraoptimized.pdb")
 
+    # Now we add the interchaion contacts
+        
+    mmap = MoveMap()
+    mmap.set_bb(False)
+    mmap.set_chi(False)
+    mmap.set_jump(False)
+    mmap.set_branches(False)
+    mmap.set_jump(1, True)
+
+    # Mover from rigit body docking
+    #pert_mover = RigidBodyPerturbMover(jump_num, 3,8 )
+
+    params["interchain"]=True
+    print('Moving the chains together')
+    add_rst_chain2(pose, rst, 1, len(seq), params)
+    repeat_mover.apply(pose)
+    min_mover_cart.apply(pose)
+    remove_clash(sf_vdw, min_mover1, pose)
+
+    
+    #minmover = MinMover()
+    #minmover.movemap(movemap)
+    #minmover.score_function(scorefxn) # use any scorefxn
+    #minmover.apply(pose)
+        
     # mutate ALA back to GLY
     for i,a in enumerate(seq):
         if a == 'G':
@@ -157,7 +188,7 @@ def main():
             mutator.apply(pose)
             print('mutation: A%dG'%(i+1))
 
-
+    pose.dump_pdb("interoptimized.pdb")
     ########################################################
     # full-atom refinement
     ########################################################
@@ -186,7 +217,7 @@ def main():
 
         print('relax...')
         params['PCUT'] = 0.15
-        add_rst(pose, rst, 1, len(seq), params, True)
+        add_rst_chain2(pose, rst, 1, len(seq), params, True)
         relax.apply(pose)
 
     ########################################################
