@@ -5,9 +5,9 @@ def get_args(params):
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("NPZ", type=str, help="input distograms and anglegrams (NN predictions)")
     parser.add_argument("FASTA", type=str, help="input sequence")
+    parser.add_argument("FASTA2", type=str, help="input sequence 2")
     parser.add_argument("OUT", type=str, help="output model (in PDB format)")
 
-    parser.add_argument("-FASTA2", type=str, help="input sequence 2")
 
     parser.add_argument('-pd', type=float, dest='pcut', default=params['PCUT'], help='min probability of distance restraints')
     parser.add_argument('-m', type=int, dest='mode', default=2, choices=[0,1,2], help='0: sh+m+l, 1: (sh+m)+l, 2: (sh+m+l)')

@@ -7,6 +7,7 @@ from utils_ros import *
 from pyrosetta import *
 from pyrosetta.rosetta.protocols.minimization_packing import MinMover
 from pyrosetta.rosetta.core.pose import append_pose_to_pose
+from pyrosetta.rosetta.protocols.rigid import *
 
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
 
@@ -18,6 +19,7 @@ def main():
 
     # read params
     scriptdir = os.path.dirname(os.path.realpath(__file__))
+    #print (scriptdir)
     with open(scriptdir + '/data/params.json') as jsonfile:
         params = json.load(jsonfile)
 
@@ -41,12 +43,15 @@ def main():
     L = len(seq)
     params['seq'] = seq
     params["seqlen1"]=len(seq1)
-    params["seqlen2"]=len(seq1)
+    params["seqlen2"]=len(seq2)
     params["seqlen"]=len(seq)
     rst = gen_rst(npz,tmpdir,params)
+    add_intrachain_rst(rst,tmpdir,params) # Adding a weak flat harmonic to bring things together. 
     seq_polyala = 'A'*len(seq1+seq2) # Is this used ?
 
-
+    #print (rst)
+    #print (rst)
+                       
     ########################################################
     # Scoring functions and movers
     ########################################################
@@ -100,11 +105,11 @@ def main():
     remove_clash(sf_vdw, min_mover_vdw, pose)
     pose.dump_pdb("starting.pdb")
 
-    ########################################################
+    ########################################################  
     # minimization
     ########################################################
 
-    params["interchain"]=False
+    params["interchain"]=True
     
     if args.mode == 0:
         
@@ -156,26 +161,26 @@ def main():
 
     pose.dump_pdb("intraoptimized.pdb")
 
-    # Now we add the interchaion contacts
-        
-    mmap = MoveMap()
-    mmap.set_bb(False)
-    mmap.set_chi(False)
-    mmap.set_jump(False)
-    mmap.set_branches(False)
-    mmap.set_jump(1, True)
-
-    # Mover from rigit body docking
-    #pert_mover = RigidBodyPerturbMover(jump_num, 3,8 )
-
-    params["interchain"]=True
-    print('Moving the chains together')
-    add_rst_chain2(pose, rst, 1, len(seq), params)
-    repeat_mover.apply(pose)
-    min_mover_cart.apply(pose)
-    remove_clash(sf_vdw, min_mover1, pose)
-
-    
+    ## Now we add the interchaion contacts
+    #    
+    #mmap = MoveMap()
+    #mmap.set_bb(False)
+    #mmap.set_chi(False)
+    #mmap.set_jump(False)
+    #mmap.set_branches(False)
+    #mmap.set_jump(1, True)
+    #
+    ## Mover from rigit body docking
+    ##pert_mover = RigidBodyPerturbMover(jump_num, 3,8 )
+    #
+    #params["interchain"]=True
+    #print('Moving the chains together')
+    #add_rst_chain2(pose, rst, 1, len(seq), params)
+    #repeat_mover.apply(pose)
+    #min_mover_cart.apply(pose)
+    #remove_clash(sf_vdw, min_mover1, pose)
+    #
+    #
     #minmover = MinMover()
     #minmover.movemap(movemap)
     #minmover.score_function(scorefxn) # use any scorefxn
