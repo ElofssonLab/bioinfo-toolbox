@@ -18,7 +18,7 @@ p = argparse.ArgumentParser(description = '- plotting trRosetta maps-',
 p.add_argument('-fileA','--inputA','-i', required= True, help='Input File A')
 p.add_argument('-fileB','--inputB','-j', required= True, help='Input file B')
 #p.add_argument('-dom','--domain','-d', required= False, help='positions of domain borders', nargs='+')
-p.add_argument('-seq','--sepseq','-s', required= False, help='sequence file to identify domain baorders (>10Ala in a row)')
+p.add_argument('-seq','--sepseq','-s', required= False, help='sequence file to identify domain baorders (20 Gly)',default="GGGGGGGGGGGGGGGGGGGG")
 p.add_argument('--genus','-g', required= False, help='Use only genus names', action='store_true')
 p.add_argument('--host','-l', required= False, help='use host to match fileB', action='store_true')
 #p.add_argument('-out','--output','-o', required= False, help='output image')
@@ -27,7 +27,7 @@ ns = p.parse_args()
 
 #from Bio.SeqFeature import SeqFeature, FeatureLocation
 
-sepseq="AAAAAAAAAAAAAAAAAAAA"
+sepseq=ns.sepseq
 
 fileA=ns.inputA
 fileB=ns.inputB
