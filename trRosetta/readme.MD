@@ -30,31 +30,34 @@
   * jackhmmer -N 3 -o X.jackhmmer -A X.sto X.fa database.fasta
   * jackhmmer -N 3 -o Y.jackhmmer -A Y.sto Y.fa database.fasta
   * python3 mergeSTObyGenome.py -i X.sto -j Y.sto > X-Y.a3m
-  * python3 a3mToTrimmed.py  X-Y.a3m > X-Y.trimmed % "Trim an a3m file - probably not needed
+  * python3 a3mToTrimmed.py  X-Y.a3m > X-Y.trimmed
+  - "Trim an a3m file - probably not needed
 
 * Run trRosetta distance predictionsx
   * python3 network/predict.py  -m ~/model2019_07 X-Y.trimmed X-Y.npz  
-    % it might also be worth to try to run Y-X.a3m (reversed order)
+    - it might also be worth to try to run Y-X.a3m (reversed order)
 
 * Modify the NPX file (to delete the insertion
   * del_sepseq_npz.py -i X-Y.npz   -s X-Y.fasta -o X-Y-nosep.npz   
-    % Modify the NPZ file by deleting the npz file.
+    - Modify the NPZ file by deleting the npz file.
 
 * To run pyRosetta
-  * trRosetta-2chain.py X-Y-nodel.npx X.fa Y.fa X-Y.pdb % The script used to fold two chains.
+  * trRosetta-2chain.py X-Y-nodel.npx X.fa Y.fa X-Y.pdb 
+  - The script used to fold two chains.
   * We need (perhaps) to limit the constraints that attracts the two sequences 
-    to only the ones that have prob>0.5 % not done yet.
+    to only the ones that have prob>0.5 
+  - not done yet.
 
 * Utils needed by pyrosetta
-  * arguments.py  % one extra argument to handle two fasta input files)
-  * data/   % Files
-  * utils_ros.py  % New subrouting
+  * arguments.py    - one extra argument to handle two fasta input files)
+  * data/   - Files
+  * utils_ros.py  - New subrouting
 
 * Some usefile programs 
-  * npz_to_rr.py  % Convert and trRosettta predicton file to a CASP contact file
-  * sto_to_msa.py  % Convert stockholm to a3m (fasta format
-  * tr_calculate_contact_dist.py  % makes a plot of the distance map (with poly G shaded)
-  * start.py % The first part of trRosetta-2chain.py % useful for ipython
+  * npz_to_rr.py  - Convert and trRosettta predicton file to a CASP contact file
+  * sto_to_msa.py  - Convert stockholm to a3m (fasta format
+  * tr_calculate_contact_dist.py  - makes a plot of the distance map (with poly G shaded)
+  * start.py - The first part of trRosetta-2chain.py - useful for ipython
 
 
 
