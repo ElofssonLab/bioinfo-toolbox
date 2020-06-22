@@ -21,7 +21,7 @@
 
 * download Pyrosetta zip file for Ubuntu 18.04 LTS (64-bit) and Python-3.6  from
   http://www.pyrosetta.org/dow
-  *      Note - make sure you get the right Python version
+  *    Note:  make sure you get the right Python version
 
 
 ## List of files with short explanations (not things are not ready for publication)
@@ -31,7 +31,7 @@
   * jackhmmer -N 3 -o Y.jackhmmer -A Y.sto Y.fa database.fasta
   * python3 mergeSTObyGenome.py -i X.sto -j Y.sto > X-Y.a3m
   * python3 a3mToTrimmed.py  X-Y.a3m > X-Y.trimmed
-  - "Trim an a3m file - probably not needed
+    - "Trim an a3m file - probably not needed
 
 * Run trRosetta distance predictionsx
   * python3 network/predict.py  -m ~/model2019_07 X-Y.trimmed X-Y.npz  
@@ -43,21 +43,29 @@
 
 * To run pyRosetta
   * trRosetta-2chain.py X-Y-nodel.npx X.fa Y.fa X-Y.pdb 
-  - The script used to fold two chains.
+   - The script used to fold two chains.
   * We need (perhaps) to limit the constraints that attracts the two sequences 
     to only the ones that have prob>0.5 
-  - not done yet.
+    - not done yet.
 
 * Utils needed by pyrosetta
-  * arguments.py    - one extra argument to handle two fasta input files)
-  * data/   - Files
-  * utils_ros.py  - New subrouting
+  * arguments.py    
+    - one extra argument to handle two fasta input files)
+  * data/   
+    - Files with potentials
+  * utils_ros.py  
+    - New subrouting necessary
 
 * Some usefile programs 
-  * npz_to_rr.py  - Convert and trRosettta predicton file to a CASP contact file
-  * sto_to_msa.py  - Convert stockholm to a3m (fasta format
-  * tr_calculate_contact_dist.py  - makes a plot of the distance map (with poly G shaded)
-  * start.py - The first part of trRosetta-2chain.py - useful for ipython
+  * npz_to_rr.py  
+    - Convert and trRosettta predicton file to a CASP contact file
+  * sto_to_msa.py  
+    - Convert stockholm to a3m (fasta format
+  * tr_calculate_contact_dist.py  
+    - makes a plot of the distance map (with poly G shaded)
+  * start.py 
+    - The first part of trRosetta-2chain.py 
+    - useful for ipython
 
 
 
