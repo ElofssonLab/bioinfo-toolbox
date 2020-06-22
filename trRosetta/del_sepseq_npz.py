@@ -12,7 +12,7 @@ p = argparse.ArgumentParser(description = '- plotting trRosetta maps-',
                             formatter_class=RawTextHelpFormatter)
 p.add_argument('-data','--input','-i', required= True, help='Input trRossetta NPZ file')
 p.add_argument('-seq','--sequence','-s', required= True, help='sequence file to identify domain baorders')
-p.add_argument("--sepseq","-sep","-S",required=False, help='Separation sequence between protein in MSA' ,default="AAAAAAAAAAAAAAAAAAAA")
+p.add_argument("--sepseq","-sep","-S",required=False, help='Separation sequence between protein in MSA' ,default="GGGGGGGGGGGGGGGGGGGG")
 p.add_argument('-out','--output','-o', required= True, help='output NPX file')
 #parser.add_argument('--nargs', nargs='+')
 ns = p.parse_args()

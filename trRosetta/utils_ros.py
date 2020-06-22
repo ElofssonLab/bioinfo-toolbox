@@ -9,6 +9,7 @@ def add_intrachain_rst(rst,tmpdir,params,LB=1,UB=50,D=20,WD=-100,WB=0):
     ########################################################
     for i in range(params["seqlen1"]):
         for j in range(params["seqlen1"]+1,params["seqlen2"]+params["seqlen1"]):
+            # We should limit ourself to constrains that have a probablitu
             name=tmpdir.name+"/%d.%d-fade.txt"%(i+1,j+1)
             with open(name, "w") as f:
                 f.write('FADE'+'\t%.3f\t%.3f\t%.3f\t%.3f'%(LB,UB,D,WB)+'\n')
