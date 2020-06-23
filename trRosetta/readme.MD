@@ -10,7 +10,7 @@ git clone https://github.com/gjoni/trRosetta
 *  download pre-trained network and untar
 ```bash
 wget https://files.ipd.uw.edu/pub/trRosetta/model2019_07.tar.bz2
-tar xf model2019_07.tar.bz2)
+tar xf model2019_07.tar.bz2
 ```
 * download second part of trRosetta (server)
   * registration necessary at http://yanglab.nankai.edu.cn/trRosetta/)

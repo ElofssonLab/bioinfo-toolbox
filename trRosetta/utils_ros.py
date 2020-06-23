@@ -3,21 +3,24 @@ import random
 from pyrosetta import *
 
 
-def add_intrachain_rst(rst,tmpdir,params,LB=1,UB=50,D=20,WD=-100,WB=0):
+def add_intrachain_rst(npz,rst,tmpdir,params,minprob=0.05,LB=1,UB=50,D=20,WD=-100,WB=0):
     ########################################################
     # Distance restraints to keep the two chains together
     ########################################################
+    dist,omega,theta,phi = npz['dist'],npz['omega'],npz['theta'],npz['phi']
+    prob = np.sum(dist[:,:,5:], axis=-1)
     for i in range(params["seqlen1"]):
         for j in range(params["seqlen1"]+1,params["seqlen2"]+params["seqlen1"]):
             # We should limit ourself to constrains that have a probablitu
-            name=tmpdir.name+"/%d.%d-fade.txt"%(i+1,j+1)
-            with open(name, "w") as f:
-                f.write('FADE'+'\t%.3f\t%.3f\t%.3f\t%.3f'%(LB,UB,D,WB)+'\n')
-                #f.write('y_axis'+'\t%.3f'%stuple(dist[a,b])+'\n')
-                #f.close()
-            #rst_line = 'AtomPair %s %d %s %d FADE %.5f %.5f %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,LB,UB,D,WD,WB)
-            rst_line = 'AtomPair %s %d %s %d FLAT_HARMONIC  %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,UB,UB,D)
-            rst['fade'].append([i,j,1.0,rst_line]) # Change file?
+            if (prob[i,j]>minprob):
+                name=tmpdir.name+"/%d.%d-fade.txt"%(i+1,j+1)
+                with open(name, "w") as f:
+                    f.write('FADE'+'\t%.3f\t%.3f\t%.3f\t%.3f'%(LB,UB,D,WB)+'\n')
+                    #f.write('y_axis'+'\t%.3f'%stuple(dist[a,b])+'\n')
+                    #f.close()
+                #rst_line = 'AtomPair %s %d %s %d FADE %.5f %.5f %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,LB,UB,D,WD,WB)
+                rst_line = 'AtomPair %s %d %s %d FLAT_HARMONIC  %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,UB,UB,D)
+                rst['fade'].append([i,j,1.0,rst_line]) # Change file?
     print("fade restraints:  %d"%(len(rst['fade'])))
         
         
