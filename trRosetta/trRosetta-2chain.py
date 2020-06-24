@@ -46,7 +46,7 @@ def main():
     params["seqlen2"]=len(seq2)
     params["seqlen"]=len(seq)
     rst = gen_rst(npz,tmpdir,params)
-    add_intrachain_rst(rst,tmpdir,params) # Adding a weak flat harmonic to bring things together. 
+    add_intrachain_rst(npz,rst,tmpdir,params) # Adding a weak flat harmonic to bring things together. 
     seq_polyala = 'A'*len(seq1+seq2) # Is this used ?
 
     #print (rst)
