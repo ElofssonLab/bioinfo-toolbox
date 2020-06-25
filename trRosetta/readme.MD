@@ -46,7 +46,12 @@ tar xf model2019_07.tar.bz2
 ```
 \* it might also be worth to try to run Y-X.a3m (reversed order)
 
-* Modify the NPX file (to delete the insertion
+* Generate a "fasta" file that contains the sequence used predicting the distances.
+ ```bash 
+  head -2 X-Y.trimmed > X-Y.fasta
+ ```
+   \- Modify the NPZ file by deleting the npz file.
+* Modify the NPZ file (to delete the insertion). 
  ```bash 
   python3 del_sepseq_npz.py -i X-Y.npz -s X-Y.fasta -o X-Y-nosep.npz
  ```
