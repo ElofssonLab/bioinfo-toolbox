@@ -46,7 +46,7 @@ tar xf model2019_07.tar.bz2
 ```
 \* it might also be worth to try to run Y-X.a3m (reversed order)
 
-* Generate a "fasta" file that contains the sequence used predicting the distances.
+* Generate a "fasta" file that contains the sequence used predicting the distances. (make sure you get the whole sequence)
  ```bash 
   head -2 X-Y.trimmed > X-Y.fasta
  ```
