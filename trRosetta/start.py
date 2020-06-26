@@ -77,8 +77,9 @@ params["seqlen2"]=len(seq2)
 params["seqlen"]=len(seq)
 rst = gen_rst(npz,tmpdir,params)
 #seq_polyala = 'A'*len(seq1+seq2) # Is this used ?
-add_intrachain_rst(rst,tmpdir,params)
+add_intrachain_rst(npz,rst,tmpdir,params)
 
+sys.exit()
 
 ########################################################
 # initialize pose

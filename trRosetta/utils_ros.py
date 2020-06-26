@@ -3,7 +3,7 @@ import random
 from pyrosetta import *
 
 
-def add_intrachain_rst(npz,rst,tmpdir,params,minprob=0.05,LB=1,UB=50,D=20,WD=-100,WB=0):
+def add_intrachain_rst(npz,rst,tmpdir,params,minprob=0.5,LB=1,UB=50,D=20,WD=-100,WB=0):
     ########################################################
     # Distance restraints to keep the two chains together
     ########################################################
@@ -21,7 +21,7 @@ def add_intrachain_rst(npz,rst,tmpdir,params,minprob=0.05,LB=1,UB=50,D=20,WD=-10
                 #rst_line = 'AtomPair %s %d %s %d FADE %.5f %.5f %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,LB,UB,D,WD,WB)
                 rst_line = 'AtomPair %s %d %s %d FLAT_HARMONIC  %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,UB,UB,D)
                 rst['fade'].append([i,j,1.0,rst_line]) # Change file?
-    print("Flat harmonig restraints:  %d"%(len(rst['fade'])))
+    print("Flat harmonic restraints:  %d"%(len(rst['fade'])))
         
         
 def gen_rst(npz, tmpdir, params):
