@@ -3,7 +3,7 @@ import random
 from pyrosetta import *
 
 
-def add_intrachain_rst(npz,rst,tmpdir,params,minprob=0.5,LB=1,UB=50,D=20,WD=-100,WB=0):
+def add_intrachain_rst(npz,rst,tmpdir,params,minprob=0.5,LB=1,UB=10,D=20,WD=-100,WB=0):
     ########################################################
     # Distance restraints to keep the two chains together
     ########################################################
@@ -15,11 +15,24 @@ def add_intrachain_rst(npz,rst,tmpdir,params,minprob=0.5,LB=1,UB=50,D=20,WD=-100
             if (prob[i,j]>minprob):
                 name=tmpdir.name+"/%d.%d-fade.txt"%(i+1,j+1)
                 with open(name, "w") as f:
+                    # LB is Lower Bound
+                    # UB is upper bound
+                    # WD is
+                    # WB
                     f.write('FADE'+'\t%.3f\t%.3f\t%.3f\t%.3f'%(LB,UB,D,WB)+'\n')
                     #f.write('y_axis'+'\t%.3f'%stuple(dist[a,b])+'\n')
                     #f.close()
                 #rst_line = 'AtomPair %s %d %s %d FADE %.5f %.5f %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,LB,UB,D,WD,WB)
-                rst_line = 'AtomPair %s %d %s %d FLAT_HARMONIC  %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,UB,UB,D)
+                #
+                #FLAT_HARMONIC x0 sd tol
+
+                #  Zero in the range of x0 - tol to x0 + tol. Harmonic
+                #  with width parameter sd outside that
+                #  range. Basically, a HARMONIC potential (see above)
+                #  split at x0 with a 2*tol length region of zero
+                #  inserted.
+                  
+                rst_line = 'AtomPair %s %d %s %d FLAT_HARMONIC  %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,UB,D,UB)
                 rst['fade'].append([i,j,1.0,rst_line]) # Change file?
     print("Flat harmonic restraints:  %d"%(len(rst['fade'])))
         

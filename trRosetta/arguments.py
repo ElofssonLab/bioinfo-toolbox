@@ -8,7 +8,8 @@ def get_args(params):
     parser.add_argument("FASTA2", type=str, help="input sequence 2")
     parser.add_argument("OUT", type=str, help="output model (in PDB format)")
 
-
+    
+    parser.add_argument('-minprob', type=float, dest='pcut', default=0.5, help='min probability of distance restraints for inter-chain flat harminic')
     parser.add_argument('-pd', type=float, dest='pcut', default=params['PCUT'], help='min probability of distance restraints')
     parser.add_argument('-m', type=int, dest='mode', default=2, choices=[0,1,2], help='0: sh+m+l, 1: (sh+m)+l, 2: (sh+m+l)')
     parser.add_argument('-w', type=str, dest='wdir', default=params['WDIR'], help='folder to store temp files')
