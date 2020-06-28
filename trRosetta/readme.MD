@@ -54,7 +54,16 @@ tar xf model2019_07.tar.bz2
 * Modify the NPZ file (to delete the insertion). 
  ```bash 
   python3 del_sepseq_npz.py -i X-Y.npz -s X-Y.fasta -o X-Y-nosep.npz
- ```
+  ```
+   \- In addition one can merge the files from two individual predictions and
+ the merged one.
+* In additon merge the files from two individual predictions and
+ the merged one. (Might work - might not).
+ ```bash 
+  python3 merge_npz.py -i X.npz -j Y.npz  -k X-Y-nosep.npz -o X-Y-merged.npz
+  ```
+
+
    \- Modify the NPZ file by deleting the npz file.
 
 * To run pyRosetta
