@@ -64,4 +64,4 @@ for m in borders:
 #print (new_rst)
 
 # Save
-np.savez_compressed(ns.output, dist=new_rst['dist'], omega=new_rst['omega'], theta=new_rst['theta'], phi=new_rst['phi'])
+np.savez_compressed(ns.output, dist=new_rst['dist'], omega=new_rst['omega'], theta=new_rst['theta'], phi=new_rst['phi'], rep=new_rst['rep'])
