@@ -1,4 +1,4 @@
-# Short instructions on how to use trRosetta for modelling
+# Short instructions on how to use trRosetta for modeling
 
 ## Installation of trRosetta, PyRosetta and Rosetta
 
@@ -18,7 +18,7 @@ tar xf model2019_07.tar.bz2
 * build the singularity container (Also available on kebnekaise and on Arnes machine)
   * Two definitions available here
     * Default sing1.def (with ipython) and sing1-gpu.def (with Cuda)
-    * singularity build directoryname sing1.def  (or use fakeroot/sannbox if you prefer)
+    * singularity build directory name sing1.def  (or use fakeroot/sandbox if you prefer)
       * Command used by Arne (as he was running out of memory). To build GPU enabled image
        ```bash
        sudo su -c "SINGULARITY_TMPDIR=/home/arnee/Downloads/tmp/  SINGULARITY_DISABLE_CACHE=true SINGULARITY_CACHE=/home/arnee/Downloads/tmp/ singularity build /home/arnee/singularity-images/trRosetta-gpu.simg sing1-gpu.def"
@@ -30,7 +30,7 @@ tar xf model2019_07.tar.bz2
 
 
 ## List of files with short explanations (note things are not ready for publication)
-* Lets assume we whan to "dock X and Y" (fasta files X.fa, Y.fa)
+* Lets assume we want to "dock X and Y" (fasta files X.fa, Y.fa)
 * To prepare the MSA*
 ```bash
   jackhmmer -N 3 -o X.jackhmmer -A X.sto X.fa database.fasta
@@ -57,19 +57,23 @@ tar xf model2019_07.tar.bz2
   ```
    \- In addition one can merge the files from two individual predictions and
  the merged one.
-* In additon merge the files from two individual predictions and
- the merged one. (Might work - might not).
+* In addition merge the files from two individual predictions and
+ the merged one. 
  ```bash 
   python3 merge_npz.py -i X.npz -j Y.npz  -k X-Y-nosep.npz -o X-Y-merged.npz
   ```
-
-
    \- Modify the NPZ file by deleting the npz file.
 
 * To run pyRosetta
 ```bash
-  python3 trRosetta-2chain.py X-Y-nodel.npx X.fa Y.fa X-Y.pdb
+  python3 trRosetta-2chain.py X-Y-model.npz X.fa Y.fa X-Y.pdb
 ```
+	* Some parameters 
+	  * -minprob the minimum probability of interactions to be included.
+	  * -intradist  (distance for the "flat" potential, i.e. where attraction should start. Default 15 (as when it is closer the real potential can start to act)
+	  * -intrasd  Standard deviation of the intra-chain potential (default 20)
+	  * -allintra  (adds an even weaker constraint on all intra pairs)
+
    \- The script used to fold two chains.
    
   * We need (perhaps) to limit the constraints that attracts the two sequences
@@ -82,11 +86,11 @@ tar xf model2019_07.tar.bz2
   * data/
     - Files with potentials
   * utils_ros.py
-    - New subrouting necessary
+    - New subroutine necessary
 
 * Some useful programs
   * npz_to_rr.py
-    - Convert and trRosettta predicton file to a CASP contact file
+    - Convert and trRosetta prediction file to a CASP contact file
   * sto_to_msa.py
     - Convert stockholm to a3m (fasta format
   * tr_calculate_contact_dist.py

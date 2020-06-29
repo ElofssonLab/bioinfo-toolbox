@@ -10,8 +10,9 @@ def get_args(params):
 
     
     parser.add_argument('-minprob', type=float, dest='minprob', default=0.5, help='min probability of distance restraints for inter-chain flat harminic')
-    parser.add_argument('-intradist', type=float, dest='intradist', default=10., help='half the dsitance for the flat part in  restraints for inter-chain flat harminic')
+    parser.add_argument('-intradist', type=float, dest='intrasd', default=15., help='The distance for the flat part in  restraints for inter-chain flat harminic')
     parser.add_argument('-intrasd', type=float, dest='intradist', default=20., help='SD for  restraints for inter-chain flat harminic')
+    parser.add_argument('-allintra',  dest='allcontacts', help='Use in additiona also a weak interacting potential for all intrachain contacts',action='store_true')
     parser.add_argument('-pd', type=float, dest='pcut', default=params['PCUT'], help='min probability of distance restraints')
     parser.add_argument('-m', type=int, dest='mode', default=2, choices=[0,1,2], help='0: sh+m+l, 1: (sh+m)+l, 2: (sh+m+l)')
     parser.add_argument('-w', type=str, dest='wdir', default=params['WDIR'], help='folder to store temp files')

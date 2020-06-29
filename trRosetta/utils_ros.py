@@ -3,7 +3,7 @@ import random
 from pyrosetta import *
 
 
-def add_intrachain_rst(npz,rst,tmpdir,params,minprob=0.5,LB=1,UB=10,D=20,WD=-100,WB=0):
+def add_intrachain_rst(npz,rst,tmpdir,params,minprob=0.5,LB=1,UB=15,D=20,WD=-100,WB=0,allcontacts=False):
     ########################################################
     # Distance restraints to keep the two chains together
     ########################################################
@@ -13,13 +13,13 @@ def add_intrachain_rst(npz,rst,tmpdir,params,minprob=0.5,LB=1,UB=10,D=20,WD=-100
         for j in range(params["seqlen1"]+1,params["seqlen2"]+params["seqlen1"]):
             # We should limit ourself to constrains that have a probablitu
             if (prob[i,j]>minprob):
-                name=tmpdir.name+"/%d.%d-fade.txt"%(i+1,j+1)
+                name=tmpdir.name+"/%d.%d-harm.txt"%(i+1,j+1)
                 with open(name, "w") as f:
                     # LB is Lower Bound
                     # UB is upper bound
                     # WD is
                     # WB
-                    f.write('FADE'+'\t%.3f\t%.3f\t%.3f\t%.3f'%(LB,UB,D,WB)+'\n')
+                    f.write('HARM'+'\t%.3f\t%.3f'%(UB,D)+'\n')
                     #f.write('y_axis'+'\t%.3f'%stuple(dist[a,b])+'\n')
                     #f.close()
                 #rst_line = 'AtomPair %s %d %s %d FADE %.5f %.5f %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,LB,UB,D,WD,WB)
@@ -32,9 +32,32 @@ def add_intrachain_rst(npz,rst,tmpdir,params,minprob=0.5,LB=1,UB=10,D=20,WD=-100
                 #  split at x0 with a 2*tol length region of zero
                 #  inserted.
                   
-                rst_line = 'AtomPair %s %d %s %d FLAT_HARMONIC  %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,UB,D,UB)
-                rst['fade'].append([i,j,1.0,rst_line]) # Change file?
-    print("Flat harmonic restraints:  %d"%(len(rst['fade'])))
+                rst_line = 'AtomPair %s %d %s %d FLAT_HARMONIC  %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,0,D,UB)
+                rst['harm'].append([i,j,1.0,rst_line]) # Change file?
+            elif (allcontacts):
+                name=tmpdir.name+"/%d.%d-harm2.txt"%(i+1,j+1)
+                with open(name, "w") as f:
+                    # LB is Lower Bound
+                    # UB is upper bound
+                    # WD is
+                    # WB
+                    f.write('HARM2'+'\t%.3f\t%.3f'%(UB,D)+'\n')
+                    # f.write('FADE'+'\t%.3f\t%.3f\t%.3f\t%.3f'%(LB,UB,D,WB)+'\n')
+                    #f.write('y_axis'+'\t%.3f'%stuple(dist[a,b])+'\n')
+                    #f.close()
+                #rst_line = 'AtomPair %s %d %s %d FADE %.5f %.5f %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,LB,UB,D,WD,WB)
+                #
+                #FLAT_HARMONIC x0 sd tol
+
+                #  Zero in the range of x0 - tol to x0 + tol. Harmonic
+                #  with width parameter sd outside that
+                #  range. Basically, a HARMONIC potential (see above)
+                #  split at x0 with a 2*tol length region of zero
+                #  inserted.
+                  
+                rst_line = 'AtomPair %s %d %s %d FLAT_HARMONIC  %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,0,D*10,UB)
+                rst['harm'].append([i,j,1.0,rst_line]) 
+    print("Flat harmonic restraints:  %d"%(len(rst['harm'])))
         
         
 def gen_rst(npz, tmpdir, params):
@@ -42,7 +65,7 @@ def gen_rst(npz, tmpdir, params):
     dist,omega,theta,phi = npz['dist'],npz['omega'],npz['theta'],npz['phi']
 
     # dictionary to store Rosetta restraints
-    rst = {'dist' : [], 'omega' : [], 'theta' : [], 'phi' : [], 'rep' : [], 'fade' : []}
+    rst = {'dist' : [], 'omega' : [], 'theta' : [], 'phi' : [], 'rep' : [], 'harm' : []}
 
     ########################################################
     # assign parameters
@@ -254,7 +277,7 @@ def add_rst_chain2(pose, rst, sep1, sep2, params, nogly=False):
     if nogly==True:
         if inter:
             array += [line for a,b,p,line in rst['dist'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and seq[a]!='G' and seq[b]!='G' and p>=pcut]
-            array += [line for a,b,p,line in rst['fade'] if seq[b]!='G' and seq[a]!='G' and seq[b]!='G' and p>=pcut]
+            array += [line for a,b,p,line in rst['harm'] if seq[b]!='G' and seq[a]!='G' and seq[b]!='G' and p>=pcut]
             if params['USE_ORIENT'] == True:
                 array += [line for a,b,p,line in rst['omega'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and seq[a]!='G' and seq[b]!='G' and p>=pcut+0.5] #0.5
                 array += [line for a,b,p,line in rst['theta'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and seq[a]!='G' and seq[b]!='G' and p>=pcut+0.5] #0.5
@@ -268,7 +291,7 @@ def add_rst_chain2(pose, rst, sep1, sep2, params, nogly=False):
     else:
         if inter:
             array += [line for a,b,p,line in rst['dist']  if abs(a-b)>=sep1 and abs(a-b)<sep2 and p>=pcut ]
-            array += [line for a,b,p,line in rst['fade'] if  p>=pcut]
+            array += [line for a,b,p,line in rst['harm'] if  p>=pcut]
             if params['USE_ORIENT'] == True:
                 array += [line for a,b,p,line in rst['omega'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and p>=pcut+0.5]
                 array += [line for a,b,p,line in rst['theta'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and p>=pcut+0.5]
