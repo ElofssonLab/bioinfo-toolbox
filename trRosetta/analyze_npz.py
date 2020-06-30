@@ -108,7 +108,7 @@ fractionshortcontacts=[]
 numlongcontacts=[]
 fractionlongcontacts=[]
 numprob=[]
-fractionprog=[]
+fractionprob=[]
 x=0
 y=0
 skip=5
@@ -128,7 +128,7 @@ if (ns.sequence):
             numshortcontacts+=[0]
             numlongcontacts+=[0]
             numcontacts+=[0]
-            avereagedist+=[0]
+            averagedist+=[0]
             #print (x,mindist,average,startx,starty,m,n)
             z=0
             for i in range(startx,m):
@@ -146,12 +146,12 @@ if (ns.sequence):
                     mean_dist = np.sum(np.multiply(bins, d_slice/np.sum(d_slice)))
                     mindist[x]=min(mean_dist,mindist[x])
                     if (mean_dist<short):
-                        numshortcontacts+=1
-                    elif (mean_dist<contact):
-                        numcontacts+=1
-                    elif (mean_dist<long):
-                        numlongcontacts+=1
-                    averagedist+=mean_dist
+                        numshortcontacts[x]+=1
+                    if (mean_dist<contact):
+                        numcontacts[x]+=1
+                    if (mean_dist<long):
+                        numlongcontacts[x]+=1
+                    averagedist[x]+=mean_dist
             average[x]=average[x]/z
             averagedist[x]=average[x]/z
             Z=np.sqrt(z)
@@ -187,4 +187,15 @@ fig.colorbar(cax)
 if ns.output:
     fig.savefig(ns.output)
 #plt.show()
-print (ns.input,np.round(average,3),np.round(mindist,3),np.round(numdist,3))
+print ("Average",ns.input,np.round(average,3))
+print ("Mindist",ns.input,np.round(mindist,3))
+print ("Numdist",ns.input,np.round(numdist,3))
+print ("AverageDistance",ns.input,np.round(averagedist,3))
+print ("NumShortContacts",ns.input,np.round(numshortcontacts,3))
+print ("FractionShortContacts",ns.input,np.round(fractionshortcontacts,3))
+print ("NumMediumContacts",ns.input,np.round(numcontacts,3))
+print ("FractionMediumContacts",ns.input,np.round(fractioncontacts,3))
+print ("NumLongContacts",ns.input,np.round(numlongcontacts,3))
+print ("FractionLongContacts",ns.input,np.round(fractionlongcontacts,3))
+print ("NumProb",ns.input,np.round(numprob,3))
+print ("FractionProb",ns.input,np.round(fractionprob,3))
