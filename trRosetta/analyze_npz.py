@@ -154,11 +154,11 @@ if (ns.sequence):
                     averagedist[x]+=mean_dist
             average[x]=average[x]/z
             averagedist[x]=average[x]/z
+            fractionprob+=[numprob[x]/z]
             Z=np.sqrt(z)
             fractionshortcontacts+=[numshortcontacts[x]/Z]
             fractionlongcontacts+=[numlongcontacts[x]/Z]
             fractioncontacts+=[numcontacts[x]/Z]
-            fractionprob+=[numprob[x]/Z]
             x+=1
             starty=n+len(sepseq)
         startx=m+len(sepseq)
@@ -187,7 +187,7 @@ fig.colorbar(cax)
 if ns.output:
     fig.savefig(ns.output)
 #plt.show()
-print ("Average",ns.input,np.round(average,3))
+print ("AverageProb",ns.input,np.round(average,3))
 print ("Mindist",ns.input,np.round(mindist,3))
 print ("Numdist",ns.input,np.round(numdist,3))
 print ("AverageDistance",ns.input,np.round(averagedist,3))
