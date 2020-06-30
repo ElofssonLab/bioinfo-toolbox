@@ -93,8 +93,9 @@ tar xf model2019_07.tar.bz2
     - Convert and trRosetta prediction file to a CASP contact file
   * sto_to_msa.py
     - Convert stockholm to a3m (fasta format
-  * tr_calculate_contact_dist.py
+  * analyze_npz.py
     - makes a plot of the distance map (with poly G shaded)
+    - Calcualates statistics of the contact map -useful for scoring.
   * start.py
     - The first part of trRosetta-2chain.py
     - useful for ipython
