@@ -13,8 +13,11 @@ p = argparse.ArgumentParser(description = '- Merging three NPZ files (each file 
 p.add_argument('-data','--input','-i', required= True, help='Input trRossetta NPZ file')
 #p.add_argument('-seq','--sequence','-s', required= True, help='sequence file to identify domain baorders')
 #p.add_argument('-out','--output','-o', required= True, help='output NPX file')
+p.add_argument('-dom','--domain','-d', required= False, help='positions of domain borders', nargs='+')
 p.add_argument('-seq','--sequence','-s', required= True, help='sequence file to identify domain baorders')
 #parser.add_argument('--nargs', nargs='+')
+p.add_argument("--sepseq","-sep","-S",required=False, help='Separation sequence between protein in MSA' ,default="GGGGGGGGGGGGGGGGGGGG")
+
 ns = p.parse_args()
 
 
@@ -23,7 +26,9 @@ bins = np.array([2.25+bin_step*i for i in range(36)])
 
 rst = np.load(ns.input)
 dist = rst["dist"]
+borders=[]
 if ns.sequence:
+    sepseq=ns.sepseq
     from Bio import SeqIO
     from Bio.Seq import Seq
     from Bio.SeqRecord import SeqRecord
@@ -33,6 +38,12 @@ if ns.sequence:
             seq=record
             #print (record)
             break
+    if (len(seq)==dist.shape[0])
+    for m in re.finditer(sepseq,str(seq.seq)):
+        borders+=[m.start()]
+        #print(m.start(), m.group())
+        for i in range(m.start(),m.start()+len(sepseq)):
+            ns.domain+=[i]
 
 # We have three areas to calculate scores in
 

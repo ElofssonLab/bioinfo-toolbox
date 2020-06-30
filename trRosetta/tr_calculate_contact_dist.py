@@ -99,8 +99,23 @@ startx=0
 average=[]
 mindist=[]
 numdist=[]
+mindist=[]
+averagedist=[]
+numcontacts=[]
+fractioncontacts=[]
+numshortcontacts=[]
+fractionshortcontacts=[]
+numlongcontacts=[]
+fractionlongcontacts=[]
+numprob=[]
+fractionprog=[]
 x=0
 y=0
+skip=5
+short=5
+contact=8
+long=12
+probcut=0.5
 # We only do this for two domains at the moment
 if (ns.sequence):
     for m in borders:
@@ -109,25 +124,41 @@ if (ns.sequence):
             mindist+=[9999]
             average+=[0]
             numdist+=[0]
+            numprob+=[0]
+            numshortcontacts+=[0]
+            numlongcontacts+=[0]
+            numcontacts+=[0]
+            avereagedist+=[0]
             #print (x,mindist,average,startx,starty,m,n)
             z=0
-            
             for i in range(startx,m):
                 for j in range(starty,n):
-                    # Avoid sequene separated by less than 5 resideus
-
-                    if np.abs(i-j)<5: continue
+                    # Avoid sequences separated by less than 5 resideus
+                    if np.abs(i-j)<skip: continue
                     #print (i,j)
                     prob = dist[i, j, 0]
                     average[x]+=1-prob
                     z+=1
-                    if prob > 0.5:
-                        continue
+                    if prob > probcut:  # Should we include all or only those with prob>probcut?
+                        numprob[x]+=1
                     numdist[x]+=1
                     d_slice = dist[i, j, 1:]
                     mean_dist = np.sum(np.multiply(bins, d_slice/np.sum(d_slice)))
                     mindist[x]=min(mean_dist,mindist[x])
+                    if (mean_dist<short):
+                        numshortcontacts+=1
+                    elif (mean_dist<contact):
+                        numcontacts+=1
+                    elif (mean_dist<long):
+                        numlongcontacts+=1
+                    averagedist+=mean_dist
             average[x]=average[x]/z
+            averagedist[x]=average[x]/z
+            Z=np.sqrt(z)
+            fractionshortcontacts+=[numshortcontacts[x]/Z]
+            fractionlongcontacts+=[numlongcontacts[x]/Z]
+            fractioncontacts+=[numcontacts[x]/Z]
+            fractionprob+=[numprob[x]/Z]
             x+=1
             starty=n+len(sepseq)
         startx=m+len(sepseq)
