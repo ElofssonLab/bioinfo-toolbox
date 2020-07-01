@@ -1,85 +1,95 @@
 #configfile: "config.yaml"
 
+# It is best practice to have subsequent steps of a workflow in
+# separate, unique, output folders. This keeps the working directory
+# structured. Further, such unique prefixes allow Snakemake to prune
+# the search space for dependencies.
+
 #envvars:
-#    "LC_NUMERIC=en_US.UTF-8"
+#    "LC_NUMERIC='en_US.UTF-8'"
+
+SingImage="~/singularity-images/trRosetta.simg"
+trRosettaPath="~/git/bioinfo-toolbox/trRosetta/"
+
+#rule all:
+#  input: ["{dataset}/file.A.txt".format(dataset=dataset) for dataset in DATASETS]
 
 
 rule jackhmmer:
     input:
-        "test/{seq}.fasta"
+        "seq/{seq}.fasta"
     output:
-        "test/{seq}.sto"
+        "msa/{seq}.sto"
     shell:
         "jackhmmer -N 1 -A {output} {input}   ~/Downloads/originalrefproteomes.fasta"
 
 
-# It is best practice to have subsequent steps of a workflow in
-#  separate, unique, output folders. This keeps the working directory
-#  structured. Further, such unique prefixes allow Snakemake to prune
-#  the search space for dependencies.
+        
+rule merge:
+    input:
+        A="msa/{seqA}.sto",
+        B="msa/{seqB}.sto"
+    output:
+        "dimer/{seqA}-{seqB}.a3m"
+    shell:
+        "python3 {trRosettaPath}/mergeSTObyGenome.py -i {input.A} -j {input.B} > {output}"
+
 
 rule trimmed:
     input:
-        "test/{seq}.a3m"
+        "dimer/{seq}.a3m"
     output:
-        "test/{seq}.trimmed"
+        "dimer/{seq}.trimmed"
     shell:
-        "python3 ~/git/bioinfo-toolbox/trRosetta/a3mToTrimmed.py {input} > {output}"
+        "python3 {trRosettaPath}/a3mToTrimmed.py {input} > {output}"
+        
 
 rule mergedfasta:
     input:
-        "test/{seq}.trimmed"
+        "dimer/{seq}.trimmed"
     output:
-        "test/{seq}.fa"
+        "dimer/{seq}.fa"
     shell:
         "head -2 {input}>{output}"
 
-rule merge:
-    input:
-        A="test/{seqA}.sto",
-        B="test/{seqB}.sto"
-    output:
-        "test/{seqA}-{seqB}.a3m"
-    shell:
-        "python3 ~/git/bioinfo-toolbox/trRosetta/mergeSTObyGenome.py -i {input.A} -j {input.B} > {output}"
-
-
 rule predict:
     input:
-        "test/{seq}.trimmed"
+        "dimer/{seq}.trimmed"
     output:
-        "test/{seq}.npz"
+        "distpred/{seq}.npz"
     shell:
-        "singularity run ~/singularity-images/trRosetta.simg python3 ./network/predict.py -m  ./model2019_07  {input} {output}"
+        "singularity run {SingImage} python3 ./network/predict.py -m  ./model2019_07  {input} {output}"
 
 
 
-rule analyzeplot:
+rule analyze:
     input:
-       NPZ="test/{seq}.npz",
-       FA="test/{seq}.fa"
+       NPZ="distpred/{seq}.npz",
+       FA="dimer/{seq}.fa"
     output:
-       ANALYZE="test/{seq}.analyze",
-       PNG="test/{seq}.png"
+       ANALYZE="results/{seq}.analyze",
+       PNG="results/{seq}.png"
     shell:
-       "python3 ~/git/bioinfo-toolbox/trRosetta/analyze_npz.py -i {input.NPZ} -s {input.FA} -o {output.PNG} > {output.ANALYZE}"
+       "python3 {trRosettaPath}analyze_npz.py -i {input.NPZ} -s {input.FA} -o {output.PNG} > {output.ANALYZE}"
 
 rule deletelinker:
     input:
-       NPZ="test/{seqA}-{seqB}.npz",
-       FA="test/{seqA}-{seqB}.fa"
+       ANALYZE="results/{seq}.analyze",  # This is actually not needed - but we want to make sure it is made
+       PNG="results/{seq}.png",  # This is actually not needed - but we want to make sure it is made
+       NPZ="distpred/{seqA}-{seqB}.npz",
+       FA="dimer/{seqA}-{seqB}.fa"
     output:
-        "test/{seqA}-{seqB}_nodel.npz"
+        "distpred/{seqA}-{seqB}_nodel.npz"
     shell:
         "python3 ./del_sepseq_npz.py  -i {input.NPZ} -s {input.FA} -o {output}"
 
 
 rule pyrosetta:
     input:
-       NPZ="test/{seqA}-{seqB}_nodel.npz",
-       A="test/{seqA}.fasta",
-       B="test/{seqB}.fasta"
+       NPZ="distpred/{seqA}-{seqB}_nodel.npz",
+       A="seq/{seqA}.fasta",
+       B="seq/{seqB}.fasta"
     output:
-        "test/{seqA}-{seqB}.pdb"
+        "model/{seqA}-{seqB}.pdb"
     shell:
-        "singularity run ~/singularity-images/trRosetta.simg python3 ./trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output}"
+        "singularity run {SingImage} python3 ./trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output}"

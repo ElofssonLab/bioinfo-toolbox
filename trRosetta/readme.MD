@@ -101,6 +101,16 @@ tar xf model2019_07.tar.bz2
     - useful for ipython
 
 
+# Snakemake  (Copy to your working directory)
+* There is a snakemake file that makes it possible to run the while pipeline in one step.
+  * Direcotory structure:
+    - seq/X.fasta   - single sequence fasta files Necessary input
+    - msa  - Jackhmmer output
+    - dimer/ - merged MSA
+    - distpred/ - NPZ file from trRosetta
+    - results/ - some analyzis and plots of distance map
+    - model/ - output PDB file (currently only one)
+  
 
 # Some extra info
 *   it is suggested running step two multiple times to generate
