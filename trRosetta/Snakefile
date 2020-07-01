@@ -8,6 +8,7 @@
 #envvars:
 #    "LC_NUMERIC='en_US.UTF-8'"
 
+bind= "--bind /scratch2/:/scratch2/"
 SingImage="~/singularity-images/trRosetta.simg"
 trRosettaPath="~/git/bioinfo-toolbox/trRosetta/"
 
@@ -58,7 +59,7 @@ rule predict:
     output:
         "distpred/{seq}.npz"
     shell:
-        "singularity run {SingImage} python3 {trRosettaPath}/network/predict.py -m  {trRosettaPath}/model2019_07  {input} {output}"
+        "singularity run {bind}  {SingImage}  python3 {trRosettaPath}/network/predict.py -m  {trRosettaPath}/model2019_07  {input} {output}"
 
 
 
@@ -90,4 +91,4 @@ rule pyrosetta:
     output:
         "model/{seqA}-{seqB}.pdb"
     shell:
-        "singularity run {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output}"
+        "singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output}"
