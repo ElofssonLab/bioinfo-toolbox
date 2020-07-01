@@ -55,7 +55,7 @@ def add_intrachain_rst(npz,rst,tmpdir,params,minprob=0.5,LB=1,UB=15,D=20,WD=-100
                 #  split at x0 with a 2*tol length region of zero
                 #  inserted.
                   
-                rst_line = 'AtomPair %s %d %s %d FLAT_HARMONIC  %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,0,D*10,UB)
+                rst_line = 'AtomPair %s %d %s %d FLAT_HARMONIC  %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,0,D,UB*2)
                 rst['harm'].append([i,j,1.0,rst_line]) 
     print("Flat harmonic restraints:  %d"%(len(rst['harm'])))
         
