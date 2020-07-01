@@ -1,0 +1,85 @@
+#configfile: "config.yaml"
+
+#envvars:
+#    "LC_NUMERIC=en_US.UTF-8"
+
+
+rule jackhmmer:
+    input:
+        "test/{seq}.fasta"
+    output:
+        "test/{seq}.sto"
+    shell:
+        "jackhmmer -N 1 -A {output} {input}   ~/Downloads/originalrefproteomes.fasta"
+
+
+# It is best practice to have subsequent steps of a workflow in
+#  separate, unique, output folders. This keeps the working directory
+#  structured. Further, such unique prefixes allow Snakemake to prune
+#  the search space for dependencies.
+
+rule trimmed:
+    input:
+        "test/{seq}.a3m"
+    output:
+        "test/{seq}.trimmed"
+    shell:
+        "python3 ~/git/bioinfo-toolbox/trRosetta/a3mToTrimmed.py {input} > {output}"
+
+rule mergedfasta:
+    input:
+        "test/{seq}.trimmed"
+    output:
+        "test/{seq}.fa"
+    shell:
+        "head -2 {input}>{output}"
+
+rule merge:
+    input:
+        A="test/{seqA}.sto",
+        B="test/{seqB}.sto"
+    output:
+        "test/{seqA}-{seqB}.a3m"
+    shell:
+        "python3 ~/git/bioinfo-toolbox/trRosetta/mergeSTObyGenome.py -i {input.A} -j {input.B} > {output}"
+
+
+rule predict:
+    input:
+        "test/{seq}.trimmed"
+    output:
+        "test/{seq}.npz"
+    shell:
+        "singularity run ~/singularity-images/trRosetta.simg python3 ./network/predict.py -m  ./model2019_07  {input} {output}"
+
+
+
+rule analyzeplot:
+    input:
+       NPZ="test/{seq}.npz",
+       FA="test/{seq}.fa"
+    output:
+       ANALYZE="test/{seq}.analyze",
+       PNG="test/{seq}.png"
+    shell:
+       "python3 ~/git/bioinfo-toolbox/trRosetta/analyze_npz.py -i {input.NPZ} -s {input.FA} -o {output.PNG} > {output.ANALYZE}"
+
+rule deletelinker:
+    input:
+       NPZ="test/{seqA}-{seqB}.npz",
+       FA="test/{seqA}-{seqB}.fa"
+    output:
+        "test/{seqA}-{seqB}_nodel.npz"
+    shell:
+        "python3 ./del_sepseq_npz.py  -i {input.NPZ} -s {input.FA} -o {output}"
+
+
+rule pyrosetta:
+    input:
+       NPZ="test/{seqA}-{seqB}_nodel.npz",
+       A="test/{seqA}.fasta",
+       B="test/{seqB}.fasta"
+    output:
+        "test/{seqA}-{seqB}.pdb"
+    shell:
+        "singularity run ~/singularity-images/trRosetta.simg python3 ./trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output}"
