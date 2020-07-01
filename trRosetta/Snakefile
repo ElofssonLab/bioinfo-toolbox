@@ -58,7 +58,7 @@ rule predict:
     output:
         "distpred/{seq}.npz"
     shell:
-        "singularity run {SingImage} python3 ./network/predict.py -m  ./model2019_07  {input} {output}"
+        "singularity run {SingImage} python3 {trRosettaPath}/network/predict.py -m  {trRosettaPath}/model2019_07  {input} {output}"
 
 
 
@@ -90,4 +90,4 @@ rule pyrosetta:
     output:
         "model/{seqA}-{seqB}.pdb"
     shell:
-        "singularity run {SingImage} python3 ./trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output}"
+        "singularity run {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output}"
