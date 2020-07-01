@@ -114,7 +114,11 @@ tar xf model2019_07.tar.bz2
    ```bash 
    	  snakemake model/X-Y.pdb   (model/Y-X.pdb will use the other sequential order)
    ```
-
+  * If you want to have the analysis also run
+   ```bash 
+   	  snakemake results/X-Y.png 
+   ```
+  
   
 
 # Some extra info

@@ -74,8 +74,6 @@ rule analyze:
 
 rule deletelinker:
     input:
-       ANALYZE="results/{seq}.analyze",  # This is actually not needed - but we want to make sure it is made
-       PNG="results/{seq}.png",  # This is actually not needed - but we want to make sure it is made
        NPZ="distpred/{seqA}-{seqB}.npz",
        FA="dimer/{seqA}-{seqB}.fa"
     output:
