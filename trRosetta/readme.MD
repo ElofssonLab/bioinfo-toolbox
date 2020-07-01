@@ -110,6 +110,11 @@ tar xf model2019_07.tar.bz2
     - distpred/ - NPZ file from trRosetta
     - results/ - some analyzis and plots of distance map
     - model/ - output PDB file (currently only one)
+  * To run
+   ```bash 
+   	  snakemake model/X-Y.pdb   (model/Y-X.pdb will use the other sequential order)
+   ```
+
   
 
 # Some extra info
