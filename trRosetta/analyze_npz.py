@@ -195,8 +195,8 @@ mindist=[]
 numdist=[]
 mindist=[]
 averagedist=[]
-numcontacts=[]
-fractioncontacts=[]
+nummedcontacts=[]
+fractionmedcontacts=[]
 numshortcontacts=[]
 fractionshortcontacts=[]
 numlongcontacts=[]
@@ -207,56 +207,103 @@ x=0
 y=0
 skip=5
 short=5
-contact=8
+med=8
 long=12
 probcut=0.5
 # We only do this for two domains at the moment
+
+def get_area(i,j,cut):
+
+    if i<j:
+        if i<cut and j<cut : x= 0
+        elif i<cut and j>cut : x= 2
+        else: x= 1
+    else:
+        if i<cut and j<cut : x= 3
+        elif i>cut and j>cut : x= 4
+        else: x= 5
+    #print (i,j,cut,x)
+    return x
+extradist=2
+z=[0,0,0,0,0,0]
+mindist=[9999,9999,9999,9999,9999,9999]
+average=[0,0,0,0,0,0]
+numdist=[0,0,0,0,0,0]
+numprob=[0,0,0,0,0,0]
+numshortcontacts=[0,0,0,0,0,0]
+numlongcontacts=[0,0,0,0,0,0]
+nummedcontacts=[0,0,0,0,0,0]
+averagedist=[0,0,0,0,0,0]
+shortTP=[0,0,0,0,0,0]
+shortFP=[0,0,0,0,0,0]
+shortPPV=[0,0,0,0,0,0]
+medTP=[0,0,0,0,0,0]
+medFP=[0,0,0,0,0,0]
+medPPV=[0,0,0,0,0,0]
+longTP=[0,0,0,0,0,0]
+longFP=[0,0,0,0,0,0]
+longPPV=[0,0,0,0,0,0]
 if (ns.sequence):
     for m in borders:
         starty=0
         for n in borders:
-            mindist+=[9999]
-            average+=[0]
-            numdist+=[0]
-            numprob+=[0]
-            numshortcontacts+=[0]
-            numlongcontacts+=[0]
-            numcontacts+=[0]
-            averagedist+=[0]
             #print (x,mindist,average,startx,starty,m,n)
-            z=0
             for i in range(startx,m):
                 for j in range(starty,n):
                     # Avoid sequences separated by less than 5 resideus
                     if np.abs(i-j)<skip: continue
+                    # We have six groups, let's call them 0-5
+                    x=get_area(i,j,borders[0])
                     #print (i,j)
                     prob = dist[i, j, 0]
                     average[x]+=1-prob
-                    z+=1
+                    z[x]+=1
                     if prob > probcut:  # Should we include all or only those with prob>probcut?
                         numprob[x]+=1
                     numdist[x]+=1
-                    d_slice = dist[i, j, 1:]
-                    mean_dist = np.sum(np.multiply(bins, d_slice/np.sum(d_slice)))
+                    #d_slice = dist[i, j, 1:]
+                    #mean_dist = np.sum(np.multiply(bins, d_slice/np.sum(d_slice)))
+                    mean_dist=res[i,j]
                     mindist[x]=min(mean_dist,mindist[x])
                     if (mean_dist<short):
                         numshortcontacts[x]+=1
-                    if (mean_dist<contact):
-                        numcontacts[x]+=1
+                    if (mean_dist<med):
+                        nummedcontacts[x]+=1
                     if (mean_dist<long):
                         numlongcontacts[x]+=1
                     averagedist[x]+=mean_dist
-            average[x]=average[x]/z
-            averagedist[x]=average[x]/z
-            fractionprob+=[numprob[x]/z]
-            Z=np.sqrt(z)
-            fractionshortcontacts+=[numshortcontacts[x]/Z]
-            fractionlongcontacts+=[numlongcontacts[x]/Z]
-            fractioncontacts+=[numcontacts[x]/Z]
-            x+=1
+                    # Now we need to check agreement for all predicted long contacts
+                    if i>j:
+                        if res[i,j]<short:
+                            if res[j,i]<short+extradist:
+                                shortTP[x]+=1
+                            else:
+                                shortFP[x]+=1
+                        if res[i,j]<med:
+                            if res[j,i]<med+extradist:
+                                medTP[x]+=1
+                            else:
+                                medFP[x]+=1
+                        if res[i,j]<long:
+                            if res[j,i]<long+extradist:
+                                longTP[x]+=1
+                            else:
+                                longFP[x]+=1
             starty=n+len(sepseq)
         startx=m+len(sepseq)
-        
+
+for x in range(0,6):
+    #print (x,z[x])
+    average[x]=average[x]/z[x]
+    averagedist[x]=average[x]/z[x]
+    fractionprob+=[numprob[x]/z[x]]
+    Z=np.sqrt(z[x])
+    fractionshortcontacts+=[numshortcontacts[x]/Z]
+    fractionlongcontacts+=[numlongcontacts[x]/Z]
+    fractionmedcontacts+=[nummedcontacts[x]/Z]
+    shortPPV[x]=shortTP[x]/(shortTP[x]+shortFP[x]+1.e-20)        
+    medPPV[x]=medTP[x]/(medTP[x]+medFP[x]+1.e-20)        
+    longPPV[x]=longTP[x]/(longTP[x]+longFP[x]+1.e-20)        
 # o        
 #sys.exit()
         
@@ -287,9 +334,18 @@ print ("Numdist",ns.input,np.round(numdist,3))
 print ("AverageDistance",ns.input,np.round(averagedist,3))
 print ("NumShortContacts",ns.input,np.round(numshortcontacts,3))
 print ("FractionShortContacts",ns.input,np.round(fractionshortcontacts,3))
-print ("NumMediumContacts",ns.input,np.round(numcontacts,3))
-print ("FractionMediumContacts",ns.input,np.round(fractioncontacts,3))
+print ("NumMediumContacts",ns.input,np.round(nummedcontacts,3))
+print ("FractionMediumContacts",ns.input,np.round(fractionmedcontacts,3))
 print ("NumLongContacts",ns.input,np.round(numlongcontacts,3))
 print ("FractionLongContacts",ns.input,np.round(fractionlongcontacts,3))
 print ("NumProb",ns.input,np.round(numprob,3))
 print ("FractionProb",ns.input,np.round(fractionprob,3))
+print ("ShortTP",shortTP)
+print ("ShortFP",shortFP)
+print ("ShortPPV",np.round(shortPPV,3))
+print ("MedTP",medTP)
+print ("MedFP",medFP)
+print ("MedPPV",np.round(medPPV,3))
+print ("LongTP",longTP)
+print ("LongFP",longFP)
+print ("LongPPV",np.round(longPPV,3))

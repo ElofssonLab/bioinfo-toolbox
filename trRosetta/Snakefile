@@ -74,6 +74,7 @@ rule predict:
 
 
 
+
 rule analyze:
     input:
        NPZ="distpred/{seq}.npz",
@@ -113,3 +114,5 @@ rule pyrosetta_all:
         "model/{seqA}-{seqB}-allintra.pdb"
     shell:
         "singularity run  {bind} {SingImage} python3  {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output} -allintra "
+
+
