@@ -54,8 +54,9 @@ def add_intrachain_rst(npz,rst,tmpdir,params,minprob=0.5,LB=1,UB=15,D=20,WD=-100
                 #  range. Basically, a HARMONIC potential (see above)
                 #  split at x0 with a 2*tol length region of zero
                 #  inserted.
-                  
-                rst_line = 'AtomPair %s %d %s %d FLAT_HARMONIC  %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,0,D,UB*2)
+                # BOUNDED lb ub sd rswitch tag
+                # rst_line = 'AtomPair %s %d %s %d BOUNDED  %.5f %.5f %.5f %.5f %s '%('CB',i+1,'CB',j+1,0,UB*2,D,0.5,"Bounded")
+                rst_line = 'AtomPair %s %d %s %d FLAT_HARMONIC  %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,0,D*100,UB*2.5)
                 rst['harm'].append([i,j,1.0,rst_line]) 
     print("Flat harmonic restraints:  %d"%(len(rst['harm'])))
         
