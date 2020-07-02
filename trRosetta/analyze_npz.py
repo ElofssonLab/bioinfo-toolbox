@@ -11,7 +11,7 @@ from argparse import RawTextHelpFormatter
 p = argparse.ArgumentParser(description = '- plotting trRosetta maps-',
                             formatter_class=RawTextHelpFormatter)
 p.add_argument('-data','--input','-i', required= True, help='Input trRossetta NPZ file')
-p.add_argument('-dataB','--inputB','-j', required= False, help='Input second trRossetta NPZ file for reversed order merged files')
+p.add_argument('-dataB','--inputB','-j', required= False, help='Input second trRossetta NPZ file fot instance for reversed order merged files')
 p.add_argument('-dom','--domain','-d', required= False, help='positions of domain borders', nargs='+')
 p.add_argument('-seq','--sequence','-s', required= False, help='sequence file to identify domain baorders')
 p.add_argument("--sepseq","-sep","-S",required=False, help='Separation sequence between protein in MSA' ,default="GGGGGGGGGGGGGGGGGGGG")
@@ -27,6 +27,39 @@ p_len = dist.shape[0]
 res = np.zeros((p_len, p_len))
 res.fill(20)
 np.fill_diagonal(res, 4)
+
+three2one = {'ALA':'A','ARG':'R','ASN':'N','ASP':'D',
+             'CYS':'C','GLN':'Q','GLU':'E','GLY':'G',
+             'HIS':'H','ILE':'I','LEU':'L','LYS':'K',
+             'MET':'M','PHE':'F','PRO':'P','SER':'S',
+             'THR':'T','TRP':'W','TYR':'Y','VAL':'V',
+             'MSE':'M'}
+
+def pdb_scan(pdb):
+    prv = ''
+    seq = ''
+    for line in pdb:
+        if line.startswith('ATOM'):
+            if line[22:27].strip() != prv:
+                seq += three2one[line[17:20]]
+                prv = line[22:27].strip()
+    return seq
+
+
+
+
+def find_distance(res1, res2):
+
+    min_dist = 0
+    for atom1 in res1:
+        for atom2 in res2:
+            seta=atom1.coord
+            setb=atom2.coord
+            dab = math.sqrt((seta[0]-setb[0])**2+(seta[1]-setb[1])**2+(seta[2]-setb[2])**2)
+            if min_dist==0 or min_dist>dab: min_dist=dab
+
+    return min_dist
+
 
 
 borders=[]
@@ -63,7 +96,7 @@ if ns.inputB:
     #resB.fill(20)
     #np.fill_diagonal(resB, 4)
     if (p_len != p_lenB):
-        print ("NPZ files of differnet lengths")
+        print ("NPZ files of differemt lengths")
         sys.exit(1)
     if (len(borders)!=1):
         print ("Not two chains",borders)
