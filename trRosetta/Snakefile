@@ -1,4 +1,4 @@
-#configfile: "config.yaml"
+configfile: "config.yaml"
 
 # It is best practice to have subsequent steps of a workflow in
 # separate, unique, output folders. This keeps the working directory
@@ -8,24 +8,21 @@
 #envvars:
 #    "LC_NUMERIC='en_US.UTF-8'"
 
-bind= "--bind /scratch2/:/scratch2/"
-SingImage="~/singularity-images/trRosetta.simg"
-trRosettaPath="~/git/bioinfo-toolbox/trRosetta/"
 
 #rule all:
 #  input: ["{dataset}/file.A.txt".format(dataset=dataset) for dataset in DATASETS]
 
+workdir: config['workdir']
+jhparams=config['jhparams']
 
 rule jackhmmer:
     input:
         "seq/{seq}.fasta"
     output:
-        "msa/{seq}.sto"
+        "msa/{seq}.sto" 
     shell:
-        "jackhmmer -N 1 -A {output} {input}   ~/Downloads/originalrefproteomes.fasta"
+        "jackhmmer  {jhparams} -A {output} {input}   ~/Downloads/originalrefproteomes.fasta  "
 
-
-        
 rule merge:
     input:
         A="msa/{seqA}.sto",
@@ -36,6 +33,7 @@ rule merge:
         "python3 {trRosettaPath}/mergeSTObyGenome.py -i {input.A} -j {input.B} > {output}"
 
 
+
 rule trimmed:
     input:
         "dimer/{seq}.a3m"
@@ -43,7 +41,16 @@ rule trimmed:
         "dimer/{seq}.trimmed"
     shell:
         "python3 {trRosettaPath}/a3mToTrimmed.py {input} > {output}"
-        
+
+rule merge_top1000:
+    input:
+        "seq/{seq}.trimmed"
+    output:
+        "msa/{seq}-top1000.trimmed"
+    shell:
+        "head -2000 {input}   > {output} "
+
+
 
 rule mergedfasta:
     input:
@@ -78,17 +85,27 @@ rule deletelinker:
        NPZ="distpred/{seqA}-{seqB}.npz",
        FA="dimer/{seqA}-{seqB}.fa"
     output:
-        "distpred/{seqA}-{seqB}_nodel.npz"
+        "distpred/{seqA}-{seqB}_nosep.npz"
     shell:
-        "python3 ./del_sepseq_npz.py  -i {input.NPZ} -s {input.FA} -o {output}"
+        "python3 {trRosettaPath}/del_sepseq_npz.py  -i {input.NPZ} -s {input.FA} -o {output}"
 
 
 rule pyrosetta:
     input:
-       NPZ="distpred/{seqA}-{seqB}_nodel.npz",
+       NPZ="distpred/{seqA}-{seqB}_nosep.npz",
        A="seq/{seqA}.fasta",
        B="seq/{seqB}.fasta"
     output:
         "model/{seqA}-{seqB}.pdb"
     shell:
         "singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output}"
+
+rule pyrosetta_all:
+    input:
+       NPZ="distpred/{seqA}-{seqB}_nosep.npz",
+       A="seq/{seqA}.fasta",
+       B="seq/{seqB}.fasta"
+    output:
+        "model/{seqA}-{seqB}-allintra.pdb"
+    shell:
+        "singularity run  {bind} {SingImage} python3  {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output} -allintra "

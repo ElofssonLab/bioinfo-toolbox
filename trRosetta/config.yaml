@@ -1,0 +1,5 @@
+bind: "--bind /scratch2/:/scratch2/"
+SingImage: "~/singularity-images/trRosetta.simg"
+trRosettaPath: "~/git/bioinfo-toolbox/trRosetta/"
+jhparams: "-N 3"
+workdir: "./"
