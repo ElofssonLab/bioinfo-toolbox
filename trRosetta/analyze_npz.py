@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
 import argparse
 from argparse import RawTextHelpFormatter
+from Bio.PDB import *
         
 ##args = docopt.docopt(__doc__)
 #out_dir = args['--output_folder']
@@ -49,7 +51,7 @@ def pdb_scan(pdb):
 
 
 
-def find_distance(res1, res2):
+def find_shortest_distance(res1, res2):
 
     min_dist = 0
     for atom1 in res1:
@@ -87,6 +89,8 @@ if ns.sequence:
         for i in range(m.start(),m.start()+len(sepseq)):
             ns.domain+=[i]
 
+    seplen=len(sepseq)
+            
 # If we have two inputs put one at each diagonal but             
 if ns.inputB:
     input_fileB = np.load(ns.inputB)
@@ -97,13 +101,12 @@ if ns.inputB:
     #resB.fill(20)
     #np.fill_diagonal(resB, 4)
     if (p_len != p_lenB):
-        print ("NPZ files of differemt lengths")
+        print ("NPZ files of different lengths")
         sys.exit(1)
     if (len(borders)!=1):
         print ("Not two chains",borders)
         sys.exit(1)
     shiftA=borders[0]
-    seplen=len(sepseq)
     shiftB=p_len-1-borders[0]-seplen
     for i in range(shiftA+seplen,p_len-1):
         for j in range(i+1,p_len-1):
@@ -115,7 +118,7 @@ if ns.inputB:
         for j in range(shiftB):
             dist[i, j, 0:]=distB[j, i, 0:]
              
-
+            
 #print (ns.domain)
 for i in range(p_len-1):
     #for j in range(i+1):
@@ -128,6 +131,63 @@ for i in range(p_len-1):
         res[i, j] = mean_dist
         #res[j, i] = mean_dist
 
+maxdist=20
+if ns.pdb:
+    p = PDBParser()
+    str = p.get_structure('', ns.pdb)
+
+    #chains=[]
+    pdblen=[]
+    for chain in str[0]:
+        #print (chain,len(chain))
+        #chains+=[chain]
+        pdblen+=[len(chain)]
+
+    dimerlen=pdblen[0]+pdblen[1]
+    if (dimerlen+seplen != p_len):
+        print ("PDB file is of different lengths")
+        print (dimerlen, p_len,pdblen,seplen)
+        sys.exit(1)
+        #seplen=0
+        #borders+=[pdblen[0]]
+    
+    pdbdist = np.zeros((dimerlen+seplen, dimerlen+seplen))
+
+    #print (chains,pdblen)
+    i=-seplen
+    for chain1 in str[0]:
+        i+=seplen
+        for residue1 in chain1:
+        #print (residue1.get_resname())
+            if (residue1.get_resname()=="GLY"):
+                c1=residue1["CA"]
+            else:
+                try:
+                    c1=residue1["CB"]
+                except:
+                    break
+            j=-seplen    
+            for chain2 in str[0]:
+                j+=seplen
+                for residue2 in chain2:
+                #print (residue2.get_resname())
+                    if (residue2.get_resname()=="GLY"):
+                        c2=residue2["CA"]
+                    else:
+                        try:
+                            c2=residue2["CB"]
+                        except:
+                            break
+                    pdbdist[i,j]=c1-c2
+                    if i<j: res[i,j]=min(maxdist,pdbdist[i,j])
+                    #print(i,j,c1,c2,c1-c2)
+                    j+=1
+            i+=1
+
+
+#sys.exit()    
+        
+        
 borders+=[p_len-1]        
 startx=0
 average=[]
