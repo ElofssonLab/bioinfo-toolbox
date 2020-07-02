@@ -14,6 +14,10 @@ configfile: "config.yaml"
 
 workdir: config['workdir']
 jhparams=config['jhparams']
+bind=config['bind']
+SingImage=config['SingImage']
+trRosettaPath=config['trRosettaPath']
+
 
 rule jackhmmer:
     input:
