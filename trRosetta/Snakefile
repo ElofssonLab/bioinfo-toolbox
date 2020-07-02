@@ -78,17 +78,27 @@ rule deletelinker:
        NPZ="distpred/{seqA}-{seqB}.npz",
        FA="dimer/{seqA}-{seqB}.fa"
     output:
-        "distpred/{seqA}-{seqB}_nodel.npz"
+        "distpred/{seqA}-{seqB}_nosep.npz"
     shell:
-        "python3 ./del_sepseq_npz.py  -i {input.NPZ} -s {input.FA} -o {output}"
+        "python3 {trRosettaPath}/del_sepseq_npz.py  -i {input.NPZ} -s {input.FA} -o {output}"
 
 
 rule pyrosetta:
     input:
-       NPZ="distpred/{seqA}-{seqB}_nodel.npz",
+       NPZ="distpred/{seqA}-{seqB}_nosep.npz",
        A="seq/{seqA}.fasta",
        B="seq/{seqB}.fasta"
     output:
         "model/{seqA}-{seqB}.pdb"
     shell:
         "singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output}"
+
+rule pyrosetta_all:
+    input:
+       NPZ="distpred/{seqA}-{seqB}_nosep.npz",
+       A="seq/{seqA}.fasta",
+       B="seq/{seqB}.fasta"
+    output:
+        "model/{seqA}-{seqB}-allintra.pdb"
+    shell:
+        "singularity run  {bind} {SingImage} python3  {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output} -allintra "
