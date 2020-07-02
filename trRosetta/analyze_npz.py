@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
 import argparse
 from argparse import RawTextHelpFormatter
+from Bio.PDB import *
         
 ##args = docopt.docopt(__doc__)
 #out_dir = args['--output_folder']
@@ -11,7 +13,8 @@ from argparse import RawTextHelpFormatter
 p = argparse.ArgumentParser(description = '- plotting trRosetta maps-',
                             formatter_class=RawTextHelpFormatter)
 p.add_argument('-data','--input','-i', required= True, help='Input trRossetta NPZ file')
-p.add_argument('-dataB','--inputB','-j', required= False, help='Input second trRossetta NPZ file for reversed order merged files')
+p.add_argument('-dataB','--inputB','-j', required= False, help='Input second trRossetta NPZ file fot instance for reversed order merged files')
+p.add_argument('-pdb','--pdb','-p', required= False, help='Pdb file for analysis od distances')
 p.add_argument('-dom','--domain','-d', required= False, help='positions of domain borders', nargs='+')
 p.add_argument('-seq','--sequence','-s', required= False, help='sequence file to identify domain baorders')
 p.add_argument("--sepseq","-sep","-S",required=False, help='Separation sequence between protein in MSA' ,default="GGGGGGGGGGGGGGGGGGGG")
@@ -27,6 +30,39 @@ p_len = dist.shape[0]
 res = np.zeros((p_len, p_len))
 res.fill(20)
 np.fill_diagonal(res, 4)
+
+three2one = {'ALA':'A','ARG':'R','ASN':'N','ASP':'D',
+             'CYS':'C','GLN':'Q','GLU':'E','GLY':'G',
+             'HIS':'H','ILE':'I','LEU':'L','LYS':'K',
+             'MET':'M','PHE':'F','PRO':'P','SER':'S',
+             'THR':'T','TRP':'W','TYR':'Y','VAL':'V',
+             'MSE':'M'}
+
+def pdb_scan(pdb):
+    prv = ''
+    seq = ''
+    for line in pdb:
+        if line.startswith('ATOM'):
+            if line[22:27].strip() != prv:
+                seq += three2one[line[17:20]]
+                prv = line[22:27].strip()
+    return seq
+
+
+
+
+def find_shortest_distance(res1, res2):
+
+    min_dist = 0
+    for atom1 in res1:
+        for atom2 in res2:
+            seta=atom1.coord
+            setb=atom2.coord
+            dab = math.sqrt((seta[0]-setb[0])**2+(seta[1]-setb[1])**2+(seta[2]-setb[2])**2)
+            if min_dist==0 or min_dist>dab: min_dist=dab
+
+    return min_dist
+
 
 
 borders=[]
@@ -53,6 +89,8 @@ if ns.sequence:
         for i in range(m.start(),m.start()+len(sepseq)):
             ns.domain+=[i]
 
+    seplen=len(sepseq)
+            
 # If we have two inputs put one at each diagonal but             
 if ns.inputB:
     input_fileB = np.load(ns.inputB)
@@ -63,13 +101,12 @@ if ns.inputB:
     #resB.fill(20)
     #np.fill_diagonal(resB, 4)
     if (p_len != p_lenB):
-        print ("NPZ files of differnet lengths")
+        print ("NPZ files of different lengths")
         sys.exit(1)
     if (len(borders)!=1):
         print ("Not two chains",borders)
         sys.exit(1)
     shiftA=borders[0]
-    seplen=len(sepseq)
     shiftB=p_len-1-borders[0]-seplen
     for i in range(shiftA+seplen,p_len-1):
         for j in range(i+1,p_len-1):
@@ -81,7 +118,7 @@ if ns.inputB:
         for j in range(shiftB):
             dist[i, j, 0:]=distB[j, i, 0:]
              
-
+            
 #print (ns.domain)
 for i in range(p_len-1):
     #for j in range(i+1):
@@ -94,6 +131,63 @@ for i in range(p_len-1):
         res[i, j] = mean_dist
         #res[j, i] = mean_dist
 
+maxdist=20
+if ns.pdb:
+    p = PDBParser()
+    str = p.get_structure('', ns.pdb)
+
+    #chains=[]
+    pdblen=[]
+    for chain in str[0]:
+        #print (chain,len(chain))
+        #chains+=[chain]
+        pdblen+=[len(chain)]
+
+    dimerlen=pdblen[0]+pdblen[1]
+    if (dimerlen+seplen != p_len):
+        print ("PDB file is of different lengths")
+        print (dimerlen, p_len,pdblen,seplen)
+        sys.exit(1)
+        #seplen=0
+        #borders+=[pdblen[0]]
+    
+    pdbdist = np.zeros((dimerlen+seplen, dimerlen+seplen))
+
+    #print (chains,pdblen)
+    i=-seplen
+    for chain1 in str[0]:
+        i+=seplen
+        for residue1 in chain1:
+        #print (residue1.get_resname())
+            if (residue1.get_resname()=="GLY"):
+                c1=residue1["CA"]
+            else:
+                try:
+                    c1=residue1["CB"]
+                except:
+                    break
+            j=-seplen    
+            for chain2 in str[0]:
+                j+=seplen
+                for residue2 in chain2:
+                #print (residue2.get_resname())
+                    if (residue2.get_resname()=="GLY"):
+                        c2=residue2["CA"]
+                    else:
+                        try:
+                            c2=residue2["CB"]
+                        except:
+                            break
+                    pdbdist[i,j]=c1-c2
+                    if i<j: res[i,j]=min(maxdist,pdbdist[i,j])
+                    #print(i,j,c1,c2,c1-c2)
+                    j+=1
+            i+=1
+
+
+#sys.exit()    
+        
+        
 borders+=[p_len-1]        
 startx=0
 average=[]
