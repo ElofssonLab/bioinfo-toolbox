@@ -1,4 +1,4 @@
-#configfile: "config.yaml"
+configfile: "config.yaml"
 
 # It is best practice to have subsequent steps of a workflow in
 # separate, unique, output folders. This keeps the working directory
@@ -8,24 +8,21 @@
 #envvars:
 #    "LC_NUMERIC='en_US.UTF-8'"
 
-bind= "--bind /scratch2/:/scratch2/"
-SingImage="~/singularity-images/trRosetta.simg"
-trRosettaPath="~/git/bioinfo-toolbox/trRosetta/"
 
 #rule all:
 #  input: ["{dataset}/file.A.txt".format(dataset=dataset) for dataset in DATASETS]
 
+workdir: config['workdir']
+jhparams=config['jhparams']
 
 rule jackhmmer:
     input:
         "seq/{seq}.fasta"
     output:
-        "msa/{seq}.sto"
+        "msa/{seq}.sto" 
     shell:
-        "jackhmmer -N 1 -A {output} {input}   ~/Downloads/originalrefproteomes.fasta"
+        "jackhmmer  {jhparams} -A {output} {input}   ~/Downloads/originalrefproteomes.fasta  "
 
-
-        
 rule merge:
     input:
         A="msa/{seqA}.sto",
@@ -36,6 +33,7 @@ rule merge:
         "python3 {trRosettaPath}/mergeSTObyGenome.py -i {input.A} -j {input.B} > {output}"
 
 
+
 rule trimmed:
     input:
         "dimer/{seq}.a3m"
@@ -43,7 +41,16 @@ rule trimmed:
         "dimer/{seq}.trimmed"
     shell:
         "python3 {trRosettaPath}/a3mToTrimmed.py {input} > {output}"
-        
+
+rule merge_top1000:
+    input:
+        "seq/{seq}.trimmed"
+    output:
+        "msa/{seq}-top1000.trimmed"
+    shell:
+        "head -2000 {input}   > {output} "
+
+
 
 rule mergedfasta:
     input:
