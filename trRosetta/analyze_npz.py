@@ -134,11 +134,11 @@ for i in range(p_len-1):
 maxdist=20
 if ns.pdb:
     p = PDBParser()
-    str = p.get_structure('', ns.pdb)
+    structure = p.get_structure('', ns.pdb)
 
     #chains=[]
     pdblen=[]
-    for chain in str[0]:
+    for chain in structure[0]:
         #print (chain,len(chain))
         #chains+=[chain]
         pdblen+=[len(chain)]
@@ -155,7 +155,7 @@ if ns.pdb:
 
     #print (chains,pdblen)
     i=-seplen
-    for chain1 in str[0]:
+    for chain1 in structure[0]:
         i+=seplen
         for residue1 in chain1:
         #print (residue1.get_resname())
@@ -167,7 +167,7 @@ if ns.pdb:
                 except:
                     break
             j=-seplen    
-            for chain2 in str[0]:
+            for chain2 in structure[0]:
                 j+=seplen
                 for residue2 in chain2:
                 #print (residue2.get_resname())
@@ -323,7 +323,8 @@ if type(ns.domain) is list:
         ax.plot(x,y,lw=3,c="b",alpha=0.2)
         ax.plot(y,x,lw=3,c="b",alpha=0.2)
     #ax.set(xlim=[0,500],ylim=[0,500])
-ax.set(title=ns.input)
+line=ns.input+" NumLongContacts: " + str(numlongcontacts[5])  + " LongPPV: "+str(np.round(longPPV[5],3))
+ax.set(title=line)
 fig.colorbar(cax)
 if ns.output:
     fig.savefig(ns.output)

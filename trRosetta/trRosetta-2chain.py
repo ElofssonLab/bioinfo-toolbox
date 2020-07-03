@@ -105,7 +105,7 @@ def main():
 
     set_random_dihedral(pose)
     remove_clash(sf_vdw, min_mover_vdw, pose)
-    pose.dump_pdb("starting.pdb")
+    #pose.dump_pdb("starting.pdb")
 
     ########################################################  
     # minimization
@@ -161,7 +161,7 @@ def main():
         min_mover_cart.apply(pose)
         remove_clash(sf_vdw, min_mover1, pose)
 
-    pose.dump_pdb("intraoptimized.pdb")
+    #pose.dump_pdb("intraoptimized.pdb")
 
     ## Now we add the interchaion contacts
     #    
@@ -195,7 +195,7 @@ def main():
             mutator.apply(pose)
             print('mutation: A%dG'%(i+1))
 
-    pose.dump_pdb("interoptimized.pdb")
+    #pose.dump_pdb("interoptimized.pdb")
     ########################################################
     # full-atom refinement
     ########################################################
