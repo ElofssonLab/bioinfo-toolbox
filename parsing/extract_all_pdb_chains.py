@@ -37,7 +37,7 @@ for chain in chains:
         pdbfile = open(sys.argv[1], 'r')
     coord=read_chain(pdbfile, chain)
     pdbfile.close()
-    outname=code+chain+".pdb"
+    outname=name+chain+".pdb"
     print outname
     # outname=name+chain+".pdb"
     outfile = open(outname,'w')

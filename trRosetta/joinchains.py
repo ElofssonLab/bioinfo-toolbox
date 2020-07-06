@@ -1,11 +1,21 @@
+#!/usr/bin/env python3
 import sys
 
 if len(sys.argv) < 4:
     print ("Correct usage: script.py structure1.pdb structure2.pdb output_structure.pdb")
     sys.exit()
 
+
+    
 def rewrite(infile, chain, outfile, new):
     prev_orig = ''
+    three2one = {'ALA':'A','ARG':'R','ASN':'N','ASP':'D',
+             'CYS':'C','GLN':'Q','GLU':'E','GLY':'G',
+             'HIS':'H','ILE':'I','LEU':'L','LYS':'K',
+             'MET':'M','PHE':'F','PRO':'P','SER':'S',
+             'THR':'T','TRP':'W','TYR':'Y','VAL':'V',
+             'MSE':'M'}
+    
     with open(infile,'r') as f:
         for line in f:
             if line.startswith('ATOM'):

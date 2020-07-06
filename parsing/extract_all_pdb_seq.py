@@ -39,7 +39,7 @@ for chain in chains:
         pdbfile = gzip.open(sys.argv[1], 'r')
     else:
         pdbfile = open(sys.argv[1], 'r')
-    outname=code+chain+".fa"
+    outname=name+chain+".fasta"
     print outname
     outfile = open(outname,'w')
     outfile.write("> " + code + "_" + chain + "\n")
