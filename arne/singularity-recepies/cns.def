@@ -1,0 +1,57 @@
+Bootstrap: docker
+From: tensorflow/tensorflow:1.13.2-py3
+
+%files
+#PyRosetta4.Release.python36.ubuntu.release-256.tar.bz2 /home
+cns_solve.tgz /home
+
+%post
+apt-get update
+apt-get upgrade -y
+apt-get autoremove
+apt-get autoclean
+DEBIAN_FRONTEND=noninteractive apt-get install keyboard-configuration -y
+#DEBIAN_FRONTEND=noninteractive apt-get update keyboard-configuration 
+#apt install cuda -y --fix-missing
+#apt install ipython3 -y
+#pip install biopython 
+apt install tcsh
+
+#tar -vjxf /home/PyRosetta4.Release.python36.ubuntu.release-256.tar.bz2
+#pip install -e PyRosetta4.Release.python36.ubuntu.release-256/setup/ 
+
+cd /usr/local/
+tar -vzxf /home/cns_solve.tgz
+cd cns_solve_1.3
+
+%environment
+    export LC_ALL=C
+    export CNS_SOLVE=/usr/local/
+    export CNS_ARCH=intel-x86_64bit-linux
+    export CNS_CONFDB=/usr/local/cns_solve_1.3/libraries/confdb
+    export CNS_HELPLIB=/usr/local/cns_solve_1.3/helplib
+    export CNS_INST=/usr/local/cns_solve_1.3/intel-x86_64bit-linux
+    export CNS_LIB=/usr/local/cns_solve_1.3/libraries
+    export CNS_MODULE=/usr/local/cns_solve_1.3/modules
+    export CNS_NMRLIB=/usr/local/cns_solve_1.3/libraries/nmr
+    export CNS_NMRMODULE=/usr/local/cns_solve_1.3/modules/nmr
+    export CNS_SOLVE=/usr/local/cns_solve_1.3
+    export CNS_SOURCE=/usr/local/cns_solve_1.3/intel-x86_64bit-linux/source
+    export CNS_TOPPAR=/usr/local/cns_solve_1.3/libraries/toppar
+    export CNS_XRAYLIB=/usr/local/cns_solve_1.3/libraries/xray
+    export CNS_XTALLIB=/usr/local/cns_solve_1.3/libraries/xtal
+    export CNS_XTALMODULE=/usr/local/cns_solve_1.3/modules/xtal
+    alias cns_edit=/usr/local//cns_solve_1.3/bin/cns_edit
+    alias cns_header=/usr/local//cns_solve_1.3/bin/cns_header
+    alias cns_import_cif=/usr/local//cns_solve_1.3/bin/cns_import_cif
+    alias cns_info=cat $CNS_SOLVE/bin/cns_info
+    alias cns_transfer=/usr/local//cns_solve_1.3/bin/cns_transfer
+    alias cns_web=/usr/local//cns_solve_1.3/bin/cns_web
+    alias create_patch=/usr/local//cns_solve_1.3/bin/create_patch
+    #   alias g77off="unset CNS_G77; source /usr/local//cns_solve_1.3/cns_solve_env.sh"
+    #  alias g77on="export CNS_G77; source /usr/local//cns_solve_1.3/cns_solve_env.sh"
+    alias maketar=/usr/local//cns_solve_1.3/bin/maketar
+    alias run_diffs=/usr/local//cns_solve_1.3/bin/run_diffs
+    alias run_tests=/usr/local//cns_solve_1.3/bin/run_tests
+    alias run_tutorial=csh -f tutorial.csh
+
