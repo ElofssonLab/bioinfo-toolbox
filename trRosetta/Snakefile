@@ -14,6 +14,7 @@ configfile: "config.yaml"
 
 workdir: config['workdir']
 jhparams=config['jhparams']
+dockq=config['dockq']
 bind=config['bind']
 SingImage=config['SingImage']
 trRosettaPath=config['trRosettaPath']
@@ -46,13 +47,6 @@ rule trimmed:
     shell:
         "python3 {trRosettaPath}/a3mToTrimmed.py {input} > {output}"
 
-rule merge_top1000:
-    input:
-        "seq/{seq}.trimmed"
-    output:
-        "msa/{seq}-top1000.trimmed"
-    shell:
-        "head -2000 {input}   > {output} "
 
 
 
@@ -73,17 +67,66 @@ rule predict:
         "singularity run {bind}  {SingImage}  python3 {trRosettaPath}/network/predict.py -m  {trRosettaPath}/model2019_07  {input} {output}"
 
 
+# We hade to merge these rules to make it work.
 
+rule makepdbfile:
+    input:
+       PDB1="pdb/{seqA}.pdb",
+       PDB2="pdb/{seqB}.pdb",
+    output:
+       "pdb/{seqA}-{seqB}.pdb"
+    shell:
+       "python3 {trRosettaPath}joinchains.py  {input.PDB1}  {input.PDB2}  {output} "
 
 rule analyze:
     input:
        NPZ="distpred/{seq}.npz",
-       FA="dimer/{seq}.fa"
+       FA="dimer/{seq}.fa",
+       PDB="pdb/{seq}.pdb"
     output:
        ANALYZE="results/{seq}.analyze",
        PNG="results/{seq}.png"
     shell:
-       "python3 {trRosettaPath}analyze_npz.py -i {input.NPZ} -s {input.FA} -o {output.PNG} > {output.ANALYZE}"
+       "python3 {trRosettaPath}analyze_npz.py -i {input.NPZ} -s {input.FA} -p {input.PDB} -o {output.PNG} > {output.ANALYZE}"
+
+rule analyze_contact:
+    input:
+       NPZ="distpred/{seqA}-{seqB}.npz",
+       STR1="pdb/{seqA}.pdb",
+       STR2="pdb/{seqB}.pdb"
+    output:
+       ANALYZE="results/{seqA}-{seqB}.auc",
+       PNG="results/pr-curve_{seqA}-{seqB}.png",
+    shell:
+       "python3 {trRosettaPath}contact_prcurve.py {input.NPZ} {input.STR1} {input.STR2} > {output.ANALYZE};"
+       "i=`basename  {input.STR1} .pdb | cut -c1-4`;"
+       "mv pr-curve_$i.png {output.PNG}"
+
+
+rule dockq:
+    input:
+       MOD="model/{seqA}-{seqB}.pdb",
+       STR="pdb/{seqA}-{seqB}.pdb",
+    output:
+       DOCKQ="results/{seqA}-{seqB}.dockq"
+    shell:
+       "python3 {dockq} -short {input.MOD} {input.STR} > {output.DOCKQ};"
+
+rule TM:
+    input:
+       MOD="model/{seqA}-{seqB}.pdb",
+       STR1="pdb/{seqA}.pdb",
+       STR2="pdb/{seqB}.pdb",
+    output:
+       TM="results/{seqA}-{seqB}.tm"
+    shell:
+       "grep ^ATOM {input.MOD} | grep \" A\" > {input.MOD}_A;"
+       "grep ^ATOM {input.MOD} | grep \" B\" > {input.MOD}_B;"
+       "TMalign {input.STR1} {input.MOD}_A  > {output.TM};"
+       "TMalign {input.STR2} {input.MOD}_B  >> {output.TM};"
+
+
+
 
 rule deletelinker:
     input:
@@ -93,6 +136,7 @@ rule deletelinker:
         "distpred/{seqA}-{seqB}_nosep.npz"
     shell:
         "python3 {trRosettaPath}/del_sepseq_npz.py  -i {input.NPZ} -s {input.FA} -o {output}"
+
 
 
 rule pyrosetta:
@@ -105,14 +149,13 @@ rule pyrosetta:
     shell:
         "singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output}"
 
+
 rule pyrosetta_all:
     input:
        NPZ="distpred/{seqA}-{seqB}_nosep.npz",
        A="seq/{seqA}.fasta",
        B="seq/{seqB}.fasta"
     output:
-        "model/{seqA}-{seqB}-allintra.pdb"
+        "model/{seqA}-{seqB}-allintra4.pdb"
     shell:
         "singularity run  {bind} {SingImage} python3  {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output} -allintra "
-
-
