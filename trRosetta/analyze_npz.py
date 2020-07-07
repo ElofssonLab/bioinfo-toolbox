@@ -293,7 +293,7 @@ if (ns.sequence):
         startx=m+len(sepseq)
 
 for x in range(0,6):
-    #print (x,z[x])
+    print (x,z[x])
     average[x]=average[x]/z[x]
     averagedist[x]=average[x]/z[x]
     fractionprob+=[numprob[x]/z[x]]
