@@ -1,7 +1,6 @@
 # Short instructions on how to use trRosetta for modeling
 
-## Installation of trRosetta, PyRosetta and Rosetta
-
+## Installation of PyRosetta and trRosetta
 
 *  download tr_Rosetta
 ```bash
@@ -15,19 +14,25 @@ tar xf model2019_07.tar.bz2
 * download second part of trRosetta (server)
   * registration necessary at http://yanglab.nankai.edu.cn/trRosetta/)
 
+* download Pyrosetta zip file for Ubuntu 18.04 LTS (64-bit) and Python-3.6 from
+  http://www.pyrosetta.org/download
+  Note:  make sure you get the right Python version
+
+* --- for Snakemake pipeline --- 
+  * download CNS: https://www.dropbox.com/s/748qg15ywq2vfv8/cns_solve_1.3_all_intel-mac_linux.tar.gz?dl=0
+  * make sure to copy cns_solve_env.sh from this folder to the folder where you launch the singularity build command
+
 * build the singularity container (Also available on kebnekaise and on Arnes machine)
-  * Two definitions available here
-    * Default sing1.def (with ipython) and sing1-gpu.def (with Cuda)
-    * singularity build directory name sing1.def  (or use fakeroot/sandbox if you prefer)
-      * Command used by Arne (as he was running out of memory). To build GPU enabled image
-       ```bash
-       sudo su -c "SINGULARITY_TMPDIR=/home/arnee/Downloads/tmp/  SINGULARITY_DISABLE_CACHE=true SINGULARITY_CACHE=/home/arnee/Downloads/tmp/ singularity build /home/arnee/singularity-images/trRosetta-gpu.simg sing1-gpu.def"
-       ```
-
-* download Pyrosetta zip file for Ubuntu 18.04 LTS (64-bit) and Python-3.6  from
-  http://www.pyrosetta.org/dow
-  * Note:  make sure you get the right Python version
-
+  * Three definition files available here
+    * Default sing1.def (with ipython), sing1-gpu.def (with Cuda) and sing1-snake.def (with all the Snakemake executables)
+  * To build the singularity image:
+  ```bash
+  singularity build --fakeroot image_name sing1.def  (also use --sandbox if you want to be able to modify the container later)
+  ``` 
+  * To build GPU enabled image in case of out of memory error:
+  ```bash 
+  sudo su -c "SINGULARITY_TMPDIR=/home/arnee/Downloads/tmp/  SINGULARITY_DISABLE_CACHE=true SINGULARITY_CACHE=/home/arnee/Downloads/tmp/ singularity build /home/arnee/singularity-images/trRosetta-gpu.simg sing1-gpu.def"
+  ```
 
 ## List of files with short explanations (note things are not ready for publication)
 * Lets assume we want to "dock X and Y" (fasta files X.fa, Y.fa)

@@ -3,30 +3,58 @@ From: tensorflow/tensorflow:1.13.2-gpu-py3
 
 
 %files
-PyRosetta4.Release.python36.ubuntu.release-258.tar.bz2 /home
-DockQ /home
+    PyRosetta4.Release.python36.ubuntu.release-258.tar.bz2 /home
+    cns_solve_1.3_all_intel-mac_linux.tar.gz /home
+    cns_solve_env.sh /home
+
 
 %post
-apt-get update
-apt-get autoremove
-apt-get autoclean
-DEBIAN_FRONTEND=noninteractive apt-get install keyboard-configuration ipython3 wget -y
-DEBIAN_FRONTEND=noninteractive apt-get install python3-pandas python3-matplotlib python3-seaborn python3-sklearn -y
-apt install cuda -y --fix-missing
+    ### Base dependencies ### 
 
-pip install biopython snakemake
+    apt-get update
+    apt-get autoremove
+    apt-get autoclean
+    DEBIAN_FRONTEND=noninteractive apt-get install keyboard-configuration ipython3 wget git csh -y
+    DEBIAN_FRONTEND=noninteractive apt-get install python3-pandas python3-matplotlib python3-seaborn python3-sklearn -y
+    apt install cuda -y --fix-missing
+    pip install biopython snakemake
+    mkdir /apps
 
-wget http://zhanglab.ccmb.med.umich.edu/TM-align/TMalign.gz
-gzip -d TMalign.gz
-chmod +x TMalign
-mv TMalign /usr/bin
+    ### PyConfold ###
 
-cd /home/DockQ
-make
-cd ..
+    tar -vzxf /home/cns_solve_1.3_all_intel-mac_linux.tar.gz
+    mv cns_solve_1.3 /apps/
+    mv /home/cns_solve_env.sh /apps/cns_solve_1.3/
+    rm /home/cns_solve_1.3_all_intel-mac_linux.tar.gz
 
-tar -vjxf /home/PyRosetta4.Release.python36.ubuntu.release-258.tar.bz2
-pip install -e PyRosetta4.Release.python36.ubuntu.release-258/setup/
+    git clone https://github.com/johnlamb/pyconfold
+    mv pyconfold /apps/
+    cd /apps/pyconfold
+    pip install -e .
+
+    ### TMalign ###
+
+    wget http://zhanglab.ccmb.med.umich.edu/TM-align/TMalign.gz
+    gzip -d TMalign.gz
+    chmod +x TMalign
+    mv TMalign /usr/bin
+
+    ### DockQ ###
+
+    git clone https://github.com/bjornwallner/DockQ.git
+    mv DockQ /apps/
+    cd /apps/DockQ
+    make
+    cd ..
+
+    ### PyRosetta ###
+
+    tar -vjxf /home/PyRosetta4.Release.python36.ubuntu.release-258.tar.bz2
+    pip install -e PyRosetta4.Release.python36.ubuntu.release-258/setup/
+
+%environment
+    export CNS_SOLVE=/apps/cns_solve_1.3
+
 
 # THis is the command that worked for me as I run out of disk space on /tmp
 # sudo su -c "SINGULARITY_TMPDIR=/home/arnee/Downloads/tmp/  SINGULARITY_DISABLE_CACHE=true SINGULARITY_CACHE=/home/arnee/Downloads/tmp/ singularity build /home/arnee/singularity-images/trRosetta-gpu.simg sing1-gpu.def"
