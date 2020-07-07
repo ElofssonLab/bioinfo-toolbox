@@ -13,7 +13,7 @@ cwd = os.getcwd()
 npz_path = os.path.join(cwd,sys.argv[1])
 fasta_path = os.path.join(cwd,sys.argv[2])
 Bin_values = namedtuple("Bin_values", ["bin_step", "min_bin_value", "max_bin_value", "ending"])
-default_bin_values = {"dist":  Bin_values(0.5, 2, 16, ".rr"),     # In Ångström
+default_bin_values = {"dist":  Bin_values(0.5, 2, 16, ".rr"),     # In Angstrom
                       "omega": Bin_values(15, -180, 180, ".omega"),  # Dihedral angle in degrees
                       "theta": Bin_values(15, -180, 180, ".theta"),  # Dihedral angle in degrees
                       "phi":   Bin_values(15,    0, 180, ".phi")}  # Planar angle in degrees
@@ -43,7 +43,7 @@ def npz_to_casp(input_file, info_key="dist", fasta_file=None, out_base_path="",
         with np.load(input_file) as npz_file:
             raw_data = npz_file[info_key]
     except:
-        print("Error reading npz file: {}".format(input_file), file=sys.stderr)
+        print("Error reading npz file: " + input_file)
         sys.exit()
 
     target = '.'.join(input_file.split('/')[-1].split('.')[:-1])
@@ -64,7 +64,7 @@ def npz_to_casp(input_file, info_key="dist", fasta_file=None, out_base_path="",
             with open(fasta_file) as fasta_handle:
                 fasta_seq = ''.join(fasta_handle.read().split('\n')[1:]).strip()
         except:
-            print("Error reading fasta file: {}".format(fasta_file), file=sys.stderr)
+            print("Error reading fasta file: "+fasta_file)
             sys.exit()
 
         # Assert the fasta sequence is of the same length as the resulting contacts results
@@ -83,10 +83,10 @@ def npz_to_casp(input_file, info_key="dist", fasta_file=None, out_base_path="",
     # # How many of the bins do we want?
     wanted_bins = int((bin_values.max_bin_value - bin_values.min_bin_value)/bin_values.bin_step)
     if wanted_bins > nbins:
-        print("Number of wanted bins are higher than existing bins", file=sys.stderr)
+        print("Number of wanted bins are higher than existing bins")
         sys.exit()
     # Generate up the midpoint of each distance bin to be able to
-    # calculate correct distances. Measure in Ångström
+    # calculate correct distances. Measure in Angstrom
     bins = np.array([(bin_values.min_bin_value+bin_values.bin_step/2)+bin_values.bin_step*i for i in range(wanted_bins)])
 
     # Pull out the predictions, first array element is 
@@ -164,4 +164,5 @@ if __name__ == "__main__":
     npz_to_casp(npz_path, "omega", fasta_file=fasta_path, out_base_path=out_base_path)
     npz_to_casp(npz_path, "theta", fasta_file=fasta_path, out_base_path=out_base_path)
     npz_to_casp(npz_path, "phi", fasta_file=fasta_path, out_base_path=out_base_path)
+
 

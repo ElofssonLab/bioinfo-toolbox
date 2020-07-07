@@ -1,0 +1,194 @@
+configfile: "config.yaml"
+
+# It is best practice to have subsequent steps of a workflow in
+# separate, unique, output folders. This keeps the working directory
+# structured. Further, such unique prefixes allow Snakemake to prune
+# the search space for dependencies.
+
+
+workdir: config['workdir']
+jhparams=config['jhparams']
+bind=config['bind']
+trRosettaPath=config['trRosettaPath']
+
+
+rule jackhmmer_u1:
+    input:
+        "seq/{code}_u1.fasta"
+    output:
+        "msa/{code}_u1.sto" 
+    shell:
+        "jackhmmer {jhparams} -A {output} {input} ~/Downloads/originalrefproteomes.fasta  "
+
+
+rule jackhmmer_u2:
+    input:
+        "seq/{code}_u2.fasta"
+    output:
+        "msa/{code}_u2.sto"
+    shell:
+        "jackhmmer {jhparams} -A {output} {input} ~/Downloads/originalrefproteomes.fasta  "
+
+
+rule merge:
+    input:
+        A="msa/{code}_u1.sto",
+        B="msa/{code}_u2.sto"
+    output:
+        "dimer/{code}_u12.a3m"
+    shell:
+        "python3 {trRosettaPath}/mergeSTObyGenome.py -i {input.A} -j {input.B} > {output}"
+
+
+rule trimmed:
+    input:
+        "dimer/{code}_u12.a3m"
+    output:
+        "dimer/{code}_u12.trimmed"
+    shell:
+        "python3 {trRosettaPath}/a3mToTrimmed.py {input} > {output}"
+
+
+rule mergedfasta:
+    input:
+        "dimer/{code}_u12.trimmed"
+    output:
+        "dimer/{code}_u12.fa"
+    shell:
+        "head -2 {input} > {output}"
+
+
+rule predict:
+    input:
+        "dimer/{code}_u12.trimmed"
+    output:
+        "distpred/{code}_u12.npz"
+    shell:
+        "python3 {trRosettaPath}/network/predict.py -m {trRosettaPath}/model2019_07 {input} {output}"
+
+
+rule analyze:
+    input:
+       NPZ="distpred/{code}_u12.npz",
+       FA="dimer/{code}_u12.fa",
+       STR1="structures/{code}_u1.pdb",
+       STR2="structures/{code}_u2.pdb"
+    output:
+       ANALYZE="results/{code}_u12.summc",
+       CMAP="results/{code}_u12.png"       
+    shell:
+       "python3 {trRosettaPath}analyze_npz.py -i {input.NPZ} -s {input.FA} -o {output.CMAP} >> {output.ANALYZE};"
+       "python3 {trRosettaPath}contact_prcurve.py {input.NPZ} {input.STR1} {input.STR2} >> {output.ANALYZE};"
+       "mv *.png results/"
+
+rule deletelinker:
+    input:
+       NPZ="distpred/{code}_u12.npz",
+       FA="dimer/{code}_u12.fa"
+    output:
+        "distpred/{code}_u12_nosep.npz"
+    shell:
+        "python3 {trRosettaPath}/del_sepseq_npz.py -i {input.NPZ} -s {input.FA} -o {output}"
+
+rule pyconfold:
+    input:
+       NPZ="distpred/{code}_u12.npz",
+       FA="dimer/{code}_u12.fa"
+    output:
+       M1="model/{code}_u12_model1.pdb",
+       M2="model/{code}_u12_model2.pdb",
+       M3="model/{code}_u12_model3.pdb",
+       M4="model/{code}_u12_model4.pdb",
+       M5="model/{code}_u12_model5.pdb"
+    shell:
+       "python {trRosettaPath}/npz_to_rr.py {input.NPZ} {input.FA};"
+       "mv distpred/{wildcards.code}_u12.rr .;"
+       "rm distpred/{wildcards.code}_u12.omega;"
+       "rm distpred/{wildcards.code}_u12.theta;"
+       "rm distpred/{wildcards.code}_u12.phi;" 
+       "python {trRosettaPath}/run_pyconfold.py {input.FA} {wildcards.code}_u12.rr model/;"
+       "rm model/{wildcards.code}_u12_model*.noe"
+       "rm {wildcards.code}_u12.rr"
+
+rule pyrosetta:
+    input:
+       NPZ="distpred/{code}_u12_nosep.npz",
+       A="seq/{code}_u1.fasta",
+       B="seq/{code}_u2.fasta"
+    output:
+        "model/{code}_u12.pdb"
+    shell:
+        "python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output}"
+
+
+#rule pyrosetta_all:
+#    input:
+#       NPZ="distpred/{code}_u12_nosep.npz",
+#       A="seq/{code}_u1.fasta",
+#       B="seq/{code}_u2.fasta"
+#    output:
+#        "model/{code}_u12_allintra.pdb"
+#    shell:
+#        "python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output} -allintra"
+
+
+rule analyze_rosetta_models:
+    input:
+       MOD="model/{code}_u12.pdb",
+       STR="structures/{code}.pdb",
+       STR1="structures/{code}_u1.pdb",
+       STR2="structures/{code}_u2.pdb"
+    output:
+       "results/{code}_u12.summs"
+    shell:
+       "grep ^ATOM {input.MOD} | grep \" A\" > {wildcards.code}_A.pdb;"
+       "grep ^ATOM {input.MOD} | grep \" B\" > {wildcards.code}_B.pdb;"
+       "TMalign {input.STR1} {wildcards.code}_A.pdb | grep Chain_1 >> {output};"
+       "TMalign {input.STR2} {wildcards.code}_B.pdb | grep Chain_1 >> {output};"
+       "python3 /apps/DockQ/DockQ.py -short {input.MOD} {input.STR} >> {output};"
+       "rm {wildcards.code}_A.pdb {wildcards.code}_B.pdb;"
+
+#rule analyze_confold_models:
+#    input:
+#       MOD1="model/{code}_u12_model1.pdb",
+#       MOD2="model/{code}_u12_model2.pdb",
+#       MOD3="model/{code}_u12_model3.pdb",
+#       MOD4="model/{code}_u12_model4.pdb",
+#       MOD5="model/{code}_u12_model5.pdb",
+#       STR="structures/{code}.pdb",
+#       STR1="structures/{code}_u1.pdb",
+#       STR2="structures/{code}_u2.pdb"
+#    output:
+#       RES1="results/{code}_u12_model1.summs"
+#       RES2="results/{code}_u12_model2.summs",
+#       RES3="results/{code}_u12_model3.summs",
+#       RES4="results/{code}_u12_model4.summs",
+#       RES5="results/{code}_u12_model5.summs"
+#    shell:
+#       "grep ^ATOM {input.MOD1} | grep \" A\" > {wildcards.code}_A.pdb;"
+#       "grep ^ATOM {input.MOD1} | grep \" B\" > {wildcards.code}_B.pdb;"
+#       "TMalign {input.STR1} {wildcards.code}_A.pdb | grep Chain_1 >> {output.RES1};"
+#       "TMalign {input.STR2} {wildcards.code}_B.pdb | grep Chain_1 >> {output.RES1};"
+#       "python3 /apps/DockQ/DockQ.py -short {input.MOD1} {input.STR} >> {output.RES1};"
+#       "grep ^ATOM {input.MOD2} | grep \" A\" > {wildcards.code}_A.pdb;"
+#       "grep ^ATOM {input.MOD2} | grep \" B\" > {wildcards.code}_B.pdb;"
+#       "TMalign {input.STR1} {wildcards.code}_A.pdb | grep Chain_1 >> {output.RES2};"
+#       "TMalign {input.STR2} {wildcards.code}_B.pdb | grep Chain_1 >> {output.RES2};"
+#       "python3 /apps/DockQ/DockQ.py -short {input.MOD2} {input.STR} >> {output.RES2};"
+#       "grep ^ATOM {input.MOD3} | grep \" A\" > {wildcards.code}_A.pdb;"
+#       "grep ^ATOM {input.MOD3} | grep \" B\" > {wildcards.code}_B.pdb;"
+#       "TMalign {input.STR1} {wildcards.code}_A.pdb | grep Chain_1 >> {output.RES3};"
+#       "TMalign {input.STR2} {wildcards.code}_B.pdb | grep Chain_1 >> {output.RES3};"
+#       "python3 /apps/DockQ/DockQ.py -short {input.MOD3} {input.STR} >> {output.RES3};"
+#       "grep ^ATOM {input.MOD4} | grep \" A\" > {wildcards.code}_A.pdb;"
+#       "grep ^ATOM {input.MOD4} | grep \" B\" > {wildcards.code}_B.pdb;"
+#       "TMalign {input.STR1} {wildcards.code}_A.pdb | grep Chain_1 >> {output.RES4};"
+#       "TMalign {input.STR2} {wildcards.code}_B.pdb | grep Chain_1 >> {output.RES4};"
+#       "python3 /apps/DockQ/DockQ.py -short {input.MOD4} {input.STR} >> {output.RES4};"
+#       "grep ^ATOM {input.MOD5} | grep \" A\" > {wildcards.code}_A.pdb;"
+#       "grep ^ATOM {input.MOD5} | grep \" B\" > {wildcards.code}_B.pdb;"
+#       "TMalign {input.STR1} {wildcards.code}_A.pdb | grep Chain_1 >> {output.RES5};"
+#       "TMalign {input.STR2} {wildcards.code}_B.pdb | grep Chain_1 >> {output.RES5};"
+#       "python3 /apps/DockQ/DockQ.py -short {input.MOD5} {input.STR} >> {output.RES5};"
+#       "rm {wildcards.code}_A.pdb {wildcards.code}_B.pdb;"
+
