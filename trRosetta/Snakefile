@@ -18,6 +18,18 @@ dockq=config['dockq']
 bind=config['bind']
 SingImage=config['SingImage']
 trRosettaPath=config['trRosettaPath']
+cns_solve=config['cns_solve']
+
+# An uggly hack because I do not know how to pas commands with curly brackets to snakemake
+gawk1="gawk '{print $1}'"
+gawk2="gawk '{print $2}'"
+gawk3="gawk '{print $3}'"
+gawk4="gawk '{print $4}'"
+gawk5="gawk '{print $5}'"
+gawk6="gawk '{print $6}'"
+gawk7="gawk '{print $7}'"
+gawk8="gawk '{print $8}'"
+gawk9="gawk '{print $9}'"
 
 
 rule jackhmmer:
@@ -96,11 +108,12 @@ rule analyze_contact:
        STR2="pdb/{seqB}.pdb"
     output:
        ANALYZE="results/{seqA}-{seqB}.auc",
-       PNG="results/pr-curve_{seqA}-{seqB}.png",
+       #     PNG="results/{seqA}-{seqB}-pr-curve.png", # This sometimes crash therefore is is ignored
     shell:
        "python3 {trRosettaPath}contact_prcurve.py {input.NPZ} {input.STR1} {input.STR2} > {output.ANALYZE};"
        "i=`basename  {input.STR1} .pdb | cut -c1-4`;"
-       "mv pr-curve_$i.png {output.PNG}"
+       "rm -f pr-curve_$i.png ;"
+       #       "if [ -s pr-curve_$i.png ] ; then  mv pr-curve_$i.png {output.PNG} ; fi "
 
 
 rule dockq:
@@ -108,7 +121,7 @@ rule dockq:
        MOD="model/{seqA}-{seqB}.pdb",
        STR="pdb/{seqA}-{seqB}.pdb",
     output:
-       DOCKQ="results/{seqA}-{seqB}.dockq"
+       DOCKQ="modquality/{seqA}-{seqB}.dockq"
     shell:
        "python3 {dockq} -short {input.MOD} {input.STR} > {output.DOCKQ};"
 
@@ -118,7 +131,7 @@ rule TM:
        STR1="pdb/{seqA}.pdb",
        STR2="pdb/{seqB}.pdb",
     output:
-       TM="results/{seqA}-{seqB}.tm"
+       TM="modquality/{seqA}-{seqB}.tm"
     shell:
        "grep ^ATOM {input.MOD} | grep \" A\" > {input.MOD}_A;"
        "grep ^ATOM {input.MOD} | grep \" B\" > {input.MOD}_B;"
@@ -126,7 +139,44 @@ rule TM:
        "TMalign {input.STR2} {input.MOD}_B  >> {output.TM};"
 
 
-
+rule csv:
+    input:
+       SEQA="seq/{seqA}.fasta",
+       SEQB="seq/{seqB}.fasta",
+       MSAA="msa/{seqA}.sto",
+       MSAB="msa/{seqB}.sto",
+       TRIMMED="dimer/{seqA}-{seqB}.trimmed",
+       DOCKQ="modquality/{seqA}-{seqB}.dockq",
+       TM="modquality/{seqA}-{seqB}.tm",
+       ANALYZE="results/{seqA}-{seqB}.analyze",
+       AUC="results/{seqA}-{seqB}.auc",
+    output:
+       TM="csv/{seqA}-{seqB}.csv"
+    shell:
+       "name=`basename {input.TRIMMED} .trimmed`;"
+       "lenA=`grep -v \> {input.SEQA} | wc -c`;"
+       "lenB=`grep -v \> {input.SEQB} | wc -c`;"
+       "msa=`grep -v \> {input.TRIMMED} | wc -l`;"
+       "msaA=`grep -c =GS {input.MSAA} `;"
+       "msaB=`grep -c =GS {input.MSAB} `;"
+       "dockQ=`{gawk2} {input.DOCKQ}  `;"
+       "tmA=`grep -e ^TM-score {input.TM} | {gawk2} | head -1`;"
+       "tmB=`grep -e ^TM-score {input.TM} | {gawk2} | head -3 | tail -1`;"
+       "long=`grep NumLongContacts {input.ANALYZE} | sed 's/\]//g' | sed 's/\[//g' | {gawk8}`;"
+       "longPPV=`grep LongPPV {input.ANALYZE} | sed 's/\]//g' | sed 's/\[//g' | {gawk7}`;"
+       "longA=`grep NumLongContacts {input.ANALYZE} | sed 's/\]//g' | sed 's/\[//g' | {gawk6}`;"
+       "longPPVA=`grep LongPPV {input.ANALYZE}  | sed 's/\]//g' | sed 's/\[//g' | {gawk5}`;"
+       "longB=`grep NumLongContacts {input.ANALYZE} | sed 's/\]//g' | sed 's/\[//g' | {gawk7}`;"
+       "longPPVB=`grep LongPPV {input.ANALYZE} | sed 's/\]//g' | sed 's/\[//g' | {gawk6}`;"
+       "med=`grep NumMediumContacts {input.ANALYZE} | sed 's/\]//g' | sed 's/\[//g' | {gawk8}`;"
+       "medPPV=`grep MedPPV {input.ANALYZE} | sed 's/\]//g' | sed 's/\[//g' | {gawk7}`;"
+       "medA=`grep NumMediumContacts {input.ANALYZE} | sed 's/\]//g' | sed 's/\[//g' | {gawk6}`;"
+       "medPPVA=`grep MedPPV {input.ANALYZE} | sed 's/\]//g' | sed 's/\[//g' | {gawk5}`;"
+       "medB=`grep NumMediumContacts {input.ANALYZE} | sed 's/\]//g' | sed 's/\[//g' | {gawk7}`;"
+       "medPPVB=`grep MedPPV {input.ANALYZE} | sed 's/\]//g' | sed 's/\[//g' | {gawk6}`;"
+       "auc=`grep AUC {input.AUC} |  {gawk8}`;"
+       "echo name,lenA,lenB,msa,msaA,msaB,dockQ,tmA,tmB,long,med,longPPV,medPPV,longA,medA,longPPVA,medPPVA,longB,medB,longPPVB,medPPVB,auc > {output.TM};"
+       "echo $name,$lenA,$lenB,$msa,$msaA,$msaB,$dockQ,$tmA,$tmB,$long,$med,$longPPV,$medPPV,$longA,$medA,$longPPVA,$medPPVA,$longB,$medB,$longPPVB,$medPPVB,$auc >> {output.TM}"
 
 rule deletelinker:
     input:
@@ -159,3 +209,26 @@ rule pyrosetta_all:
         "model/{seqA}-{seqB}-allintra4.pdb"
     shell:
         "singularity run  {bind} {SingImage} python3  {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output} -allintra "
+
+rule pyconfold:
+    input:
+       NPZ="distpred/{seqA}-{seqB}_nosep.npz",
+       FA1="seq/{seqA}.fasta",
+       FA2="seq/{seqB}.fasta"
+    output:
+       RR="distpred/{seqA}-{seqB}_nosep.rr",
+       M1="confold/{seqA}-{seqB}_model1.pdb",
+       M2="confold/{seqA}-{seqB}_model2.pdb",
+       M3="confold/{seqA}-{seqB}_model3.pdb",
+       M4="confold/{seqA}-{seqB}_model4.pdb",
+       M5="confold/{seqA}-{seqB}_model5.pdb"
+    shell:
+       "python3 {trRosettaPath}/npz_to_rr.py {input.NPZ} {input.FA1} {input.FA2}  ;"
+       "export CNS_SOLVE={cns_solve} ;"
+       "python3 {trRosettaPath}/run_pycondock.py {input.FA1} {input.FA2} {output.RR} confold/{wildcards.seqA}/;"
+       "rm distpred/{wildcards.seqA}-{wildcards.seqB}_nosep.omega;"
+       "rm distpred/{wildcards.seqA}-{wildcards.seqB}_nosep.theta;"
+       "rm distpred/{wildcards.seqA}-{wildcards.seqB}_nosep.phi;" 
+       "mv confold/{wildcards.seqA}/*.pdb confold/;"
+       "rm confold/{wildcards.seqA} ;"
+       #"rm distpred/{wildcards.seqA}-{wildcards.seqB}_nosep.rr"
