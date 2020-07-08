@@ -5,13 +5,16 @@ import sys
 from collections import namedtuple
 
 
-if len(sys.argv) != 3:
-    print("Usage: {} trRosetta_contacts.npz seq.fasta".format(os.path.basename(__file__)))
-    sys.exit()
-
 cwd = os.getcwd()
+if len(sys.argv) != 3:
+    if len(sys.argv) != 4:
+        print("Usage: {} trRosetta_contacts.npz seq.fasta".format(os.path.basename(__file__)))
+        sys.exit()
+    else:
+        fasta2_path = os.path.join(cwd,sys.argv[3])
 npz_path = os.path.join(cwd,sys.argv[1])
 fasta_path = os.path.join(cwd,sys.argv[2])
+
 Bin_values = namedtuple("Bin_values", ["bin_step", "min_bin_value", "max_bin_value", "ending"])
 default_bin_values = {"dist":  Bin_values(0.5, 2, 16, ".rr"),     # In Angstrom
                       "omega": Bin_values(15, -180, 180, ".omega"),  # Dihedral angle in degrees
@@ -33,7 +36,7 @@ default_bin_values = {"dist":  Bin_values(0.5, 2, 16, ".rr"),     # In Angstrom
 # 
 out_base_path = npz_path[:-4]
 
-def npz_to_casp(input_file, info_key="dist", fasta_file=None, out_base_path="",
+def npz_to_casp(input_file, info_key="dist", fasta_file=None,  fasta2_file=None, out_base_path="",
                 min_sep=0, pthres=0.5):
     """
     Convert a trRosetta npz-file into casp formated restraints file.
@@ -66,6 +69,15 @@ def npz_to_casp(input_file, info_key="dist", fasta_file=None, out_base_path="",
         except:
             print("Error reading fasta file: "+fasta_file)
             sys.exit()
+
+        if fasta2_file:
+            try:
+                with open(fasta2_file) as fasta2_handle:
+                    fasta_seq += ''.join(fasta2_handle.read().split('\n')[1:]).strip()
+            except:
+                print("Error reading fasta file: "+fasta_file)
+                sys.exit()
+
 
         # Assert the fasta sequence is of the same length as the resulting contacts results
         fasta_length = len(fasta_seq)
@@ -160,9 +172,14 @@ def npz_to_casp(input_file, info_key="dist", fasta_file=None, out_base_path="",
 
 if __name__ == "__main__":
     # Distances
-    npz_to_casp(npz_path, "dist", fasta_file=fasta_path, out_base_path=out_base_path)
-    npz_to_casp(npz_path, "omega", fasta_file=fasta_path, out_base_path=out_base_path)
-    npz_to_casp(npz_path, "theta", fasta_file=fasta_path, out_base_path=out_base_path)
-    npz_to_casp(npz_path, "phi", fasta_file=fasta_path, out_base_path=out_base_path)
-
+    try:
+        npz_to_casp(npz_path, "dist",  fasta2_file=fasta2_path,fasta_file=fasta_path, out_base_path=out_base_path)
+        npz_to_casp(npz_path, "omega", fasta2_file=fasta2_path,fasta_file=fasta_path, out_base_path=out_base_path)
+        npz_to_casp(npz_path, "theta", fasta2_file=fasta2_path,fasta_file=fasta_path, out_base_path=out_base_path)
+        npz_to_casp(npz_path, "phi",   fasta2_file=fasta2_path,fasta_file=fasta_path, out_base_path=out_base_path)
+    except:
+        npz_to_casp(npz_path, "dist", fasta_file=fasta_path, out_base_path=out_base_path)
+        npz_to_casp(npz_path, "omega", fasta_file=fasta_path, out_base_path=out_base_path)
+        npz_to_casp(npz_path, "theta", fasta_file=fasta_path, out_base_path=out_base_path)
+        npz_to_casp(npz_path, "phi", fasta_file=fasta_path, out_base_path=out_base_path)
 
