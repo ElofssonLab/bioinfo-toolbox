@@ -16,6 +16,8 @@ parser = argparse.ArgumentParser(description="Trimming extra characters in align
 parser.add_argument('-o','--orgname', help='Keep original filenames', action="store_true")
 #parser.add_argument('file', metavar='file', type=argparse.FileType('r'), nargs=1, help='filename')
 parser.add_argument('-name', type=str, help='name')
+parser.add_argument("--sepseq","-sep","-S",required=False, help='Separation sequence between protein in MSA' ,default="GGGGGGGGGGGGGGGGGGGG")
+parser.add_argument('-seq','--sequence','-s', required= False, help='sequence file to identify domain baorders')
 parser.add_argument('file', metavar='file', type=str, nargs=1, help='filename')
 args = parser.parse_args()
 
@@ -28,7 +30,14 @@ for infilef in args.file:
 #    print infilef
     infile = open(infilef)
 
-
+dompos=0
+if args.sequence:
+    seqfile = open (args.sequence)
+    for l in seqfile:
+        if not ">" in l:
+            l = l.strip()
+            dompos+=len(l)
+    
 # Added functionality to remove gaps in first sequence..
 
 
@@ -67,7 +76,10 @@ for l in infile:
             #        if re.search("[A-Z]",new):
             #sys.stdout.write(upperseq)
             sys.stdout.write(seqname)
-            sys.stdout.write(new)
+            if dompos>0:
+                sys.stdout.write(new[:dompos]+args.sepseq+new[dompos:])
+            else:
+                sys.stdout.write(new)
     elif '>' in l and counter == 0:
         if args.name:
             #sys.stdout.write(">"+args.name+" "+l+"\n")
