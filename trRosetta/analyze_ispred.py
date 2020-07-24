@@ -15,7 +15,6 @@ p = argparse.ArgumentParser(description = '- plotting trRosetta maps-',
 p.add_argument('-data1','--input1','-i', required= True, help='Input ispred file 1')
 p.add_argument('-data2','--input2','-j', required= True, help='Input ispred file 2')
 p.add_argument('-pdb','--pdb','-p', required= False, help='Pdb file for analysis od distances')
-p.add_argument('-dom','--domain','-d', required= False, help='positions of domain borders', nargs='+')
 ns = p.parse_args()
 
 input_file1 = np.load(ns.input1)
