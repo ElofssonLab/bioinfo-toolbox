@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
+#import matplotlib
+#matplotlib.use('Agg')
 import numpy as np
 import argparse
 from argparse import RawTextHelpFormatter
@@ -126,14 +128,19 @@ length=dist.shape[0]
 #print("phi",rst["phi"][0,0,0:])
 
 zero_rst={'dist' : [], 'omega' : [], 'theta' : [], 'phi' : [] }
-zero_rst['dist']=np.zeros(numbin+1)
-zero_rst['omega']=np.zeros(numomega+1)
-zero_rst['theta']=np.zeros(numtheta+1)
-zero_rst['phi']=np.zeros(numphi+1)
-zero_rst['dist'][0]=1.
-zero_rst['omega'][0]=1.
-zero_rst['theta'][0]=1.
-zero_rst['phi'][0]=1.
+zero_rst['dist']=np.zeros(numbin+1, dtype=np.float32)
+zero_rst['omega']=np.zeros(numomega+1, dtype=np.float32)
+zero_rst['theta']=np.zeros(numtheta+1, dtype=np.float32)
+zero_rst['phi']=np.zeros(numphi+1, dtype=np.float32)
+# We do not set it to 0 as this cause problems with log,
+zero_rst["dist"].fill(.1/numbin)
+zero_rst["omega"].fill(.1/numomega)
+zero_rst["theta"].fill(.1/numtheta)
+zero_rst["phi"].fill(.1/numphi)
+zero_rst['dist'][0]=0.9
+zero_rst['omega'][0]=0.9
+zero_rst['theta'][0]=0.9
+zero_rst['phi'][0]=0.9
 
 new_rst["dist"]=np.copy(rst["dist"])
 new_rst["omega"]=np.copy(rst["omega"])
@@ -180,6 +187,8 @@ for x in range(0,m-1):
             for d in rst.files:
                 new_rst[d][x,y]=zero_rst[d]
                 new_rst[d][y,x]=zero_rst[d]
+                #new_rst[d][x,y]=new_rst[d][x,y]
+                #new_rst[d][y,x]=new_rst[d][y,x]
         #else:
         #    print (x,y,x2,y2,res[x,y],res[x2,y2],res[x,y2],res[x2,y])
         #    for d in rst.files:
@@ -188,12 +197,23 @@ for x in range(0,m-1):
         #    new_res[x,y]=res[x,y]
         #    new_res[y,x]=res[y,x]
 
-sys.exit()
 #print (new_rst)
+
+# Now we delete the sepseq
+#shift=0
+#for m in borders:
+#    print ("Deleting :",m,m+len(sepseq))
+#    for x in rst.files:
+#        #print (x)
+#        new_rst[x]=np.delete(new_rst[x],slice(m+shift,m+shift+len(sepseq)),1)
+#        new_rst[x]=np.delete(new_rst[x],slice(m+shift,m+shift+len(sepseq)),0)
+#    shift+=len(sepseq)
+
 
 # Save
 np.savez_compressed(ns.output, dist=new_rst['dist'], omega=new_rst['omega'], theta=new_rst['theta'], phi=new_rst['phi'])# , rep=new_rst['rep'])
 
+sys.exit()
 
 outfig1=ns.output+"-org.png"
 outfig2=ns.output+"-new.png"

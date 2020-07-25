@@ -292,18 +292,19 @@ if (ns.sequence):
             starty=n+len(sepseq)
         startx=m+len(sepseq)
 
-for x in range(0,6):
-    print (x,z[x])
-    average[x]=average[x]/z[x]
-    averagedist[x]=average[x]/z[x]
-    fractionprob+=[numprob[x]/z[x]]
-    Z=np.sqrt(z[x])
-    fractionshortcontacts+=[numshortcontacts[x]/Z]
-    fractionlongcontacts+=[numlongcontacts[x]/Z]
-    fractionmedcontacts+=[nummedcontacts[x]/Z]
-    shortPPV[x]=shortTP[x]/(shortTP[x]+shortFP[x]+1.e-20)        
-    medPPV[x]=medTP[x]/(medTP[x]+medFP[x]+1.e-20)        
-    longPPV[x]=longTP[x]/(longTP[x]+longFP[x]+1.e-20)        
+if (ns.pdb): 
+    for x in range(0,6):
+        print (x,z[x])
+        average[x]=average[x]/z[x]
+        averagedist[x]=average[x]/z[x]
+        fractionprob+=[numprob[x]/z[x]]
+        Z=np.sqrt(z[x])
+        fractionshortcontacts+=[numshortcontacts[x]/Z]
+        fractionlongcontacts+=[numlongcontacts[x]/Z]
+        fractionmedcontacts+=[nummedcontacts[x]/Z]
+        shortPPV[x]=shortTP[x]/(shortTP[x]+shortFP[x]+1.e-20)        
+        medPPV[x]=medTP[x]/(medTP[x]+medFP[x]+1.e-20)        
+        longPPV[x]=longTP[x]/(longTP[x]+longFP[x]+1.e-20)        
 # o        
 #sys.exit()
         

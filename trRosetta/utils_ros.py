@@ -322,6 +322,7 @@ def add_rst_chain2(pose, rst, sep1, sep2, params, nogly=False):
     constraints = rosetta.protocols.constraint_movers.ConstraintSetMover()
     constraints.constraint_file(tmpname)
     constraints.add_constraints(True)
+    #print (pose,tmpname)
     constraints.apply(pose)
 
     os.remove(tmpname)
