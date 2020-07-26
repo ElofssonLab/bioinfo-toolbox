@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 #import matplotlib
 #matplotlib.use('Agg')
 import numpy as np
@@ -22,7 +22,8 @@ p.add_argument('-data','--input','-i', required= True, help='Input trRossetta NP
 p.add_argument('-seq','--sequence','-s', required= True, help='sequence file to identify domain borders')
 #p.add_argument('-ali','--alignment','-a', required= True, help='Alignment of first and second sequence')
 p.add_argument("--sepseq","-sep","-S",required=False, help='Separation sequence between protein in MSA' ,default="GGGGGGGGGGGGGGGGGGGG")
-p.add_argument('-out','--output','-o', required= True, help='output NPX file')
+p.add_argument('-out','--output','-o', required= True, help='output NPZ file')
+p.add_argument('-png','--heatmap','-p', required= False, help='also save PNG files.', action='store_true')
 #parser.add_argument('--nargs', nargs='+')
 ns = p.parse_args()
 
@@ -142,6 +143,36 @@ zero_rst['omega'][0]=0.9
 zero_rst['theta'][0]=0.9
 zero_rst['phi'][0]=0.9
 
+max_intradist=16
+intradist_rst={'dist' : [], 'omega' : [], 'theta' : [], 'phi' : [] }
+intradist_rst['dist']=np.zeros(numbin+1, dtype=np.float32)
+intradist_rst['omega']=np.zeros(numomega+1, dtype=np.float32)
+intradist_rst['theta']=np.zeros(numtheta+1, dtype=np.float32)
+intradist_rst['phi']=np.zeros(numphi+1, dtype=np.float32)
+# We do not set it to 0 as this cause problems with log,
+intradist_rst["dist"]=np.array([0.499,
+                                0.,0.,0.,0.,0.,0.,
+                                0.,0.,0.,0.,0.,0.02,
+                                0.02,0.02,0.02,0.02,0.02,0.02,
+                                0.02,0.02,0.02,0.02,0.02,0.02,
+                                0.02,0.02,0.02,0.02,0.02,0.02,
+                                0.02,0.02,0.02,0.02,0.02,0.02
+],dtype=np.float32)
+
+print (intradist_rst["dist"],zero_rst["dist"])
+d_slice = intradist_rst["dist"][ 1:]
+print (intradist_rst["dist"].sum(),zero_rst["dist"].sum(),np.sum(np.multiply(bins, d_slice/np.sum(d_slice))))
+
+sys.exit()
+#intradist_rst["dist"].fill(.1/numbin)
+intradist_rst["omega"].fill(.1/numomega)
+intradist_rst["theta"].fill(.1/numtheta)
+intradist_rst["phi"].fill(.1/numphi)
+#intradist_rst['dist'][0]=0.6
+intradist_rst['omega'][0]=0.9
+intradist_rst['theta'][0]=0.9
+intradist_rst['phi'][0]=0.9
+
 new_rst["dist"]=np.copy(rst["dist"])
 new_rst["omega"]=np.copy(rst["omega"])
 new_rst["theta"]=np.copy(rst["theta"])
@@ -180,15 +211,38 @@ for x in range(0,m-1):
         y3=y
         #print ("Test",m,seplen,x,y,x2,y2,x3,y3)
         #print ("Dist",res[x,y],res[x2,y2],res[x3,y3])
-        if (  res[x,y]<cutoff and res[x2,y2]<cutoff and res[x3,y3]<cutoff): # and  (res[x,y2]<cutoff and res[x2,y]<cutoff):
-            #print ("Found",x,y,x2,y2,x3,y3,res[x,y],res[x2,y2],res[x3,y3])
-            new_res[x,y]=max_dist
-            new_res[y,x]=max_dist
-            for d in rst.files:
-                new_rst[d][x,y]=zero_rst[d]
-                new_rst[d][y,x]=zero_rst[d]
-                #new_rst[d][x,y]=new_rst[d][x,y]
-                #new_rst[d][y,x]=new_rst[d][y,x]
+        if (  res[x,y]<cutoff):
+            if (res[x2,y2]<cutoff and res[x3,y3]<cutoff): # and  (res[x,y2]<cutoff and res[x2,y]<cutoff):
+                #print ("Found",x,y,x2,y2,x3,y3,res[x,y],res[x2,y2],res[x3,y3])
+                new_res[x,y]=max_dist
+                new_res[y,x]=max_dist
+                for d in rst.files:
+                    new_rst[d][x,y]=zero_rst[d]
+                    new_rst[d][y,x]=zero_rst[d]
+                    #new_rst[d][x,y]=new_rst[d][x,y]
+                    #new_rst[d][y,x]=new_rst[d][y,x]
+            elif(res[x2,y2]<cutoff or res[x3,y3]<cutoff): # and  (res[x,y2]<cutoff and res[x2,y]<cutoff):
+                #print ("Found",x,y,x2,y2,x3,y3,res[x,y],res[x2,y2],res[x3,y3])
+                if (res[x,y]<maxintradist):  # what should we put this to?
+                    new_res[x,y]=max_intradist
+                    new_res[y,x]=max_intradist
+                    print ("homocontact",x,y,res[x,y],new_rst["dist"][x,y],intradist_rst["dist"])
+                    for d in rst.files:
+                        new_rst[d][x,y]=intradist_rst[d]
+                        new_rst[d][y,x]=intradist_rst[d]
+                        #new_rst[d][x,y]=new_rst[d][x,y]
+                        #new_rst[d][y,x]=new_rst[d][y,x]
+            else:
+                print ("contact",res[x,y],x,y,new_rst["dist"][x,y],intradist_rst["dist"])
+            #    #print ("Found",x,y,x2,y2,x3,y3,res[x,y],res[x2,y2],res[x3,y3])
+            #    if (res[x,y]<maxintradist):
+            #        new_res[x,y]=max_intradist
+            #        new_res[y,x]=max_intradist
+            #        for d in rst.files:
+            #            new_rst[d][x,y]=intradist_rst[d]
+            #            new_rst[d][y,x]=intradist_rst[d]
+            #        #new_rst[d][x,y]=new_rst[d][x,y]
+            #        #new_rst[d][y,x]=new_rst[d][y,x]
         #else:
         #    print (x,y,x2,y2,res[x,y],res[x2,y2],res[x,y2],res[x2,y])
         #    for d in rst.files:
@@ -213,44 +267,45 @@ for x in range(0,m-1):
 # Save
 np.savez_compressed(ns.output, dist=new_rst['dist'], omega=new_rst['omega'], theta=new_rst['theta'], phi=new_rst['phi'])# , rep=new_rst['rep'])
 
-sys.exit()
+#sys.exit()
 
-outfig1=ns.output+"-org.png"
-outfig2=ns.output+"-new.png"
-
-fig = plt.figure()
-ax = fig.add_subplot(111)
-cax = ax.matshow(res, cmap="hot")
-if type(ns.domain) is list:
-    for cut in ns.domain:
-        #x=[0,p_len-1,cut,cut]
-        #y=[cut,cut,0,p_len-1]
-        x=[0,p_len-1]
-        y=[float(cut),float(cut)]
-        #print (x,y)
-        ax.plot(x,y,lw=3,c="b",alpha=0.2)
-        ax.plot(y,x,lw=3,c="b",alpha=0.2)
-    #ax.set(xlim=[0,500],ylim=[0,500])
-line="Original plot"
-ax.set(title=line)
-fig.colorbar(cax)
-fig.savefig(outfig1)
-
-
-fig = plt.figure()
-ax = fig.add_subplot(111)
-cax = ax.matshow(new_res, cmap="hot")
-if type(ns.domain) is list:
-    for cut in ns.domain:
-        #x=[0,p_len-1,cut,cut]
-        #y=[cut,cut,0,p_len-1]
-        x=[0,p_len-1]
-        y=[float(cut),float(cut)]
-        #print (x,y)
-        ax.plot(x,y,lw=3,c="b",alpha=0.2)
-        ax.plot(y,x,lw=3,c="b",alpha=0.2)
-    #ax.set(xlim=[0,500],ylim=[0,500])
-line="updated plot"
-ax.set(title=line)
-fig.colorbar(cax)
-fig.savefig(outfig2)
+if (ns.heatmap):
+    outfig1=ns.output+"-org.png"
+    outfig2=ns.output+"-new.png"
+    
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    cax = ax.matshow(res, cmap="hot")
+    if type(ns.domain) is list:
+        for cut in ns.domain:
+            #x=[0,p_len-1,cut,cut]
+            #y=[cut,cut,0,p_len-1]
+            x=[0,p_len-1]
+            y=[float(cut),float(cut)]
+            #print (x,y)
+            ax.plot(x,y,lw=3,c="b",alpha=0.2)
+            ax.plot(y,x,lw=3,c="b",alpha=0.2)
+        #ax.set(xlim=[0,500],ylim=[0,500])
+    line="Original plot"
+    ax.set(title=line)
+    fig.colorbar(cax)
+    fig.savefig(outfig1)
+    
+    
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    cax = ax.matshow(new_res, cmap="hot")
+    if type(ns.domain) is list:
+        for cut in ns.domain:
+            #x=[0,p_len-1,cut,cut]
+            #y=[cut,cut,0,p_len-1]
+            x=[0,p_len-1]
+            y=[float(cut),float(cut)]
+            #print (x,y)
+            ax.plot(x,y,lw=3,c="b",alpha=0.2)
+            ax.plot(y,x,lw=3,c="b",alpha=0.2)
+        #ax.set(xlim=[0,500],ylim=[0,500])
+    line="updated plot"
+    ax.set(title=line)
+    fig.colorbar(cax)
+    fig.savefig(outfig2)

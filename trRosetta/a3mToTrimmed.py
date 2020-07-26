@@ -19,6 +19,7 @@ parser.add_argument('-name', type=str, help='name')
 parser.add_argument("--sepseq","-sep","-S",required=False, help='Separation sequence between protein in MSA' ,default="GGGGGGGGGGGGGGGGGGGG")
 parser.add_argument('-seq','--sequence','-s', required= False, help='sequence file to identify domain baorders')
 parser.add_argument('file', metavar='file', type=str, nargs=1, help='filename')
+parser.add_argument('-max','--maxhits','-m', required= False, help='maximum number of sequences to include')
 args = parser.parse_args()
 
 #print args
@@ -30,6 +31,10 @@ for infilef in args.file:
 #    print infilef
     infile = open(infilef)
 
+if ns.maxhits:
+    maxhits=ns.maxhits
+else:
+    maxhits=1.e20
 dompos=0
 if args.sequence:
     seqfile = open (args.sequence)
@@ -47,6 +52,7 @@ gaps=np.zeros(maxlen)
 
 seqname=""
 for l in infile:
+    if (counter > maxhits): break
     if '>' in l and not counter == 0:
         if args.orgname:
             #sys.stdout.write('\n'+l)
@@ -92,4 +98,5 @@ for l in infile:
             seqname='>target/1-100\n'
 
         counter += 1
+            
 sys.stdout.write('\n')
