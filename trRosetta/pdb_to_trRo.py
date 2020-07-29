@@ -75,6 +75,7 @@ if __name__ == "__main__":
     z_step = z_per_bin/2
     angle_z_step = 1
 
+    minvalue=0.1
     dist_wanted_bins = (20 - 2)/DIST_STEP
     omega_wanted_bins = 360/OMEGA_STEP
     theta_wanted_bins = 360/THETA_STEP
@@ -85,7 +86,11 @@ if __name__ == "__main__":
     omega_mat = np.zeros((plen, plen, 25))
     theta_mat = np.zeros((plen, plen, 25))
     phi_mat = np.zeros((plen, plen, 13))
-
+    dist_mat.fill(minvalue/26)
+    omega_mat.fill(minvalue/24)
+    theta_mat.fill(minvalue/24)
+    phi_mat.fill(minvalue/12)
+    
     dist_bins = [i for i in np.arange(2, 2 + (dist_wanted_bins)*0.5, 0.5)]
     omega_bins = [i for i in np.arange(-180, -180 + (omega_wanted_bins)*OMEGA_STEP, OMEGA_STEP)]
     theta_bins = [i for i in np.arange(-180, -180 + (theta_wanted_bins)*THETA_STEP, THETA_STEP)]
@@ -121,10 +126,10 @@ if __name__ == "__main__":
                 continue
             # print(i,j)
             if i == j:
-                dist_mat[i, j, 0] = 1
-                omega_mat[i, j, 0] = 1
-                theta_mat[i, j, 0] = 1
-                phi_mat[i, j, 0] = 1
+                dist_mat[i, j, 0] = 0.9
+                omega_mat[i, j, 0] = 0.9
+                theta_mat[i, j, 0] = 0.9
+                phi_mat[i, j, 0] = 0.9
                 j += 1
                 continue
 
@@ -141,17 +146,17 @@ if __name__ == "__main__":
             dist = (c2B-c1B).norm()
 
             if dist > 20:
-                dist_mat[i, j, 0] = 1
-                omega_mat[i, j, 0] = 1
-                theta_mat[i, j, 0] = 1
-                phi_mat[i, j, 0] = 1
+                dist_mat[i, j, 0] = 0.9
+                omega_mat[i, j, 0] = 0.9
+                theta_mat[i, j, 0] = 0.9
+                phi_mat[i, j, 0] = 0.9
             else:
                 # Dist and omega are symmetrical and have already been copied
                 if not symm:
                     ix = np.digitize(dist, dist_bins)
                     cum_prob = 0
                     b_step = 0
-                    while cum_prob < 0.999:
+                    while cum_prob < 0.899:
                         bin_prob = st.norm.cdf(b_step*-z_step) -\
                             st.norm.cdf(-z_step*(1+b_step))
                         dist_mat[i, j, np.min([ix+b_step, dist_num_bins])] += bin_prob
@@ -170,7 +175,7 @@ if __name__ == "__main__":
                     ix = np.digitize(omega, omega_bins)
                     cum_prob = 0
                     b_step = 0
-                    while cum_prob < 0.999:
+                    while cum_prob < 0.899:
                         bin_prob = st.norm.cdf(b_step*-angle_z_step) -\
                             st.norm.cdf(-angle_z_step*(1+b_step))
                         omega_mat[i, j, np.min([ix+b_step, omega_num_bins])] += bin_prob
@@ -188,7 +193,7 @@ if __name__ == "__main__":
                 ix = np.digitize(theta, theta_bins)
                 cum_prob = 0
                 b_step = 0
-                while cum_prob < 0.999:
+                while cum_prob < 0.899:
                     bin_prob = st.norm.cdf(b_step*-angle_z_step) -\
                         st.norm.cdf(-angle_z_step*(1+b_step))
                     theta_mat[i, j, np.min([ix+b_step, theta_num_bins])] += bin_prob
@@ -205,7 +210,7 @@ if __name__ == "__main__":
                 ix = np.digitize(phi, phi_bins)
                 cum_prob = 0
                 b_step = 0
-                while cum_prob < 0.999:
+                while cum_prob < 0.899:
                     bin_prob = st.norm.cdf(b_step*-angle_z_step) -\
                         st.norm.cdf(-angle_z_step*(1+b_step))
                     phi_mat[i, j, np.min([ix+b_step, phi_num_bins])] += bin_prob
