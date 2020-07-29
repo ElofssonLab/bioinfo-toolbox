@@ -19,6 +19,7 @@ def parse_a3m(filename):
 
     # convert letters into numbers
     alphabet = np.array(list("ARNDCQEGHILKMFPSTWYV-"), dtype='|S1').view(np.uint8)
+    #print ([list(s) for s in seqs])
     msa = np.array([list(s) for s in seqs], dtype='|S1').view(np.uint8)
     for i in range(alphabet.shape[0]):
         msa[msa == alphabet[i]] = i

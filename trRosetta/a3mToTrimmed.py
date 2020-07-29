@@ -31,10 +31,10 @@ for infilef in args.file:
 #    print infilef
     infile = open(infilef)
 
-if ns.maxhits:
-    maxhits=ns.maxhits
-else:
-    maxhits=1.e20
+#if args.maxhits:
+#    maxhits=args.maxhits
+#else:
+#    maxhits=1.e20
 dompos=0
 if args.sequence:
     seqfile = open (args.sequence)
@@ -52,7 +52,7 @@ gaps=np.zeros(maxlen)
 
 seqname=""
 for l in infile:
-    if (counter > maxhits): break
+    #if (counter > maxhits): break
     if '>' in l and not counter == 0:
         if args.orgname:
             #sys.stdout.write('\n'+l)
