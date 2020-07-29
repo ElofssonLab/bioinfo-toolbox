@@ -31,8 +31,8 @@ for infilef in args.file:
 #    print infilef
     infile = open(infilef)
 
-if ns.maxhits:
-    maxhits=ns.maxhits
+if args.maxhits:
+    maxhits=args.maxhits
 else:
     maxhits=1.e20
 dompos=0
