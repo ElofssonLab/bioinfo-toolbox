@@ -1,158 +1,218 @@
 #!/usr/bin/env python3
+import argparse
 import sys
 import os
+from Bio.PDB.vectors import rotaxis, calc_angle, calc_dihedral
+from Bio.PDB.Polypeptide import is_aa
+from math import pi
 import numpy as np
 import scipy.stats as st
 from collections import defaultdict
 
 
-def parse_atm_record(line):
-    record = defaultdict()
-    record['name'] = line[0:6].strip()
-    record['atm_no'] = int(line[6:11])
-    record['atm_name'] = line[12:16].strip()
-    record['res_name'] = line[17:20].strip()
-    record['chain'] = line[21]
-    record['res_no'] = int(line[22:26])
-    record['insert'] = line[26].strip()
-    record['resid'] = line[22:29]
-    record['x'] = float(line[30:38])
-    record['y'] = float(line[38:46])
-    record['z'] = float(line[46:54])
-    record['occ'] = float(line[54:60])
-    record['B'] = float(line[60:66])
-    
-    return record
+def virtual_cb_vector(residue):
+    # get atom coordinates as vectors
+    n = residue['N'].get_vector()
+    c = residue['C'].get_vector()
+    ca = residue['CA'].get_vector()
+    # center at origin
+    n = n - ca
+    c = c - ca
+    # find rotation matrix that rotates n -120 degrees along the ca-c vector
+    rot = rotaxis(-pi*120.0/180.0, c)
+    # apply rotation to ca-n vector
+    cb_at_origin = n.left_multiply(rot)
+    # put on top of ca atom
+    cb = cb_at_origin + ca
+    return cb
 
-
-def get_first_chain(pdbfile):
-    for line in pdbfile:
-        if not line.startswith('ATOM'):
-            continue
-        atm_record = parse_atm_record(line)
-        break
-
-    return atm_record['chain']
-
-
-def get_res_dict(pdbfile, chain):
-    cb_lst = []
-    res_dict = defaultdict(list)
-
-    if not chain:
-        chain = get_first_chain(pdbfile)
-        pdbfile.seek(0)
-
-    for line in pdbfile:
-        if not line.startswith('ATOM'):
-            continue
-
-        atm_record = parse_atm_record(line)
-
-        if atm_record['chain'] != ' ' and atm_record['chain'] != chain  and chain != '*':
-            continue
-
-        res_i = atm_record['res_no']
-        
-        if res_dict.keys():
-            min_res_i = min(res_dict.keys())
-        else:
-            min_res_i = res_i
-
-        # I do not really understand whatis tested here, but seems to never be true/AE
-        if res_i > 1000 and len(res_dict) < 1000 and min_res_i + len(res_dict) < 1000:
-            continue
-
-        # Why ?
-        if atm_record['insert'] == 'X':
-            res_i = res_i * 0.001
-
-        atm = [float('inf'), float('inf'), float('inf')]
-
-        if atm_record['atm_name'] == 'CA':
-                atm = [atm_record['x'], atm_record['y'], atm_record['z']]
-                res_dict[res_i].append(np.array(atm))   
-        elif atm_record['atm_name'] == 'CB':
-                atm = [atm_record['x'], atm_record['y'], atm_record['z']]
-                res_dict[res_i].append(np.array(atm)) 
-    
-    return res_dict
-
-
-def get_cb_coordinates(pdbfile, chain):
-    res_dict = get_res_dict(pdbfile, chain)
-
-    cb_lst = []
-    tmp_i = 0
-
-    # need to sort to get the sequence correct
-    sorted_keys = sorted(res_dict.keys())
-    
-    for i in sorted_keys:
-        if len(res_dict[i]) > 1:
-            tmp_i += 1
-            cb_lst.append(res_dict[i][-1])
-        elif len(res_dict[i]) == 1:
-            tmp_i += 1
-            cb_lst.append(res_dict[i][0])
-            #print tmp_i,i,res_dict[i][0],res_dict[i][-1]
-    pdbfile.close()
-    return cb_lst
-
-def get_cb_contacts(gapped_cb_lst):
-    seqlen = len(gapped_cb_lst)
-    dist_mat = np.zeros((seqlen, seqlen), np.float)
-    dist_mat.fill(float('inf'))
-
-    for i, cb1 in enumerate(gapped_cb_lst):
-        if cb1[0] == '-':
-            continue
-        for j, cb2 in enumerate(gapped_cb_lst):
-            if cb2[0] == '-':
-                continue
-            diff_vec = cb1 - cb2
-            dist_mat[i, j] = np.sqrt(np.sum(diff_vec * diff_vec))
-    return dist_mat
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print("Usage: {} <pdb-files> <npz-name> [std in Å]".format(os.path.basename(__file__)))
-        sys.exit(1)
-    pdb_filename = sys.argv[1]
-    npz_name = sys.argv[2]
-    if len(sys.argv) > 3:
-        std = float(sys.argv[3])
+    arg_parser = argparse.\
+        ArgumentParser(
+                description="Convert a pdb/mcif to trRosetta distances/angles")
+
+    in_group = arg_parser.add_mutually_exclusive_group(required=True)
+    in_group.add_argument("-p", "--pdb_file", type=argparse.FileType('r'))
+    in_group.add_argument("-m", "--mmCIF_file", type=argparse.FileType('r'))
+
+    arg_parser.add_argument("npz_name", type=str)
+    arg_parser.add_argument("-c", "--chain", type=str, default='A')
+    # arg_parser.add_argument("-s", "--std", default=1, type=float,
+    #                         help="Standard deviation in Ångström")
+    args = arg_parser.parse_args()
+    std = 1
+
+    if args.pdb_file:
+        from Bio.PDB.PDBParser import PDBParser
+        bio_parser = PDBParser(PERMISSIVE=1)
+        structure_file = args.pdb_file
+        structure_id = args.pdb_file.name[:-4]
     else:
-        std = 1  # One standard deviation is this many Ångström
+        from Bio.PDB.MMCIFParser import MMCIFParser
+        bio_parser = MMCIFParser()
+        structure_file = args.mmCIF_file
+        structure_id = args.mmCIF_file.name[:-4]
 
-    STEP = 0.5
-    z_per_bin = std/STEP
+    # Load structure
+    structure = bio_parser.get_structure(structure_id, structure_file)
+
+    # Get residues and length of protein
+    residues = []
+    for residue1 in structure[0][args.chain]:
+        if not is_aa(residue1):
+            continue
+        residues.append(residue1.get_resname())
+    plen = len(residues)
+
+    # Setup bins and step for the final matrix
+    DIST_STEP = 0.5
+    OMEGA_STEP = 15
+    THETA_STEP = 15
+    PHI_STEP = 15
+
+    z_per_bin = std/DIST_STEP
     z_step = z_per_bin/2
-    wanted_bins = (20 - 2)/STEP
-    cb_lst = get_cb_coordinates(open(pdb_filename, 'r'), "A")
-    contact_mat = get_cb_contacts(cb_lst)
-    plen = contact_mat.shape[0]
+    angle_z_step = 1
+
+    dist_wanted_bins = (20 - 2)/DIST_STEP
+    omega_wanted_bins = 360/OMEGA_STEP
+    theta_wanted_bins = 360/THETA_STEP
+    phi_wanted_bins = 180/PHI_STEP
+    # cb_lst = get_cb_coordinates(open(args.pdb_file, 'r'), "A")
+    # contact_mat = get_cb_contacts(len(residues))
     dist_mat = np.zeros((plen, plen, 37))
+    omega_mat = np.zeros((plen, plen, 25))
+    theta_mat = np.zeros((plen, plen, 25))
+    phi_mat = np.zeros((plen, plen, 13))
 
-    bins = [i for i in np.arange(2, 2 + (wanted_bins+1)*0.5, 0.5)]
-    num_bins = len(bins)
+    dist_bins = [i for i in np.arange(2, 2 + (dist_wanted_bins)*0.5, 0.5)]
+    omega_bins = [i for i in np.arange(-180, -180 + (omega_wanted_bins)*OMEGA_STEP, OMEGA_STEP)]
+    theta_bins = [i for i in np.arange(-180, -180 + (theta_wanted_bins)*THETA_STEP, THETA_STEP)]
+    phi_bins = [i for i in np.arange(0, (phi_wanted_bins)*PHI_STEP, PHI_STEP)]
+    # print(dist_bins)
+    # print(len(dist_bins))
+    # print(omega_bins)
+    # print(len(omega_bins))
+    # sys.exit()
+    dist_num_bins = len(dist_bins)
+    omega_num_bins = len(omega_bins)
+    theta_num_bins = len(theta_bins)
+    phi_num_bins = len(phi_bins)
 
-    for i in range(plen):
-        for j in range(i, plen):
-            if contact_mat[i, j] > 20:
+    # Iterate over all residues and calculate distances
+    i = 0
+    j = 0
+    for residue1 in structure[0][args.chain]:
+        # Only use real atoms, not HET or water
+        if not is_aa(residue1):
+            continue
+
+        # If the residue lacks CB (Glycine etc), create a virtual
+        if residue1.has_id('CB'):
+            c1B = residue1['CB'].get_vector()
+        else:
+            c1B = virtual_cb_vector(residue1)
+
+        j = 0
+        for residue2 in structure[0][args.chain]:
+            symm = False
+            if not is_aa(residue2):
+                continue
+            # print(i,j)
+            if i == j:
                 dist_mat[i, j, 0] = 1
+                omega_mat[i, j, 0] = 1
+                theta_mat[i, j, 0] = 1
+                phi_mat[i, j, 0] = 1
+                j += 1
+                continue
+
+            if i > j:
+                dist_mat[i, j] = dist_mat[j, i]
+                omega_mat[i, j] = omega_mat[j, i]
+                symm = True
+            # If the residue lacks CB (Glycine etc), create a virtual
+            if residue2.has_id('CB'):
+                c2B = residue2['CB'].get_vector()
             else:
-                dist = contact_mat[i,j]
-                ix = np.digitize(dist, bins)
-                
+                c2B = virtual_cb_vector(residue2)
+            ###############################################
+            dist = (c2B-c1B).norm()
+
+            if dist > 20:
+                dist_mat[i, j, 0] = 1
+                omega_mat[i, j, 0] = 1
+                theta_mat[i, j, 0] = 1
+                phi_mat[i, j, 0] = 1
+            else:
+                # Dist and omega are symmetrical and have already been copied
+                if not symm:
+                    ix = np.digitize(dist, dist_bins)
+                    cum_prob = 0
+                    b_step = 0
+                    while cum_prob < 0.999:
+                        bin_prob = st.norm.cdf(b_step*-z_step) -\
+                            st.norm.cdf(-z_step*(1+b_step))
+                        dist_mat[i, j, np.min([ix+b_step, dist_num_bins])] += bin_prob
+                        dist_mat[i, j, np.max([ix-b_step, 1])] += bin_prob
+                        cum_prob += bin_prob*2
+                        b_step += 1
+                ###############################################
+                # # Omega
+                c1A = residue1['CA'].get_vector()
+                c2A = residue2['CA'].get_vector()
+
+                if not symm:
+                    raw_omega = calc_dihedral(c1A, c1B, c2B, c2A)
+                    omega = (raw_omega*180)/pi
+
+                    ix = np.digitize(omega, omega_bins)
+                    cum_prob = 0
+                    b_step = 0
+                    while cum_prob < 0.999:
+                        bin_prob = st.norm.cdf(b_step*-angle_z_step) -\
+                            st.norm.cdf(-angle_z_step*(1+b_step))
+                        omega_mat[i, j, np.min([ix+b_step, omega_num_bins])] += bin_prob
+                        omega_mat[i, j, np.max([ix-b_step, 1])] += bin_prob
+                        cum_prob += bin_prob*2
+                        b_step += 1
+
+                ###############################################
+                # # Theta
+                N1 = residue1['N'].get_vector()
+
+                raw_theta = calc_dihedral(N1, c1A, c1B, c2B)
+                theta = (raw_theta*180)/pi
+
+                ix = np.digitize(theta, theta_bins)
                 cum_prob = 0
                 b_step = 0
-                while cum_prob < 0.99:
-                    bin_prob = st.norm.cdf(b_step*-z_step)-st.norm.cdf(-z_step*(1+b_step))
-                    dist_mat[i, j, np.min([ix+b_step, num_bins-1])] += bin_prob
-                    dist_mat[i, j, np.max([ix-b_step, 1])] += bin_prob
+                while cum_prob < 0.999:
+                    bin_prob = st.norm.cdf(b_step*-angle_z_step) -\
+                        st.norm.cdf(-angle_z_step*(1+b_step))
+                    theta_mat[i, j, np.min([ix+b_step, theta_num_bins])] += bin_prob
+                    theta_mat[i, j, np.max([ix-b_step, 1])] += bin_prob
                     cum_prob += bin_prob*2
                     b_step += 1
 
-    np.savez_compressed(npz_name, dist=dist_mat)
-                    
+                ###############################################
+                # # Phi
+
+                raw_phi = calc_angle(c1A, c1B, c2B)
+                phi = (raw_phi*180)/pi
+
+                ix = np.digitize(phi, phi_bins)
+                cum_prob = 0
+                b_step = 0
+                while cum_prob < 0.999:
+                    bin_prob = st.norm.cdf(b_step*-angle_z_step) -\
+                        st.norm.cdf(-angle_z_step*(1+b_step))
+                    phi_mat[i, j, np.min([ix+b_step, phi_num_bins])] += bin_prob
+                    phi_mat[i, j, np.max([ix-b_step, 1])] += bin_prob
+                    cum_prob += bin_prob*2
+                    b_step += 1
+            j += 1
+        i += 1
+
+    np.savez_compressed(args.npz_name, dist=dist_mat, omega=omega_mat, theta=theta_mat, phi=phi_mat)
