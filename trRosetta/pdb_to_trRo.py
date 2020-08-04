@@ -34,7 +34,7 @@ if __name__ == "__main__":
     in_group.add_argument("-m", "--mmCIF_file", type=argparse.FileType('r'))
 
     arg_parser.add_argument("npz_name", type=str)
-    arg_parser.add_argument("-c", "--chain", type=str, default='A')
+    #arg_parser.add_argument("-c", "--chain", type=str, default='A')
     # arg_parser.add_argument("-s", "--std", default=1, type=float,
     #                         help="Standard deviation in Ångström")
     args = arg_parser.parse_args()
@@ -56,10 +56,11 @@ if __name__ == "__main__":
 
     # Get residues and length of protein
     residues = []
-    for residue1 in structure[0][args.chain]:
-        if not is_aa(residue1):
-            continue
-        residues.append(residue1.get_resname())
+    for chain in structure[0]:
+        for residue1 in structure[0][chain.id]:
+            if not is_aa(residue1):
+                continue
+            residues.append(residue1.get_resname())
     plen = len(residues)
 
     # Setup bins and step for the final matrix
@@ -104,121 +105,123 @@ if __name__ == "__main__":
     # Iterate over all residues and calculate distances
     i = 0
     j = 0
-    for residue1 in structure[0][args.chain]:
+    for chain in structure[0]:
+        for residue1 in structure[0][chain.id]:
         # Only use real atoms, not HET or water
-        if not is_aa(residue1):
-            continue
-
-        # If the residue lacks CB (Glycine etc), create a virtual
-        if residue1.has_id('CB'):
-            c1B = residue1['CB'].get_vector()
-        else:
-            c1B = virtual_cb_vector(residue1)
-
-        j = 0
-        for residue2 in structure[0][args.chain]:
-            symm = False
-            if not is_aa(residue2):
+            if not is_aa(residue1):
                 continue
-            # print(i,j)
-            if i == j:
-                dist_mat[i, j, 0] = 0.9
-                omega_mat[i, j, 0] = 0.9
-                theta_mat[i, j, 0] = 0.9
-                phi_mat[i, j, 0] = 0.9
-                j += 1
-                continue
-
-            if i > j:
-                dist_mat[i, j] = dist_mat[j, i]
-                omega_mat[i, j] = omega_mat[j, i]
-                symm = True
+            
             # If the residue lacks CB (Glycine etc), create a virtual
-            if residue2.has_id('CB'):
-                c2B = residue2['CB'].get_vector()
+            if residue1.has_id('CB'):
+                c1B = residue1['CB'].get_vector()
             else:
-                c2B = virtual_cb_vector(residue2)
-            ###############################################
-            dist = (c2B-c1B).norm()
-
-            if dist > 20:
-                dist_mat[i, j, 0] = 0.9
-                omega_mat[i, j, 0] = 0.9
-                theta_mat[i, j, 0] = 0.9
-                phi_mat[i, j, 0] = 0.9
-            else:
-                # Dist and omega are symmetrical and have already been copied
-                if not symm:
-                    ix = np.digitize(dist, dist_bins)
-                    cum_prob = 0
-                    b_step = 0
-                    while cum_prob < cumm_cutoff:
-                        bin_prob = st.norm.cdf(b_step*-z_step) -\
-                            st.norm.cdf(-z_step*(1+b_step))
-                        dist_mat[i, j, np.min([ix+b_step, dist_num_bins])]\
-                            += bin_prob
-                        dist_mat[i, j, np.max([ix-b_step, 1])] += bin_prob
-                        cum_prob += bin_prob*2
-                        b_step += 1
-                ###############################################
-                # # Omega
-                c1A = residue1['CA'].get_vector()
-                c2A = residue2['CA'].get_vector()
-
-                if not symm:
-                    raw_omega = calc_dihedral(c1A, c1B, c2B, c2A)
-                    omega = (raw_omega*180)/pi
-
-                    ix = np.digitize(omega, omega_bins)
-                    cum_prob = 0
-                    b_step = 0
-                    while cum_prob < cumm_cutoff:
-                        bin_prob = st.norm.cdf(b_step*-angle_z_step) -\
-                            st.norm.cdf(-angle_z_step*(1+b_step))
-                        omega_mat[i, j, np.min([ix+b_step, omega_num_bins])]\
-                            += bin_prob
-                        omega_mat[i, j, np.max([ix-b_step, 1])] += bin_prob
-                        cum_prob += bin_prob*2
-                        b_step += 1
-
-                ###############################################
-                # # Theta
-                N1 = residue1['N'].get_vector()
-
-                raw_theta = calc_dihedral(N1, c1A, c1B, c2B)
-                theta = (raw_theta*180)/pi
-
-                ix = np.digitize(theta, theta_bins)
-                cum_prob = 0
-                b_step = 0
-                while cum_prob < cumm_cutoff:
-                    bin_prob = st.norm.cdf(b_step*-angle_z_step) -\
-                        st.norm.cdf(-angle_z_step*(1+b_step))
-                    theta_mat[i, j, np.min([ix+b_step, theta_num_bins])]\
-                        += bin_prob
-                    theta_mat[i, j, np.max([ix-b_step, 1])] += bin_prob
-                    cum_prob += bin_prob*2
-                    b_step += 1
-
-                ###############################################
-                # # Phi
-
-                raw_phi = calc_angle(c1A, c1B, c2B)
-                phi = (raw_phi*180)/pi
-
-                ix = np.digitize(phi, phi_bins)
-                cum_prob = 0
-                b_step = 0
-                while cum_prob < cumm_cutoff:
-                    bin_prob = st.norm.cdf(b_step*-angle_z_step) -\
-                        st.norm.cdf(-angle_z_step*(1+b_step))
-                    phi_mat[i, j, np.min([ix+b_step, phi_num_bins])]\
-                        += bin_prob
-                    phi_mat[i, j, np.max([ix-b_step, 1])] += bin_prob
-                    cum_prob += bin_prob*2
-                    b_step += 1
-            j += 1
-        i += 1
+                c1B = virtual_cb_vector(residue1)
+            
+            j = 0
+            for chain in structure[0]:
+                for residue2 in structure[0][chain.id]:
+                    symm = False
+                    if not is_aa(residue2):
+                        continue
+                    # print(i,j)
+                    if i == j:
+                        dist_mat[i, j, 0] = 0.9
+                        omega_mat[i, j, 0] = 0.9
+                        theta_mat[i, j, 0] = 0.9
+                        phi_mat[i, j, 0] = 0.9
+                        j += 1
+                        continue
+                    
+                    if i > j:
+                        dist_mat[i, j] = dist_mat[j, i]
+                        omega_mat[i, j] = omega_mat[j, i]
+                        symm = True
+                    # If the residue lacks CB (Glycine etc), create a virtual
+                    if residue2.has_id('CB'):
+                        c2B = residue2['CB'].get_vector()
+                    else:
+                        c2B = virtual_cb_vector(residue2)
+                    ###############################################
+                    dist = (c2B-c1B).norm()
+                    
+                    if dist > 20:
+                        dist_mat[i, j, 0] = 0.9
+                        omega_mat[i, j, 0] = 0.9
+                        theta_mat[i, j, 0] = 0.9
+                        phi_mat[i, j, 0] = 0.9
+                    else:
+                        # Dist and omega are symmetrical and have already been copied
+                        if not symm:
+                            ix = np.digitize(dist, dist_bins)
+                            cum_prob = 0
+                            b_step = 0
+                            while cum_prob < cumm_cutoff:
+                                bin_prob = st.norm.cdf(b_step*-z_step) -\
+                                    st.norm.cdf(-z_step*(1+b_step))
+                                dist_mat[i, j, np.min([ix+b_step, dist_num_bins])]\
+                                    += bin_prob
+                                dist_mat[i, j, np.max([ix-b_step, 1])] += bin_prob
+                                cum_prob += bin_prob*2
+                                b_step += 1
+                        ###############################################
+                        # # Omega
+                        c1A = residue1['CA'].get_vector()
+                        c2A = residue2['CA'].get_vector()
+                    
+                        if not symm:
+                            raw_omega = calc_dihedral(c1A, c1B, c2B, c2A)
+                            omega = (raw_omega*180)/pi
+                    
+                            ix = np.digitize(omega, omega_bins)
+                            cum_prob = 0
+                            b_step = 0
+                            while cum_prob < cumm_cutoff:
+                                bin_prob = st.norm.cdf(b_step*-angle_z_step) -\
+                                    st.norm.cdf(-angle_z_step*(1+b_step))
+                                omega_mat[i, j, np.min([ix+b_step, omega_num_bins])]\
+                                    += bin_prob
+                                omega_mat[i, j, np.max([ix-b_step, 1])] += bin_prob
+                                cum_prob += bin_prob*2
+                                b_step += 1
+                    
+                        ###############################################
+                        # # Theta
+                        N1 = residue1['N'].get_vector()
+                    
+                        raw_theta = calc_dihedral(N1, c1A, c1B, c2B)
+                        theta = (raw_theta*180)/pi
+                    
+                        ix = np.digitize(theta, theta_bins)
+                        cum_prob = 0
+                        b_step = 0
+                        while cum_prob < cumm_cutoff:
+                            bin_prob = st.norm.cdf(b_step*-angle_z_step) -\
+                                st.norm.cdf(-angle_z_step*(1+b_step))
+                            theta_mat[i, j, np.min([ix+b_step, theta_num_bins])]\
+                                += bin_prob
+                            theta_mat[i, j, np.max([ix-b_step, 1])] += bin_prob
+                            cum_prob += bin_prob*2
+                            b_step += 1
+                    
+                        ###############################################
+                        # # Phi
+                    
+                        raw_phi = calc_angle(c1A, c1B, c2B)
+                        phi = (raw_phi*180)/pi
+                    
+                        ix = np.digitize(phi, phi_bins)
+                        cum_prob = 0
+                        b_step = 0
+                        while cum_prob < cumm_cutoff:
+                            bin_prob = st.norm.cdf(b_step*-angle_z_step) -\
+                                st.norm.cdf(-angle_z_step*(1+b_step))
+                            phi_mat[i, j, np.min([ix+b_step, phi_num_bins])]\
+                                += bin_prob
+                            phi_mat[i, j, np.max([ix-b_step, 1])] += bin_prob
+                            cum_prob += bin_prob*2
+                            b_step += 1
+                    j += 1
+            i += 1
 
     np.savez_compressed(args.npz_name,
                         dist=dist_mat,
