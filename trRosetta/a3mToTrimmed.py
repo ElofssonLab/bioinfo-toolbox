@@ -81,11 +81,17 @@ for l in infile:
         if (frac<(1-cutoff)):
             #        if re.search("[A-Z]",new):
             #sys.stdout.write(upperseq)
-            sys.stdout.write(seqname)
+            try:
+                sys.stdout.write(seqname)
+            except (BrokenPipeError, IOError):
+                pass                
             if dompos>0:
                 sys.stdout.write(new[:dompos]+args.sepseq+new[dompos:])
             else:
-                sys.stdout.write(new)
+                try:
+                    sys.stdout.write(new)
+                except (BrokenPipeError, IOError):
+                    pass                
     elif '>' in l and counter == 0:
         if args.name:
             #sys.stdout.write(">"+args.name+" "+l+"\n")
@@ -98,5 +104,8 @@ for l in infile:
             seqname='>target/1-100\n'
 
         counter += 1
-            
-sys.stdout.write('\n')
+
+try:
+    sys.stdout.write('\n')
+except (BrokenPipeError, IOError):
+    pass                
