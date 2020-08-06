@@ -13,7 +13,7 @@ from Bio.PDB import *
 p = argparse.ArgumentParser(description = '- plotting trRosetta maps-',
                             formatter_class=RawTextHelpFormatter)
 p.add_argument('-data','--input','-i', required= True, help='Input trRossetta NPZ file')
-p.add_argument('-dataB','--inputB','-j', required= False, help='Input second trRossetta NPZ file fot instance for reversed order merged files')
+p.add_argument('-dataB','--inputB','-j', required= False, help='Input second trRossetta NPZ file (for instance for reversed order merged files)')
 p.add_argument('-pdb','--pdb','-p', required= False, help='Pdb file for analysis od distances')
 p.add_argument('-dom','--domain','-d', required= False, help='positions of domain borders', nargs='+')
 p.add_argument('-seq','--sequence','-s', required= False, help='sequence file to identify domain baorders')
@@ -90,7 +90,9 @@ if ns.sequence:
             ns.domain+=[i]
 
     seplen=len(sepseq)
-            
+
+if (len(borders))==0: seplen=0
+
 # If we have two inputs put one at each diagonal but             
 if ns.inputB:
     input_fileB = np.load(ns.inputB)
@@ -294,11 +296,11 @@ if (ns.sequence):
 
 if (ns.pdb): 
     for x in range(0,6):
-        print (x,z[x])
-        average[x]=average[x]/z[x]
-        averagedist[x]=average[x]/z[x]
-        fractionprob+=[numprob[x]/z[x]]
-        Z=np.sqrt(z[x])
+        #print (x,z[x])
+        average[x]=average[x]/(z[x]+1.e-20)
+        averagedist[x]=average[x]/(z[x]+1.e-20)
+        fractionprob+=[numprob[x]/(z[x]+1.e-20)]
+        Z=np.sqrt(z[x]+1.e-20)
         fractionshortcontacts+=[numshortcontacts[x]/Z]
         fractionlongcontacts+=[numlongcontacts[x]/Z]
         fractionmedcontacts+=[nummedcontacts[x]/Z]
