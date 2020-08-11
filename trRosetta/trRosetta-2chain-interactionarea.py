@@ -25,8 +25,11 @@ def main():
 
     # get command line arguments
     args = get_args(params)
-    print(args)
-
+    #print(args)
+    #print (params)
+    params["interchain"]=args.interchain
+    #print (params["interchain"])
+    #sys.exit()
     # init PyRosetta
     init('-hb_cen_soft -relax:default_repeats 5 -default_max_cycles 200 -out:level 100')
 
@@ -48,7 +51,8 @@ def main():
     rst = gen_rst(npz,tmpdir,params)
     #print (args.minprob)
     #sys.exit()
-    #add_intrachain_rst(npz,rst,tmpdir,params,minprob=args.minprob,UB=args.intradist,D=args.intrasd,allcontacts=args.allcontacts) # Adding a weak flat harmonic to bring things together. 
+    #add_intrachain_rst(npz,rst,tmpdir,params,minprob=args.minprob,UB=args.intradist,D=args.intrasd,allcontacts=args.allcontacts) # Adding a weak flat harmonic to bring things together.
+    #add_interacton_areas_rst(npz,rst,tmpdir,params,minprob=args.minprob,UB=args.intradist,D=args.intrasd,allcontacts=args.allcontacts) # Adding a weak flat harmonic to bring things together. 
     seq_polyala = 'A'*len(seq1+seq2) # Is this used ?
 
     #print (rst)
@@ -111,7 +115,8 @@ def main():
     # minimization
     ########################################################
 
-    params["interchain"]=False
+    
+    #params["interchain"]=False
     
     if args.mode == 0:
         
@@ -163,18 +168,17 @@ def main():
 
     #pose.dump_pdb("intraoptimized.pdb")
 
-    ## Now we add the interchain contacts
-
-
-    add_intrachain_rst(npz,rst,tmpdir,params,minprob=args.minprob,UB=args.intradist,D=args.intrasd,allcontacts=args.allcontacts)
+    #params["interchain"]=False
+    #add_rst_chain2(pose, rst, 1, len(seq), params)
+    #add_intrachain_rst(npz,rst,tmpdir,params,minprob=args.minprob,UB=args.intradist,D=args.intrasd,allcontacts=args.allcontacts)
+    add_interacton_areas_rst(npz,rst,tmpdir,params,minprob=args.minprob,UB=args.intradist,D=args.intrasd,allcontacts=args.allcontacts) # Adding a weak flat harmonic to bring things together. 
     add_intra_rst(pose, rst, 1, len(seq), params)
-    #pert_mover = RigidBodyPerturbMover(jump_num, 3,8 )
-    repeat_mover.apply(pose)
+    #repeat_mover.apply(pose)
     min_mover_cart.apply(pose)
     remove_clash(sf_vdw, min_mover1, pose)
 
 
-    # Adding a weak flat harmonic to bring things together. 
+    ## Now we add the interchaion contacts
     #    
     #mmap = MoveMap()
     #mmap.set_bb(False)
@@ -183,7 +187,7 @@ def main():
     #mmap.set_branches(False)
     #mmap.set_jump(1, True)
     #
-    ## Mover from rigid body docking
+    ## Mover from rigit body docking
     ##pert_mover = RigidBodyPerturbMover(jump_num, 3,8 )
     #
     #params["interchain"]=True

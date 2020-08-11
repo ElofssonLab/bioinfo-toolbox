@@ -46,9 +46,7 @@ def main():
     params["seqlen2"]=len(seq2)
     params["seqlen"]=len(seq)
     rst = gen_rst(npz,tmpdir,params)
-    #print (args.minprob)
-    #sys.exit()
-    #add_intrachain_rst(npz,rst,tmpdir,params,minprob=args.minprob,UB=args.intradist,D=args.intrasd,allcontacts=args.allcontacts) # Adding a weak flat harmonic to bring things together. 
+    add_intrachain_rst(npz,rst,tmpdir,params,minprob=0) # Adding a weak flat harmonic to bring things together. 
     seq_polyala = 'A'*len(seq1+seq2) # Is this used ?
 
     #print (rst)
@@ -105,13 +103,13 @@ def main():
 
     set_random_dihedral(pose)
     remove_clash(sf_vdw, min_mover_vdw, pose)
-    #pose.dump_pdb("starting.pdb")
+    pose.dump_pdb("starting.pdb")
 
     ########################################################  
     # minimization
     ########################################################
 
-    params["interchain"]=False
+    params["interchain"]=True
     
     if args.mode == 0:
         
@@ -161,20 +159,9 @@ def main():
         min_mover_cart.apply(pose)
         remove_clash(sf_vdw, min_mover1, pose)
 
-    #pose.dump_pdb("intraoptimized.pdb")
+    pose.dump_pdb("intraoptimized.pdb")
 
-    ## Now we add the interchain contacts
-
-
-    add_intrachain_rst(npz,rst,tmpdir,params,minprob=args.minprob,UB=args.intradist,D=args.intrasd,allcontacts=args.allcontacts)
-    add_intra_rst(pose, rst, 1, len(seq), params)
-    #pert_mover = RigidBodyPerturbMover(jump_num, 3,8 )
-    repeat_mover.apply(pose)
-    min_mover_cart.apply(pose)
-    remove_clash(sf_vdw, min_mover1, pose)
-
-
-    # Adding a weak flat harmonic to bring things together. 
+    ## Now we add the interchaion contacts
     #    
     #mmap = MoveMap()
     #mmap.set_bb(False)
@@ -183,7 +170,7 @@ def main():
     #mmap.set_branches(False)
     #mmap.set_jump(1, True)
     #
-    ## Mover from rigid body docking
+    ## Mover from rigit body docking
     ##pert_mover = RigidBodyPerturbMover(jump_num, 3,8 )
     #
     #params["interchain"]=True
@@ -206,7 +193,7 @@ def main():
             mutator.apply(pose)
             print('mutation: A%dG'%(i+1))
 
-    #pose.dump_pdb("interoptimized.pdb")
+    pose.dump_pdb("interoptimized.pdb")
     ########################################################
     # full-atom refinement
     ########################################################
