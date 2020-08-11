@@ -84,14 +84,17 @@ for l in infile:
             try:
                 sys.stdout.write(seqname)
             except (BrokenPipeError, IOError):
-                pass                
+                sys.exit()
             if dompos>0:
-                sys.stdout.write(new[:dompos]+args.sepseq+new[dompos:])
+                try:
+                    sys.stdout.write(new[:dompos]+args.sepseq+new[dompos:])
+                except (BrokenPipeError, IOError):
+                    sys.exit()
             else:
                 try:
                     sys.stdout.write(new)
                 except (BrokenPipeError, IOError):
-                    pass                
+                    sys.exit()
     elif '>' in l and counter == 0:
         if args.name:
             #sys.stdout.write(">"+args.name+" "+l+"\n")
@@ -108,4 +111,4 @@ for l in infile:
 try:
     sys.stdout.write('\n')
 except (BrokenPipeError, IOError):
-    pass                
+    sys.exit()
