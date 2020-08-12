@@ -1,6 +1,7 @@
 #!/bin/bash 
 
-code=`basename $1 _FSA.txt | sed s/output_//g`
+test=`echo $1 | sed "s/.nohomology//g"`
+code=`basename ${test} _FSA.txt | sed s/output_//g`
 
 echo ${code} , $1
 for i in 1 2 3 4 5 6 7 8 9 10
