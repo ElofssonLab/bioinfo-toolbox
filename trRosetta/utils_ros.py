@@ -3,7 +3,7 @@ import random
 from pyrosetta import *
 
 
-def add_intrachain_rst(npz,rst,tmpdir,params,minprob=0.5,LB=1,UB=15,D=20,WD=-100,WB=0,allcontacts=False):
+def add_intrachain_rst(npz,rst,tmpdir,params,minprob=0.5,LB=1,UB=15,D=20,WD=1000,WB=50,allcontacts=False):
     ########################################################
     # Distance restraints to keep the two chains together
     ########################################################
@@ -19,7 +19,7 @@ def add_intrachain_rst(npz,rst,tmpdir,params,minprob=0.5,LB=1,UB=15,D=20,WD=-100
                     # UB is upper bound
                     # WD is
                     # WB
-                    f.write('HARM'+'\t%.3f\t%.3f'%(UB,D)+'\n')
+                    f.write('INTRACHAIN'+'\t%.3f\t%.3f'%(UB,D)+'\n')
                     #f.write('y_axis'+'\t%.3f'%stuple(dist[a,b])+'\n')
                     #f.close()
                 #rst_line = 'AtomPair %s %d %s %d FADE %.5f %.5f %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,LB,UB,D,WD,WB)
@@ -33,7 +33,7 @@ def add_intrachain_rst(npz,rst,tmpdir,params,minprob=0.5,LB=1,UB=15,D=20,WD=-100
                 #  inserted.
                   
                 rst_line = 'AtomPair %s %d %s %d FLAT_HARMONIC  %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,0,D,UB)
-                rst['harm'].append([i,j,1.0,rst_line]) # Change file?
+                rst['intrachain'].append([i,j,1.0,rst_line]) # Change file?
             elif (allcontacts):
                 name=tmpdir.name+"/%d.%d-harm2.txt"%(i+1,j+1)
                 with open(name, "w") as f:
@@ -56,9 +56,73 @@ def add_intrachain_rst(npz,rst,tmpdir,params,minprob=0.5,LB=1,UB=15,D=20,WD=-100
                 #  inserted.
                 # BOUNDED lb ub sd rswitch tag
                 # rst_line = 'AtomPair %s %d %s %d BOUNDED  %.5f %.5f %.5f %.5f %s '%('CB',i+1,'CB',j+1,0,UB*2,D,0.5,"Bounded")
-                rst_line = 'AtomPair %s %d %s %d FLAT_HARMONIC  %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,0,D*100,UB*2.5)
-                rst['harm'].append([i,j,1.0,rst_line]) 
-    print("Flat harmonic restraints:  %d"%(len(rst['harm'])))
+                rst_line = 'AtomPair %s %d %s %d FLAT_HARMONIC  %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,0,WD,WB)
+                rst['intrachain'].append([i,j,1.0,rst_line]) 
+    print("Flat harmonic restraints:  %d"%(len(rst['intrachain'])))
+        
+def add_interacton_areas_rst(npz,rst,tmpdir,params,minprob=0.5,UB=30,D=30,WD=1000,WB=50,allcontacts=False):
+    ########################################################
+    # Distance restraints to keep the two chains together - using predicted interaction residues
+    ########################################################
+    dist,omega,theta,phi = npz['dist'],npz['omega'],npz['theta'],npz['phi']
+    prob = np.sum(dist[:,:,5:], axis=-1)
+    list_i=np.zeros((params["seqlen1"]))
+    list_j=np.zeros((params["seqlen1"]+params["seqlen2"]))
+    for i in range(params["seqlen1"]):
+        for j in range(params["seqlen1"]+1,params["seqlen2"]+params["seqlen1"]):
+            # We should limit ourself to constrains that have a probablitu
+            if (prob[i,j]>minprob):
+                #print (i,j,prob[i,j])
+                list_i[i]+=1
+                list_j[j]+=1
+    for i in range(params["seqlen1"]):
+        for j in range(params["seqlen1"]+1,params["seqlen2"]+params["seqlen1"]):
+            if (list_i[i]>0 and list_j[j]>0):
+
+                name=tmpdir.name+"/%d.%d-harm.txt"%(i+1,j+1)
+                with open(name, "w") as f:
+                    # LB is Lower Bound
+                    # UB is upper bound
+                    # WD is
+                    # WB
+                    f.write('INTRACHAIN'+'\t%.3f\t%.3f'%(UB,D)+'\n')
+                  
+                #     f(x) = weight * limit^2 * ( 1 - e^( -(x-x0)^2/limit^2 ) )
+                #W=10
+                #D=8
+                #UB=12
+                
+                rst_line = 'AtomPair %s %d %s %d FLAT_HARMONIC  %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,0,D,UB)
+                #rst_line = 'AtomPair %s %d %s %d TOPOUT  %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,10,8,12)
+                #print (rst_line)
+                rst['intrachain'].append([i,j,1.0,rst_line]) # Change file?
+            elif (allcontacts):
+                name=tmpdir.name+"/%d.%d-harm2.txt"%(i+1,j+1)
+                with open(name, "w") as f:
+                    # LB is Lower Bound
+                    # UB is upper bound
+                    # WD is
+                    # WB
+                    f.write('HARM2'+'\t%.3f\t%.3f'%(UB,D)+'\n')
+                    # f.write('FADE'+'\t%.3f\t%.3f\t%.3f\t%.3f'%(LB,UB,D,WB)+'\n')
+                    #f.write('y_axis'+'\t%.3f'%stuple(dist[a,b])+'\n')
+                    #f.close()
+                #rst_line = 'AtomPair %s %d %s %d FADE %.5f %.5f %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,LB,UB,D,WD,WB)
+                #
+                #FLAT_HARMONIC x0 sd tol
+
+                #  Zero in the range of x0 - tol to x0 + tol. Harmonic
+                #  with width parameter sd outside that
+                #  range. Basically, a HARMONIC potential (see above)
+                #  split at x0 with a 2*tol length region of zero
+                #  inserted.
+                # BOUNDED lb ub sd rswitch tag
+                # rst_line = 'AtomPair %s %d %s %d BOUNDED  %.5f %.5f %.5f %.5f %s '%('CB',i+1,'CB',j+1,0,UB*2,D,0.5,"Bounded")
+                # Using default from 
+                rst_line = 'AtomPair %s %d %s %d FLAT_HARMONIC  %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,0,WD,WB)
+                #print (rst_line)
+                rst['intrachain'].append([i,j,1.0,rst_line]) 
+    print("Intrachain attraction restraints:  %d"%(len(rst['intrachain'])))
         
         
 def gen_rst(npz, tmpdir, params):
@@ -66,7 +130,7 @@ def gen_rst(npz, tmpdir, params):
     dist,omega,theta,phi = npz['dist'],npz['omega'],npz['theta'],npz['phi']
 
     # dictionary to store Rosetta restraints
-    rst = {'dist' : [], 'omega' : [], 'theta' : [], 'phi' : [], 'rep' : [], 'harm' : []}
+    rst = {'dist' : [], 'omega' : [], 'theta' : [], 'phi' : [], 'rep' : [], 'intrachain' : []}
 
     ########################################################
     # assign parameters
@@ -276,9 +340,9 @@ def add_rst_chain2(pose, rst, sep1, sep2, params, nogly=False):
     array=[]
 
     if nogly==True:
+        array += [line for a,b,p,line in rst['intrachain'] if seq[b]!='G' and seq[a]!='G' and seq[b]!='G' and p>=pcut]
         if inter:
             array += [line for a,b,p,line in rst['dist'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and seq[a]!='G' and seq[b]!='G' and p>=pcut]
-            array += [line for a,b,p,line in rst['harm'] if seq[b]!='G' and seq[a]!='G' and seq[b]!='G' and p>=pcut]
             if params['USE_ORIENT'] == True:
                 array += [line for a,b,p,line in rst['omega'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and seq[a]!='G' and seq[b]!='G' and p>=pcut+0.5] #0.5
                 array += [line for a,b,p,line in rst['theta'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and seq[a]!='G' and seq[b]!='G' and p>=pcut+0.5] #0.5
@@ -290,9 +354,9 @@ def add_rst_chain2(pose, rst, sep1, sep2, params, nogly=False):
                 array += [line for a,b,p,line in rst['theta'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and seq[a]!='G' and seq[b]!='G' and p>=pcut+0.5  and np.sign(a-seqlen)==np.sign(b-seqlen) ] #0.5
                 array += [line for a,b,p,line in rst['phi'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and seq[a]!='G' and seq[b]!='G' and p>=pcut+0.6 and np.sign(a-seqlen)==np.sign(b-seqlen) ] #0.6
     else:
+        array += [line for a,b,p,line in rst['intrachain'] if  p>=pcut]
         if inter:
             array += [line for a,b,p,line in rst['dist']  if abs(a-b)>=sep1 and abs(a-b)<sep2 and p>=pcut ]
-            array += [line for a,b,p,line in rst['harm'] if  p>=pcut]
             if params['USE_ORIENT'] == True:
                 array += [line for a,b,p,line in rst['omega'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and p>=pcut+0.5]
                 array += [line for a,b,p,line in rst['theta'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and p>=pcut+0.5]
@@ -303,6 +367,53 @@ def add_rst_chain2(pose, rst, sep1, sep2, params, nogly=False):
                 array += [line for a,b,p,line in rst['omega'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and p>=pcut+0.5  and np.sign(a-seqlen)==np.sign(b-seqlen)  ]
                 array += [line for a,b,p,line in rst['theta'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and p>=pcut+0.5 and np.sign(a-seqlen)==np.sign(b-seqlen) ]
                 array += [line for a,b,p,line in rst['phi'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and p>=pcut+0.6 and np.sign(a-seqlen)==np.sign(b-seqlen) ] #0.6
+
+
+
+    if len(array) < 1:
+        return
+
+    random.shuffle(array)
+
+    # save to file
+    tmpname = params['TDIR']+'/minimize.cst'
+    with open(tmpname,'w') as f:
+        for line in array:
+            f.write(line+'\n')
+        f.close()
+
+    # add to pose
+    constraints = rosetta.protocols.constraint_movers.ConstraintSetMover()
+    constraints.constraint_file(tmpname)
+    constraints.add_constraints(True)
+    #print (pose,tmpname)
+    constraints.apply(pose)
+
+    os.remove(tmpname)
+
+def add_intra_rst(pose, rst, sep1, sep2, params, nogly=False):
+
+    pcut=params['PCUT']
+    seq = params['seq']
+    seqlen=params['seqlen1']
+    inter=params['interchain'] # THis can be "
+    
+    array=[]
+
+    if nogly==True:
+        array += [line for a,b,p,line in rst['intrachain'] if seq[b]!='G' and seq[a]!='G' and seq[b]!='G' and p>=pcut]
+        array += [line for a,b,p,line in rst['dist'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and seq[a]!='G' and seq[b]!='G' and p>=pcut  and np.sign(a-seqlen)==np.sign(b-seqlen) ] #0.5
+        if params['USE_ORIENT'] == True:
+            array += [line for a,b,p,line in rst['omega'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and seq[a]!='G' and seq[b]!='G' and p>=pcut+0.5  and np.sign(a-seqlen)!=np.sign(b-seqlen) ] #0.5
+            array += [line for a,b,p,line in rst['theta'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and seq[a]!='G' and seq[b]!='G' and p>=pcut+0.5  and np.sign(a-seqlen)!=np.sign(b-seqlen) ] #0.5
+            array += [line for a,b,p,line in rst['phi'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and seq[a]!='G' and seq[b]!='G' and p>=pcut+0.6 and np.sign(a-seqlen)!=np.sign(b-seqlen) ] #0.6
+    else:
+        array += [line for a,b,p,line in rst['intrachain'] if  p>=pcut]
+        array += [line for a,b,p,line in rst['dist'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and p>=pcut  and np.sign(a-seqlen)!=np.sign(b-seqlen)  ]
+        if params['USE_ORIENT'] == True:
+            array += [line for a,b,p,line in rst['omega'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and p>=pcut+0.5  and np.sign(a-seqlen)!=np.sign(b-seqlen)  ]
+            array += [line for a,b,p,line in rst['theta'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and p>=pcut+0.5 and np.sign(a-seqlen)!=np.sign(b-seqlen) ]
+            array += [line for a,b,p,line in rst['phi'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and p>=pcut+0.6 and np.sign(a-seqlen)!=np.sign(b-seqlen) ] #0.6
 
 
 
