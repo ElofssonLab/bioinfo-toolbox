@@ -5,7 +5,7 @@ from Bio.PDB.Polypeptide import is_aa
 from math import pi
 import numpy as np
 import scipy.stats as st
-
+import pandas as pd
 
 def virtual_cb_vector(residue):
     # get atom coordinates as vectors
@@ -29,39 +29,65 @@ if __name__ == "__main__":
         ArgumentParser(
                 description="Convert a pdb/mcif to trRosetta distances/angles")
 
-    in_group = arg_parser.add_mutually_exclusive_group(required=True)
-    in_group.add_argument("-p", "--pdb_file", type=argparse.FileType('r'))
-    in_group.add_argument("-m", "--mmCIF_file", type=argparse.FileType('r'))
+    #in_group = arg_parser.add_mutually_exclusive_group(required=True)
+    #in_group.add_argument("-p", "--pdb_file", type=argparse.FileType('r'))
+    #in_group.add_argument("-m", "--mmCIF_file", type=argparse.FileType('r'))
 
+    arg_parser.add_argument("pdbA", type=str)
+    arg_parser.add_argument("pdbB", type=str)
+    arg_parser.add_argument("ispredA", type=str)
+    arg_parser.add_argument("ispredB", type=str)
     arg_parser.add_argument("npz_name", type=str)
     #arg_parser.add_argument("-c", "--chain", type=str, default='A')
     # arg_parser.add_argument("-s", "--std", default=1, type=float,
     #                         help="Standard deviation in Ångström")
     args = arg_parser.parse_args()
     std = 1
+    ispredA=pd.read_csv(args.ispredA,sep="\t",header=None)
+    ispredB=pd.read_csv(args.ispredA,sep="\t",header=None)
+    print (ispredA[5],ispredB[5])
+    #sys.exit()
+    #if args.pdb_file:
+    from Bio.PDB.PDBParser import PDBParser
+    bio_parser = PDBParser(PERMISSIVE=1)
+    structure_fileA = args.pdbA
+    structure_idA = args.pdbA[:-4]
+    structure_fileB = args.pdbB
+    structure_idB = args.pdbB[:-4]
+    #else:
+    #    from Bio.PDB.MMCIFParser import MMCIFParser
+    #    bio_parser = MMCIFParser()
+    #    structure_file = args.mmCIF_file
+    #    structure_id = args.mmCIF_file.name[:-4]
 
-    if args.pdb_file:
-        from Bio.PDB.PDBParser import PDBParser
-        bio_parser = PDBParser(PERMISSIVE=1)
-        structure_file = args.pdb_file
-        structure_id = args.pdb_file.name[:-4]
-    else:
-        from Bio.PDB.MMCIFParser import MMCIFParser
-        bio_parser = MMCIFParser()
-        structure_file = args.mmCIF_file
-        structure_id = args.mmCIF_file.name[:-4]
+    # Load structures
+    structureA = bio_parser.get_structure(structure_idA, structure_fileA)
+    structureB = bio_parser.get_structure(structure_idB, structure_fileB)
 
-    # Load structure
-    structure = bio_parser.get_structure(structure_id, structure_file)
-
-    # Get residues and length of protein
-    residues = []
-    for chain in structure[0]:
-        for residue1 in structure[0][chain.id]:
+    # Get residues and length of proteins
+    residuesA = []
+    for chain in structureA[0]:
+        for residue1 in structureA[0][chain.id]:
             if not is_aa(residue1):
                 continue
-            residues.append(residue1.get_resname())
-    plen = len(residues)
+            residuesA.append(residue1.get_resname())
+    seqlenA = len(residuesA)
+    residuesB = []
+    for chain in structureB[0]:
+        for residue1 in structureB[0][chain.id]:
+            if not is_aa(residue1):
+                continue
+            residuesB.append(residue1.get_resname())
+    seqlenB = len(residuesB)
+
+    dist_rst=np.array([0.249,
+                                0.,0.,0.,0.,0.,0.,
+                                0.,0.,0.,0.,0.,0.03,
+                                0.03,0.03,0.03,0.03,0.03,0.03,
+                                0.03,0.03,0.03,0.03,0.03,0.03,
+                                0.03,0.03,0.03,0.03,0.03,0.03,
+                                0.03,0.03,0.03,0.03,0.03,0.03
+    ],dtype=np.float32)
 
     # Setup bins and step for the final matrix
     DIST_STEP = 0.5
@@ -73,6 +99,7 @@ if __name__ == "__main__":
     z_step = z_per_bin/2
     angle_z_step = 1
 
+    plen=seqlenA+seqlenB
     minvalue = 0.1
     dist_wanted_bins = (20 - 2)/DIST_STEP
     omega_wanted_bins = 360/OMEGA_STEP
@@ -105,7 +132,13 @@ if __name__ == "__main__":
     # Iterate over all residues and calculate distances
     i = 0
     j = 0
-    for chain in structure[0]:
+
+    structure=structureA
+    for chain in structureB[0]:
+        chain.id = 'X'
+        structure[0].add(chain)
+    
+    for chain in structure[0]: # We assume only one chain
         for residue1 in structure[0][chain.id]:
         # Only use real atoms, not HET or water
             if not is_aa(residue1):
@@ -144,7 +177,7 @@ if __name__ == "__main__":
                     ###############################################
                     dist = (c2B-c1B).norm()
                     
-                    if dist > 20:
+                    if dist > 20 or np.sign(i-seqlenA)!=np.sign(j-seqlenA):
                         dist_mat[i, j, 0] = 0.9
                         omega_mat[i, j, 0] = 0.9
                         theta_mat[i, j, 0] = 0.9
@@ -223,8 +256,17 @@ if __name__ == "__main__":
                     j += 1
             i += 1
 
+
+    # set all predicted surface residue pairs to be 12A apart
+    for i in range(seqlenA):
+        for j in range(seqlenB):
+            if (ispredA[5][i]=="I"  and ispredB[5][j]=="I"   ):
+                dist_mat[i, j+seqlenA] = dist_rst
+                dist_mat[j+seqlenA,i] = dist_rst
+
     np.savez_compressed(args.npz_name,
                         dist=dist_mat,
                         omega=omega_mat,
                         theta=theta_mat,
                         phi=phi_mat)
+    

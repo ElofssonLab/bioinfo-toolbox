@@ -229,9 +229,9 @@ def sample_docking(pdb_filename, partners,
     ####    a novel protocol may only require centroid (DockingLowRes) or
     ####    fullatom (DockingHighRes), uncomment the lines below and their
     ####    application below
-    #docking_low = DockingLowRes()
-    #docking_low.set_movable_jumps(Vector1([1]))
-    #docking_low.set_scorefxn(scorefxn_low)
+    docking_low = DockingLowRes()
+    docking_low.set_movable_jumps(Vector1([1]))
+    docking_low.set_scorefxn(scorefxn_low)
     #docking_high = DockingHighRes()
     #docking_high.set_movable_jumps(Vector1([1]))
     #docking_high.set_scorefxn(scorefxn_high)
