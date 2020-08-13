@@ -109,7 +109,7 @@ def main():
     dock_jump=1
     dock_pert = RigidBodyPerturbMover(dock_jump, translation, rotation)
     spin = RigidBodySpinMover(dock_jump)
-    #slide_into_contact = DockingSlideIntoContact(dock_jump)
+    slide_into_contact = DockingSlideIntoContact(dock_jump)
     
     movemap_docking = MoveMap()
     movemap_docking.set_jump(dock_jump, True)
@@ -137,6 +137,16 @@ def main():
     # The order of these two commands matters, to make the proteins separated or not        
     set_random_dihedral(pose)
     setup_foldtree(pose, partners, Vector1([dock_jump]))
+
+    # Just to ensure that the two proteins starts separated.
+    mindist=100
+    #print ("Rotation 1: ",pose.jump(dock_jump).get_rotation())
+    print ("Translation 1: ",pose.jump(dock_jump).get_translation())
+    if sum(pose.jump(dock_jump).get_translation()) < mindist:
+        initial_mover = RigidBodyPerturbMover(dock_jump, 0, 2*mindist)
+        #print ("Rotation 1b: ",pose.jump(dock_jump).get_rotation())
+        print ("Translation 1b: ",pose.jump(dock_jump).get_translation())
+        
     remove_clash(sf_vdw, min_mover_vdw, pose)
     if args.saveintermediate:
         pose.dump_pdb(args.OUT+"-starting.pdb")
@@ -166,7 +176,7 @@ def main():
     
     # Flags (lets use new that overrides some old ones)
     #
-    #if args.initialmode == A: # No concatcs
+    #if args.initialmode == A: # No harmonic intrachanin attraction
     #    params["interchain"]=True
     if args.initialmode == "B": # (Default)
         #params["interchain"]=True
@@ -227,6 +237,9 @@ def main():
         repeat_mover.apply(pose)
         min_mover_cart.apply(pose)
         remove_clash(sf_vdw, min_mover1, pose)
+
+    #print ("Rotation 2: ",pose.jump(dock_jump).get_rotation())
+    print ("Translation 2: ",pose.jump(dock_jump).get_translation())
 
     if args.saveintermediate:
         pose.dump_pdb(args.OUT+"-step1.pdb")
@@ -300,17 +313,17 @@ def main():
     #params["interchain"]=False
     #add_rst_chain2(pose, rst, 1, len(seq), params)
     #add_intrachain_rst(npz,rst,tmpdir,params,minprob=args.minprob,UB=args.intradist,D=args.intrasd,allcontacts=args.allcontacts)
-    add_interacton_areas_rst(npz,rst,tmpdir,params,minprob=args.minprob,UB=args.intradist,D=args.intrasd,allcontacts=args.allcontacts) # Adding a weak flat harmonic to bring things together. 
-    add_intra_rst(pose, rst, 1, len(seq), params)
+    #add_interacton_areas_rst(npz,rst,tmpdir,params,minprob=args.minprob,UB=args.intradist,D=args.intrasd,allcontacts=args.allcontacts) # Adding a weak flat harmonic to bring things together. 
+    #add_intra_rst(pose, rst, 1, len(seq), params)
     #repeat_mover.apply(pose)
 
 
     # Sometimes we need to add the intra restraints again
-    if args.initialmode == A: # Should we also add it for "D"
+    if args.initialmode == "A": # Should we also add it for "D"
         add_intra_rst(pose, rst, 1, len(seq), params)
 
-    #  Dockmode "A" is no docking  (# in principle we could try all modes at the same time
-    if "B" in args.dockmode: # default protocol
+    #  Dockingmode "A" is no docking  (# in principle we could try all modes at the same time
+    if "B" in args.dockingmode: # default protocol
         dock_pose=Pose()
         dock_pose.assign(pose)
         min_mover_cart.apply(dock_pose)
@@ -320,7 +333,9 @@ def main():
         if args.saveintermediate:
             dock_pose.dump_pdb(args.OUT+"-dockB2.pdb")
             #pose.dump_pdb("intraoptimized.pdb")
-    if "C" in args.dockmode: # Docking protocol using minmover
+        print ("Rotation 3B: ",pose.jump(dock_jump).get_rotation())
+        print ("Translation 3B: ",pose.jump(dock_jump).get_translation())
+    if "C" in args.dockingmode: # Docking protocol using minmover
         dock_pose=Pose()
         dock_pose.assign(pose)
         repeat_dock.apply(dock_pose)
@@ -329,7 +344,9 @@ def main():
         remove_clash(sf_vdw, min_mover1, dock_pose)
         if args.saveintermediate:
             dock_pose.dump_pdb(args.OUT+"-dockC2.pdb")
-    if "D" in args.dockmode: # Docking protocol using minmover
+        print ("Rotation 3C: ",pose.jump(dock_jump).get_rotation())
+        print ("Translation 3C: ",pose.jump(dock_jump).get_translation())
+    if "D" in args.dockingmode: # Docking protocol using minmover
         dock_pose=Pose()
         dock_pose.assign(pose)
         dock_prot.apply(dock_pose)
@@ -338,6 +355,8 @@ def main():
         remove_clash(sf_vdw, min_mover1, pose)
         if args.saveintermediate:
             dock_pose.dump_pdb(args.OUT+"-dockD2.pdb")
+        print ("Rotation 3D: ",pose.jump(dock_jump).get_rotation())
+        print ("Translation 3D: ",pose.jump(dock_jump).get_translation())
 
 
         

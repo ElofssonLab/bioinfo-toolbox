@@ -130,12 +130,12 @@ repeat_mover = RepeatMover(min_mover, 3)
 
 scorefxn_docking_low = create_score_function('interchain_cen')
 scorefxn_low_min = create_score_function('interchain_cen', 'docking_min')
+dock_jump=1
 
 translation=3.0
 rotation = 8.0
 dock_pert = RigidBodyPerturbMover(dock_jump, translation, rotation)
 spin = RigidBodySpinMover(dock_jump)
-dock_jump=1
 slide_into_contact = DockingSlideIntoContact(dock_jump)
 
 movemap_docking = MoveMap()
@@ -157,6 +157,8 @@ append_pose_to_pose(pose,pose2)
 partners="A_B"
 dock_jump=1
 
+pert_mover = RigidBodyPerturbMover(jump_num, 0, 200)
+
 # mutate GLY to ALA
 for i,a in enumerate(seq):
     if a == 'G':
@@ -168,8 +170,11 @@ for i,a in enumerate(seq):
 set_random_dihedral(pose)
 setup_foldtree(pose, partners, Vector1([dock_jump]))
 
-    
+jump_num = 1
+print (pose.jump(jump_num).get_rotation())
+print (pose.jump(jump_num).get_translation())
 remove_clash(sf_vdw, min_mover_vdw, pose)
+
 pose.dump_pdb("starting.pdb")
 
 ########################################################  
@@ -197,6 +202,8 @@ add_rst_chain2(pose, rst, 1, len(seq), params)
 repeat_mover.apply(pose)
 min_mover_cart.apply(pose)
 remove_clash(sf_vdw, min_mover1, pose)
+
+
 
 pose.dump_pdb("step1.pdb")
 
