@@ -456,3 +456,44 @@ def add_intra_rst(pose, rst, sep1, sep2, params, nogly=False):
 
     os.remove(tmpname)
 
+def add_rst(pose, rst, sep1, sep2, params, nogly=False):
+
+    pcut=params['PCUT']
+    seq = params['seq']
+
+    array=[]
+
+    if nogly==True:
+        array += [line for a,b,p,line in rst['dist'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and seq[a]!='G' and seq[b]!='G' and p>=pcut]
+        if params['USE_ORIENT'] == True:
+            array += [line for a,b,p,line in rst['omega'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and seq[a]!='G' and seq[b]!='G' and p>=pcut+0.5] #0.5
+            array += [line for a,b,p,line in rst['theta'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and seq[a]!='G' and seq[b]!='G' and p>=pcut+0.5] #0.5
+            array += [line for a,b,p,line in rst['phi'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and seq[a]!='G' and seq[b]!='G' and p>=pcut+0.6] #0.6
+    else:
+        array += [line for a,b,p,line in rst['dist'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and p>=pcut]
+        if params['USE_ORIENT'] == True:
+            array += [line for a,b,p,line in rst['omega'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and p>=pcut+0.5]
+            array += [line for a,b,p,line in rst['theta'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and p>=pcut+0.5]
+            array += [line for a,b,p,line in rst['phi'] if abs(a-b)>=sep1 and abs(a-b)<sep2 and p>=pcut+0.6] #0.6
+
+
+    if len(array) < 1:
+        return
+
+    random.shuffle(array)
+
+    # save to file
+    tmpname = params['TDIR']+'/minimize.cst'
+    with open(tmpname,'w') as f:
+        for line in array:
+            f.write(line+'\n')
+        f.close()
+
+    # add to pose
+    constraints = rosetta.protocols.constraint_movers.ConstraintSetMover()
+    constraints.constraint_file(tmpname)
+    constraints.add_constraints(True)
+    constraints.apply(pose)
+
+    os.remove(tmpname)
+
