@@ -23,6 +23,7 @@ def get_args(params):
     parser.add_argument('--orient', dest='use_orient', action='store_true', help='use orientations')
     parser.add_argument('--intermediate', dest='saveintermediate', action='store_true', help='',default=False)
     parser.add_argument('--nointerchain', dest='interchain', action='store_false', help='',default=True)
+    parser.add_argument('--repulsion', dest='repulsion', action='store_true', help='',default=False)
     parser.add_argument('--no-orient', dest='use_orient', action='store_false')
     parser.add_argument('--fastrelax', dest='fastrelax', action='store_true', help='perform FastRelax')
     parser.add_argument('--no-fastrelax', dest='fastrelax', action='store_false')

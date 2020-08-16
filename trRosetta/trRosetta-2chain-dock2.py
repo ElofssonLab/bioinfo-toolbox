@@ -142,7 +142,8 @@ def main():
     mindist=100
     #print ("Rotation 1: ",pose.jump(dock_jump).get_rotation())
     print ("Translation 1: ",pose.jump(dock_jump).get_translation())
-    if sum(pose.jump(dock_jump).get_translation()) < mindist:
+    if (pose.jump(dock_jump).get_translation()[0]**2+pose.jump(dock_jump).get_translation()[1]**2+
+           pose.jump(dock_jump).get_translation()[2]**2) < mindist**2:
         initial_mover = RigidBodyPerturbMover(dock_jump, 0, 2*mindist)
         #print ("Rotation 1b: ",pose.jump(dock_jump).get_rotation())
         print ("Translation 1b: ",pose.jump(dock_jump).get_translation())
@@ -152,6 +153,8 @@ def main():
         pose.dump_pdb(args.OUT+"-starting.pdb")
     starting_pose=Pose()
     starting_pose.assign(pose)
+
+
     ########################################################  
     # minimization
     ########################################################
@@ -188,7 +191,8 @@ def main():
         #params["interchain"]=True
         #add_intrachain_rst(npz,rst,tmpdir,params,minprob=args.minprob,UB=args.intradist,D=args.intrasd,allcontacts=True)
         add_interacton_areas_rst(npz,rst,tmpdir,params,minprob=args.minprob,UB=args.intradist,D=args.intrasd,allcontacts=args.allcontacts)
-
+    if args.repulsion:
+        add_intrachain_repulsion_rst(npz,rst,tmpdir,params,minprob=args.minprob)
     
     if args.mode == 0:
         
@@ -254,10 +258,10 @@ def main():
     random_pose.assign(pose)
     
     
-    mmap = MoveMap()
-    mmap.set_bb(False)
-    mmap.set_chi(False)
-    mmap.set_jump(True)
+    mmap_docking = MoveMap()
+    mmap_docking.set_bb(False)
+    mmap_docking.set_chi(False)
+    mmap_docking.set_jump(True)
     
     
     perturb = SequenceMover()
@@ -316,6 +320,22 @@ def main():
     #add_interacton_areas_rst(npz,rst,tmpdir,params,minprob=args.minprob,UB=args.intradist,D=args.intrasd,allcontacts=args.allcontacts) # Adding a weak flat harmonic to bring things together. 
     #add_intra_rst(pose, rst, 1, len(seq), params)
     #repeat_mover.apply(pose)
+    sf_fa = create_score_function('ref2015')
+    sf_fa.set_weight(rosetta.core.scoring.atom_pair_constraint, 5)
+    sf_fa.set_weight(rosetta.core.scoring.dihedral_constraint, 1)
+    sf_fa.set_weight(rosetta.core.scoring.angle_constraint, 1)
+
+    mmap_relax = MoveMap()
+    mmap_relax.set_bb(True)
+    mmap_relax.set_chi(True)
+    mmap_relax.set_jump(True)
+    
+    relax = rosetta.protocols.relax.FastRelax()
+    relax.set_scorefxn(sf_fa)
+    relax.max_iter(200)
+    relax.dualspace(True)
+    relax.set_movemap(mmap_relax)
+    switch = SwitchResidueTypeSetMover("fa_standard")
 
 
     # Sometimes we need to add the intra restraints again
@@ -326,6 +346,7 @@ def main():
     if "B" in args.dockingmode: # default protocol
         dock_pose=Pose()
         dock_pose.assign(pose)
+        mmap=mmap_docking
         min_mover_cart.apply(dock_pose)
         if args.saveintermediate:
             dock_pose.dump_pdb(args.OUT+"-dockB1.pdb")
@@ -335,6 +356,19 @@ def main():
             #pose.dump_pdb("intraoptimized.pdb")
         print ("Rotation 3B: ",pose.jump(dock_jump).get_rotation())
         print ("Translation 3B: ",pose.jump(dock_jump).get_translation())
+        for i,a in enumerate(seq):
+            if a == 'G':
+                mutator = rosetta.protocols.simple_moves.MutateResidue(i+1,'GLY')
+                mutator.apply(dock_pose)
+                print('mutation: A%dG'%(i+1))
+        pose.remove_constraints()
+        switch.apply(dock_pose)
+        print('relax...')
+        params['PCUT'] = 0.15
+        add_rst_chain2(dock_pose, rst, 1, len(seq), params, True)
+        relax.apply(dock_pose)
+        if args.saveintermediate:
+            dock_pose.dump_pdb(args.OUT+"-dockB-relax.pdb")
     if "C" in args.dockingmode: # Docking protocol using minmover
         dock_pose=Pose()
         dock_pose.assign(pose)
@@ -346,6 +380,19 @@ def main():
             dock_pose.dump_pdb(args.OUT+"-dockC2.pdb")
         print ("Rotation 3C: ",pose.jump(dock_jump).get_rotation())
         print ("Translation 3C: ",pose.jump(dock_jump).get_translation())
+        for i,a in enumerate(seq):
+            if a == 'G':
+                mutator = rosetta.protocols.simple_moves.MutateResidue(i+1,'GLY')
+                mutator.apply(dock_pose)
+                print('mutation: A%dG'%(i+1))
+        pose.remove_constraints()
+        switch.apply(dock_pose)
+        print('relax...')
+        params['PCUT'] = 0.15
+        add_rst_chain2(dock_pose, rst, 1, len(seq), params, True)
+        relax.apply(dock_pose)
+        if args.saveintermediate:
+            dock_pose.dump_pdb(args.OUT+"-dockC-relax.pdb")
     if "D" in args.dockingmode: # Docking protocol using minmover
         dock_pose=Pose()
         dock_pose.assign(pose)
@@ -357,8 +404,19 @@ def main():
             dock_pose.dump_pdb(args.OUT+"-dockD2.pdb")
         print ("Rotation 3D: ",pose.jump(dock_jump).get_rotation())
         print ("Translation 3D: ",pose.jump(dock_jump).get_translation())
-
-
+        for i,a in enumerate(seq):
+            if a == 'G':
+                mutator = rosetta.protocols.simple_moves.MutateResidue(i+1,'GLY')
+                mutator.apply(dock_pose)
+                print('mutation: A%dG'%(i+1))
+        pose.remove_constraints()
+        switch.apply(dock_pose)
+        print('relax...')
+        params['PCUT'] = 0.15
+        add_rst_chain2(dock_pose, rst, 1, len(seq), params, True)
+        relax.apply(dock_pose)
+        if args.saveintermediate:
+            dock_pose.dump_pdb(args.OUT+"-dockD-relax.pdb")
         
     # mutate ALA back to GLY
     for i,a in enumerate(seq):
@@ -374,26 +432,9 @@ def main():
 
     if args.fastrelax == True:
 
-        sf_fa = create_score_function('ref2015')
-        sf_fa.set_weight(rosetta.core.scoring.atom_pair_constraint, 5)
-        sf_fa.set_weight(rosetta.core.scoring.dihedral_constraint, 1)
-        sf_fa.set_weight(rosetta.core.scoring.angle_constraint, 1)
-
-        mmap = MoveMap()
-        mmap.set_bb(True)
-        mmap.set_chi(True)
-        mmap.set_jump(True)
-
-        relax = rosetta.protocols.relax.FastRelax()
-        relax.set_scorefxn(sf_fa)
-        relax.max_iter(200)
-        relax.dualspace(True)
-        relax.set_movemap(mmap)
 
         pose.remove_constraints()
-        switch = SwitchResidueTypeSetMover("fa_standard")
         switch.apply(pose)
-
         print('relax...')
         params['PCUT'] = 0.15
         add_rst_chain2(pose, rst, 1, len(seq), params, True)

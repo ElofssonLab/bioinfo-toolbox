@@ -124,7 +124,25 @@ def add_interacton_areas_rst(npz,rst,tmpdir,params,minprob=0.5,UB=30,D=30,WD=100
                 rst['intrachain'].append([i,j,1.0,rst_line]) 
     print("Intrachain attraction restraints:  %d"%(len(rst['intrachain'])))
         
-        
+
+def add_intrachain_repulsion_rst(npz,rst,tmpdir,params,minprob=0.5,WD=100,WB=4):
+    ########################################################
+    # Distance restraints to keep the two chains together
+    ########################################################
+    dist,omega,theta,phi = npz['dist'],npz['omega'],npz['theta'],npz['phi']
+    prob = np.sum(dist[:,:,5:], axis=-1)
+    for i in range(params["seqlen1"]):
+        for j in range(params["seqlen1"]+1,params["seqlen2"]+params["seqlen1"]):
+            # We should limit ourself to constrains that have a probablitu
+            if (prob[i,j]<minprob): # We actually ignore interacting pairs.
+                name=tmpdir.name+"/%d.%d-repulsion2.txt"%(i+1,j+1)
+                with open(name, "w") as f:
+                    f.write('REPULSION'+'\t%.3f\t%.3f'%(UB,D)+'\n')
+                rst_line = 'AtomPair %s %d %s %d FLAT_HARMONIC  %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,WD,1,WD-WB)
+                rst['intrachain'].append([i,j,1.0,rst_line]) 
+    print("Flat harmonic restraints:  %d"%(len(rst['intrachain'])))
+
+    
 def gen_rst(npz, tmpdir, params):
 
     dist,omega,theta,phi = npz['dist'],npz['omega'],npz['theta'],npz['phi']
