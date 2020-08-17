@@ -137,7 +137,7 @@ def add_intrachain_repulsion_rst(npz,rst,tmpdir,params,minprob=0.5,WD=100,WB=4):
             if (prob[i,j]<minprob): # We actually ignore interacting pairs.
                 name=tmpdir.name+"/%d.%d-repulsion2.txt"%(i+1,j+1)
                 with open(name, "w") as f:
-                    f.write('REPULSION'+'\t%.3f\t%.3f'%(UB,D)+'\n')
+                    f.write('REPULSION'+'\t%.3f\t%.3f'%(WD,WB)+'\n')
                 rst_line = 'AtomPair %s %d %s %d FLAT_HARMONIC  %.5f %.5f %.5f'%('CB',i+1,'CB',j+1,WD,1,WD-WB)
                 rst['intrachain'].append([i,j,1.0,rst_line]) 
     print("Flat harmonic restraints:  %d"%(len(rst['intrachain'])))
