@@ -11,17 +11,20 @@ def skipgaps(string,gaps):
             newstring+=string[j]
     return newstring
 
-cutoff=0.75
+
 parser = argparse.ArgumentParser(description="Trimming extra characters in aligned sequence from an a3m file")
 parser.add_argument('-o','--orgname', help='Keep original filenames', action="store_true")
 #parser.add_argument('file', metavar='file', type=argparse.FileType('r'), nargs=1, help='filename')
 parser.add_argument('-name', type=str, help='name')
+parser.add_argument('--cutoff',"-c", type=float, help='cutoff',default=0.75)
 parser.add_argument("--sepseq","-sep","-S",required=False, help='Separation sequence between protein in MSA' ,default="GGGGGGGGGGGGGGGGGGGG")
 parser.add_argument('-seq','--sequence','-s', required= False, help='sequence file to identify domain baorders')
 parser.add_argument('file', metavar='file', type=str, nargs=1, help='filename')
 parser.add_argument('-max','--maxhits','-m', required= False, help='maximum number of sequences to include')
 args = parser.parse_args()
 
+
+cutoff=args.cutoff
 #print args
 
 #if args.orgname:
