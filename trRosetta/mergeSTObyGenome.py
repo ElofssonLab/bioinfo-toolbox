@@ -42,6 +42,8 @@ if (ns.host):
 else:
    use_host=False
 
+#print ("TEST:",use_host,use_genus)
+   
 handleA = open(fileA, 'r')
 
 dataA={}
@@ -78,7 +80,7 @@ for record in SeqIO.parse(handleA, 'stockholm') :
             #
          if use_host:
             organism=host
-         #print (organism)
+            #print (organism)
          #try: 
          #   geneid,name,host,organism=re.split(r'\|',record.description)
          #except:
@@ -87,9 +89,9 @@ for record in SeqIO.parse(handleA, 'stockholm') :
       if use_genus:
          organism=re.sub(r'\s+','',organism)
       if (not organism in dataA.keys()):
-         #print ((record.name,record.description,organism))
+         #print ("A:",organism,(record.name,record.description,organism))
          dataA[organism]=record
-
+         
 
 
 handleB = open(fileB, 'r')
@@ -124,7 +126,7 @@ for record in SeqIO.parse(handleB, 'stockholm') :
       if use_genus:
          organism=re.sub(r'\s+','',organism)
       if (not organism in dataB.keys()):
-         #        print (record.name,organism)
+         #print ("B",record.name,organism)
          dataB[organism]=record
 
 # First we shoudl always use sequecne 1 in both files...
