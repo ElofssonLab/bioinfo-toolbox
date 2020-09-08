@@ -10,6 +10,7 @@ from Bio.SeqRecord import SeqRecord
 import argparse
 from argparse import RawTextHelpFormatter
 from Bio.Align import MultipleSeqAlignment        
+
 ##args = docopt.docopt(__doc__)
 #out_dir = args['--output_folder']
  
@@ -24,8 +25,12 @@ p.add_argument('--genus','-g', required= False, help='Use only genus names', act
 p.add_argument('--host','-l', required= False, help='use host to match fileB', action='store_true')
 p.add_argument('--skipped','-S', required= False, help='file to print skipped files (endings will be added)')
 p.add_argument('--paralogs','-p', required= False, help='file to print paralogous files (endinfs will be added)')
+p.add_argument('--output','-out','-o', required= False, help='output file (if missing stdout)')
 #p.add_argument('-out','--output','-o', required= False, help='output image')
 #parser.add_argument('--nargs', nargs='+')
+p.add_argument('--max','-m', required= False, help='Maximum number of sequences to include',default=1000000)
+#p.add_argument('-id', required= False, help='Maximum number of sequences to include',default=1.0,type=float) # This is way too slow..
+
 ns = p.parse_args()
 
 #from Bio.SeqFeature import SeqFeature, FeatureLocation
@@ -149,15 +154,73 @@ for record in SeqIO.parse(handleB, 'stockholm') :
 
 # First we should always use sequecne 1 in both files...
 
-print ("> " + seqA.name + " AND " + seqB.name)
-print (seqA.seq+sepseq+seqB.seq)
+sequences=[]
 
+sequences+=[SeqRecord(seq=seqA.seq+sepseq+seqB.seq,id=seqA.name+" "+seqB.name,name=seqA.name+" "+seqB.name,description=seqA.name+" "+seqB.name,dbxrefs=[])]
+
+count=0
+if (not ns.output):
+   print ("> " + seqA.name + " AND " + seqB.name)
+   print (seqA.seq+sepseq+seqB.seq)
 for key in dataA.keys():
    if (key in dataB.keys()):
-      print ("> " + key )
-      print (dataA[key].seq+sepseq+dataB[key].seq)
+      sequences+=[SeqRecord(seq=dataA[key].seq+sepseq+dataB[key].seq,id=key,name=key,description=key,dbxrefs=[])]
+      if count < ns.max:
+         if (not ns.output):
+            print ("> " + key )
+            print (dataA[key].seq+sepseq+dataB[key].seq)
+            count+=1
+      else:
+         skippingA+=[SeqRecord(seq=dataA[key].seq,id=key,name=key,description=key,dbxrefs=[])]
+         skippingB+=[SeqRecord(seq=dataB[key].seq,id=key,name=key,description=key,dbxrefs=[])]
+   else:
+      skippingA+=[SeqRecord(seq=dataA[key].seq,id=key,name=key,description=key,dbxrefs=[])]
+for key in dataB.keys():
+   if not (key in dataA.keys()):
+      skippingB+=[SeqRecord(seq=dataB[key].seq,id=key,name=key,description=key,dbxrefs=[])]
+
+      
+selected=[]      
+if (ns.output):
+   msa=MultipleSeqAlignment(sequences)
+   for record in msa:
+      # Check protein id
+      #id=0
+      #selmsa=MultipleSeqAlignment(selected)
+      #for sel in selmsa:
+      #   j=0
+      #   k=0
+      #   #print ("test",sel)
+      #   for i in range(len(sel.seq)):
+      #      #print ("FOO",i,j,k,sel.seq[i],record.seq[i])
+      #      if (sel.seq[i]!="-"):
+      #         k+=1
+      #         if (sel.seq[i]==record.seq[i]):
+      #            j+=1
+      #   ###print (sel.id,record.id,len(sel.seq),j,k,j/k)
+      #   ##a = sel.seq
+      #   ##b = record.seq
+      #   ##k = len(sel.seq)
+      #   ##print (sel.seq)
+      #   ##k = sel.seq.findall('[A-Z]')
+      #   ##print (k)
+      #   #k = len(re.findall('[A-Z]',str(sel.seq)))
+      #   #j = k-len(re.findall('[A-Z]',''.join(x for x, y in zip(sel.seq, record.seq) if x != y)))
+      #   ##print (sel.seq)
+      #   ##print (record.seq)
+      #   ##print (j/k)
+      #   id=max(id,j/k)
+      if (count<ns.max):   
+         selected+=[record]
+         count+=1
+      ##print ("max",record.name,id)
+      ##print ("selected",selected)
+   selmsa=MultipleSeqAlignment(selected)
+   AlignIO.write(selmsa, ns.output+".fasta", "fasta")
+   #AlignIO.write(msa, ns.output+".fasta", "fasta")
 
 
+   
 if (ns.skipped):
    msaA=MultipleSeqAlignment(skippingA)
    msaB=MultipleSeqAlignment(skippingB)
