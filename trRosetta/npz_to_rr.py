@@ -78,7 +78,8 @@ def npz_to_casp(input_file, info_key="dist", fasta_file=None,  fasta2_file=None,
                 print("Error reading fasta file: "+fasta_file)
                 sys.exit()
 
-
+        #print ("test",fasta_file,fasta2_file)
+        
         # Assert the fasta sequence is of the same length as the resulting contacts results
         fasta_length = len(fasta_seq)
         assert nres == fasta_length, "Sequence from fasta file is not of the same length as" +\
@@ -172,6 +173,7 @@ def npz_to_casp(input_file, info_key="dist", fasta_file=None,  fasta2_file=None,
 
 if __name__ == "__main__":
     # Distances
+    #print ("test",fasta_path,fasta2_path)
     try:
         npz_to_casp(npz_path, "dist",  fasta2_file=fasta2_path,fasta_file=fasta_path, out_base_path=out_base_path)
         npz_to_casp(npz_path, "omega", fasta2_file=fasta2_path,fasta_file=fasta_path, out_base_path=out_base_path)

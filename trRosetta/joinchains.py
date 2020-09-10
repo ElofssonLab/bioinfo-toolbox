@@ -19,12 +19,17 @@ def rewrite(infile, chain, outfile, new):
     with open(infile,'r') as f:
         for line in f:
             if line.startswith('ATOM'):
-                if prev_orig != '' and line[22:27] != prev_orig: new+=1
+                #print (line[22:27],":",prev_orig,":",new)
+                if prev_orig != '' and line[22:27] != prev_orig:
+                    new+=1
+                    #prev_orig = line[22:27]
                 renumb = ' '*(4-len(str(new)))+str(new)+' '
                 outline = line[:21]+chain+renumb+line[27:].rstrip()
                 outfile.write(outline+'\n')
 
+            #print (line)
             prev_orig = line[22:27]
+            #print ("org:",prev_orig,":",line[22:27])
         outfile.write('TER\n')
 
     return new

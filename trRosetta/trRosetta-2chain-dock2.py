@@ -367,8 +367,7 @@ def main():
         params['PCUT'] = 0.15
         add_rst_chain2(dock_pose, rst, 1, len(seq), params, True)
         relax.apply(dock_pose)
-        if args.saveintermediate:
-            dock_pose.dump_pdb(args.OUT+"-dockB-relax.pdb")
+        dock_pose.dump_pdb(args.OUT+"-dockB-relax.pdb")
     if "C" in args.dockingmode: # Docking protocol using minmover
         dock_pose=Pose()
         dock_pose.assign(pose)
@@ -391,8 +390,8 @@ def main():
         params['PCUT'] = 0.15
         add_rst_chain2(dock_pose, rst, 1, len(seq), params, True)
         relax.apply(dock_pose)
-        if args.saveintermediate:
-            dock_pose.dump_pdb(args.OUT+"-dockC-relax.pdb")
+        
+        dock_pose.dump_pdb(args.OUT+"-dockC-relax.pdb")
     if "D" in args.dockingmode: # Docking protocol using minmover
         dock_pose=Pose()
         dock_pose.assign(pose)
@@ -415,8 +414,7 @@ def main():
         params['PCUT'] = 0.15
         add_rst_chain2(dock_pose, rst, 1, len(seq), params, True)
         relax.apply(dock_pose)
-        if args.saveintermediate:
-            dock_pose.dump_pdb(args.OUT+"-dockD-relax.pdb")
+        dock_pose.dump_pdb(args.OUT+"-dockD-relax.pdb")
         
     # mutate ALA back to GLY
     for i,a in enumerate(seq):
@@ -439,7 +437,6 @@ def main():
         params['PCUT'] = 0.15
         add_rst_chain2(pose, rst, 1, len(seq), params, True)
         relax.apply(pose)
-
     ########################################################
     # save final model
     ########################################################
