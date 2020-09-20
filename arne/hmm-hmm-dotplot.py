@@ -57,7 +57,7 @@ res = np.zeros((len(a), len(b)))
 for i in range(len(a)):
     for j in range(len(b)):
         #print (i,j,a[i],b[j],KL(a[i],b[j]))
-        res[i,j]=-1*np.log(KL(a[i],b[j]))
+        res[i,j]=np.log(KL(a[i],b[j]))
 
 pd.DataFrame(res).to_csv(ns.output)
 if (ns.plot):
