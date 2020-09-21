@@ -18,7 +18,8 @@ def hhscore(a,b,f):
     for i in np.arange(len(a)):
         #print (i,a[i],b[i],f[i])
         sum+=a[i]*b[i]/f[i]
-    return sum
+    return np.log(sum)
+    #return sum
 # quick funcation fromthe stacjexchange
 def KL(a, b):
     a = np.asarray(a, dtype=np.float)
@@ -101,6 +102,7 @@ p.add_argument('-fileB','--inputB','-j', required= True, help='Input file B')
 p.add_argument('-out','--output','-o', required= True, help='Output CSV file')
 p.add_argument('-png','--plot','-p', required= False, help='Outplot plot file (optional)')
 p.add_argument('-log','--log','-l', required= False, help='use log',action='store_true',default=False)
+p.add_argument('-norm','--normalize','-n', required= False, help='Normalize',action='store_true',default=False)
 
 p.add_argument('-win','--window','-w', required= False, default=0,help='Windows size for diagonal')
 p.add_argument('-type','--type','-t', required= False, default="HH",help='Type (valid choises are KL, CC, MI, Shannon,HH')
@@ -120,70 +122,30 @@ tiny=1.e-10
 
 
 # AA freq A C D E  F G H I  K L M N  P Q R S  T V W Y
-f=[0.074,0.033,0.059,0.058,
-   0.040,0.074,0.029,0.038,
-   0.072,0.076,0.018,0.044,0.050,
-   0.037,0.042,0.081,0.062,
-   0.068,0.013,0.033]
+f=[0.074,0.033,0.059,0.058, 0.040,0.074,0.029,0.038,
+   0.072,0.076,0.018,0.044,0.050, 0.037,0.042,0.081,
+   0.062,0.068,0.013,0.033]
 
 
-#   Alanine
-#   7.4 %
-#   
-#   Arginine
-#   4.2 %
-#   
-#   Asparagine
-#   4.4 %
-#   
-#   Aspartic Acid
-#   5.9 %
-#   
-#   Cysteine
-#   3.3 %
-#   
-#   Glutamic Acid
-#   5.8 %
-#   
-#   Glutamine
-#   3.7 %
-#   
-#   Glycine
-#   7.4 %
-#   
-#   Histidine
-#   2.9 %
-#   
-#   Isoleucine
-#   3.8 %
-#   
-#   Leucine
-#   7.6 %
-#   
-#   Lysine
-#   7.2 %
-#   
-#   Methionine
-#   1.8 %
-#   
-#   Phenylalanine
-#   4.0 %
-#   
-#   Proline
-#   5.0 %
-#   
-#   Serine
-#   8.1 %
-#   
-#   Threonine
-#   6.2 %
-#   
-#   Tryptophan
-#   1.3 %
-#   
-#   Tyrosine
-#   3.3 %
-#   
+#   Alanine 7.4 %
+#   Arginine 4.2 %
+#   Asparagine 4.4 %
+#   Aspartic Acid 5.9 %
+#   Cysteine 3.3 %
+#   Glutamic Acid 5.8 %
+#   Glutamine 3.7 %
+#   Glycine 7.4 %
+#   Histidine 2.9 %
+#   Isoleucine 3.8 %
+#   Leucine 7.6 %
+#   Lysine 7.2 %
+#   Methionine 1.8 %
+#   Phenylalanine 4.0 %
+#   Proline 5.0 %
+#   Serine 8.1 %
+#   Threonine 6.2 %
+#   Tryptophan 1.3 %
+#   Tyrosine 3.3 %
 #   Valine 6.8 %
 
 
@@ -210,9 +172,10 @@ elif(ns.type=="HH"):
     for i in range(len(a)):
         for j in range(len(b)):
             res[i,j]=hhscore(a[i],b[j],f)
+            
 else:sys.exit()
    
-   
+print (res)
 # Normalise along diagonal (length W)
 newres = np.zeros((len(a), len(b)))
 if int(ns.window)>0:
@@ -234,7 +197,20 @@ else:
         newres=np.log(res)
     else:
         newres=res
-   
+
+print (newres)
+if (ns.normalize):
+    tempres=np.zeros((len(a), len(b)))
+    row_sums = newres.sum(axis=1)
+    col_sums = newres.sum(axis=0)
+    for i in range(len(a)):
+        for j in range(len(b)):
+            tempres[i,j] = 2*newres[i,j] / (row_sums[i]/len(a)+col_sums[j]/len(b))
+            #print (i,j,newres[i,j],row_sums[i]/len(a),col_sums[j]/len(b))
+    newres=tempres
+
+    
+print (newres)
 pd.DataFrame(newres).to_csv(ns.output)
 if (ns.plot):
     fig = plt.figure()
