@@ -3,6 +3,7 @@
 import sys
 import re
 import matplotlib.pyplot as plt
+import seaborn as sns
 import argparse
 from argparse import RawTextHelpFormatter
 import numpy as np
@@ -18,8 +19,8 @@ def hhscore(a,b,f):
     for i in np.arange(len(a)):
         #print (i,a[i],b[i],f[i])
         sum+=a[i]*b[i]/f[i]
-    return np.log(sum)
-    #return sum
+    #return np.log(sum)
+    return sum
 # quick funcation fromthe stacjexchange
 def KL(a, b):
     a = np.asarray(a, dtype=np.float)
@@ -105,9 +106,10 @@ p.add_argument('-log','--log','-l', required= False, help='use log',action='stor
 p.add_argument('-norm','--normalize','-n', required= False, help='Normalize',action='store_true',default=False)
 p.add_argument('-verb','--verbose','-v', required= False, help='verbose output',action='store_true',default=False)
 
-p.add_argument('-win','--window','-w', required= False, default=0,help='Windows size for diagonal')
+p.add_argument('-win','--window','-w', required= False, default=9,help='Windows size for diagonal')
 p.add_argument('-type','--type','-t', required= False, default="HH",help='Type (valid choises are KL, CC, MI, Shannon,HH')
-
+p.add_argument('-max', required= False, help='Maximum value for color')
+p.add_argument('-min', required= False, help='Maximum value for color')
 ns = p.parse_args()
 
 #handleA = open(ns.inputA, 'r')
@@ -222,12 +224,13 @@ if (ns.plot):
     ax = fig.add_subplot(111)
     #fig, (ax1, ax2) = plt.subplots(ncols=2)
     #ax2=ax.twin()
-    cax = ax.matshow(newres, cmap="hot")
+    #cax = ax.matshow(newres, cmap="hot")
+    ax = sns.heatmap(newres,cmap="binary",square=True,cbar=True) # ,vmin=,vmax=
     #print (res)
     ax.set(title="Dotplot between two HMMs")
     ax.set_xlabel(ns.inputA)
     ax.set_ylabel(ns.inputB)
-    fig.colorbar(cax)
+    #fig.colorbar(cax)
     fig.savefig(ns.plot)
    
    
