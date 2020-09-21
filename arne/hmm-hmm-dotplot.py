@@ -103,6 +103,7 @@ p.add_argument('-out','--output','-o', required= True, help='Output CSV file')
 p.add_argument('-png','--plot','-p', required= False, help='Outplot plot file (optional)')
 p.add_argument('-log','--log','-l', required= False, help='use log',action='store_true',default=False)
 p.add_argument('-norm','--normalize','-n', required= False, help='Normalize',action='store_true',default=False)
+p.add_argument('-verb','--verbose','-v', required= False, help='verbose output',action='store_true',default=False)
 
 p.add_argument('-win','--window','-w', required= False, default=0,help='Windows size for diagonal')
 p.add_argument('-type','--type','-t', required= False, default="HH",help='Type (valid choises are KL, CC, MI, Shannon,HH')
@@ -175,7 +176,8 @@ elif(ns.type=="HH"):
             
 else:sys.exit()
    
-print (res)
+if ns.verbose:
+    print (res)
 # Normalise along diagonal (length W)
 newres = np.zeros((len(a), len(b)))
 if int(ns.window)>0:
@@ -198,7 +200,8 @@ else:
     else:
         newres=res
 
-print (newres)
+if ns.verbose:
+    print (newres)
 if (ns.normalize):
     tempres=np.zeros((len(a), len(b)))
     row_sums = newres.sum(axis=1)
@@ -206,11 +209,13 @@ if (ns.normalize):
     for i in range(len(a)):
         for j in range(len(b)):
             tempres[i,j] = 2*newres[i,j] / (row_sums[i]/len(a)+col_sums[j]/len(b))
-            #print (i,j,newres[i,j],row_sums[i]/len(a),col_sums[j]/len(b))
+            if ns.verbose:
+                print (i,j,newres[i,j],row_sums[i]/len(a),col_sums[j]/len(b))
     newres=tempres
 
     
-print (newres)
+if ns.verbose:
+    print (newres)
 pd.DataFrame(newres).to_csv(ns.output)
 if (ns.plot):
     fig = plt.figure()
