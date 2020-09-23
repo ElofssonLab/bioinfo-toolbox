@@ -96,15 +96,15 @@ for record in SeqIO.parse(handleA, 'stockholm') :
             continue
             #print (re.split(r'\|',record.description))
             #
-         if use_host:
-            organism=host
-            #print (organism)
-         try: 
-            geneid,name,host,organism=re.split(r'\|',record.description)
-         except:
-         #   print ("skipping: ",record.name)
-            skippingA+=[record]
-            continue
+         #if use_host:
+         #   organism=host
+         #   #print (organism)
+         #try: 
+         #   geneid,name,host,organism=re.split(r'\|',record.description)
+         #except:
+         ##   print ("skipping: ",record.name)
+         #   skippingA+=[record]
+         #   continue
       if use_genus:
          organism=re.sub(r'\s+','',organism)
       if (not organism in dataA.keys()):
