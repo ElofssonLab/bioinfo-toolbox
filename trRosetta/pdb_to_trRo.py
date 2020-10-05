@@ -73,7 +73,7 @@ if __name__ == "__main__":
     z_step = z_per_bin/2
     angle_z_step = 1
 
-    minvalue = 0.1
+    minvalue = 0.01
     dist_wanted_bins = (20 - 2)/DIST_STEP
     omega_wanted_bins = 360/OMEGA_STEP
     theta_wanted_bins = 360/THETA_STEP
@@ -125,10 +125,10 @@ if __name__ == "__main__":
                         continue
                     # print(i,j)
                     if i == j:
-                        dist_mat[i, j, 0] = 0.9
-                        omega_mat[i, j, 0] = 0.9
-                        theta_mat[i, j, 0] = 0.9
-                        phi_mat[i, j, 0] = 0.9
+                        dist_mat[i, j, 0] = (1-minvalue)
+                        omega_mat[i, j, 0] = (1-minvalue)
+                        theta_mat[i, j, 0] = (1-minvalue)
+                        phi_mat[i, j, 0] = (1-minvalue)
                         j += 1
                         continue
                     
@@ -145,10 +145,10 @@ if __name__ == "__main__":
                     dist = (c2B-c1B).norm()
                     
                     if dist > 20:
-                        dist_mat[i, j, 0] = 0.9
-                        omega_mat[i, j, 0] = 0.9
-                        theta_mat[i, j, 0] = 0.9
-                        phi_mat[i, j, 0] = 0.9
+                        dist_mat[i, j, 0] = (1-minvalue)
+                        omega_mat[i, j, 0] = (1-minvalue)
+                        theta_mat[i, j, 0] = (1-minvalue)
+                        phi_mat[i, j, 0] = (1-minvalue)
                     else:
                         # Dist and omega are symmetrical and have already been copied
                         if not symm:
