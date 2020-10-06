@@ -81,15 +81,25 @@ if (ns.fast):
             orgcontacts=newcontacts
 else:
     for d in range(1,len(rstAB)):
+        i,j=(rstAB[d]["dist"][distA:distAB,0:distA, 0]  < 0.5 ).nonzero()
+        
+        for x in range(len(i)):
+            orgprob = new_rst["dist"][i[x], j[x], 0]
+            newprob = rstAB[d]["dist"][i[x], j[x], 0]
+            if newprob < orgprob:
+                for f in rstAB[0].files:
+                    new_rst[f][i,j]=rstAB[d][f][i,j]
+                    new_rst[f][j,i]=rstAB[d][f][j,i]
+        
         #print ("Using ",d,distA,distB)
-        for i in range(distA):
-            for j in range(distA+1,distA+distB):
-                orgprob = new_rst["dist"][i, j, 0]
-                newprob = rstAB[d]["dist"][i, j, 0]
-                if newprob < orgprob:
-                    for f in rstAB[0].files:
-                        new_rst[f][i,j]=rstAB[d][f][i,j]
-                        new_rst[f][j,i]=rstAB[d][f][j,i]
+        #for i in range(distA):
+        #    for j in range(distA+1,distA+distB):
+        #        orgprob = new_rst["dist"][i, j, 0]
+        #        newprob = rstAB[d]["dist"][i, j, 0]
+        #        if newprob < orgprob:
+        #            for f in rstAB[0].files:
+        #                new_rst[f][i,j]=rstAB[d][f][i,j]
+        #                new_rst[f][j,i]=rstAB[d][f][j,i]
 
                     
 # Then we add the distance for the individual proteins   
