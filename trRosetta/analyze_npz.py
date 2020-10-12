@@ -138,11 +138,13 @@ if ns.pdb:
     p = PDBParser()
     structure = p.get_structure('', ns.pdb)
 
-    #chains=[]
+    chains=[]
     pdblen=[]
     for chain in structure[0]:
         #print (chain,len(chain))
-        #chains+=[chain]
+        chains+=[chain]
+        #for residue in chain:
+        #    print (residue)
         pdblen+=[len(chain)]
 
     dimerlen=pdblen[0]+pdblen[1]
@@ -167,22 +169,23 @@ if ns.pdb:
                 try:
                     c1=residue1["CB"]
                 except:
-                    break
+                    c1=residue1["CA"]
             j=-seplen    
             for chain2 in structure[0]:
                 j+=seplen
                 for residue2 in chain2:
                 #print (residue2.get_resname())
+                    print (residue2)
                     if (residue2.get_resname()=="GLY"):
                         c2=residue2["CA"]
                     else:
                         try:
                             c2=residue2["CB"]
                         except:
-                            break
+                            c2=residue2["CA"]
                     pdbdist[i,j]=c1-c2
                     if i<j: res[i,j]=min(maxdist,pdbdist[i,j])
-                    #print(i,j,c1,c2,c1-c2)
+                    print(i,residue1.get_resname(),j,residue2.get_resname(),c1,c2,c1-c2)
                     j+=1
             i+=1
 
@@ -294,7 +297,7 @@ if (ns.sequence):
             starty=n+len(sepseq)
         startx=m+len(sepseq)
 
-if (ns.pdb): 
+if (ns.pdb):
     for x in range(0,6):
         #print (x,z[x])
         average[x]=average[x]/(z[x]+1.e-20)
