@@ -128,7 +128,7 @@ class trRosetta_fold():
             pose.remove_constraints()
             dock_pert.apply(pose)
             self.apply_rst(pose, array, self.tmpdir.name+'/minimize.cst')
-            print ('To dock:{}, Real:{}'.format(sf_fa(pose), sf_fa(real)))
+            print ('Pose energy before dock:'+str(sf_fa(pose)))
             #pose.dump_pdb(ns.out+'_'+str(n+1)+'_p.pdb')
             relax.apply(pose)
             print (sf_fa(pose))
