@@ -51,6 +51,32 @@ class trRosetta_fold():
                 mutator = rosetta.protocols.simple_moves.MutateResidue(i+1, mut.upper())
                 mutator.apply(pose)
 
+    def format_rx_contacts(self, rx_file, sep, top=10):
+        count = 0
+        array = []
+        for line in open(rx_file):
+            if count == top: break
+            a = int(line.split()[0])
+            b = int(line.split()[1].rstrip())+sep
+            if self.par['SEQ'][a-1] == 'G' or self.par['SEQ'][b-1] == 'G': continue
+            array += 'AtomPair CB {} CB {} FLAT_HARMONIC 8 1 4'.format(a, b)
+            count += 1
+        return array  
+
+    def format_npz_contacts(self, npz_file, array):
+        npz = np.load(npz_file)
+        dist = npz['dist'][:,:,5:]
+        sep = self.par['LENSEQ1']
+        pcut = self.par['PCUT']
+        psumup = np.sum(dist, axis=-1)
+        i,j = np.where(psumup>pcut+0.5)
+        for a,b in zip(i,j):
+            if a>b or abs(a-b)<=5 or np.sign(a-sep)==np.sign(b-sep): continue
+            flatcenter = (np.where(dist[a,b]==np.amax(dist[a,b]))[0][0]//2)+4.5
+            rst_line = 'AtomPair CB {a} CB {b} FLAT_HARMONIC {f} 2 1'.format(a=a+1, b=b+1, f=flatcenter)
+            if rst_line not in array: array.append(rst_line)
+        return array
+
     def ISPRED_site(self, ispred, res, thr=0.1):
         site = []
         non_site = []
@@ -96,7 +122,7 @@ class trRosetta_fold():
         constraints.apply(pose)
         os.remove(constraints_file)
 
-    def custom_docking(self, pose, isfile1, isfile2):
+    def custom_docking(self, pose, file1, file2):
         print (ns.out+'_1.pdb')
 
         mmap = MoveMap()
@@ -119,9 +145,10 @@ class trRosetta_fold():
         to_fullatom = SwitchResidueTypeSetMover('fa_standard')
         to_fullatom.apply(pose)
 
-        siteA, repA = self.ISPRED_top_site(isfile1, 0)
-        siteB, repB = self.ISPRED_top_site(isfile2, self.par['LENSEQ1'])
-        array = self.format_ISPRED_rst(siteA, siteB, repA, repB)
+        #siteA, repA = self.ISPRED_top_site(file1, 0)
+        #siteB, repB = self.ISPRED_top_site(file2, self.par['LENSEQ1'])
+        #array = self.format_ISPRED_rst(siteA, siteB, repA, repB)
+        array = self.format_rx_contacts(file1, self.par['LENSEQ1'])
         print ('Extracted {} constraints'.format(len(array)))
 
         #real = pose_from_pdb('./3f1p/3f1p.pdb')
