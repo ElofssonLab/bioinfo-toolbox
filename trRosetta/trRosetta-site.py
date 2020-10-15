@@ -51,21 +51,7 @@ class trRosetta_fold():
                 mutator = rosetta.protocols.simple_moves.MutateResidue(i+1, mut.upper())
                 mutator.apply(pose)
 
-    def add_site(self, npz_file, array):
-        npz = np.load(npz_file)
-        dist = npz['dist'][:,:,5:]
-        sep = self.par['LENSEQ1']
-        pcut = self.par['PCUT']
-        psumup = np.sum(dist, axis=-1)
-        i,j = np.where(psumup>pcut+0.5)
-        for a,b in zip(i,j):
-            if a>b or abs(a-b)<=5 or np.sign(a-sep)==np.sign(b-sep): continue
-            flatcenter = (np.where(dist[a,b]==np.amax(dist[a,b]))[0][0]//2)+4.5
-            rst_line = 'AtomPair CB {a} CB {b} FLAT_HARMONIC {f} 2 1'.format(a=a+1, b=b+1, f=flatcenter)
-            if rst_line not in array: array.append(rst_line)
-        return array
-
-    def ISPRED_site(self, ispred, res, thr=0.3):
+    def ISPRED_site(self, ispred, res, thr=0.1):
         site = []
         non_site = []
         for line in open(ispred):
@@ -74,6 +60,24 @@ class trRosetta_fold():
             if self.par['SEQ'][res-1] == 'G': continue
             if score > thr: site.append(res)
             else: non_site.append(res)
+        return site, non_site
+
+    def ISPRED_top_site(self, ispred, res, top=3):
+        site = []
+        non_site = []
+        for line in open(ispred):
+            res += 1
+            score = float(line.split()[-1])
+            if self.par['SEQ'][res-1] == 'G': continue
+            if float(score) == 0.0: non_site.append(res)
+            else: 
+                for p, r in enumerate(site):
+                    if score > r[1]: 
+                        site = site[:p]+[[res,score]]+site[p:]
+                        break
+                if [res,score] not in site: site.append([res,score])           
+        site = [el[0] for el in site][:top]
+
         return site, non_site
 
     def format_ISPRED_rst(self, siteA, siteB, repA, repB):
@@ -93,6 +97,7 @@ class trRosetta_fold():
         os.remove(constraints_file)
 
     def custom_docking(self, pose, isfile1, isfile2):
+        print (ns.out+'_1.pdb')
 
         mmap = MoveMap()
         mmap.set_bb(False)
@@ -114,8 +119,8 @@ class trRosetta_fold():
         to_fullatom = SwitchResidueTypeSetMover('fa_standard')
         to_fullatom.apply(pose)
 
-        siteA, repA = self.ISPRED_site(isfile1, 0)
-        siteB, repB = self.ISPRED_site(isfile2, self.par['LENSEQ1'])
+        siteA, repA = self.ISPRED_top_site(isfile1, 0)
+        siteB, repB = self.ISPRED_top_site(isfile2, self.par['LENSEQ1'])
         array = self.format_ISPRED_rst(siteA, siteB, repA, repB)
         print ('Extracted {} constraints'.format(len(array)))
 
