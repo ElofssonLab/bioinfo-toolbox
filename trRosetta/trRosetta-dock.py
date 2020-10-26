@@ -42,7 +42,7 @@ def main():
             key = str(key)
             sliced[key] = np.delete(npz[key], slice(trf.par['LENSEQ'], trf.par['LENSEQ']+21), axis=0)
             sliced[key] = np.delete(sliced[key], slice(trf.par['LENSEQ'], trf.par['LENSEQ']+21), axis=1)
-    npz = sliced
+        npz = sliced
     print (npz['dist'].shape, trf.par['LENSEQ'])
 
     npz1 = trf.npz_selection(npz, 1)
