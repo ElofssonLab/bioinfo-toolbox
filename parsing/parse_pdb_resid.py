@@ -481,7 +481,7 @@ if __name__ == '__main__':
         chain = sys.argv[2]
     else:
         chain = get_first_chain(pdbfile)
-    print get_atom_seq(pdbfile, chain)
+    print (get_atom_seq(pdbfile, chain))
     pdbfile.close()
     #pdbfile = open(sys.argv[1], 'r')
     #print get_coordinates(pdbfile)
