@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from Bio import SeqIO
+import sys
 import argparse
 from argparse import RawTextHelpFormatter
 
@@ -10,13 +11,12 @@ def parse_msa(msa_file, top, cov):
     for record in SeqIO.parse(open(msa_file), "fasta"):
         if query == '': query = [record.id.strip(), record.seq.strip()]
         else:
-            frag = record.id.split('|')[1]+'_'+record.id.split('/')[-1].rstrip()
+            frag = record.id.split('|')[1]+'|'+record.id.split('/')[-1].rstrip()
             prot = record.id.split('|')[-1].split('/')[0]
             seq = record.seq.strip()
-
             if cov != None:
                 if (len(seq.strip('-'))/len(query[1]))*100 < cov: continue
-            if len(hits.keys) == top: break
+            if len(hits.keys()) == top: break
 
             if prot not in proteomes: proteomes[prot] = []
             proteomes[prot].append(frag)
@@ -34,8 +34,16 @@ def merge_msa(q1, h1, p1, q2, h2, p2, sep='A'*20):
     proteomes2 = set(p2.keys())
     common = proteomes1.intersection(proteomes2)
     for proteome in common:
+        domcount = {}
         frag1 = p1[proteome][0]
         frag2 = p2[proteome][0]
+#        print (proteome, frags1, frags2)
+#        for frag in frags1+frags2: 
+#            code = frag.split('|')[0]
+#            if code not in domcount: domcount[code] = 1
+#            else: domcount[code] += 1
+#        for code in domcount: print (code, domcount[code])
+
         mcode = '>'+frag1+'-'+frag2+'\n'
         mseq = h1[frag1]+sep+h2[frag2]+'\n'
         merged_msa.append([mcode, mseq])
@@ -49,6 +57,7 @@ p.add_argument('-i1', required=True, help='input a3m file A')
 p.add_argument('-i2', required=True, help='input a3m file B')
 p.add_argument('-top', required=False, default=None, help='number of top-hits to include from input MSAs')
 p.add_argument('-cov', required=False, default=None, help='minimum coverage (0-100) to include hits')
+p.add_argument('-o', required=False, default=None, help='out path')
 ns = p.parse_args()
 
 
@@ -63,14 +72,14 @@ q2, h2, p2 = parse_msa(ns.i2, top, cov)
 merged12 = merge_msa(q1, h1, p1, q2, h2, p2)
 merged21 = merge_msa(q2, h2, p2, q1, h1, p1)
 
-out = ns.i1.rstrip(ns.i1.split('.')[-1])
-out += '-'+ns.i2.rstrip(ns.i2.split('.')[-1])
-out += '.trimmed'
-with open(out, 'w') as f: 
-    for code, seq in merged12: f.write(code+seq)
+path = ns.o
+file1 = ns.i1.rstrip(ns.i1.split('.')[-1]).split('/')[-1].rstrip('.')
+file2 = ns.i2.rstrip(ns.i2.split('.')[-1]).split('/')[-1].rstrip('.')
 
-out = ns.i2.rstrip(ns.i2.split('.')[-1])
-out += '-'+ns.i1.rstrip(ns.i1.split('.')[-1])
-out += '.trimmed'
+out = '{}/{}-{}.trimmed'.format(path, file1, file2)
+with open(out, 'w') as f: 
+    for code, seq in merged12: f.write(code+str(seq))
+
+out = '{}/{}-{}.trimmed'.format(path, file2, file1)
 with open(out, 'w') as f:
-    for code, seq in merged21: f.write(code+seq)
+    for code, seq in merged21: f.write(code+str(seq))
