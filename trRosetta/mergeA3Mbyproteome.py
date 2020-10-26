@@ -76,10 +76,10 @@ path = ns.o
 file1 = ns.i1.rstrip(ns.i1.split('.')[-1]).split('/')[-1].rstrip('.')
 file2 = ns.i2.rstrip(ns.i2.split('.')[-1]).split('/')[-1].rstrip('.')
 
-out = '{}/{}-{}.trimmed'.format(path, file1, file2)
+out = '{}/{}-{}.a3m'.format(path, file1, file2)
 with open(out, 'w') as f: 
     for code, seq in merged12: f.write(code+str(seq))
 
-out = '{}/{}-{}.trimmed'.format(path, file2, file1)
+out = '{}/{}-{}.a3m'.format(path, file2, file1)
 with open(out, 'w') as f:
     for code, seq in merged21: f.write(code+str(seq))
