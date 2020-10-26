@@ -105,6 +105,9 @@ for record in SeqIO.parse(handleA, 'stockholm') :
          ##   print ("skipping: ",record.name)
          #   skippingA+=[record]
          #   continue
+      #gaps=len(re.findall(r'[A-Z]',str(record.seq)))/len(record.seq)
+      print (record.seq,gaps)
+      sys.exit()
       if use_genus:
          organism=re.sub(r'\s+','',organism)
       if (not organism in dataA.keys()):
@@ -146,6 +149,7 @@ for record in SeqIO.parse(handleB, 'stockholm') :
             organism=host
       if use_genus:
          organism=re.sub(r'\s+','',organism)
+
       if (not organism in dataB.keys()):
          #print ("B",record.name,organism)
          dataB[organism]=record
@@ -163,8 +167,9 @@ if (not ns.output):
    print ("> " + seqA.name + " AND " + seqB.name)
    print (seqA.seq+sepseq+seqB.seq)
 for key in dataA.keys():
-   if (key in dataB.keys()):
+   if ((key in dataB.keys()) and  (dataA[key].id!=dataB[key].id)):
       sequences+=[SeqRecord(seq=dataA[key].seq+sepseq+dataB[key].seq,id=key,name=key,description=key,dbxrefs=[])]
+
       if count < ns.max:
          if (not ns.output):
             print ("> " + key )
