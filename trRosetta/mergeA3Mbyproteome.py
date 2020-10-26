@@ -26,7 +26,7 @@ def parse_msa(msa_file, top, cov):
 
 def merge_msa(q1, h1, p1, q2, h2, p2, sep='A'*20):
     merged_msa = []
-    qmcode = q1[0]+'-'+q2[0]+'\n'
+    qmcode = '>'+q1[0]+'-'+q2[0]+'\n'
     qmseq = q1[1]+sep+q2[1]+'\n'
     merged_msa.append([qmcode, qmseq])
 
