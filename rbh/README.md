@@ -1,4 +1,6 @@
-# there are two main scripts to run: blast_rbh.sh and jackhmmer_rbh.sh. 
+# there are two main scripts to run: blast_rbh.sh/jackhmmer_rbh.sh and rbh.sh. 
+  *blast.sh*/*jackhmmer_rbh.sh* generate the orthologs for each ecoli protein.
+  *rbh.sh*: merge ortholog proteins for each interacting pair and run trRosetta.
 
 **blast_rbh.py**:
 
@@ -12,6 +14,9 @@
   - Jackhmmer method can search homologs against reference and nonreference proteomes(32979 proteomes).
   - Jackhmmer command is : 3 iterations, evalue 0.01.
 
+**rbh.sh**:
+  - modify the parameters in *param setting* section. Most param are similar as above and there are two new params: lengthfile(a txt file has two columns: one column is protein name, one column is sequence length.), format(psiblast or jackhmmer).
+ 
 
 
 
