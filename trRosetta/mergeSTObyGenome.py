@@ -106,8 +106,8 @@ for record in SeqIO.parse(handleA, 'stockholm') :
          #   skippingA+=[record]
          #   continue
       #gaps=len(re.findall(r'[A-Z]',str(record.seq)))/len(record.seq)
-      print (record.seq,gaps)
-      sys.exit()
+      #print (record.seq,gaps)
+      #sys.exit()
       if use_genus:
          organism=re.sub(r'\s+','',organism)
       if (not organism in dataA.keys()):
