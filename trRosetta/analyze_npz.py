@@ -151,43 +151,46 @@ if ns.pdb:
     if (dimerlen+seplen != p_len):
         print ("PDB file is of different lengths")
         print (dimerlen, p_len,pdblen,seplen)
-        sys.exit(1)
+        #print ()
+        #sys.exit(1)
+        ns.pdb=False
+    else:
         #seplen=0
         #borders+=[pdblen[0]]
     
-    pdbdist = np.zeros((dimerlen+seplen, dimerlen+seplen))
+        pdbdist = np.zeros((dimerlen+seplen, dimerlen+seplen))
 
-    #print (chains,pdblen)
-    i=-seplen
-    for chain1 in structure[0]:
-        i+=seplen
-        for residue1 in chain1:
-        #print (residue1.get_resname())
-            if (residue1.get_resname()=="GLY"):
-                c1=residue1["CA"]
-            else:
-                try:
-                    c1=residue1["CB"]
-                except:
+        #print (chains,pdblen)
+        i=-seplen
+        for chain1 in structure[0]:
+            i+=seplen
+            for residue1 in chain1:
+                #print (residue1.get_resname())
+                if (residue1.get_resname()=="GLY"):
                     c1=residue1["CA"]
-            j=-seplen    
-            for chain2 in structure[0]:
-                j+=seplen
-                for residue2 in chain2:
-                #print (residue2.get_resname())
-                    print (residue2)
-                    if (residue2.get_resname()=="GLY"):
-                        c2=residue2["CA"]
-                    else:
-                        try:
-                            c2=residue2["CB"]
-                        except:
+                else:
+                    try:
+                        c1=residue1["CB"]
+                    except:
+                        c1=residue1["CA"]
+                j=-seplen    
+                for chain2 in structure[0]:
+                    j+=seplen
+                    for residue2 in chain2:
+                        #print (residue2.get_resname())
+                        print (residue2)
+                        if (residue2.get_resname()=="GLY"):
                             c2=residue2["CA"]
-                    pdbdist[i,j]=c1-c2
-                    if i<j: res[i,j]=min(maxdist,pdbdist[i,j])
-                    print(i,residue1.get_resname(),j,residue2.get_resname(),c1,c2,c1-c2)
-                    j+=1
-            i+=1
+                        else:
+                            try:
+                                c2=residue2["CB"]
+                            except:
+                                c2=residue2["CA"]
+                        pdbdist[i,j]=c1-c2
+                        if i<j: res[i,j]=min(maxdist,pdbdist[i,j])
+                        print(i,residue1.get_resname(),j,residue2.get_resname(),c1,c2,c1-c2)
+                        j+=1
+                i+=1
 
 
 #sys.exit()    

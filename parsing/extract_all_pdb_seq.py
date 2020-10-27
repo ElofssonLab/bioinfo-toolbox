@@ -28,9 +28,9 @@ except:
     chains = get_all_chains(pdbfile)
 else:
     chains = chain
-print ":"+code+":"
-print pdbfile
-print chains
+print (":"+code+":")
+print (pdbfile)
+print (chains)
 pdbfile.close()
 #print chains
 for chain in chains:
@@ -40,7 +40,7 @@ for chain in chains:
     else:
         pdbfile = open(sys.argv[1], 'r')
     outname=name+chain+".fasta"
-    print outname
+    print (outname)
     outfile = open(outname,'w')
     outfile.write("> " + code + "_" + chain + "\n")
     outfile.write(get_atom_seq(pdbfile, chain) + "\n")
