@@ -29,7 +29,7 @@ name = sys.argv[1].replace(".pdb","_")
 
 chains = get_all_chains(pdbfile)
 pdbfile.close()
-print chains,name
+print (chains,name)
 for chain in chains:
     if sys.argv[1].endswith(".gz"):
         pdbfile = gzip.open(sys.argv[1], 'rb')
@@ -38,7 +38,7 @@ for chain in chains:
     coord=read_chain(pdbfile, chain)
     pdbfile.close()
     outname=name+chain+".pdb"
-    print outname
+    print (outname)
     # outname=name+chain+".pdb"
     outfile = open(outname,'w')
     write(coord,outfile)
