@@ -3,6 +3,7 @@ import argparse
 from Bio.PDB.vectors import rotaxis, calc_angle, calc_dihedral
 from Bio.PDB.Polypeptide import is_aa
 from math import pi
+import math
 import numpy 
 from Bio.PDB import PDBIO
 
@@ -14,7 +15,8 @@ if __name__ == "__main__":
     in_group.add_argument("-p", "--pdb_file", type=argparse.FileType('r'))
     in_group.add_argument("-m", "--mmCIF_file", type=argparse.FileType('r'))
 
-    arg_parser.add_argument("-r", "--rotation", required=True, help="12 parameters for translation and rotation (Note you need a space before a - sign)",nargs=12,type=float)
+    arg_parser.add_argument("-r", "--rotation", required=False, help="12 parameters for translation and rotation (Note you need a space before a - sign)",nargs=12,type=float)
+    arg_parser.add_argument("-a", "--angles", required=False, help="6 parameters for translation and rotation (Note you need a space before a - sign)",nargs=6,type=float)
 
     arg_parser.add_argument("-o","--outfile", type=str)
     #arg_parser.add_argument("-c", "--chain", type=str, default='A')
@@ -37,13 +39,34 @@ if __name__ == "__main__":
     # Load structure
     structure = bio_parser.get_structure(structure_id, structure_file)
 
-    rotation_matrix = numpy.array((
-        (args.rotation[3],args.rotation[4],args.rotation[5]),
-        (args.rotation[6],args.rotation[7],args.rotation[8]),
-        (args.rotation[9],args.rotation[10],args.rotation[11])
-        ),'f')
-    translation_matrix = numpy.array((args.rotation[0],args.rotation[1],args.rotation[2]),'f')
 
+    if (args.rotation):
+        rotation_matrix = numpy.array((
+            (args.rotation[3],args.rotation[4],args.rotation[5]),
+            (args.rotation[6],args.rotation[7],args.rotation[8]),
+            (args.rotation[9],args.rotation[10],args.rotation[11])
+        ),'f')
+        translation_matrix = numpy.array((args.rotation[0],args.rotation[1],args.rotation[2]),'f')
+    elif (args.angles):
+        alpha=args.angles[0]*pi/180
+        beta=args.angles[1]*pi/180
+        gamma=args.angles[2]*pi/180
+        rotation_matrix=numpy.array((
+            (math.cos(alpha)*math.cos(beta),
+             math.cos(alpha)*math.sin(beta)*math.sin(gamma)-math.sin(alpha)*math.cos(gamma),
+             math.cos(alpha)*math.sin(beta)*math.cos(gamma)+math.sin(alpha)*math.sin(gamma)),
+            (math.sin(alpha)*math.cos(beta),
+             math.sin(alpha)*math.sin(beta)*math.sin(gamma)+math.cos(alpha)*math.cos(gamma),
+             math.sin(alpha)*math.sin(beta)*math.cos(gamma)-math.cos(alpha)*math.sin(gamma)),
+            (-1*math.sin(beta),
+             math.cos(beta)*math.sin(gamma),
+             math.cos(beta)*math.cos(gamma))
+        ),'f')
+                                    
+        translation_matrix = numpy.array((args.angles[3],args.angles[4],args.angles[5]),'f')
+    else:
+        sys.die("No rotation information")
+        
     print (rotation_matrix)
     print (translation_matrix)
     for atom in structure.get_atoms():
