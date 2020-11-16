@@ -8,8 +8,8 @@ import re
 parser = argparse.ArgumentParser(description="Converting CASP-RR file t gramm constrants")
 #parser.add_argument('file', metavar='file', type=argparse.FileType('r'), nargs=1, help='filename')
 parser.add_argument('--threshold',"-t", type=float, help='distance skip',default=2.)
-parser.add_argument("--sepseq","-sep","-S",required=False, help='Separation sequence between protein in MSA' ,default="GGGGGGGGGGGGGGGGGGGG")
-parser.add_argument('-seq','--sequence','-s', required= False, help='sequence file to identify domain baorders')
+#parser.add_argument("--sepseq","-sep","-S",required=False, help='Separation sequence between protein in MSA' ,default="GGGGGGGGGGGGGGGGGGGG")
+parser.add_argument('-seq','--sequence','-s', required= False, help='sequence file of first sequene to identify domain borders')
 parser.add_argument('file', metavar='file', type=str, nargs=1, help='filename')
 parser.add_argument('-max','--maxhits','-m', required= False, help='maximum number of sequences to include')
 args = parser.parse_args()
@@ -29,7 +29,6 @@ for infilef in args.file:
 dompos=0
 borders=[]
 if args.sequence:
-    sepseq=args.sepseq
     from Bio import SeqIO
     from Bio.Seq import Seq
     from Bio.SeqRecord import SeqRecord
@@ -39,15 +38,8 @@ if args.sequence:
     with open(args.sequence, "r") as handle:
         for record in SeqIO.parse(handle, "fasta"):
             seq=record
-            #print (record)
-            break
-    args.domain=[]
-    for m in re.finditer(sepseq,str(seq.seq)):
-        borders+=[m.start()]
-        #print(m.start(), m.group())
-        for i in range(m.start(),m.start()+len(sepseq)):
-            args.domain+=[i]
-
+    borders+=[len(seq)]
+    
 #print ("test",borders[0])
 for l in infile:
     #if (counter > maxhits): break

@@ -35,7 +35,8 @@ if ns.sequence:
     from Bio.Seq import Seq
     from Bio.SeqRecord import SeqRecord
     #import A3MIO
-    # We can read it as fasta as we only care about the first sequence withouth gaps
+    # We can read it as fasta as we only care about the first sequence without gaps
+    # 
     import re
     with open(ns.sequence, "r") as handle:
         for record in SeqIO.parse(handle, "fasta"):
