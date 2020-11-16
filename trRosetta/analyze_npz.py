@@ -16,7 +16,8 @@ p.add_argument('-data','--input','-i', required= True, help='Input trRossetta NP
 p.add_argument('-dataB','--inputB','-j', required= False, help='Input second trRossetta NPZ file (for instance for reversed order merged files)')
 p.add_argument('-pdb','--pdb','-p', required= False, help='Pdb file for analysis od distances')
 p.add_argument('-dom','--domain','-d', required= False, help='positions of domain borders', nargs='+')
-p.add_argument('-seq','--sequence','-s', required= False, help='sequence file to identify domain baorders')
+p.add_argument('-seq','--sequence','-s', required= False, help='sequence file of complete sequence to identify domain borders')
+p.add_argument('-first','--firstsequence','-f', required= False, help='sequence file of first seuence to identify domain borders')
 p.add_argument("--sepseq","-sep","-S",required=False, help='Separation sequence between protein in MSA' ,default="GGGGGGGGGGGGGGGGGGGG")
 p.add_argument('-out','--output','-o', required= False, help='output image')
 #parser.add_argument('--nargs', nargs='+')
@@ -83,7 +84,21 @@ if ns.sequence:
     #print (ns.sequence)    
     #print (seq,seq.seq)    
     ns.domain=[]
-    for m in re.finditer(sepseq,str(seq.seq)):
+    if ns.firstsequence:
+        with open(ns.firstsequence, "r") as fhandle:
+            for record in SeqIO.parse(fhandle, "fasta"):
+                firstseq=record
+                #print (record)
+                break
+        tempseq=str(seq.seq)
+        maskedseq=tempseq[:len(firstseq)].lower()+tempseq[len(firstseq):]
+        #print (str(seq.seq))
+        #print (maskedseq)
+        #sys.exit()
+    else:
+        maskedseq=str(seq.seq)
+    for m in re.finditer(sepseq,maskedseq):
+        
         borders+=[m.start()]
         #print(m.start(), m.group())
         for i in range(m.start(),m.start()+len(sepseq)):

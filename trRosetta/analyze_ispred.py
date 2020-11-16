@@ -56,7 +56,6 @@ def find_shortest_distance(res1, res2):
 
 borders=[]
 if ns.sequence:
-    sepseq=ns.sepseq
     from Bio import SeqIO
     from Bio.Seq import Seq
     from Bio.SeqRecord import SeqRecord
@@ -68,18 +67,8 @@ if ns.sequence:
             seq=record
             #print (record)
             break
-    #print (re.finditer(sepseq,str(seq.seq)))
-    #print (ns.sequence)    
-    #print (seq,seq.seq)    
-    ns.domain=[]
-    for m in re.finditer(sepseq,str(seq.seq)):
-        borders+=[m.start()]
-        #print(m.start(), m.group())
-        for i in range(m.start(),m.start()+len(sepseq)):
-            ns.domain+=[i]
-
-    seplen=len(sepseq)
-            
+    borders+=[len(seq)]
+    
 # If we have two inputs put one at each diagonal but             
 if ns.inputB:
     input_fileB = np.load(ns.inputB)

@@ -18,8 +18,9 @@ import sys
 p = argparse.ArgumentParser(description = '- plotting trRosetta maps-',
                             formatter_class=RawTextHelpFormatter)
 p.add_argument('-data','--input','-i', required= True, help='Input trRossetta NPZ file')
-p.add_argument('-seq','--sequence','-s', required= True, help='sequence file to identify domain borders')
+p.add_argument('-seq','--sequence','-s', required= True, help='first sequence file to identify domain borders')
 #p.add_argument('-ali','--alignment','-a', required= True, help='Alignment of first and second sequence')
+p.add_argument('-first','--firstsequence','-f', required= False, help='sequence file of first seuence to identify domain borders')
 p.add_argument("--sepseq","-sep","-S",required=False, help='Separation sequence between protein in MSA' ,default="GGGGGGGGGGGGGGGGGGGG")
 p.add_argument('-out','--output','-o', required= True, help='output NPZ file')
 p.add_argument('-png','--heatmap','-p', required= False, help='also save PNG files.', action='store_true')
@@ -59,7 +60,20 @@ if ns.sequence:
             #print (record)
             break
     ns.domain=[]
-    for m in re.finditer(sepseq,str(seq.seq)):
+    if ns.firstsequence:
+        with open(ns.firstsequence, "r") as fhandle:
+            for record in SeqIO.parse(fhandle, "fasta"):
+                firstseq=record
+                #print (record)
+                break
+        tempseq=str(seq.seq)
+        maskedseq=tempseq[:len(firstseq)].lower()+tempseq[len(firstseq):]
+        #print (str(seq.seq))
+        #print (maskedseq)
+        #sys.exit()
+    else:
+        maskedseq=str(seq.seq)
+    for m in re.finditer(sepseq,maskedseq):
         borders+=[m.start()]
         #print(m.start(), m.group())
         for i in range(m.start(),m.start()+len(sepseq)):

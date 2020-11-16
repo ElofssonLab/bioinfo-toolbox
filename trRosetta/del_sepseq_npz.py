@@ -11,7 +11,7 @@ from argparse import RawTextHelpFormatter
 p = argparse.ArgumentParser(description = '- plotting trRosetta maps-',
                             formatter_class=RawTextHelpFormatter)
 p.add_argument('-data','--input','-i', required= True, help='Input trRossetta NPZ file')
-p.add_argument('-seq','--sequence','-s', required= True, help='sequence file to identify domain baorders')
+p.add_argument('-seq','--sequence','-s', required= True, help='sequence file of first to identify domain baorders')
 p.add_argument("--sepseq","-sep","-S",required=False, help='Separation sequence between protein in MSA' ,default="GGGGGGGGGGGGGGGGGGGG")
 p.add_argument('-out','--output','-o', required= True, help='output NPX file')
 #parser.add_argument('--nargs', nargs='+')
@@ -43,12 +43,13 @@ if ns.sequence:
             seq=record
             #print (record)
             break
-    ns.domain=[]
-    for m in re.finditer(sepseq,str(seq.seq)):
-        borders+=[m.start()]
-        #print(m.start(), m.group())
-        for i in range(m.start(),m.start()+len(sepseq)):
-            ns.domain+=[i]
+    borders+=[len(seq)]
+    #ns.domain=[]
+    #for m in re.finditer(sepseq,str(seq.seq)):
+    #    borders+=[m.start()]
+    #    #print(m.start(), m.group())
+    #    for i in range(m.start(),m.start()+len(sepseq)):
+    #        ns.domain+=[i]
 
 shift=0
 new_rst = {'dist' : [], 'omega' : [], 'theta' : [], 'phi' : [] } # , 'rep' : []}
