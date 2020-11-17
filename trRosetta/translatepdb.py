@@ -104,6 +104,7 @@ if __name__ == "__main__":
         for atom in structure.get_atoms():
             atom.transform(rotation_matrix2, translation_matrix)
     elif (args.angles):
+        print ("Input",args.angles)
         alpha=args.angles[0]*pi/180
         beta=args.angles[1]*pi/180
         gamma=args.angles[2]*pi/180
