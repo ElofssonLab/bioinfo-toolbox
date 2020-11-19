@@ -72,7 +72,8 @@ def interface_contacts(code1, code2):
             if atom.get_id() == 'CB': CB1 = atom
             elif atom.get_id() == 'CA': CA1 = atom
         if CB1 != '': C1 = CB1
-        else: C1 = CA1
+        elif CA1!= '' :  C1 = CA1
+        else: continue
 
         for pos2, res2 in enumerate(str2):
             CA2 = CB2 = ''
@@ -80,7 +81,9 @@ def interface_contacts(code1, code2):
                 if atom.get_id() == 'CB': CB2 = atom
                 elif atom.get_id() == 'CA': CA2 = atom
             if CB2 != '': C2 = CB2
-            else: C2 = CA2
+            elif CA2 != '': C2 = CA2
+            else: continue
+            #print (pos2,res2,C1,":",C2)
 
             d = C1-C2
             for pos, thr in enumerate(bins):
@@ -185,24 +188,26 @@ if __name__ == "__main__":
     #Extract the predicted inter-protein contacts
     with np.load(npz) as npz_file: pred_cmap = npz_file['dist'][:sep, sep:, :]
     
-    assert real_cmap.shape == pred_cmap.shape,\
-           'Cmaps doesn\'t match, real - {} vs pred - {}'.format(real_cmap.shape, pred_cmap.shape)
+    #assert real_cmap.shape == pred_cmap.shape,\
+    #       'Cmaps doesn\'t match, real - {} vs pred - {}'.format(real_cmap.shape, pred_cmap.shape)
+    if real_cmap.shape != pred_cmap.shape:
+           print ('Cmaps doesn\'t match, real - {} vs pred - {}'.format(real_cmap.shape, pred_cmap.shape))
+    else:
+        sorted_list = sort_pred(pred_cmap)
 
-    sorted_list = sort_pred(pred_cmap)
+        codeauc8 = []
+        codeauc12 = []
+        for t in tolrange: 
+            aucval12 = bin_auc(pred_cmap, real_cmap, sorted_list, t, 35)
+            aucs12[t] += aucval12
+            codeauc12.append(aucval12)
+        for t in tolrange: 
+            aucval8 = bin_auc(pred_cmap, real_cmap, sorted_list, t, 12)
+            aucs8[t] += aucval8
+            codeauc8.append(aucval8)
 
-    codeauc8 = []
-    codeauc12 = []
-    for t in tolrange: 
-        aucval12 = bin_auc(pred_cmap, real_cmap, sorted_list, t, 35)
-        aucs12[t] += aucval12
-        codeauc12.append(aucval12)
-    for t in tolrange: 
-        aucval8 = bin_auc(pred_cmap, real_cmap, sorted_list, t, 12)
-        aucs8[t] += aucval8
-        codeauc8.append(aucval8)
-
-    values = ns.c.split('/')[-1].rstrip('.npz')+'\t'
-    for aucval in codeauc12: values += '{}\t\t'.format(round(aucval, 3))
-    for aucval in codeauc8: values += '{}\t\t'.format(round(aucval, 3))
-    print (values)
+        values = ns.c.split('/')[-1].rstrip('.npz')+'\t'
+        for aucval in codeauc12: values += '{}\t\t'.format(round(aucval, 3))
+        for aucval in codeauc8: values += '{}\t\t'.format(round(aucval, 3))
+        print (values)
 
