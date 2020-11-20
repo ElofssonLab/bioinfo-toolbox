@@ -49,7 +49,7 @@ if args.sequence:
 # Added functionality to remove gaps in first sequence..
 
 
-maxlen=100000
+maxlen=500000
 counter = 0
 gaps=np.zeros(maxlen)
 
