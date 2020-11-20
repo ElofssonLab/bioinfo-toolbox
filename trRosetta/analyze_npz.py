@@ -193,7 +193,7 @@ if ns.pdb:
                     j+=seplen
                     for residue2 in chain2:
                         #print (residue2.get_resname())
-                        print (residue2)
+                        #print (residue2)
                         if (residue2.get_resname()=="GLY"):
                             c2=residue2["CA"]
                         else:
@@ -203,7 +203,7 @@ if ns.pdb:
                                 c2=residue2["CA"]
                         pdbdist[i,j]=c1-c2
                         if i<j: res[i,j]=min(maxdist,pdbdist[i,j])
-                        print(i,residue1.get_resname(),j,residue2.get_resname(),c1,c2,c1-c2)
+                        #print(i,residue1.get_resname(),j,residue2.get_resname(),c1,c2,c1-c2)
                         j+=1
                 i+=1
 
@@ -266,6 +266,18 @@ medPPV=[0,0,0,0,0,0]
 longTP=[0,0,0,0,0,0]
 longFP=[0,0,0,0,0,0]
 longPPV=[0,0,0,0,0,0]
+shortTN=[0,0,0,0,0,0]
+shortFN=[0,0,0,0,0,0]
+shortMCC=[0,0,0,0,0,0]
+medTN=[0,0,0,0,0,0]
+medFN=[0,0,0,0,0,0]
+medMCC=[0,0,0,0,0,0]
+longTN=[0,0,0,0,0,0]
+longFN=[0,0,0,0,0,0]
+longMCC=[0,0,0,0,0,0]
+shortF1=[0,0,0,0,0,0]
+medF1=[0,0,0,0,0,0]
+longF1=[0,0,0,0,0,0]
 if (ns.sequence):
     for m in borders:
         starty=0
@@ -286,32 +298,47 @@ if (ns.sequence):
                     numdist[x]+=1
                     #d_slice = dist[i, j, 1:]
                     #mean_dist = np.sum(np.multiply(bins, d_slice/np.sum(d_slice)))
+                    # Now we need to check agreement for all predicted long contacts
                     mean_dist=res[i,j]
                     mindist[x]=min(mean_dist,mindist[x])
+                    averagedist[x]+=mean_dist
                     if (mean_dist<short):
                         numshortcontacts[x]+=1
                     if (mean_dist<med):
                         nummedcontacts[x]+=1
                     if (mean_dist<long):
                         numlongcontacts[x]+=1
-                    averagedist[x]+=mean_dist
-                    # Now we need to check agreement for all predicted long contacts
                     if i>j:
                         if res[i,j]<short:
                             if res[j,i]<short+extradist:
                                 shortTP[x]+=1
                             else:
                                 shortFP[x]+=1
+                        else:
+                            if res[j,i]<short+extradist:
+                                shortFN[x]+=1
+                            else:
+                                shortTN[x]+=1
                         if res[i,j]<med:
                             if res[j,i]<med+extradist:
                                 medTP[x]+=1
                             else:
                                 medFP[x]+=1
+                        else:
+                            if res[j,i]<short+extradist:
+                                medFN[x]+=1
+                            else:
+                                medTN[x]+=1
                         if res[i,j]<long:
                             if res[j,i]<long+extradist:
                                 longTP[x]+=1
                             else:
                                 longFP[x]+=1
+                        else:
+                            if res[j,i]<short+extradist:
+                                longFN[x]+=1
+                            else:
+                                longTN[x]+=1
             starty=n+len(sepseq)
         startx=m+len(sepseq)
 
@@ -328,6 +355,12 @@ if (ns.pdb):
         shortPPV[x]=shortTP[x]/(shortTP[x]+shortFP[x]+1.e-20)        
         medPPV[x]=medTP[x]/(medTP[x]+medFP[x]+1.e-20)        
         longPPV[x]=longTP[x]/(longTP[x]+longFP[x]+1.e-20)        
+        shortMCC[x]=(shortTP[x]*shortTN[x]-shortFP[x]*shortFN[x])/np.sqrt((shortTP[x]+shortFP[x])*(shortTP[x]+shortFN[x])*(shortTN[x]+shortFP[x])*(shortTN[x]+shortFN[x])+1.e-20)
+        medMCC[x]=(medTP[x]*medTN[x]-medFP[x]*medFN[x])/np.sqrt((medTP[x]+medFP[x])*(medTP[x]+medFN[x])*(medTN[x]+medFP[x])*(medTN[x]+medFN[x])+1.e-20)
+        longMCC[x]=(longTP[x]*longTN[x]-longFP[x]*longFN[x])/np.sqrt((longTP[x]+longFP[x])*(longTP[x]+longFN[x])*(longTN[x]+longFP[x])*(longTN[x]+longFN[x])+1.e-20)
+        shortF1[x]=2*shortTP[x]/(2*shortTP[x]+shortFP[x]+shortFN[x]+1.e-20)
+        medF1[x]=2*medTP[x]/(2*medTP[x]+medFP[x]+medFN[x]+1.e-20)
+        longF1[x]=2*longTP[x]/(2*longTP[x]+longFP[x]+longFN[x]+1.e-20)
 # o        
 #sys.exit()
         
@@ -367,10 +400,22 @@ print ("NumProb",ns.input,np.round(numprob,3))
 print ("FractionProb",ns.input,np.round(fractionprob,3))
 print ("ShortTP",shortTP)
 print ("ShortFP",shortFP)
+print ("ShortTN",shortTN)
+print ("ShortFN",shortFN)
 print ("ShortPPV",np.round(shortPPV,3))
+print ("ShortMCC",np.round(shortMCC,3))
+print ("ShortF1",np.round(shortF1,3))
 print ("MedTP",medTP)
 print ("MedFP",medFP)
+print ("MedTN",medTN)
+print ("MedFN",medFN)
 print ("MedPPV",np.round(medPPV,3))
+print ("MedMCC",np.round(medMCC,3))
+print ("MedF1",np.round(medF1,3))
 print ("LongTP",longTP)
 print ("LongFP",longFP)
+print ("LongTN",longTN)
+print ("LongFN",longFN)
 print ("LongPPV",np.round(longPPV,3))
+print ("LongMCC",np.round(longMCC,3))
+print ("LongF1",np.round(longF1,3))
