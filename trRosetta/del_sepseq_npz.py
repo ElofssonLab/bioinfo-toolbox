@@ -55,16 +55,19 @@ shift=0
 new_rst = {'dist' : [], 'omega' : [], 'theta' : [], 'phi' : [] } # , 'rep' : []}
 #new_rst=rst
 for m in borders:
-    print ("Deleting :",m,m+len(sepseq))
+    print ("Deleting :",m,m+len(sepseq),dist.shape[0])
     for x in rst.files:
         #print (x)
         new_rst[x]=np.delete(rst[x],slice(m+shift,m+shift+len(sepseq)),1)
         new_rst[x]=np.delete(new_rst[x],slice(m+shift,m+shift+len(sepseq)),0)
     shift+=len(sepseq)
-        
+
+print ("New Length :",new_rst["dist"].shape[0])    
 # o        
 #sys.exit()
 #print (new_rst)
+
+
 
 # Save
 np.savez_compressed(ns.output, dist=new_rst['dist'], omega=new_rst['omega'], theta=new_rst['theta'], phi=new_rst['phi'])# , rep=new_rst['rep'])
