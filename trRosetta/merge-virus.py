@@ -11,8 +11,8 @@ import pandas as pd
 
 #from Bio.SeqFeature import SeqFeature, FeatureLocation
 
-#sepseq="GGGGGGGGGGGGGGGGGGGG" # fir old reasons I keep polyA
-sepseq="AAAAAAAAAAAAAAAAAAAA"
+sepseq="GGGGGGGGGGGGGGGGGGGG" # fir old reasons I keep polyA
+#sepseq="AAAAAAAAAAAAAAAAAAAA"
 
 
 fileA=sys.argv[1]
