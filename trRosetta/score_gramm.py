@@ -58,6 +58,29 @@ allowed_atoms = ['N','CA','C','O','OXT','CB',
                  'NH','NH1','NH2','ND','ND1','ND2',
                  'SG','SD','SE']
 
+def get_sep(struc):
+
+    three2one = {'ALA':'A','ARG':'R','ASN':'N','ASP':'D',
+                 'CYS':'C','GLN':'Q','GLU':'E','GLY':'G',
+                 'HIS':'H','ILE':'I','LEU':'L','LYS':'K',
+                 'MET':'M','PHE':'F','PRO':'P','SER':'S',
+                 'THR':'T','TRP':'W','TYR':'Y','VAL':'V',
+                 'MSE':'M'}
+    seq = ''
+    prv = ''
+    chain = ''
+    for line in open(struc):
+        if line.startswith('ATOM'):
+            if chain == '': chain = line[21]
+            elif chain != line[21]: break
+
+            if line[22:27].strip() != prv:
+                seq += three2one[line[17:20]]
+                prv = line[22:27].strip()
+        if line.startswith('TER'): break
+
+    return seq
+
 def ligand_center(atom_list, geometric=False):
     masses = []
     positions = [ [], [], [] ] # [ [X1, X2, ..] , [Y1, Y2, ...] , [Z1, Z2, ...] ]
@@ -81,29 +104,25 @@ def ligand_center(atom_list, geometric=False):
         return [sum(coord_list)/sum(masses) for coord_list in w_pos]
 
 def get_rototranslation(data):
+    count = 0
     result_batch = []
     with tf.Session(graph=get_rt, config=config) as sess:
         for pose, m1, m2 in data:
             r_mat, t_vec = sess.run([r, t], feed_dict = {gr:m1, gt:m2, lcm:cm})
             result_batch.append([pose, r_mat, t_vec])
+            count += 1
+            if count%1000 == 0: print ('Processed {} rt matrixes!'.format(count))
     return result_batch
 
 def rototranslate_coord(data, c_only=True):
     count = 0
     result_batch = []
     with tf.Session(graph=rt_comp, config=config) as sess:
-        for res in data:
-            mat = res[2]
-            vec = res[3]
-            for atom in str2[0]['B'][res[0]]:
-                name = atom.get_id()
-                coord = atom.get_coord()
-                main_c = get_main_coord(str2[0]['B'][res[0]])
-                if c_only and name != main_c: continue
-                rt_coord = sess.run(rtcoord, feed_dict = {r_mat:mat, t_vec:vec, xyz:coord})
-                result_batch.append([res[0], res[1], name, rt_coord])
-                count += 1
-                if count % (1000*res_num) == 0: print (count/res_num)
+        for rt in data:
+            rt_coord, p_score = sess.run([rtcoord, score], feed_dict = {r_mat:rt[1], t_vec:rt[2]})
+            result_batch.append([rt[0], rt_coord, p_score])
+            count += 1
+            if count % (1000) == 0: print ('Roto-translated {} structures!'.format(count))
     return result_batch
 
 def get_main_coord(res):
@@ -119,27 +138,109 @@ def split_jobs(job_list, cores):
     batch_list.append(job_list[bs*(cores-1):])
     return batch_list
 
-    
+def mergesort_pred(linear):
+    elem = 1
+    while len(linear) > elem:
+        joblist = []
+        for idx in range(0, len(linear)+elem*2, elem*2):
+            ida = idx+elem
+            idb = idx+elem*2
+            if len(linear) >= idb:
+                a = linear[idx:ida]
+                b = linear[ida:idb]
+            elif len(linear) >= ida:
+                a = linear[idx:ida]
+                b = linear[ida:]
+            elif len(linear) >= idx:
+                a = linear[idx:]
+                b = []
+            else: continue
+            joblist.append([a, b])
+
+        pool = mp.Pool(processes=cores)
+        results = pool.map(merge, joblist)
+        pool.close()
+        pool.join()
+
+        linear = [ el for res in results for el in res ]
+        elem *= 2
+    return linear
+
+def merge(job):
+    l = []
+    l1 = job[0]
+    l2 = job[1]
+    p1 = p2 = 0
+    while len(l) < len(l1)+len(l2):
+        if p1 == len(l1): l.extend(l2[p2:])
+        elif p2 == len(l2): l.extend(l1[p1:])
+        elif l1[p1][2] >= l2[p2][2]:
+            l.append(l1[p1])
+            p1 += 1
+        else:
+            l.append(l2[p2])
+            p2 += 1
+    return l
+
+
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description = '- Plot PPV stats for a Cmap or a list of Cmaps')
     p.add_argument('-g', required= True, help='gramm output')
     p.add_argument('-c', required= True, help='trRosetta predictions')
     p.add_argument('-s1', required= True, help='structure file 1')
     p.add_argument('-s2', required= True, help='structure file 2')
+    p.add_argument('-o', required= False, default=None, help='output file path and prefix to write models (no format)')
     ns = p.parse_args()
 
-    with np.load(ns.c) as data: cmap = data['dist'] 
-    #get top contacts
+    ##### parse contacts #####
+    contactidxs = []
+    sep = len(get_sep(ns.s1))
+    with np.load(ns.c) as data: cmap = data['dist'][:sep, sep:]
+    contactids = [y+sep+1 for y in range(0, cmap.shape[1]) if np.any(cmap[:,y,0]<=0.15)]
+    #contactids = np.array(contactids, dtype=np.int)
 
     ##### parse structures #####
     p = PDBParser(QUIET=True)
     str1 = p.get_structure('', ns.s1)
     str2 = p.get_structure('', ns.s2)
     str3 = p.get_structure('', ns.s2)
+    rec_res = Selection.unfold_entities(str1, 'R')
     lig_res = Selection.unfold_entities(str2, 'R')
-    lig_atoms = Selection.unfold_entities(str2, 'A')
-    res_num = len(lig_res)
+    print (len(lig_res), len(rec_res))
+
+    ##### ligand real interface CB/CA coordinates #####
+    lcoordinates = []
+    for idx in contactids: 
+        atom = get_main_coord(str2[0]['B'][idx])
+        if atom is None: continue
+        lcoordinates.append([c for c in str2[0]['B'][idx][atom].get_coord()])
+    lcoordinates = np.array(lcoordinates, dtype=np.float32)
+    
+    ##### ligand CB/CA coordinates #####
+    full_lig = []
+    full_lig_id = []
+    for res in lig_res:
+        resid = res.get_id()
+        for atom in res:
+            atomid = atom.get_id()
+            full_lig.append([c for c in atom.get_coord()])
+            full_lig_id.append([resid, atomid])
+    full_lig = np.array(full_lig, dtype=np.float32)
+
+    ##### receptor CB/CA coordinates #####
+    rcoordinates = []
+    for res in rec_res: 
+        atom = get_main_coord(res)
+        if atom is None: continue
+        rcoordinates.append([c for c in res[atom].get_coord()])
+    rcoordinates = np.array(rcoordinates, dtype=np.float32)
+    
+    ##### get contact probabilities #####
+    contactids = np.array(contactids, dtype=np.int)
+    lrprobs = np.sum(cmap[:,contactids-(sep+1), 1:], axis=-1)
+
     ##### calculate lcm #####
+    lig_atoms = Selection.unfold_entities(str2, 'A')
     cm = np.array(ligand_center(lig_atoms), dtype=np.float32)
 
     ##### graph to elaborate GRAMM output #######################################
@@ -170,15 +271,44 @@ if __name__ == "__main__":
                                                                                 #
         r_lcm = tf.linalg.matvec(r, lcm)                                        #
         t = gt+(lcm-r_lcm)                                                      #
+        t = tf.expand_dims(t, axis=-1)                                          #
+    #############################################################################
 
-    ##### graph to roto-translate atom coordinates ##############################
+    ##### graph to roto-translate and score atom coordinates ####################
     with tf.Graph().as_default() as rt_comp:                                    #
         with tf.name_scope('input1'):                                           #
-            t_vec = tf.placeholder(dtype=tf.float32, shape=(3))                 #
+            pr = tf.constant(lrprobs)                                           #
+            xyz = tf.constant(lcoordinates)                                     #
+            rec = tf.constant(rcoordinates)                                     #
+            t_vec = tf.placeholder(dtype=tf.float32, shape=(3, 1))              #
             r_mat = tf.placeholder(dtype=tf.float32, shape=(3, 3))              #
-            xyz = tf.placeholder(dtype=tf.float32, shape=(3))                   #
                                                                                 #
-        rtcoord = tf.math.add(t_vec, tf.linalg.matvec(r_mat, xyz))              #
+        xyz = tf.transpose(xyz, perm=[1,0])                                     #
+        rtcoord = tf.math.add(t_vec, tf.linalg.matmul(r_mat, xyz))              #
+        rtcoord = tf.transpose(rtcoord, perm=[1,0])                             #
+                                                                                #
+        ##### scoring #####                                                     #
+        pr = 1+tf.math.log(pr)                                                  #
+        A = tf.expand_dims(rec, axis=1)                                         #
+        B = tf.expand_dims(rtcoord, axis=0)                                     #
+        distances = tf.math.sqrt(tf.reduce_sum((A-B)**2, axis=-1))              #
+        zeros = tf.zeros(distances.shape, dtype=tf.float32)                     #
+        scores = tf.where(tf.math.less(distances, 20), pr, zeros)               #
+        score = tf.math.reduce_sum(scores)                                      #
+    #############################################################################
+
+    ##### graph for full roto-translation #######################################
+    with tf.Graph().as_default() as full_rt:                                    #
+        with tf.name_scope('input2'):                                           #
+            full_xyz = tf.constant(full_lig)                                    #
+            full_t = tf.placeholder(dtype=tf.float32, shape=(3, 1))             #
+            full_r = tf.placeholder(dtype=tf.float32, shape=(3, 3))             #
+                                                                                #
+        full_xyz = tf.transpose(full_xyz, perm=[1,0])                           #
+        full_rtcoord = tf.math.add(full_t, tf.linalg.matmul(full_r, full_xyz))  #
+        full_rtcoord = tf.transpose(full_rtcoord, perm=[1,0])                   #
+    #############################################################################
+
 
     cores = mp.cpu_count()-1
     config = tf.ConfigProto()
@@ -203,31 +333,33 @@ if __name__ == "__main__":
     pool.close()
     pool.join()
 
-    ##### rototranslate CBs coordinates #####
+    ##### rototranslate and score poses #####
     rtlist = []
-    for batch in results: rtlist.extend(batch) 
-    res_jobs = [ [res.get_id()]+mat for mat in rtlist for res in lig_res ]
+    rtdict = {}
+    for batch in results: 
+        rtlist.extend(batch) 
+        for result in batch: rtdict[result[0]] = result[1:]
 
     pool = mp.Pool(processes = cores)
-    job_list = split_jobs(res_jobs, cores)
+    job_list = split_jobs(rtlist, cores)
     results = pool.map(rototranslate_coord, job_list)
     pool.close()
     pool.join()
 
-    rtcdic = {}
-    for batch in results:
-        for res in batch:
-            if res[1] not in rtcdic: rtcdic[res[1]]={}
-            if res[0] not in rtcdic[res[1]]: rtcdic[res[1]][res[0]] = {}
-            rtcdic[res[1]][res[0]][res[2]] = res[3]
+    ##### sort out results #####
+    scorelist = []
+    for batch in results: scorelist.extend(batch)
+    sortedlist = mergesort_pred(scorelist)
 
-    #io = PDBIO()
-    #for name, coord in coords: str3[0]['B'][res][name].set_coord(coord)
-    #io.set_structure(str3)
-    #io.save('try.pdb')
-        
-        
-
-
-
-
+    ##### print out #####
+    io = PDBIO()
+    with tf.Session(graph=full_rt, config=config) as sess:
+        for n in range(10):
+            pose = sortedlist[n][0]
+            score = sortedlist[n][2]
+            print ('# {} - Pose {} - Score {}'.format(n+1, pose, score))
+            if not ns.o is None:
+                rt_coord = sess.run(full_rtcoord, feed_dict = {full_r:rtdict[pose][0], full_t:rtdict[pose][1]})
+                for coord, ids in zip(rt_coord, full_lig_id): str3[0]['B'][ids[0]][ids[1]].set_coord(coord)
+                io.set_structure(str3)
+                io.save('{}_{}.pdb'.format(ns.o, n+1))
