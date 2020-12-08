@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import math
+import sys
 import argparse
 import numpy  as np
 import tensorflow as tf
@@ -212,15 +213,22 @@ if __name__ == "__main__":
 
     ##### ligand real interface CB/CA coordinates #####
     lcoordinates = []
+    if (len(contactids)==0):
+        print("No contacts found ")
+        sys.exit(0)
     for idx in contactids: 
         atom = get_main_coord(str2[0][lchainid][idx])
         if atom is None: continue
         lcoordinates.append([c for c in str2[0][lchainid][idx][atom].get_coord()])
     lcoordinates = np.array(lcoordinates, dtype=np.float32)
+    if (len(lcoordinates)==0):
+        print("No ligand coordinates found ")
+        sys.exit(0)
     
     ##### ligand CB/CA coordinates #####
     full_lig = []
     full_lig_id = []
+    #print (lig_res)
     for res in lig_res:
         resid = res.get_id()
         for atom in res:
@@ -236,6 +244,9 @@ if __name__ == "__main__":
         if atom is None: continue
         rcoordinates.append([c for c in res[atom].get_coord()])
     rcoordinates = np.array(rcoordinates, dtype=np.float32)
+    if (len(rcoordinates)==0):
+        print("No receptor coordinates found")
+        sys.exit(0)
     
     ##### get contact probabilities #####
     contactids = np.array(contactids, dtype=np.int)
@@ -276,6 +287,8 @@ if __name__ == "__main__":
         t = tf.expand_dims(t, axis=-1)                                          #
     #############################################################################
 
+    print ("TEST",lcoordinates,rcoordinates)
+    
     ##### graph to roto-translate and score atom coordinates ####################
     with tf.Graph().as_default() as rt_comp:                                    #
         with tf.name_scope('input1'):                                           #
