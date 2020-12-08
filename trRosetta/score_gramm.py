@@ -122,7 +122,7 @@ def rototranslate_coord(data, c_only=True):
             rt_coord, p_score = sess.run([rtcoord, score], feed_dict = {r_mat:rt[1], t_vec:rt[2]})
             result_batch.append([rt[0], rt_coord, p_score])
             count += 1
-            if count % (1000) == 0: print ('Roto-translated {} structures!'.format(count))
+            if count%1000 == 0: print ('Roto-translated {} structures!'.format(count))
     return result_batch
 
 def get_main_coord(res):
@@ -312,7 +312,7 @@ if __name__ == "__main__":
     #############################################################################
 
 
-    cores = mp.cpu_count()-1
+    cores = 5 #mp.cpu_count()-1
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
 
@@ -362,6 +362,6 @@ if __name__ == "__main__":
             print ('# {} - Pose {} - Score {}'.format(n+1, pose, score))
             if not ns.o is None:
                 rt_coord = sess.run(full_rtcoord, feed_dict = {full_r:rtdict[pose][0], full_t:rtdict[pose][1]})
-                for coord, ids in zip(rt_coord, full_lig_id): str3[0]['B'][ids[0]][ids[1]].set_coord(coord)
+                for coord, ids in zip(rt_coord, full_lig_id): str3[0][lchainid][ids[0]][ids[1]].set_coord(coord)
                 io.set_structure(str3)
                 io.save('{}_{}.pdb'.format(ns.o, n+1))
