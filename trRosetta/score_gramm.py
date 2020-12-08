@@ -196,7 +196,8 @@ if __name__ == "__main__":
     contactidxs = []
     sep = len(get_sep(ns.s1))
     with np.load(ns.c) as data: cmap = data['dist'][:sep, sep:]
-    contactids = [y+sep+1 for y in range(0, cmap.shape[1]) if np.any(cmap[:,y,0]<=0.15)]
+    contactids = [y+1 for y in range(0, cmap.shape[1]) if np.any(cmap[:,y,0]<=0.15)]
+    print (cmap.shape)
     #contactids = np.array(contactids, dtype=np.int)
 
     ##### parse structures #####
@@ -204,6 +205,7 @@ if __name__ == "__main__":
     str1 = p.get_structure('', ns.s1)
     str2 = p.get_structure('', ns.s2)
     str3 = p.get_structure('', ns.s2)
+    for c in str2[0]: lchainid = c.get_id()
     rec_res = Selection.unfold_entities(str1, 'R')
     lig_res = Selection.unfold_entities(str2, 'R')
     print (len(lig_res), len(rec_res))
@@ -211,9 +213,9 @@ if __name__ == "__main__":
     ##### ligand real interface CB/CA coordinates #####
     lcoordinates = []
     for idx in contactids: 
-        atom = get_main_coord(str2[0]['B'][idx])
+        atom = get_main_coord(str2[0][lchainid][idx])
         if atom is None: continue
-        lcoordinates.append([c for c in str2[0]['B'][idx][atom].get_coord()])
+        lcoordinates.append([c for c in str2[0][lchainid][idx][atom].get_coord()])
     lcoordinates = np.array(lcoordinates, dtype=np.float32)
     
     ##### ligand CB/CA coordinates #####
