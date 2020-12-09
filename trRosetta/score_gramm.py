@@ -250,7 +250,7 @@ if __name__ == "__main__":
     
     ##### get contact probabilities #####
     contactids = np.array(contactids, dtype=np.int)
-    lrprobs = np.sum(cmap[:,contactids-(sep+1), 1:], axis=-1)
+    lrprobs = np.sum(cmap[:,contactids-1, 1:], axis=-1)
 
     ##### calculate lcm #####
     lig_atoms = Selection.unfold_entities(str2, 'A')
