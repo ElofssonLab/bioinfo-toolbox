@@ -1,44 +1,14 @@
-configfile: "config.yaml"
+include: "/home/arnee/git/benchmark5/benchmark4.3/snakemake.common"
 
 # It is best practice to have subsequent steps of a workflow in
 # separate, unique, output folders. This keeps the working directory
 # structured. Further, such unique prefixes allow Snakemake to prune
 # the search space for dependencies.
 
-#envvars:
-#    "LC_NUMERIC='en_US.UTF-8'"
+# Trick to run many jobs in parallell
+# while I= read -r i ; do snakemake --cores 8 -p $i ; done < foo.txt
+#
 
-
-#rule all:
-#  input: ["{dataset}/file.A.txt".format(dataset=dataset) for dataset in DATASETS]
-
-workdir: config['workdir']
-jhparams=config['jhparams']
-dockq=config['dockq']
-bind=config['bind']
-SingImage=config['SingImage']
-trRosettaPath=config['trRosettaPath']
-cns_solve=config['cns_solve']
-
-# An uggly hack because I do not know how to pas commands with curly brackets to snakemake
-gawk1="gawk '{print $1}'"
-gawk2="gawk '{print $2}'"
-gawk3="gawk '{print $3}'"
-gawk4="gawk '{print $4}'"
-gawk5="gawk '{print $5}'"
-gawk6="gawk '{print $6}'"
-gawk7="gawk '{print $7}'"
-gawk8="gawk '{print $8}'"
-gawk9="gawk '{print $9}'"
-
-
-rule jackhmmer:
-    input:
-        "seq/{seq}.fasta"
-    output:
-        "msa/{seq}.sto" 
-    shell:
-        "jackhmmer  {jhparams} -A {output} {input}   ~/Downloads/originalrefproteomes.fasta  "
 
 rule merge:
     input:
@@ -49,8 +19,6 @@ rule merge:
     shell:
         "python3 {trRosettaPath}/mergeSTObyGenome.py -i {input.A} -j {input.B} > {output}"
 
-
-
 rule trimmed:
     input:
         "dimer/{seq}.a3m"
@@ -60,16 +28,6 @@ rule trimmed:
         "python3 {trRosettaPath}/a3mToTrimmed.py {input} > {output}"
 
 
-
-
-rule mergedfasta:
-    input:
-        "dimer/{seq}.trimmed"
-    output:
-        "dimer/{seq}.fa"
-    shell:
-        "head -2 {input}>{output}"
-
 rule predict:
     input:
         "dimer/{seq}.trimmed"
@@ -78,126 +36,74 @@ rule predict:
     shell:
         "singularity run {bind}  {SingImage}  python3 {trRosettaPath}/network/predict.py -m  {trRosettaPath}/model2019_07  {input} {output}"
 
-
-# We hade to merge these rules to make it work.
-
-rule makepdbfile:
-    input:
-       PDB1="pdb/{seqA}.pdb",
-       PDB2="pdb/{seqB}.pdb",
-    output:
-       "pdb/{seqA}-{seqB}.pdb"
-    shell:
-       "python3 {trRosettaPath}joinchains.py  {input.PDB1}  {input.PDB2}  {output} "
-
-rule analyze:
-    input:
-       NPZ="distpred/{seq}.npz",
-       FA="dimer/{seq}.fa",
-       PDB="pdb/{seq}.pdb"
-    output:
-       ANALYZE="results/{seq}.analyze",
-       PNG="results/{seq}.png"
-    shell:
-       "python3 {trRosettaPath}analyze_npz.py -i {input.NPZ} -s {input.FA} -p {input.PDB} -o {output.PNG} > {output.ANALYZE}"
-
-rule analyze_contact:
-    input:
-       NPZ="distpred/{seqA}-{seqB}.npz",
-       STR1="pdb/{seqA}.pdb",
-       STR2="pdb/{seqB}.pdb"
-    output:
-       ANALYZE="results/{seqA}-{seqB}.auc",
-       #     PNG="results/{seqA}-{seqB}-pr-curve.png", # This sometimes crash therefore is is ignored
-    shell:
-       "python3 {trRosettaPath}contact_prcurve.py {input.NPZ} {input.STR1} {input.STR2} > {output.ANALYZE};"
-       "i=`basename  {input.STR1} .pdb | cut -c1-4`;"
-       "rm -f pr-curve_$i.png ;"
-       #       "if [ -s pr-curve_$i.png ] ; then  mv pr-curve_$i.png {output.PNG} ; fi "
-
-
-rule dockq:
-    input:
-       MOD="model/{seqA}-{seqB}.pdb",
-       STR="pdb/{seqA}-{seqB}.pdb",
-    output:
-       DOCKQ="modquality/{seqA}-{seqB}.dockq"
-    shell:
-       "python3 {dockq} -short {input.MOD} {input.STR} > {output.DOCKQ};"
-
-rule TM:
-    input:
-       MOD="model/{seqA}-{seqB}.pdb",
-       STR1="pdb/{seqA}.pdb",
-       STR2="pdb/{seqB}.pdb",
-    output:
-       TM="modquality/{seqA}-{seqB}.tm"
-    shell:
-       "grep ^ATOM {input.MOD} | grep \" A\" > {input.MOD}_A;"
-       "grep ^ATOM {input.MOD} | grep \" B\" > {input.MOD}_B;"
-       "TMalign {input.STR1} {input.MOD}_A  > {output.TM};"
-       "TMalign {input.STR2} {input.MOD}_B  >> {output.TM};"
-
-
-rule csv:
-    input:
-       SEQA="seq/{seqA}.fasta",
-       SEQB="seq/{seqB}.fasta",
-       MSAA="msa/{seqA}.sto",
-       MSAB="msa/{seqB}.sto",
-       TRIMMED="dimer/{seqA}-{seqB}.trimmed",
-       DOCKQ="modquality/{seqA}-{seqB}.dockq",
-       TM="modquality/{seqA}-{seqB}.tm",
-       ANALYZE="results/{seqA}-{seqB}.analyze",
-       AUC="results/{seqA}-{seqB}.auc",
-    output:
-       TM="csv/{seqA}-{seqB}.csv"
-    shell:
-       "name=`basename {input.TRIMMED} .trimmed`;"
-       "lenA=`grep -v \> {input.SEQA} | wc -c`;"
-       "lenB=`grep -v \> {input.SEQB} | wc -c`;"
-       "msa=`grep -v \> {input.TRIMMED} | wc -l`;"
-       "msaA=`grep -c =GS {input.MSAA} `;"
-       "msaB=`grep -c =GS {input.MSAB} `;"
-       "dockQ=`{gawk2} {input.DOCKQ}  `;"
-       "tmA=`grep -e ^TM-score {input.TM} | {gawk2} | head -1`;"
-       "tmB=`grep -e ^TM-score {input.TM} | {gawk2} | head -3 | tail -1`;"
-       "long=`grep NumLongContacts {input.ANALYZE} | sed 's/\]//g' | sed 's/\[//g' | {gawk8}`;"
-       "longPPV=`grep LongPPV {input.ANALYZE} | sed 's/\]//g' | sed 's/\[//g' | {gawk7}`;"
-       "longA=`grep NumLongContacts {input.ANALYZE} | sed 's/\]//g' | sed 's/\[//g' | {gawk6}`;"
-       "longPPVA=`grep LongPPV {input.ANALYZE}  | sed 's/\]//g' | sed 's/\[//g' | {gawk5}`;"
-       "longB=`grep NumLongContacts {input.ANALYZE} | sed 's/\]//g' | sed 's/\[//g' | {gawk7}`;"
-       "longPPVB=`grep LongPPV {input.ANALYZE} | sed 's/\]//g' | sed 's/\[//g' | {gawk6}`;"
-       "med=`grep NumMediumContacts {input.ANALYZE} | sed 's/\]//g' | sed 's/\[//g' | {gawk8}`;"
-       "medPPV=`grep MedPPV {input.ANALYZE} | sed 's/\]//g' | sed 's/\[//g' | {gawk7}`;"
-       "medA=`grep NumMediumContacts {input.ANALYZE} | sed 's/\]//g' | sed 's/\[//g' | {gawk6}`;"
-       "medPPVA=`grep MedPPV {input.ANALYZE} | sed 's/\]//g' | sed 's/\[//g' | {gawk5}`;"
-       "medB=`grep NumMediumContacts {input.ANALYZE} | sed 's/\]//g' | sed 's/\[//g' | {gawk7}`;"
-       "medPPVB=`grep MedPPV {input.ANALYZE} | sed 's/\]//g' | sed 's/\[//g' | {gawk6}`;"
-       "auc=`grep AUC {input.AUC} |  {gawk8}`;"
-       "echo name,lenA,lenB,msa,msaA,msaB,dockQ,tmA,tmB,long,med,longPPV,medPPV,longA,medA,longPPVA,medPPVA,longB,medB,longPPVB,medPPVB,auc > {output.TM};"
-       "echo $name,$lenA,$lenB,$msa,$msaA,$msaB,$dockQ,$tmA,$tmB,$long,$med,$longPPV,$medPPV,$longA,$medA,$longPPVA,$medPPVA,$longB,$medB,$longPPVB,$medPPVB,$auc >> {output.TM}"
-
-rule deletelinker:
-    input:
-       NPZ="distpred/{seqA}-{seqB}.npz",
-       FA="dimer/{seqA}-{seqB}.fa"
-    output:
-        "distpred/{seqA}-{seqB}_nosep.npz"
-    shell:
-        "python3 {trRosettaPath}/del_sepseq_npz.py  -i {input.NPZ} -s {input.FA} -o {output}"
-
-
-
 rule pyrosetta:
     input:
        NPZ="distpred/{seqA}-{seqB}_nosep.npz",
        A="seq/{seqA}.fasta",
        B="seq/{seqB}.fasta"
     output:
-        "model/{seqA}-{seqB}.pdb"
+        "pymodel/{seqA}-{seqB}.pdb"
     shell:
         "singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output}"
+
+rule pyrosettasingle:
+    input:
+       NPZ="distpred/{seqA}.npz",
+       A="seq/{seqA}.fasta",
+    output:
+        "single/{seqA}.pdb"
+    shell:
+        "singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta.py {input.NPZ} {input.A} {output}"
+
+
+rule pyrosettamulti:
+    input:
+       NPZ="distpred/{seqA}-{seqB}_nosep.npz",
+       A="seq/{seqA}.fasta",
+       B="seq/{seqB}.fasta"
+    output:
+        out01="pymodel/{seqA}-{seqB}_01.pdb",
+        out02="pymodel/{seqA}-{seqB}_02.pdb",
+        out03="pymodel/{seqA}-{seqB}_03.pdb",
+        out04="pymodel/{seqA}-{seqB}_04.pdb",
+        out05="pymodel/{seqA}-{seqB}_05.pdb",
+        #out06="pymodel/{seqA}-{seqB}_06.pdb",
+        #out07="pymodel/{seqA}-{seqB}_07.pdb",
+        #out08="pymodel/{seqA}-{seqB}_08.pdb",
+        #out09="pymodel/{seqA}-{seqB}_09.pdb",
+        #out10="pymodel/{seqA}-{seqB}_10.pdb",
+        #out11="pymodel/{seqA}-{seqB}_11.pdb",
+        #out12="pymodel/{seqA}-{seqB}_12.pdb",
+        #out13="pymodel/{seqA}-{seqB}_13.pdb",
+        #out14="pymodel/{seqA}-{seqB}_14.pdb",
+        #out15="pymodel/{seqA}-{seqB}_15.pdb",
+        #out16="pymodel/{seqA}-{seqB}_16.pdb",
+        #out17="pymodel/{seqA}-{seqB}_17.pdb",
+        #out18="pymodel/{seqA}-{seqB}_18.pdb",
+        #out19="pymodel/{seqA}-{seqB}_19.pdb",
+        #out20="pymodel/{seqA}-{seqB}_20.pdb"
+    shell:
+        "singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output.out01};"
+        "singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output.out02};"
+        "singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output.out03};"
+        "singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output.out04};"
+        "singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output.out05};"
+        #"singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output.out06};"
+        #"singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output.out07};"
+        #"singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output.out08};"
+        #"singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output.out09};"
+        #"singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output.out10};"
+        #"singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output.out11};"
+        #"singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output.out12};"
+        #"singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output.out13};"
+        #"singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output.out14};"
+        #"singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output.out15};"
+        #"singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output.out16};"
+        #"singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output.out17};"
+        #"singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output.out18};"
+        #"singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output.out19};"
+        #"singularity run  {bind} {SingImage} python3 {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output.out20};"
+
 
 
 rule pyrosetta_all:
@@ -206,29 +112,7 @@ rule pyrosetta_all:
        A="seq/{seqA}.fasta",
        B="seq/{seqB}.fasta"
     output:
-        "model/{seqA}-{seqB}-allintra4.pdb"
+         "pymodel-allintra/{seqA}-{seqB}.pdb"
     shell:
         "singularity run  {bind} {SingImage} python3  {trRosettaPath}/trRosetta-2chain.py {input.NPZ} {input.A} {input.B} {output} -allintra "
 
-rule pyconfold:
-    input:
-       NPZ="distpred/{seqA}-{seqB}_nosep.npz",
-       FA1="seq/{seqA}.fasta",
-       FA2="seq/{seqB}.fasta"
-    output:
-       RR="distpred/{seqA}-{seqB}_nosep.rr",
-       M1="confold/{seqA}-{seqB}_model1.pdb",
-       M2="confold/{seqA}-{seqB}_model2.pdb",
-       M3="confold/{seqA}-{seqB}_model3.pdb",
-       M4="confold/{seqA}-{seqB}_model4.pdb",
-       M5="confold/{seqA}-{seqB}_model5.pdb"
-    shell:
-       "python3 {trRosettaPath}/npz_to_rr.py {input.NPZ} {input.FA1} {input.FA2}  ;"
-       "export CNS_SOLVE={cns_solve} ;"
-       "python3 {trRosettaPath}/run_pycondock.py {input.FA1} {input.FA2} {output.RR} confold/{wildcards.seqA}/;"
-       "rm distpred/{wildcards.seqA}-{wildcards.seqB}_nosep.omega;"
-       "rm distpred/{wildcards.seqA}-{wildcards.seqB}_nosep.theta;"
-       "rm distpred/{wildcards.seqA}-{wildcards.seqB}_nosep.phi;" 
-       "mv confold/{wildcards.seqA}/*.pdb confold/;"
-       "rm confold/{wildcards.seqA} ;"
-       #"rm distpred/{wildcards.seqA}-{wildcards.seqB}_nosep.rr"
