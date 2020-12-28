@@ -83,7 +83,6 @@ if ns.sequence:
     #print (re.finditer(sepseq,str(seq.seq)))
     #print (ns.sequence)    
     #print (seq,seq.seq)    
-    ns.domain=[]
     if ns.firstsequence:
         with open(ns.firstsequence, "r") as fhandle:
             for record in SeqIO.parse(fhandle, "fasta"):
@@ -97,14 +96,23 @@ if ns.sequence:
         #sys.exit()
     else:
         maskedseq=str(seq.seq)
-    for m in re.finditer(sepseq,maskedseq):
+    if ns.domain: # This overrides sepseq
+        #print (ns.domain)
+        seplen=0
+        borders=[]
+        for i in ns.domain:
+            borders+=[int(i)-1]
+        ns.domain=[]
+        #sys.exit(0)
+    else:
+        ns.domain=[]
+        for m in re.finditer(sepseq,maskedseq):
         
-        borders+=[m.start()]
-        #print(m.start(), m.group())
-        for i in range(m.start(),m.start()+len(sepseq)):
-            ns.domain+=[i]
-
-    seplen=len(sepseq)
+            borders+=[m.start()]
+            #print(m.start(), m.group())
+            for i in range(m.start(),m.start()+len(sepseq)):
+                ns.domain+=[i]
+        seplen=len(sepseq)
 
 if (len(borders))==0: seplen=0
 
@@ -167,12 +175,13 @@ if ns.pdb:
         print ("PDB file is of different lengths")
         print (dimerlen, p_len,pdblen,seplen)
         #print ()
-        #sys.exit(1)
+        sys.exit(1)
         ns.pdb=False
     else:
         #seplen=0
         #borders+=[pdblen[0]]
-    
+        print ("PDB file is of same lengths")
+        print (dimerlen, p_len,pdblen,seplen,ns.sepseq)    
         pdbdist = np.zeros((dimerlen+seplen, dimerlen+seplen))
 
         #print (chains,pdblen)
