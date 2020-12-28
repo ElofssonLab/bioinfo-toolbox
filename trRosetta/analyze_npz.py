@@ -236,7 +236,15 @@ probcut=0.5
 # We only do this for two domains at the moment
 
 def get_area(i,j,cut):
-
+    # find this area
+    # (0-2 is for upper half, i.e. PDB file)
+    # (3-5) is for lower hald, i.e. predictions 
+    # 0: Intra-contacts for chain A (pdb)
+    # 1: Intra-contacts for chain B (pdb)
+    # 2: Inter-cintacts for PDB
+    # 3: Predicted intra contacts for chain A
+    # 4: Predicted intra contacts for chain B
+    # 5: Predicted inter contacts
     if i<j:
         if i<cut and j<cut : x= 0
         elif i<cut and j>cut : x= 2
