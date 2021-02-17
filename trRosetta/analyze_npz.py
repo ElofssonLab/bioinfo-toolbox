@@ -19,10 +19,12 @@ p.add_argument('-dom','--domain','-d', required= False, help='positions of domai
 p.add_argument('-seq','--sequence','-s', required= False, help='sequence file of complete sequence to identify domain borders')
 p.add_argument('-first','--firstsequence','-f', required= False, help='sequence file of first seuence to identify domain borders')
 p.add_argument("--sepseq","-sep","-S",required=False, help='Separation sequence between protein in MSA' ,default="GGGGGGGGGGGGGGGGGGGG")
+p.add_argument("--probcut","-prob","-P",required=False, help='Probability cutoff for plotting' ,default=0.5)
 p.add_argument('-out','--output','-o', required= False, help='output image')
 #parser.add_argument('--nargs', nargs='+')
 ns = p.parse_args()
 
+probcut=float(ns.probcut)
 input_file = np.load(ns.input)
 bin_step = 0.5
 bins = np.array([2.25+bin_step*i for i in range(36)])
@@ -148,8 +150,8 @@ if ns.inputB:
 for i in range(p_len-1):
     #for j in range(i+1):
     for j in range(p_len-1):
-        prob = dist[i, j, 0]
-        if prob > 0.5:
+        prob = np.sum(dist[i,j,5:], axis=-1) # dist[i, j, 0]
+        if prob < probcut:
             continue
         d_slice = dist[i, j, 1:]
         mean_dist = np.sum(np.multiply(bins, d_slice/np.sum(d_slice)))
@@ -241,7 +243,7 @@ skip=5
 short=5
 med=8
 long=12
-probcut=0.5
+
 # We only do this for two domains at the moment
 
 def get_area(i,j,cut):
@@ -307,10 +309,10 @@ if (ns.sequence):
                     # We have six groups, let's call them 0-5
                     x=get_area(i,j,borders[0])
                     #print (i,j)
-                    prob = dist[i, j, 0]
+                    prob = np.sum(dist[i,j,5:], axis=-1) # dist[i, j, 0]
                     average[x]+=1-prob
                     z[x]+=1
-                    if prob > probcut:  # Should we include all or only those with prob>probcut?
+                    if prob < probcut:  # Should we include all or only those with prob>probcut?
                         numprob[x]+=1
                     numdist[x]+=1
                     #d_slice = dist[i, j, 1:]
