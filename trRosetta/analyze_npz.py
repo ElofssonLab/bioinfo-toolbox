@@ -175,7 +175,7 @@ if ns.pdb:
     dimerlen=pdblen[0]+pdblen[1]
     if (dimerlen+seplen != p_len):
         print ("PDB file is of different lengths")
-        print (dimerlen, p_len,pdblen,seplen)
+        print (dimerlen, p_len,pdblen,seplen,sepseq)
         #print ()
         sys.exit(1)
         ns.pdb=False
