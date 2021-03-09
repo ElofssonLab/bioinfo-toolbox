@@ -45,7 +45,7 @@ def pdb_scan(pdb):
     prv = ''
     seq = ''
     for line in pdb:
-        if line.startswith('ATOM'):
+        if (line.startswith('ATOM') and (line.find('CA'))):
             if line[22:27].strip() != prv:
                 seq += three2one[line[17:20]]
                 prv = line[22:27].strip()
