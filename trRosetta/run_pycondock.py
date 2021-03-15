@@ -9,5 +9,5 @@ fa2_file = sys.argv[2]
 rr_file = sys.argv[3]
 out_folder = sys.argv[4]
 
-pyconsFold.model_dock(fa1_file,fa2_file, rr_file, out_folder,top_models=5)
+pyconsFold.model_dock(fa1_file,fa2_file, rr_file, out_folder,top_models=5,debug=True)
 
