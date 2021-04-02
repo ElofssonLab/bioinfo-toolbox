@@ -209,7 +209,7 @@ if __name__ == "__main__":
     for c in str2[0]: lchainid = c.get_id()
     rec_res = Selection.unfold_entities(str1, 'R')
     lig_res = Selection.unfold_entities(str2, 'R')
-    print (len(lig_res), len(rec_res))
+    #print (len(lig_res), len(rec_res))
 
     ##### ligand real interface CB/CA coordinates #####
     lcoordinates = []
@@ -287,7 +287,6 @@ if __name__ == "__main__":
         t = tf.expand_dims(t, axis=-1)                                          #
     #############################################################################
 
-    print ("TEST",lcoordinates,rcoordinates)
     
     ##### graph to roto-translate and score atom coordinates ####################
     with tf.Graph().as_default() as rt_comp:                                    #
