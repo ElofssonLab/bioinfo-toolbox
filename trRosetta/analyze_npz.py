@@ -2,6 +2,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
+import re
 import argparse
 from argparse import RawTextHelpFormatter
 from Bio.PDB import *
@@ -399,11 +400,12 @@ if type(ns.domain) is list:
         ax.plot(x,y,lw=3,c="b",alpha=0.2)
         ax.plot(y,x,lw=3,c="b",alpha=0.2)
     #ax.set(xlim=[0,500],ylim=[0,500])
-line=ns.input+" NumLongContacts: " + str(numlongcontacts[5])  + " LongPPV: "+str(np.round(longPPV[5],3))
+name=re.sub(r'\..*','',re.sub(r'.*\/','',ns.input))
+line=name+" Contacts: " + str(numlongcontacts[5])  + " PPV: "+str(np.round(longPPV[5],3))
 ax.set(title=line)
 fig.colorbar(cax)
 if ns.output:
-    fig.savefig(ns.output)
+    fig.savefig(ns.output,dpi=600)
 #plt.show()
 print ("AverageProb",ns.input,np.round(average,3))
 print ("Mindist",ns.input,np.round(mindist,3))
