@@ -12,8 +12,9 @@ apt install cuda -y --fix-missing
 apt install nvidia-cuda-toolkit -y
 apt install ipython3 -y
 /usr/bin/python3 -m pip install --upgrade pip
-pip install biopython 
-pip install miga --no-cache-dir --verbose
+pip3 install biopython 
+export CUDA_HOME=/usr/
+pip3 install miga --no-cache-dir --verbose
 
 
 # Comments
