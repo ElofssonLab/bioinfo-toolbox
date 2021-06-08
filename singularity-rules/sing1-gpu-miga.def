@@ -1,0 +1,22 @@
+Bootstrap: docker
+From: tensorflow/tensorflow:latest-gpu
+
+%post
+apt-get update
+#apt-get upgrade -y
+apt-get autoremove
+apt-get autoclean
+DEBIAN_FRONTEND=noninteractive apt-get install keyboard-configuration -y
+#DEBIAN_FRONTEND=noninteractive apt-get update keyboard-configuration 
+apt install cuda -y --fix-missing
+apt install nvidia-cuda-toolkit -y
+apt install ipython3 -y
+/usr/bin/python3 -m pip install --upgrade pip
+pip install biopython 
+pip install miga --no-cache-dir --verbose
+
+
+# Comments
+# THis is the command that worked for me as I run out of disk space on /tmp
+# sudo su -c "SINGULARITY_TMPDIR=/home/arnee/Downloads/tmp/  SINGULARITY_DISABLE_CACHE=true SINGULARITY_CACHE=/home/arnee/Downloads/tmp/ singularity build /home/arnee/singularity-images/trRosetta-gpu.simg sing1-gpu.def"
+
