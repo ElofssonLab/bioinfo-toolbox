@@ -23,7 +23,10 @@ p.add_argument("--sepseq","-sep","-S",required=False, help='Separation sequence 
 p.add_argument("--probcut","-prob","-P",required=False, help='Probability cutoff for plotting' ,default=0.5)
 p.add_argument('-out','--output','-o', required= False, help='output image')
 #parser.add_argument('--nargs', nargs='+')
+p.add_argument('-l','-lines','--lines', nargs='+', help='Lines to be drawn', required=False)
+
 ns = p.parse_args()
+
 
 probcut=float(ns.probcut)
 input_file = np.load(ns.input)
@@ -390,6 +393,16 @@ ax = fig.add_subplot(111)
 #ax2=ax.twin()
 cax = ax.matshow(res, cmap="hot")
 #print (res)
+
+if type(ns.lines) is list:
+    first=int(ns.lines[0])
+    last=int(ns.lines[-1])
+    for i in ns.lines:
+        x=[first,last]
+        y=[int(i),int(i)]
+        ax.plot(x,y,lw=2,c="g",alpha=0.8)
+        ax.plot(y,x,lw=2,c="g",alpha=0.8)
+    
 if type(ns.domain) is list:
     for cut in ns.domain:
         #x=[0,p_len-1,cut,cut]
