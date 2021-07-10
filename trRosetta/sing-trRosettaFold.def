@@ -3,9 +3,10 @@ From: tensorflow/tensorflow:latest
 
 
 %files
-PyRosetta4.Release.python36.ubuntu.release-288.tar.bz2 /home
+PyRosetta4.Release.python38.ubuntu.release-288.tar.bz2 /home
 folding-linux.yml
 RoseTTAFold-linux.yml
+RoseTTAFold-linux-cu101.yml
 
 %post
 apt-get update
@@ -15,6 +16,7 @@ apt-get autoclean
 DEBIAN_FRONTEND=noninteractive apt-get install keyboard-configuration -y
 #DEBIAN_FRONTEND=noninteractive apt-get update keyboard-configuration 
 apt install nvidia-cuda-toolkit -y --fix-missing
+apt install nvidia-utils-460 -y --fix-missing
 apt install ipython3 -y
 apt install wget
 apt install unzip
@@ -24,8 +26,8 @@ pip install biopython
 apt install -y libgl1-mesa-glx libegl1-mesa libxrandr2 libxrandr2 libxss1 libxcursor1 libxcomposite1 libasound2 libxi6 libxtst6
 apt install curl
 
-tar -vjxf /home/PyRosetta4.Release.python36.ubuntu.release-288.tar.bz2
-pip install -e PyRosetta4.Release.python36.ubuntu.release-288/setup/ 
+tar -vjxf /home/PyRosetta4.Release.python38.ubuntu.release-288.tar.bz2
+pip install -e PyRosetta4.Release.python38.ubuntu.release-288/setup/ 
 
 
 p=`pwd`
@@ -40,10 +42,11 @@ cd $p
 
 conda update -n base -c defaults conda
 
-conda env create python=3.6 -f RoseTTAFold-linux.yml
-conda env create python=3.6 -f folding-linux.yml
+#conda env create python=3.8 -f RoseTTAFold-linux-cu101.yml
+conda env create python=3.8 -f RoseTTAFold-linux.yml
+conda env create python=3.8 -f folding-linux.yml
 
-#conda install /home/PyRosetta4.Release.python36.ubuntu.release-288.tar.bz2 -n folding
+conda install /home/PyRosetta4.Release.python38.ubuntu.release-288.tar.bz2 -n folding
 
 
 # download lddt
