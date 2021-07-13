@@ -82,6 +82,11 @@ ls
 %runscript
     exec /opt/miniconda3/envs/$(head -n 1 RoseTTAFold-linux.yml | cut -f 2 -d ' ')/bin/"$@"
     exec /opt/miniconda3/envs/$(head -n 1 folding-linux.yml | cut -f 2 -d ' ')/bin/"$@"
+    if [ -f "/opt/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/opt/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/opt/miniconda3/bin:$PATH"
+    fi
     
     
 
