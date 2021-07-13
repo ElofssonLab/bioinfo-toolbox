@@ -3,6 +3,7 @@ From: tensorflow/tensorflow:latest
 
 
 %files
+PyRosetta4.Release.python36.ubuntu.release-288.tar.bz2 /home
 PyRosetta4.Release.python38.ubuntu.release-288.tar.bz2 /home
 folding-linux.yml
 RoseTTAFold-linux.yml
@@ -26,8 +27,8 @@ pip install biopython
 apt install -y libgl1-mesa-glx libegl1-mesa libxrandr2 libxrandr2 libxss1 libxcursor1 libxcomposite1 libasound2 libxi6 libxtst6
 apt install curl
 
-tar -vjxf /home/PyRosetta4.Release.python38.ubuntu.release-288.tar.bz2
-pip install -e PyRosetta4.Release.python38.ubuntu.release-288/setup/ 
+tar -vjxf /home/PyRosetta4.Release.python36.ubuntu.release-288.tar.bz2
+pip install -e PyRosetta4.Release.python36.ubuntu.release-288/setup/ 
 
 
 p=`pwd`
@@ -44,9 +45,13 @@ conda update -n base -c defaults conda
 
 #conda env create python=3.8 -f RoseTTAFold-linux-cu101.yml
 conda env create python=3.8 -f RoseTTAFold-linux.yml
-conda env create python=3.8 -f folding-linux.yml
+conda env create python=3.6 -f folding-linux.yml
 
-conda install /home/PyRosetta4.Release.python38.ubuntu.release-288.tar.bz2 -n folding
+. /opt/miniconda3/etc/profile.d/conda.sh
+#conda install /home/PyRosetta4.Release.python36.ubuntu.release-288.tar.bz2 -n folding
+conda activate folding
+pip install -e PyRosetta4.Release.python36.ubuntu.release-288/setup/ 
+conda deactivate 
 
 
 # download lddt
