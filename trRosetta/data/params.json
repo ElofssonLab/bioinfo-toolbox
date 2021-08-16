@@ -12,5 +12,8 @@
     "DCUT"  : 19.5,
     "ALPHA" : 1.57,
     "DSTEP" : 0.5,
-    "ASTEP" : 15.0
+    "ASTEP" : 15.0,
+    "BBWGHT" : 10.0,
+    "NRUNS"  : 3
+    
 }

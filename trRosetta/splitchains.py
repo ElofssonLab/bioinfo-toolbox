@@ -51,8 +51,10 @@ CHAIN="A"
 skiplen=200
 for model in structure:
     for chain in model:
+        print (chain)
         for residue in chain:
-            if residue.get_id()[1]-skiplen>lastres:
+            #print (residue)
+            if (residue.get_id()[1]-skiplen>lastres or chain.id!=CHAIN):
                 skip=residue.get_id()[1]-1-lastres
                 i=0
                 CHAIN="B"

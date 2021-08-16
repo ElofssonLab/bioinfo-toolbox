@@ -9,6 +9,7 @@ def get_args(params):
     parser.add_argument("OUT", type=str, help="output model (in PDB format)")
 
     
+    parser.add_argument('-r', type=int, dest='nrestarts', default=1, help='number of noisy restrarts')
     parser.add_argument('-minprob', type=float, dest='minprob', default=0.5, help='min probability of distance restraints for inter-chain flat harminic')
     parser.add_argument('-intradist', type=float, dest='intradist', default=15., help='The distance for the flat part in  restraints for inter-chain flat harmonic')
     parser.add_argument('-intrasd', type=float, dest='intrasd', default=20., help='SD for  restraints for inter-chain flat harminic')
@@ -27,6 +28,10 @@ def get_args(params):
     parser.add_argument('--no-orient', dest='use_orient', action='store_false')
     parser.add_argument('--fastrelax', dest='fastrelax', action='store_true', help='perform FastRelax')
     parser.add_argument('--no-fastrelax', dest='fastrelax', action='store_false')
+    parser.add_argument('--roll', dest='roll', action='store_true', help='circularly shift 6d coordinate arrays by 1')
+    parser.add_argument('--no-roll', dest='roll', action='store_false')
+    parser.add_argument('-bb', type=str, dest='bb', default='', help='predicted backbone torsions')
+    parser.add_argument('-sg', type=str, dest='sg', default='', help='window size and order for a Savitzky-Golay filter (comma-separated)')
     parser.set_defaults(use_orient=True)
     parser.set_defaults(fastrelax=True)
 
@@ -34,5 +39,11 @@ def get_args(params):
 
     params['PCUT'] = args.pcut
     params['USE_ORIENT'] = args.use_orient
+    params['NRUNS'] = args.nrestarts
+    params['ROLL'] = args.roll
+
+    params['NPZ'] = args.NPZ
+    params['BB'] = args.bb
+    params['SG'] = args.sg
 
     return args
