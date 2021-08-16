@@ -1,5 +1,5 @@
 
-This directory contain small scripts fotr differente projects
+This directory contain small scripts for different projects
 developed by Arne Elofsson. Not really organized perfectly.
 
 RNAfold:

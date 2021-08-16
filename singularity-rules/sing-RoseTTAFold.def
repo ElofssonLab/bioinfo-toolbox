@@ -1,0 +1,98 @@
+Bootstrap: docker
+From: tensorflow/tensorflow:latest
+
+
+%files
+PyRosetta4.Release.python36.ubuntu.release-288.tar.bz2 /home
+PyRosetta4.Release.python38.ubuntu.release-288.tar.bz2 /home
+folding-linux.yml
+RoseTTAFold-linux.yml
+RoseTTAFold-linux-cu101.yml
+
+%post
+apt-get update
+#apt-get upgrade -y
+apt-get autoremove
+apt-get autoclean
+DEBIAN_FRONTEND=noninteractive apt-get install keyboard-configuration -y
+#DEBIAN_FRONTEND=noninteractive apt-get update keyboard-configuration 
+apt install nvidia-cuda-toolkit -y --fix-missing
+apt install nvidia-utils-460 -y --fix-missing
+apt install ipython3 -y
+apt install wget
+apt install unzip
+apt install hhsuite -y
+apt install hmmer -y
+pip install biopython 
+apt install -y libgl1-mesa-glx libegl1-mesa libxrandr2 libxrandr2 libxss1 libxcursor1 libxcomposite1 libasound2 libxi6 libxtst6
+apt install curl
+
+tar -vjxf /home/PyRosetta4.Release.python36.ubuntu.release-288.tar.bz2
+pip install -e PyRosetta4.Release.python36.ubuntu.release-288/setup/ 
+
+
+p=`pwd`
+cd /tmp
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+chmod +x Miniconda3-latest-Linux-x86_64.sh
+bash ./Miniconda3-latest-Linux-x86_64.sh -b -p /opt/miniconda3 
+ln -s /opt/miniconda3/bin/conda /usr/bin/conda 
+rm /tmp/Miniconda3-latest-Linux-x86_64.sh
+chmod a+wr -R /opt/miniconda3/
+cd $p
+
+conda update -n base -c defaults conda
+
+#conda env create python=3.8 -f RoseTTAFold-linux-cu101.yml
+conda env create python=3.8 -f RoseTTAFold-linux.yml
+conda env create python=3.6 -f folding-linux.yml
+
+. /opt/miniconda3/etc/profile.d/conda.sh
+#conda install /home/PyRosetta4.Release.python36.ubuntu.release-288.tar.bz2 -n folding
+conda activate folding
+pip install -e PyRosetta4.Release.python36.ubuntu.release-288/setup/ 
+conda deactivate 
+
+
+# download lddt
+echo "downloading lddt . . ."
+mkdir -p /opt/lddt/
+cd /opt/
+wget https://openstructure.org/static/lddt-linux.zip -O lddt.zip
+unzip -d lddt -j lddt.zip
+rm lddt.zip
+ln -s /opt/lddt/* /usr/bin/
+cd $p
+
+# download cs-blast
+echo "downloading cs-blast . . ."
+mkdir -p /opt/csblast-2.2.3
+cd /opt/
+wget http://wwwuser.gwdg.de/~compbiol/data/csblast/releases/csblast-2.2.3_linux64.tar.gz -O csblast-2.2.3.tar.gz
+tar xf csblast-2.2.3.tar.gz -C csblast-2.2.3 --strip-components=1
+ln -s /opt/csblast-2.2.3/bin/* /usr/bin/
+rm csblast-2.2.3.tar.gz
+cd $p
+
+pwd
+ls
+
+
+
+%runscript
+    exec /opt/miniconda3/envs/$(head -n 1 RoseTTAFold-linux.yml | cut -f 2 -d ' ')/bin/"$@"
+    exec /opt/miniconda3/envs/$(head -n 1 folding-linux.yml | cut -f 2 -d ' ')/bin/"$@"
+    if [ -f "/opt/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/opt/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/opt/miniconda3/bin:$PATH"
+    fi
+    
+    
+
+
+
+# Comments
+# Tjis is the command that worked for me as I run out of disk space on /tmp
+# sudo su -c "SINGULARITY_TMPDIR=/home/arnee/Downloads/tmp/  SINGULARITY_DISABLE_CACHE=true SINGULARITY_CACHE=/home/arnee/Downloads/tmp/ singularity build /home/arnee/singularity-images/RosettaFold-gpu.simg sing-trRosettaFold.def"
+

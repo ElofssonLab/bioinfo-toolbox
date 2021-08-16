@@ -171,7 +171,7 @@ def gen_rst(npz, tmpdir, params):
     seq = params['seq']
 
     ########################################################
-    # repultion restraints
+    # repulsion restraints
     ########################################################
     #cbs = ['CA' if a=='G' else 'CB' for a in params['seq']]
     '''

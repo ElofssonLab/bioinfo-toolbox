@@ -2,6 +2,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
+import re
 import argparse
 from argparse import RawTextHelpFormatter
 from Bio.PDB import *
@@ -19,10 +20,15 @@ p.add_argument('-dom','--domain','-d', required= False, help='positions of domai
 p.add_argument('-seq','--sequence','-s', required= False, help='sequence file of complete sequence to identify domain borders')
 p.add_argument('-first','--firstsequence','-f', required= False, help='sequence file of first seuence to identify domain borders')
 p.add_argument("--sepseq","-sep","-S",required=False, help='Separation sequence between protein in MSA' ,default="GGGGGGGGGGGGGGGGGGGG")
+p.add_argument("--probcut","-prob","-P",required=False, help='Probability cutoff for plotting' ,default=0.5)
 p.add_argument('-out','--output','-o', required= False, help='output image')
 #parser.add_argument('--nargs', nargs='+')
+p.add_argument('-l','-lines','--lines', nargs='+', help='Lines to be drawn', required=False)
+
 ns = p.parse_args()
 
+
+probcut=float(ns.probcut)
 input_file = np.load(ns.input)
 bin_step = 0.5
 bins = np.array([2.25+bin_step*i for i in range(36)])
@@ -43,7 +49,7 @@ def pdb_scan(pdb):
     prv = ''
     seq = ''
     for line in pdb:
-        if line.startswith('ATOM'):
+        if (line.startswith('ATOM') and (line.find('CA'))):
             if line[22:27].strip() != prv:
                 seq += three2one[line[17:20]]
                 prv = line[22:27].strip()
@@ -83,7 +89,6 @@ if ns.sequence:
     #print (re.finditer(sepseq,str(seq.seq)))
     #print (ns.sequence)    
     #print (seq,seq.seq)    
-    ns.domain=[]
     if ns.firstsequence:
         with open(ns.firstsequence, "r") as fhandle:
             for record in SeqIO.parse(fhandle, "fasta"):
@@ -97,14 +102,23 @@ if ns.sequence:
         #sys.exit()
     else:
         maskedseq=str(seq.seq)
-    for m in re.finditer(sepseq,maskedseq):
+    if ns.domain: # This overrides sepseq
+        #print (ns.domain)
+        seplen=0
+        borders=[]
+        for i in ns.domain:
+            borders+=[int(i)-1]
+        ns.domain=[]
+        #sys.exit(0)
+    else:
+        ns.domain=[]
+        for m in re.finditer(sepseq,maskedseq):
         
-        borders+=[m.start()]
-        #print(m.start(), m.group())
-        for i in range(m.start(),m.start()+len(sepseq)):
-            ns.domain+=[i]
-
-    seplen=len(sepseq)
+            borders+=[m.start()]
+            #print(m.start(), m.group())
+            for i in range(m.start(),m.start()+len(sepseq)):
+                ns.domain+=[i]
+        seplen=len(sepseq)
 
 if (len(borders))==0: seplen=0
 
@@ -140,8 +154,8 @@ if ns.inputB:
 for i in range(p_len-1):
     #for j in range(i+1):
     for j in range(p_len-1):
-        prob = dist[i, j, 0]
-        if prob > 0.5:
+        prob = np.sum(dist[i,j,5:], axis=-1) # dist[i, j, 0]
+        if prob < probcut:
             continue
         d_slice = dist[i, j, 1:]
         mean_dist = np.sum(np.multiply(bins, d_slice/np.sum(d_slice)))
@@ -165,14 +179,15 @@ if ns.pdb:
     dimerlen=pdblen[0]+pdblen[1]
     if (dimerlen+seplen != p_len):
         print ("PDB file is of different lengths")
-        print (dimerlen, p_len,pdblen,seplen)
+        print (dimerlen, p_len,pdblen,seplen,sepseq)
         #print ()
-        #sys.exit(1)
+        sys.exit(1)
         ns.pdb=False
     else:
         #seplen=0
         #borders+=[pdblen[0]]
-    
+        print ("PDB file is of same lengths")
+        print (dimerlen, p_len,pdblen,seplen,ns.sepseq)    
         pdbdist = np.zeros((dimerlen+seplen, dimerlen+seplen))
 
         #print (chains,pdblen)
@@ -232,11 +247,19 @@ skip=5
 short=5
 med=8
 long=12
-probcut=0.5
+
 # We only do this for two domains at the moment
 
 def get_area(i,j,cut):
-
+    # find this area
+    # (0-2 is for upper half, i.e. PDB file)
+    # (3-5) is for lower hald, i.e. predictions 
+    # 0: Intra-contacts for chain A (pdb)
+    # 1: Intra-contacts for chain B (pdb)
+    # 2: Inter-cintacts for PDB
+    # 3: Predicted intra contacts for chain A
+    # 4: Predicted intra contacts for chain B
+    # 5: Predicted inter contacts
     if i<j:
         if i<cut and j<cut : x= 0
         elif i<cut and j>cut : x= 2
@@ -290,10 +313,10 @@ if (ns.sequence):
                     # We have six groups, let's call them 0-5
                     x=get_area(i,j,borders[0])
                     #print (i,j)
-                    prob = dist[i, j, 0]
+                    prob = np.sum(dist[i,j,5:], axis=-1) # dist[i, j, 0]
                     average[x]+=1-prob
                     z[x]+=1
-                    if prob > probcut:  # Should we include all or only those with prob>probcut?
+                    if prob < probcut:  # Should we include all or only those with prob>probcut?
                         numprob[x]+=1
                     numdist[x]+=1
                     #d_slice = dist[i, j, 1:]
@@ -370,6 +393,16 @@ ax = fig.add_subplot(111)
 #ax2=ax.twin()
 cax = ax.matshow(res, cmap="hot")
 #print (res)
+
+if type(ns.lines) is list:
+    first=int(ns.lines[0])
+    last=int(ns.lines[-1])
+    for i in ns.lines:
+        x=[first,last]
+        y=[int(i),int(i)]
+        ax.plot(x,y,lw=2,c="g",alpha=0.8)
+        ax.plot(y,x,lw=2,c="g",alpha=0.8)
+    
 if type(ns.domain) is list:
     for cut in ns.domain:
         #x=[0,p_len-1,cut,cut]
@@ -380,11 +413,12 @@ if type(ns.domain) is list:
         ax.plot(x,y,lw=3,c="b",alpha=0.2)
         ax.plot(y,x,lw=3,c="b",alpha=0.2)
     #ax.set(xlim=[0,500],ylim=[0,500])
-line=ns.input+" NumLongContacts: " + str(numlongcontacts[5])  + " LongPPV: "+str(np.round(longPPV[5],3))
+name=re.sub(r'\..*','',re.sub(r'.*\/','',ns.input))
+line=name+" Contacts: " + str(numlongcontacts[5])  + " PPV: "+str(np.round(longPPV[5],3))
 ax.set(title=line)
 fig.colorbar(cax)
 if ns.output:
-    fig.savefig(ns.output)
+    fig.savefig(ns.output,dpi=600)
 #plt.show()
 print ("AverageProb",ns.input,np.round(average,3))
 print ("Mindist",ns.input,np.round(mindist,3))
