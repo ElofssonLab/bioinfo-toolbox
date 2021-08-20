@@ -17,7 +17,7 @@ apt-get autoclean
 DEBIAN_FRONTEND=noninteractive apt-get install keyboard-configuration -y
 #DEBIAN_FRONTEND=noninteractive apt-get update keyboard-configuration 
 apt install nvidia-cuda-toolkit -y --fix-missing
-apt install nvidia-utils-460 -y --fix-missing
+apt install nvidia-utils-470 -y --fix-missing
 apt install ipython3 -y
 apt install wget
 apt install unzip

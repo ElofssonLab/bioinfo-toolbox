@@ -21,6 +21,7 @@ p.add_argument('-fileA','--inputA','-i', required= True, help='Input File A')
 p.add_argument('-fileB','--inputB','-j', required= True, help='Input file B')
 #p.add_argument('-dom','--domain','-d', required= False, help='positions of domain borders', nargs='+')
 p.add_argument('-seq','--sepseq','-s', required= False, help='sequence file to identify domain baorders (20 Gly)',default="GGGGGGGGGGGGGGGGGGGG")
+p.add_argument('-nosep','--nosep','-N', required= False, help='No separation between sequences',action="store_true")
 p.add_argument('--genus','-g', required= False, help='Use only genus names', action='store_true')
 p.add_argument('--host','-l', required= False, help='use host to match fileB', action='store_true')
 p.add_argument('--skipped','-S', required= False, help='file to print skipped files (endings will be added)')
@@ -37,6 +38,8 @@ ns = p.parse_args()
 
 sepseq=ns.sepseq
 
+if ns.nosep:
+   sepseq=''
 fileA=ns.inputA
 fileB=ns.inputB
 
