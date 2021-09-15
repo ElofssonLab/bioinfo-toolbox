@@ -52,16 +52,15 @@ skiplen=200
 resid=0
 for model in structure:
     for chain in model:
-        print (chain)
+        #print (chain)
         for residue in chain:
             resid+=1
-            #print (residue)
-            if (residue.get_id()[1]-skiplen>lastres or chain.id!=CHAIN):
+            #print (residue,residue.get_id()[1],skiplen,lastres,chain.id,CHAIN)
+            if (residue.get_id()[1]-skiplen>lastres or chain.id!="A"):
                 skip=residue.get_id()[1]-1-lastres
                 i=0
-                if (CHAIN=="A"):
-                    print ("TER")
-                    skiplen+=20000
+                print ("TER")
+                skiplen+=20000
                 CHAIN="B"
                 resid=1
             for atom in residue:
