@@ -49,17 +49,21 @@ lastres=0
 skip=0
 CHAIN="A"
 skiplen=200
+resid=0
 for model in structure:
     for chain in model:
         print (chain)
         for residue in chain:
+            resid+=1
             #print (residue)
             if (residue.get_id()[1]-skiplen>lastres or chain.id!=CHAIN):
                 skip=residue.get_id()[1]-1-lastres
                 i=0
                 if (CHAIN=="A"):
                     print ("TER")
+                    skiplen+=20000
                 CHAIN="B"
+                resid=1
             for atom in residue:
                 i+=1
                 print("{:6s}{:5d}  {:4s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}".format("ATOM",i,atom.id,residue.get_resname(),CHAIN,residue.get_id()[1]-skip,"",atom.get_coord()[0],atom.get_coord()[1],atom.get_coord()[2],atom.get_bfactor(),0.))
