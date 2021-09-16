@@ -11,5 +11,5 @@ do
     for j in $@
     do
 	python3 ~/git/DockQ/DockQ-mod.py -short $i $j
-    done | gawk '{if ($2<1) {i+=1;s+=$2}}END{ if (i>0){print i,s,s/i}else{print 0,0,0}}' > ${dir}/${name}.pcd
+    done | gawk '{if ($2<=1) {i+=1;s+=$2}}END{ if (i>0){print i,s,s/i}else{print 0,0,0}}' > ${dir}/${name}.pcd
 done
