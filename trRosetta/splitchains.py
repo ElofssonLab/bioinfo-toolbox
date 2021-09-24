@@ -57,7 +57,7 @@ for model in structure:
             resid+=1
             #print (residue,residue.get_id()[1],skiplen,lastres,chain.id,CHAIN)
             if (residue.get_id()[1]-skiplen>lastres or chain.id!="A"):
-                skip=residue.get_id()[1]-1-lastres
+                skip=residue.get_id()[1]-1 # -lastres
                 i=0
                 print ("TER")
                 skiplen+=20000
