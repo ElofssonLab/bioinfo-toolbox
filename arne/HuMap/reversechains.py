@@ -26,7 +26,7 @@ parser = PDBParser(PERMISSIVE=1)
 name1=sys.argv[1]
 #name2=sys.argv[2]
 outname=re.sub(".pdb","_reorder.pdb",name1)
-outname1=re.sub(".pdb","_matching.pdb",name1)
+#outname1=re.sub(".pdb","_matching.pdb",name1)
 #outname2=re.sub(".pdb","_matching.pdb",name2)
 structure1 = parser.get_structure("protein1", name1)
 #structure2 = parser.get_structure("protein2", name2)
@@ -44,7 +44,7 @@ for pp in ppb.build_peptides(structure1):
     
 
 #
-chains = list(structure1.get_chains())
+#chains = list(structure1.get_chains())
 #print (chains)
 newstruct=structure1.copy()
 chains = list(newstruct.get_chains())
@@ -56,8 +56,13 @@ for c in chains:
 #print (chains)
 newstruct.id=0
 newstruct.serial_num=0
+id1=chains[0].id
+id2=chains[1].id
+chains[1].id=id1
+chains[0].id=id2
 newstruct[0].add(chains[1])
 newstruct[0].add(chains[0])
+
 chains = list(newstruct.get_chains())
 print (chains)
 # Add it onto structure1

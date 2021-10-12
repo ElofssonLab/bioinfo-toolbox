@@ -11,10 +11,17 @@ done | sed "s/ //g"  > DockQ.csv
 
 for i in pdb/*/*DockQ.reorder
 do
-    j=`basename $i .DockQ`
+    j=`basename $i .DockQ.reorder`
     echo -n $j ","
     gawk '{print $2}' $i
 done | sed "s/ //g"  > DockQreorder.csv
+
+for i in pdb/*/*DockQall2
+do
+    j=`basename $i .DockQall2`
+    echo -n $j ","
+    gawk '{print $2}' $i
+done | sed "s/ //g"  > DockQall.csv
 
 
 # A few MM files crashed (as they are only CA)
@@ -58,8 +65,19 @@ do
     gawk '{if ($1=="IF_NumRes:") {N=$2}  
     	 else if ($1=="IF_pLDDT") {I=$2}   
     	 else if ($1=="pLDDT") {p=$2}   
-    	 else if ($1=="if_plddt_sum") {s=$2}   
     	 else if ($1=="Summary:") {print N ","  I ","  p ","  s  }}'    $k/$j.pLDDT 
 done |sed "s/ //g" > pLDDT.csv
+
+for i in negatome-pLDDT/*
+do
+    j=`basename $i .pLDDT`
+    echo -n $j ","
+    #gawk '{if ($1=="IF_NumRes:") {N=$2}  else if ($1=="IF_pLDDT") {I=$2}   else {print N ","  I "," $2}}' $k/$j.pLDDT
+    #grep Summary: $k/$j.pLDDT | sed "s/\[//g" | sed "s/\]//g" | sed "s/Summary://g"
+    gawk '{if ($1=="IF_NumRes:") {N=$2}  
+    	 else if ($1=="IF_pLDDT") {I=$2}   
+    	 else if ($1=="pLDDT") {p=$2}   
+    	 else if ($1=="Summary:") {print N ","  I ","  p ","  s  }}'    $i
+done |sed "s/ //g" > negatome-pLDDT.csv
 
 bin/mergecsv.py
