@@ -2,8 +2,8 @@
 
 
 # We actually need to renumber residues first
-A=/tmp/temp1.pdb.$$
-B=/tmp/temp2.pdb.$$
+#A=/tmp/temp1.pdb.$$
+#B=/tmp/temp2.pdb.$$
 
 #pdb_reres $1 > $A 
 #pdb_reres $2 > $B

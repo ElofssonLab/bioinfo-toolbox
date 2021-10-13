@@ -18,5 +18,5 @@ then
     done
 
     # Find Max
-    grep -H TM-score= pdb/$1/$1_*.MMall | sort -nk 2 | tail -1 |  sed "s/.*\///g" | sed "s/.MMall:/ /g" | sed "s/\_/ /g" > pdb/$1/$1.MMall2
+    grep -H TM-score= pdb/$1/${name}*.MM* | sort -nk 2 | tail -1 |  sed "s/.*\///g" | sed "s/.MM.*:/ /g" | sed "s/\_/ /g" > pdb/$1/$1.MMall2
 fi

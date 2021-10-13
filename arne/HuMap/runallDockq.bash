@@ -15,40 +15,46 @@ do
 	pdb_reres pdb/${i}/${i}_reorder_matching.pdb >pdb/${i}/${i}_reorder_matching_renum.pdb
 	#pdb_reres $2 > $B
 	#
-	if [ -f pdb/${i}/${i}.MMall2 ]
+	if [ -f pdb/${i}/${i}*.MMall2 ]
 	then
-	    pdb=`gawk '{print $2}' pdb/${i}/${i}.MMall2 `
-	    chain=`gawk '{print $3}' pdb/${i}/${i}.MMall2 `
-	    if [ -f cif/${pdb}_{$chain}.pdb ]
-	    then
-		cp cif/${pdb}_{$chain}.pdb pdb/${i}/${i}_mmall2.pdb
-	    fi
+	    for p in pdb/${i}/${i}*.MMall2
+	    do
+		pdb=`gawk '{print $2}' $p `
+		chain=`gawk '{print $3}' $p `
+		if [ -f cif/${pdb}_${chain}_rechain.pdb ]
+		then
+		    cp cif/${pdb}_${chain}_rechain.pdb pdb/${i}/${m}_mmall.pdb 
+		fi
+	    done
 	fi
-	if [ -f cif/${l}_{$l}{$n}.pdb ]
+	if [ -f cif/${k}_${l}${n}_rechain.pdb ]
 	then
-	    cp cif/${l}_{$l}{$n}.pdb pdb/${i}/${i}_pdborg.pdb
+	    cp cif/${k}_${l}${n}_rechain.pdb pdb/${i}/${m}_pdborg.pdb
 	fi
 	
 	for a in pdb/${i}/${i}*.pdb
 	do
-	    for b in  pdb/${i}/${m}.pdb
+	    for b in  pdb/${i}/${m}*.pdb
 	    do
 		A=`basename $a`
 		B=`basename $b`
 		python3 ~/git/DockQ/DockQ-mod.py -short -useCA  $a $b > pdb/${i}/${A}-${B}.DockQall
 	    done
 	done
+	python3 ~/git/DockQ/DockQ-mod.py -short -useCA pdb/${i}/${i}.pdb pdb/${i}/${m}.pdb > pdb/${i}/${i}.DockQ 
+	python3 ~/git/DockQ/DockQ-mod.py -short -useCA pdb/${i}/${i}_reorder.pdb pdb/${i}/${m}.pdb > pdb/${i}/${i}.DockQ.reorder
+	cp pdb/${i}/${i}.DockQ pdb/${i}/${i}-${m}.DockQall
+	cp pdb/${i}/${i}.DockQ.reorder pdb/${i}/${i}-${m}_reorder.DockQall
 	grep -H DockQ pdb/${i}/${i}*.DockQall pdb/${i}/${i}.DockQ pdb/${i}/${i}.DockQ.reorder | sort -nk2 |tail -1 >  pdb/${i}/${i}.DockQall2
 	
     
     
 	# Original and different chain order
-	python3 ~/git/DockQ/DockQ-mod.py -short -useCA pdb/${i}/${i}.pdb pdb/${i}/${m}.pdb > pdb/${i}/${i}.DockQ 
-	python3 ~/git/DockQ/DockQ-mod.py -short -useCA pdb/${i}/${i}_reorder.pdb pdb/${i}/${m}.pdb > pdb/${i}/${i}.DockQ.reorder 
+	
 
 	~/git/bioinfo-toolbox/trRosetta/MMalign pdb/${i}/${i}.pdb pdb/${i}/${m}.pdb > pdb/${i}/${i}.MM
 	~/git/bioinfo-toolbox/trRosetta/MMalign pdb/${i}/${i}_reorder.pdb pdb/${i}/${m}.pdb > pdb/${i}/${i}.MM.reorder
     fi
     
-done < map_petras.tsv
+done <  map_petras.tsv
 

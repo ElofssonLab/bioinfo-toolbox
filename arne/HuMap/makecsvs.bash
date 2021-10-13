@@ -1,6 +1,10 @@
 #!/bin/bash -x
 
 find ./pdb/ -size 0 -exec rm {} \;
+for i in `find pdb/ -name "*DockQ" -exec grep -Hc already {} \; | grep -v :0 |sed s/:.*//g`
+do
+    rm $i
+done
 
 for i in pdb/*/*DockQ
 do
@@ -8,6 +12,11 @@ do
     echo -n $j ","
     gawk '{print $2}' $i
 done | sed "s/ //g"  > DockQ.csv
+
+for i in `find pdb/ -name "*DockQ.reorder" -exec grep -Hc already {} \; | grep -v :0 |sed s/:.*//g`
+do
+    rm $i
+done
 
 for i in pdb/*/*DockQ.reorder
 do
@@ -46,16 +55,25 @@ find pdb/ -name "*.MMall" -size 1 -exec rm {} \;
 find pdb/ -name "*.MMall2" -size 0 -exec rm {} \;
 for i in pdb/*/*MMall2
 do
-    #j=`basename $i .MMall | sed s/\-[0-9][A-Za-z0-9][A-Za-z0-9][A-Za-z0-9]//g`
     j=`basename $i .MMall2 `
-    a=`grep TM-score= $i | head -2 | sort -n -k 5 | tail -1 |gawk '{print $5}' `
-    b=`grep TM-score= pdb/$j/$j.MM | head -2 | sort -n -k 2 | tail -1 |gawk '{print $2}'`
+    a=`grep TM-score= $i | sed "s/.*= //g" | sed "s/\ .*//g" | sort -n | tail -1 `
+    b=`grep TM-score= pdb/$j/$j.MM* | head -2 | sort -n -k 2 | tail -1 |gawk '{print $2}'`
     echo -n $j ","
     echo $a $b | gawk '{ if($1>$2){print $1}else{print $2}}'
-    #grep TM-score= $i | head -2 | sort -n -k 5 | tail -1 |gawk '{print $2","$3","$4","$5}' 
-done  |sed "s/ //g" >  MMall.csv
+done  |sed "s/ //g" > MMall.csv
 
-for i in pdb/*/unrelaxed_model_1.pdb
+#for i in pdb/*/*MMall2
+#do
+#    #j=`basename $i .MMall | sed s/\-[0-9][A-Za-z0-9][A-Za-z0-9][A-Za-z0-9]//g`
+#    j=`basename $i .MMall2 `
+#    a=`grep TM-score= $i | head -2 | sort -n -k 5 | tail -1 |sed "s/.*= //g" | sed "s/ .*//g' `
+#    b=`grep TM-score= pdb/$j/$j.MM* | head -2 | sort -n -k 2 | tail -1 |gawk '{print $2}'`
+#    echo -n $j ","
+#    echo $a $b | gawk '{ if($1>$2){print $1}else{print $3}}'
+#    #grep TM-score= $i | head -2 | sort -n -k 5 | tail -1 |gawk '{print $2","$3","$4","$5}' 
+#done  |sed "s/ //g" >  MMall.csv
+
+for i in pdb/*/*.pLDDT
 do
     k=`dirname $i`
     j=`basename $k`
@@ -65,9 +83,10 @@ do
     gawk '{if ($1=="IF_NumRes:") {N=$2}  
     	 else if ($1=="IF_pLDDT") {I=$2}   
     	 else if ($1=="pLDDT") {p=$2}   
-    	 else if ($1=="Summary:") {print N ","  I ","  p ","  s  }}'    $k/$j.pLDDT 
+    	 else if ($1=="Summary:") {print N ","  I ","  p  }}'    $k/$j.pLDDT 
 done |sed "s/ //g" > pLDDT.csv
 
+echo "Name,NumRes,IF_plDDT,plDDT" > negatome-pLDDT.csv
 for i in negatome-pLDDT/*
 do
     j=`basename $i .pLDDT`
@@ -77,7 +96,7 @@ do
     gawk '{if ($1=="IF_NumRes:") {N=$2}  
     	 else if ($1=="IF_pLDDT") {I=$2}   
     	 else if ($1=="pLDDT") {p=$2}   
-    	 else if ($1=="Summary:") {print N ","  I ","  p ","  s  }}'    $i
-done |sed "s/ //g" > negatome-pLDDT.csv
+    	 else if ($1=="Summary:") {print N ","  I ","  p }}'    $i
+done |sed "s/ //g" >> negatome-pLDDT.csv
 
 bin/mergecsv.py
