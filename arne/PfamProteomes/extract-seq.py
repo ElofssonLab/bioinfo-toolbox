@@ -36,7 +36,7 @@ for record in SeqIO.parse(handle, type ) :
 #   record.id=str(record.name)
    # Look at all features for this record
    #   for feature in record.features:
-   OutFile = open(dir + "/" + name +  '.fa', 'w')
+   OutFile = open(dir + "/" + name +  '.fasta', 'w')
 #   print ("FILE: " + name + "\n")
    SeqIO.write(record, OutFile, "fasta")
    if record.features:
