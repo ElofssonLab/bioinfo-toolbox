@@ -16,7 +16,7 @@ dir=sys.argv[2]
 #subdir=
 
 # Open GenBank file
-handle = open(file, 'rU')
+handle = open(file, 'r')
 
 type='fasta'
 if re.search(".gb$",file):
