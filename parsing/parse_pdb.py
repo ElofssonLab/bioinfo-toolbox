@@ -493,7 +493,7 @@ def get_first_chain(pdbfile):
 def get_all_chains(pdbfile):
     chains=[]
     lastchain='*'
-    for line in pdbfile:
+    for line in open(pdbfile, 'r'):
         if not line.startswith('ATOM'):
             continue
         atm_record = parse_atm_record(line)
@@ -501,7 +501,7 @@ def get_all_chains(pdbfile):
             chains.append(atm_record['chain'])
             lastchain=atm_record['chain']
     return chains
-
+    
 
 def get_acc(pdbfile):
 

@@ -19,15 +19,22 @@ from parsing import parse_fasta
 from parsing import parse_pdb
 
 
-def realign(fasta_filename, pdb_filename, outfilename='',chain='*'):
-    
+def realign(native_filename, pdb_filename,chain,nativechains, outfilename=''):
+    maxscore=0
     ### get sequence
-    seq = list(parse_fasta.read_fasta(open(fasta_filename, 'r')).values())[0][0]
-    ref_len = len(seq)
+    #seq = list(parse_fasta.read_fasta(open(fasta_filename, 'r')).values())[0][0]
     atom_seq = parse_pdb.get_atom_seq(open(pdb_filename, 'r'), chain)
     pdbfile=open(pdb_filename, 'r')
+    for c in nativechains:
+        seq=parse_pdb.get_atom_seq(open(native_filename, 'r'), c)
+        score=pairwise2.align.globalms(atom_seq, seq, 2, -1, -0.5, -0.1,score_only=True)
+        if (score> maxscore):
+            score=maxscore
+            NC=c
+
+    seq=parse_pdb.get_atom_seq(open(native_filename, 'r'), c)
+    ref_len = len(seq)
     align = pairwise2.align.globalms(atom_seq, seq, 2, -1, -0.5, -0.1)
-    #score=print (align)
     atom_seq_ali = align[-1][0]
     seq_ali = align[-1][1]
     #print (atom_seq_ali,seq_ali)
@@ -70,7 +77,7 @@ def realign(fasta_filename, pdb_filename, outfilename='',chain='*'):
 
     #pdbfile.close()
 
-    return 
+    return(NC)
   
     
 
@@ -79,15 +86,23 @@ def realign(fasta_filename, pdb_filename, outfilename='',chain='*'):
 if __name__ == "__main__":
 
     p = argparse.ArgumentParser(description='Plot protein residue contact maps.')
-    p.add_argument('fasta_file')#, required=True)
+    p.add_argument('native')#, required=True)
     p.add_argument('pdb')
     p.add_argument('-o', '--outfile', default='')
-    p.add_argument('-c', '--chain',default='*')
+    #p.add_argument('-c', '--chain',default='*')
+    #p.add_argument('-n', '--nativechain',default='*')
     args = vars(p.parse_args(sys.argv[1:]))
 
-    fasta_filename = args['fasta_file']
 
     
     #if len(open(args['pdb']).readline().split(' ')) != 3:
-    realign(args['fasta_file'],  args['pdb'],outfilename=args['outfile'],chain=args['chain'])
 
+    #print (args['pdb'],args['native'])
+    modelchains=parse_pdb.get_all_chains(args['pdb'])
+    nativechains=parse_pdb.get_all_chains(args['native'])
+
+    #print ("Chains",modelchains,nativechains)
+    for chain in modelchains:
+        #print ("TEST",chain)
+        NC=realign(args['native'],  args['pdb'],chain,nativechains,outfilename=args['outfile'])
+        nativechains.remove(NC)
