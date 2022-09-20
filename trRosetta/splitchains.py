@@ -9,14 +9,15 @@ from Bio.PDB.PDBIO import PDBIO
 
 
 if __name__ == "__main__":
-    arg_parser = argparse.\
-        ArgumentParser(
+    arg_parser = argparse.ArgumentParser(
                 description="Convert a pdb/mcif to trRosetta distances/angles")
 
     in_group = arg_parser.add_mutually_exclusive_group(required=True)
     in_group.add_argument("-p", "--pdb_file", type=argparse.FileType('r'))
     in_group.add_argument("-m", "--mmCIF_file", type=argparse.FileType('r'))
+    arg_parser.add_argument("-s","--skiplen",required=False,default=200,type=int,help="Skip length separating chains (default=200)")
     args=arg_parser.parse_args()
+
 
     if args.pdb_file:
         from Bio.PDB.PDBParser import PDBParser
@@ -30,6 +31,7 @@ if __name__ == "__main__":
         structure_id = args.mmCIF_file.name[:-4]
 
     # Load structure
+    print (structure_id,structure_file)
     structure = bio_parser.get_structure(structure_id, structure_file)
 
     # Get residues and length of protein
@@ -48,7 +50,8 @@ i=0
 lastres=0
 skip=0
 CHAIN="A"
-skiplen=200
+#skiplen=200
+skiplen=args.skiplen
 resid=0
 for model in structure:
     for chain in model:
