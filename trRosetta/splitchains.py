@@ -16,6 +16,7 @@ if __name__ == "__main__":
     in_group.add_argument("-p", "--pdb_file", type=argparse.FileType('r'))
     in_group.add_argument("-m", "--mmCIF_file", type=argparse.FileType('r'))
     arg_parser.add_argument("-s","--skiplen",required=False,default=200,type=int,help="Skip length separating chains (default=200)")
+    arg_parser.add_argument("-r","--reverse",required=False,action="store_true",help="Reverse the chain order")
     args=arg_parser.parse_args()
 
 
@@ -31,7 +32,7 @@ if __name__ == "__main__":
         structure_id = args.mmCIF_file.name[:-4]
 
     # Load structure
-    print (structure_id,structure_file)
+    #print (structure_id,structure_file)
     structure = bio_parser.get_structure(structure_id, structure_file)
 
     # Get residues and length of protein
@@ -49,7 +50,14 @@ if __name__ == "__main__":
 i=0
 lastres=0
 skip=0
-CHAIN="A"
+if args.reverse:
+    CHAIN="B"
+    firstchain=False
+    FIRSTCHAIN="B"
+else:
+    CHAIN="A"
+    FIRSTCHAIN="A"
+    firstchain=True
 #skiplen=200
 skiplen=args.skiplen
 resid=0
@@ -57,18 +65,51 @@ for model in structure:
     for chain in model:
         #print (chain)
         for residue in chain:
-            resid+=1
             #print (residue,residue.get_id()[1],skiplen,lastres,chain.id,CHAIN)
-            if (residue.get_id()[1]-skiplen>lastres or chain.id!="A"):
-                skip=residue.get_id()[1]-1 # -lastres
+            if (residue.get_id()[1]-skiplen>lastres or chain.id!=FIRSTCHAIN):
+                if (residue.get_id()[1]-skiplen>lastres):
+                    #print ("TER")
+                    skiplen+=20000
+                    firstchain=True
+                    #resid=1
+                    skip=residue.get_id()[1]-1 # -lastres
                 i=0
-                print ("TER")
-                skiplen+=20000
-                CHAIN="B"
-                resid=1
-            for atom in residue:
-                i+=1
-                print("{:6s}{:5d}  {:4s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}".format("ATOM",i,atom.id,residue.get_resname(),CHAIN,residue.get_id()[1]-skip,"",atom.get_coord()[0],atom.get_coord()[1],atom.get_coord()[2],1.,atom.get_bfactor()))
+                if args.reverse:
+                    CHAIN="A"
+                else:
+                    CHAIN="B"
+                
+            lastres=residue.get_id()[1]
+            if (firstchain):
+                resid+=1
+                for atom in residue:
+                    i+=1
+                    print("{:6s}{:5d}  {:4s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}".format("ATOM",i,atom.id,residue.get_resname(),CHAIN,residue.get_id()[1]-skip,"",atom.get_coord()[0],atom.get_coord()[1],atom.get_coord()[2],1.,atom.get_bfactor()))
+            #if (args.reverse):
+            #    lastres=0
+                
+
+print ("TER")
+                        
+if (args.reverse):
+    i=0
+    resid=0
+    CHAIN="B"
+    FIRSTCHAIN="A"
+    skip=0
+    skiplen=args.skiplen
+    for model in structure:
+        for chain in model:
+            #print (chain)
+            for residue in chain:
+                resid+=1
+                #print (residue,residue.get_id()[1],skiplen,lastres,chain.id,CHAIN)
+                if (chain.id!=FIRSTCHAIN or residue.get_id()[1]-skiplen>lastres):
+                    break
+                for atom in residue:
+                    i+=1
+                    print("{:6s}{:5d}  {:4s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}".format("ATOM",i,atom.id,residue.get_resname(),CHAIN,residue.get_id()[1]-skip,"",atom.get_coord()[0],atom.get_coord()[1],atom.get_coord()[2],1.,atom.get_bfactor()))
                 lastres=residue.get_id()[1]
+
 print ("TER")
 print ("END")

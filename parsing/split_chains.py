@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 import argparse
 import re
+import io
+
+def print_to_string(*args, **kwargs):
+    output = io.StringIO()
+    print(*args, file=output, **kwargs)
+    contents = output.getvalue()
+    output.close()
+    return contents
+
 #from Bio.PDB.vectors import rotaxis, calc_angle, calc_dihedral
 from Bio.PDB.PDBParser import PDBParser
 from Bio.PDB import Selection
@@ -12,7 +21,7 @@ d3to1 = {'CYS': 'C', 'ASP': 'D', 'SER': 'S', 'GLN': 'Q', 'LYS': 'K',
  'ILE': 'I', 'PRO': 'P', 'THR': 'T', 'PHE': 'F', 'ASN': 'N', 
  'GLY': 'G', 'HIS': 'H', 'LEU': 'L', 'ARG': 'R', 'TRP': 'W', 
  'ALA': 'A', 'VAL':'V', 'GLU': 'E', 'TYR': 'Y', 'MET': 'M'}
-polygly="GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG"
+
 
 if __name__ == "__main__":
     arg_parser = argparse.\
@@ -22,6 +31,8 @@ if __name__ == "__main__":
     in_group = arg_parser.add_mutually_exclusive_group(required=True)
     in_group.add_argument("-p", "--pdb_file", type=argparse.FileType('r'))
     in_group.add_argument("-m", "--mmCIF_file", type=argparse.FileType('r'))
+    arg_parser.add_argument("-r","--reverse",required=False,action="store_true",help="Reverse the chain order")
+    arg_parser.add_argument("-g","--gap",required=False,default="GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",type=str,help="sequence separating the two chains")
     args=arg_parser.parse_args()
 
     if args.pdb_file:
@@ -49,7 +60,7 @@ if __name__ == "__main__":
 #            resnum.append(residue1.get_resname())
 #    plen = len(residues)
 
-
+polygly=args.gap
 seq = ''
 for model in structure:
     for chain in model:
@@ -66,9 +77,16 @@ i=0
 lastres=len(seq1)
 lengly=len(polygly)
 skip=0
-CHAIN="A"
-skiplen=200
+if args.reverse:
+    CHAIN="B"
+    firstchain=False
+else:
+    CHAIN="A"
+    firstchain=True
+#skiplen=200
 resid=0
+
+
 for model in structure:
     for chain in model:
         #print (chain)
@@ -78,16 +96,44 @@ for model in structure:
             if (residue.get_id()[1]==lastres+1):
                 skip=residue.get_id()[1]-1+lengly # -lastres
                 i=0
-                print ("TER")
-                skiplen+=20000
-                CHAIN="B"
+                #skiplen+=20000
+                if args.reverse:
+                    CHAIN="A"
+                    firstchain=True
+                else:
+                    print ("TER")
+                    CHAIN="B"
                 resid=1
             elif (residue.get_id()[1]<=lastres+lengly and residue.get_id()[1]>lastres):
                 skip
             else:
-                for atom in residue:
-                    i+=1
-                    print("{:6s}{:5d}  {:4s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}".format("ATOM",i,atom.id,residue.get_resname(),CHAIN,residue.get_id()[1]-skip,"",atom.get_coord()[0],atom.get_coord()[1],atom.get_coord()[2],1.,atom.get_bfactor()))
+                if (firstchain):
+                    for atom in residue:
+                        i+=1
+                        print("{:6s}{:5d}  {:4s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}".format("ATOM",i,atom.id,residue.get_resname(),CHAIN,residue.get_id()[1]-skip,"",atom.get_coord()[0],atom.get_coord()[1],atom.get_coord()[2],1.,atom.get_bfactor()))
 
 print ("TER")
+if (args.reverse):
+    i=0
+    resid=0
+    CHAIN="B"
+    skip=0
+    for model in structure:
+        for chain in model:
+            #print (chain)
+            for residue in chain:
+                resid+=1
+                #print (residue,residue.get_id()[1],skiplen,lastres,chain.id,CHAIN)
+                if (residue.get_id()[1]==lastres+1):
+                    skip=residue.get_id()[1]-1+lengly # -lastres
+                    i=0
+                    print ("TER")
+                    #skiplen+=20000
+                    break
+                else:
+                    if (firstchain):
+                        for atom in residue:
+                            i+=1
+                            print("{:6s}{:5d}  {:4s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}".format("ATOM",i,atom.id,residue.get_resname(),CHAIN,residue.get_id()[1]-skip,"",atom.get_coord()[0],atom.get_coord()[1],atom.get_coord()[2],1.,atom.get_bfactor()))
+
 print ("END")
