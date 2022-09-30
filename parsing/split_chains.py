@@ -2,6 +2,7 @@
 import argparse
 import re
 import io
+import sys
 
 def print_to_string(*args, **kwargs):
     output = io.StringIO()
@@ -22,6 +23,10 @@ d3to1 = {'CYS': 'C', 'ASP': 'D', 'SER': 'S', 'GLN': 'Q', 'LYS': 'K',
  'GLY': 'G', 'HIS': 'H', 'LEU': 'L', 'ARG': 'R', 'TRP': 'W', 
  'ALA': 'A', 'VAL':'V', 'GLU': 'E', 'TYR': 'Y', 'MET': 'M'}
 
+
+chains=["A","B","C","D","E","F","G","H","I"]
+chainsrev=["B","A"]
+#chainsrev=chains.reverse()
 
 if __name__ == "__main__":
     arg_parser = argparse.\
@@ -60,57 +65,79 @@ if __name__ == "__main__":
 #            resnum.append(residue1.get_resname())
 #    plen = len(residues)
 
-polygly=args.gap
+polyinsert=args.gap
 seq = ''
 for model in structure:
     for chain in model:
         for residue in chain:
             seq+=d3to1[residue.resname]
 #print('>some_header\n',''.join(seq))
-#print(seq,polygly)
-#print(re.search(polygly, seq, re.IGNORECASE))
-seq1,seq2=seq.split(polygly)
-#print (seq1,seq2)
+#print(seq,polyinsert)
+#print(re.search(polyinsert, seq, re.IGNORECASE))
+#seq=[]
+sequence=seq.split(polyinsert)
+numchains=len(sequence)
+#print(seq,numchains)
+if (numchains == 1):
+    sys.exit()
+
+#print (seq[0],seq2)
 #sys.exit()
 
-i=0
-lastres=len(seq1)
-lengly=len(polygly)
-skip=0
-if args.reverse:
-    CHAIN="B"
+if args.reverse: # Only works for dimers
+    CHAIN=chainsrev[0]
     firstchain=False
 else:
-    CHAIN="A"
+    CHAIN=chains[0]
     firstchain=True
-#skiplen=200
+    #skiplen=200
 resid=0
 
 
+i=0
+c=1
+
+leninsert=len(polyinsert)
+skip=0
+
+last=0
+lastres=[-1*leninsert]
+#print (numchains,sequence)
+for i in range(1,numchains):
+    lastres.append(len(sequence[i])+last)
+    last=lastres[i]+leninsert
+    #print (i,lastres,last)
+lastres.append(len(seq))
+lastres.append(len(seq))
+#print (lastres)
 for model in structure:
     for chain in model:
         #print (chain)
         for residue in chain:
             resid+=1
-            #print (residue,residue.get_id()[1],skiplen,lastres,chain.id,CHAIN)
-            if (residue.get_id()[1]==lastres+1):
-                skip=residue.get_id()[1]-1+lengly # -lastres
+            #print (residue,residue.get_id()[1],lastres[c],leninsert,chain.id,CHAIN,skip)
+            if (residue.get_id()[1]==(lastres[c]+1)):
+                #print ("TEST1")
+                skip=residue.get_id()[1] # +leninsert # -lastres
                 i=0
                 #skiplen+=20000
                 if args.reverse:
-                    CHAIN="A"
+                    CHAIN=chainsrev[c]
                     firstchain=True
                 else:
                     print ("TER")
-                    CHAIN="B"
+                    CHAIN=chains[c]
                 resid=1
-            elif (residue.get_id()[1]<=lastres+lengly and residue.get_id()[1]>lastres):
-                skip
-            else:
+                c=c+1
+            elif (residue.get_id()[1]>=(lastres[c-1]+leninsert) and residue.get_id()[1]<lastres[c+1]):
+                #print ("TEST3")
                 if (firstchain):
                     for atom in residue:
                         i+=1
                         print("{:6s}{:5d}  {:4s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}".format("ATOM",i,atom.id,residue.get_resname(),CHAIN,residue.get_id()[1]-skip,"",atom.get_coord()[0],atom.get_coord()[1],atom.get_coord()[2],1.,atom.get_bfactor()))
+            else:
+                #print ("TEST2",c,residue.get_id()[1],lastres[c],leninsert,lastres[c-1])
+                skip
 
 print ("TER")
 if (args.reverse):
@@ -124,8 +151,8 @@ if (args.reverse):
             for residue in chain:
                 resid+=1
                 #print (residue,residue.get_id()[1],skiplen,lastres,chain.id,CHAIN)
-                if (residue.get_id()[1]==lastres+1):
-                    skip=residue.get_id()[1]-1+lengly # -lastres
+                if (residue.get_id()[1]==lastres[c]+1):
+                    skip=residue.get_id()[1]-1+leninsert # -lastres
                     i=0
                     print ("TER")
                     #skiplen+=20000

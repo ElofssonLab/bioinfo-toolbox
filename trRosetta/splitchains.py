@@ -7,6 +7,10 @@ from Bio.PDB.StructureBuilder import StructureBuilder
 from Bio.PDB import Selection
 from Bio.PDB.PDBIO import PDBIO
 
+chains=["A","B","C","D","E","F","G","H","I"]
+chainsrev=["B","A"]
+#chainsrev=chains.reverse()
+
 
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser(
@@ -46,7 +50,7 @@ if __name__ == "__main__":
 #            resnum.append(residue1.get_resname())
 #    plen = len(residues)
 
-
+c=0
 i=0
 lastres=0
 skip=0
@@ -55,7 +59,7 @@ if args.reverse:
     firstchain=False
     FIRSTCHAIN="B"
 else:
-    CHAIN="A"
+    CHAIN=chains[c]
     FIRSTCHAIN="A"
     firstchain=True
 #skiplen=200
@@ -66,18 +70,19 @@ for model in structure:
         #print (chain)
         for residue in chain:
             #print (residue,residue.get_id()[1],skiplen,lastres,chain.id,CHAIN)
-            if (residue.get_id()[1]-skiplen>lastres or chain.id!=FIRSTCHAIN):
+            if (residue.get_id()[1]-skiplen>lastres): # or chain.id!=CHAIN):
                 if (residue.get_id()[1]-skiplen>lastres):
-                    #print ("TER")
-                    skiplen+=20000
+                    print ("TER")
+                    #skiplen+=20000
                     firstchain=True
                     #resid=1
                     skip=residue.get_id()[1]-1 # -lastres
                 i=0
+                c+=1
                 if args.reverse:
                     CHAIN="A"
                 else:
-                    CHAIN="B"
+                    CHAIN=chains[c]
                 
             lastres=residue.get_id()[1]
             if (firstchain):
@@ -111,5 +116,5 @@ if (args.reverse):
                     print("{:6s}{:5d}  {:4s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}".format("ATOM",i,atom.id,residue.get_resname(),CHAIN,residue.get_id()[1]-skip,"",atom.get_coord()[0],atom.get_coord()[1],atom.get_coord()[2],1.,atom.get_bfactor()))
                 lastres=residue.get_id()[1]
 
-print ("TER")
+    print ("TER")
 print ("END")
