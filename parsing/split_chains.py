@@ -110,12 +110,15 @@ for i in range(1,numchains):
 lastres.append(len(seq))
 lastres.append(len(seq))
 #print (lastres)
+nonzero=0
 for model in structure:
     for chain in model:
         #print (chain)
         for residue in chain:
             resid+=1
             #print (residue,residue.get_id()[1],lastres[c],leninsert,chain.id,CHAIN,skip)
+            if residue.get_id()[1]==0:
+                nonzero=1
             if (residue.get_id()[1]==(lastres[c]+1)):
                 #print ("TEST1")
                 skip=residue.get_id()[1] # +leninsert # -lastres
@@ -134,7 +137,7 @@ for model in structure:
                 if (firstchain):
                     for atom in residue:
                         i+=1
-                        print("{:6s}{:5d}  {:4s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}".format("ATOM",i,atom.id,residue.get_resname(),CHAIN,residue.get_id()[1]-skip,"",atom.get_coord()[0],atom.get_coord()[1],atom.get_coord()[2],1.,atom.get_bfactor()))
+                        print("{:6s}{:5d}  {:4s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}".format("ATOM",i,atom.id,residue.get_resname(),CHAIN,residue.get_id()[1]-skip+nonzero,"",atom.get_coord()[0],atom.get_coord()[1],atom.get_coord()[2],1.,atom.get_bfactor()))
             else:
                 #print ("TEST2",c,residue.get_id()[1],lastres[c],leninsert,lastres[c-1])
                 skip

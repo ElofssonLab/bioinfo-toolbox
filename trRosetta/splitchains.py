@@ -65,14 +65,18 @@ else:
 #skiplen=200
 skiplen=args.skiplen
 resid=0
+nonzero=0
 for model in structure:
     for chain in model:
         #print (chain)
         for residue in chain:
+            if residue.get_id()[1]==0:
+                nonzero=1
             #print (residue,residue.get_id()[1],skiplen,lastres,chain.id,CHAIN)
             if (residue.get_id()[1]-skiplen>lastres): # or chain.id!=CHAIN):
                 if (residue.get_id()[1]-skiplen>lastres):
                     print ("TER")
+                    nonzero=0
                     #skiplen+=20000
                     firstchain=True
                     #resid=1
@@ -89,13 +93,13 @@ for model in structure:
                 resid+=1
                 for atom in residue:
                     i+=1
-                    print("{:6s}{:5d}  {:4s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}".format("ATOM",i,atom.id,residue.get_resname(),CHAIN,residue.get_id()[1]-skip,"",atom.get_coord()[0],atom.get_coord()[1],atom.get_coord()[2],1.,atom.get_bfactor()))
+                    print("{:6s}{:5d}  {:4s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}".format("ATOM",i,atom.id,residue.get_resname(),CHAIN,residue.get_id()[1]-skip+nonzero,"",atom.get_coord()[0],atom.get_coord()[1],atom.get_coord()[2],1.,atom.get_bfactor()))
             #if (args.reverse):
             #    lastres=0
                 
 
 print ("TER")
-                        
+nonzero=0                        
 if (args.reverse):
     i=0
     resid=0
@@ -107,13 +111,15 @@ if (args.reverse):
         for chain in model:
             #print (chain)
             for residue in chain:
+                if residue.get_id()[1]==0:
+                    nonzero=1
                 resid+=1
                 #print (residue,residue.get_id()[1],skiplen,lastres,chain.id,CHAIN)
                 if (chain.id!=FIRSTCHAIN or residue.get_id()[1]-skiplen>lastres):
                     break
                 for atom in residue:
                     i+=1
-                    print("{:6s}{:5d}  {:4s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}".format("ATOM",i,atom.id,residue.get_resname(),CHAIN,residue.get_id()[1]-skip,"",atom.get_coord()[0],atom.get_coord()[1],atom.get_coord()[2],1.,atom.get_bfactor()))
+                    print("{:6s}{:5d}  {:4s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}".format("ATOM",i,atom.id,residue.get_resname(),CHAIN,residue.get_id()[1]-skip+nonzero,"",atom.get_coord()[0],atom.get_coord()[1],atom.get_coord()[2],1.,atom.get_bfactor()))
                 lastres=residue.get_id()[1]
 
     print ("TER")
