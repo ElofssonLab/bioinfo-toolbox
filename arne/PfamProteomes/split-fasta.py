@@ -15,7 +15,7 @@ file=sys.argv[1]
 #subdir=
 
 # Open GenBank file
-handle = open(file, 'rU')
+handle = open(file, 'r')
 
 j=0
 cutoff=1
